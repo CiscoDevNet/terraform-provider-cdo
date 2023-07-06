@@ -8,7 +8,7 @@ import (
 	"flag"
 	"log"
 
-	"github.com/cisco-lockhart/cdo-tf-provider/internal/provider"
+	"github.com/cisco-lockhart/terraform-provider-cdo/internal/provider"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 )
 

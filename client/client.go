@@ -4,6 +4,7 @@ package client
 
 import (
 	"context"
+	"github.com/cisco-lockhart/go-client/device/ios"
 	"net/http"
 
 	"github.com/cisco-lockhart/go-client/device/asa"
@@ -47,6 +48,22 @@ func (c *Client) UpdateAsa(ctx context.Context, r asa.UpdateInput) (*asa.UpdateO
 
 func (c *Client) DeleteAsa(ctx context.Context, r asa.DeleteInput) (*asa.DeleteOutput, error) {
 	return asa.Delete(ctx, c.client, r)
+}
+
+func (c *Client) ReadIos(ctx context.Context, r ios.ReadInput) (*ios.ReadOutput, error) {
+	return ios.Read(ctx, c.client, r)
+}
+
+func (c *Client) CreateIos(ctx context.Context, r ios.CreateInput) (*ios.CreateOutput, error) {
+	return ios.Create(ctx, c.client, r)
+}
+
+func (c *Client) UpdateIos(ctx context.Context, r ios.UpdateInput) (*ios.UpdateOutput, error) {
+	return ios.Update(ctx, c.client, r)
+}
+
+func (c *Client) DeleteIos(ctx context.Context, r ios.DeleteInput) (*ios.DeleteOutput, error) {
+	return ios.Delete(ctx, c.client, r)
 }
 
 func (c *Client) ReadAsaConfig(ctx context.Context, r asaconfig.ReadInput) (*asaconfig.ReadOutput, error) {

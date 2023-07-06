@@ -5,6 +5,7 @@ package provider
 
 import (
 	"context"
+	"github.com/cisco-lockhart/terraform-provider-cdo/internal/device/ios"
 	"os"
 
 	cdoClient "github.com/cisco-lockhart/go-client"
@@ -128,6 +129,7 @@ func (p *CdoProvider) Resources(ctx context.Context) []func() resource.Resource 
 	return []func() resource.Resource{
 		NewExampleResource,
 		asa.NewAsaDeviceResource,
+		ios.NewIosDeviceResource,
 	}
 }
 

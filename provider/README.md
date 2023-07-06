@@ -62,3 +62,11 @@ In order to run the full suite of Acceptance tests, run `make testacc`.
 ```shell
 make testacc
 ```
+
+### Testing
+Terraform providers generally use acceptance tests to verify behaviours, so it will creates, destroy and update real infrastructure. This means that the tests will require to interact with CDO, so it needs some setups.
+To achieve this, a CDO CI account is created: **terraform-provider-cdo@lockhart.io**, things will be ran there.
+#### API Token
+In order to interact with CDO, a API token is generated using the above account, it is stored in the staging aws secret manager called **staging-terraform-provider-cdo-acceptance-test-api-token**. If you accidentally refresh a new token, please change it in the secret manager as well.
+
+When developing locally, you can overwrite this token using environment variable, see files in `provider/internal/acctest` for details.

@@ -1,23 +1,24 @@
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package provider
+package provider_test
 
 import (
 	"fmt"
 	"testing"
 
+	"github.com/cisco-lockhart/terraform-provider-cdo/internal/acctest"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
 func TestAccExampleResource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
-		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: providerConfig + testAccExampleResourceConfig("one"),
+				Config: acctest.ProviderConfig() + testAccExampleResourceConfig("one"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cdo_example.test", "configurable_attribute", "one"),
 					resource.TestCheckResourceAttr("cdo_example.test", "defaulted", "example value when not configured"),
@@ -37,7 +38,7 @@ func TestAccExampleResource(t *testing.T) {
 			},
 			// Update and Read testing
 			{
-				Config: providerConfig + testAccExampleResourceConfig("two"),
+				Config: acctest.ProviderConfig() + testAccExampleResourceConfig("two"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cdo_example.test", "configurable_attribute", "two"),
 				),

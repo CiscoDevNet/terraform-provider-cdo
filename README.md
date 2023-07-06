@@ -39,3 +39,57 @@ Then in the provider dir you can run the acceptances tests:
 cd ./provider
 ACC_TEST_CISCO_CDO_API_TOKEN=<CDO_API_TOKEN> make testacc
 ```
+
+### Running Examples
+Examples are provided so that you can do the usual `plan`, `apply`, `destroy` etc in the folders under `provider/examples` directory.
+#### Setup
+1. Build provider locally.
+   1. Figure out where your executable will be built.
+      ```bash
+      go env GOBIN
+      ```
+      **Note:** If empty output, it is default to `~/go/bin`
+   2. Build executable.
+      ```bash
+      cd provider
+      go install .
+      ```
+   3. Verify installation
+      The installation path that you figured out above should contains an executable called **terraform-provider-cdo**.
+2. Tell terraform to use your local build
+   1. Modify local terraform configuration
+      ```bash
+      vim ~/.terraformrc
+      ```
+   2. Copy the following into it:
+      ```terraform
+      provider_installation {
+   
+        dev_overrides {
+            "hashicorp.com/cisco-lockhart/cdo" = "<DIRECTORY_OF_YOUR_EXECUTABLE>"
+        }
+  
+        # For all other providers, install them directly from their origin provider
+        # registries as normal. If you omit this, Terraform will _only_ use
+        # the dev_overrides block, and so no other providers will be available.
+        direct {}
+      }
+      ```
+#### Running
+1. Navigate to a folder under `provider/examples`, e.g. `provider/examples/resources/asa`.
+2. Run
+   ```bash
+   terraform plan
+   ```
+3. Output (sample)
+   ```
+    |
+    │ Warning: Provider development overrides are in effect
+    │
+    │ The following provider development overrides are set in the CLI configuration:
+    │  - hashicorp.com/cisco-lockhart/cdo in /Users/weilluo/go/bin
+    │
+    │ The behavior may therefore not match any released version of the provider and applying changes may cause the state to become incompatible with published releases.
+    |
+    ... rest
+   ```

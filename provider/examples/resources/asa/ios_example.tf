@@ -11,9 +11,9 @@ provider "cdo" {
   api_token = "<FILL_ME>"
 }
 
-resource "cdo_asa_device" "my_asa" {
+resource "cdo_ios_device" "my_ios" {
   name     = "my_asa"
-  sdc_type = "CDG"
+  sdc_type = "SDC"
   ipv4     = "<FILL_ME>"
   username = "<FILL_ME>"
   password = "<FILL_ME>"

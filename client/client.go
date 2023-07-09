@@ -5,6 +5,7 @@ package client
 import (
 	"context"
 	"github.com/cisco-lockhart/go-client/device/ios"
+	"github.com/cisco-lockhart/go-client/device/ios/iosconfig"
 	"net/http"
 
 	"github.com/cisco-lockhart/go-client/device/asa"
@@ -70,6 +71,14 @@ func (c *Client) ReadAsaConfig(ctx context.Context, r asaconfig.ReadInput) (*asa
 	return asaconfig.Read(ctx, c.client, r)
 }
 
-func (c *Client) ReadSpecific(ctx context.Context, r asa.ReadSpecificInput) (*asa.ReadSpecificOutput, error) {
+func (c *Client) ReadSpecificAsa(ctx context.Context, r asa.ReadSpecificInput) (*asa.ReadSpecificOutput, error) {
 	return asa.ReadSpecific(ctx, c.client, r)
+}
+
+func (c *Client) ReadIosConfig(ctx context.Context, r iosconfig.ReadInput) (*iosconfig.ReadOutput, error) {
+	return iosconfig.Read(ctx, c.client, r)
+}
+
+func (c *Client) ReadSpecificIos(ctx context.Context, r ios.ReadSpecificInput) (*ios.ReadSpecificOutput, error) {
+	return ios.ReadSpecific(ctx, c.client, r)
 }

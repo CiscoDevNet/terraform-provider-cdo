@@ -37,14 +37,6 @@ func UpdateAsaConfig(baseUrl string, specificUid string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/asa/configs/%s", baseUrl, specificUid)
 }
 
-func ReadIosConfig(baseUrl string, specificUid string) string {
-	return fmt.Sprintf("%s/aegis/rest/v1/services/ios/ios/%s", baseUrl, specificUid)
-}
-
-func UpdateIosConfig(baseUrl string, specificUid string) string {
-	return fmt.Sprintf("%s/aegis/rest/v1/services/ios/ios/%s", baseUrl, specificUid)
-}
-
 func ReadSdc(baseUrl string, larUid string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/proxies/%s", baseUrl, larUid)
 }

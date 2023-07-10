@@ -35,7 +35,7 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 
 	client.Logger.Println("updating iosconfig")
 
-	url := url.UpdateIosConfig(client.BaseUrl(), updateInp.SpecificUid)
+	url := url.UpdateDevice(client.BaseUrl(), updateInp.SpecificUid)
 
 	creds, err := makeCredentials(updateInp)
 	if err != nil {
@@ -53,16 +53,18 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 	return &outp, nil
 }
 
-func makeReqBody(creds []byte) *updateBody {
-	return &updateBody{
-		State:       "CERT_VALIDATED", // question: should this be hardcoded?
+func makeReqBody(creds []byte) *UpdateBody {
+	return &UpdateBody{
 		Credentials: string(creds),
+		SmContext: SmContext{
+			AcceptCert: true,
+		},
 	}
 }
 
-type updateBody struct {
-	State       string `json:"state"`
-	Credentials string `json:"credentials"`
+type UpdateBody struct {
+	Credentials string    `json:"credentials"`
+	SmContext   SmContext `json:"stateMachineContext"`
 }
 
 type credentials struct {
@@ -71,7 +73,11 @@ type credentials struct {
 	KeyId    string `json:"keyId,omitempty"`
 }
 
-func encrypt(req UpdateInput) error {
+type SmContext struct {
+	AcceptCert bool `json:"acceptCert"`
+}
+
+func encrypt(req *UpdateInput) error {
 	ciper, err := rsa.NewCiper(req.PublicKey.EncodedKey)
 	if err != nil {
 		return err
@@ -92,7 +98,10 @@ func makeCredentials(updateInp UpdateInput) ([]byte, error) {
 	var creds []byte
 	var err error
 	if updateInp.PublicKey != nil {
-		encrypt(updateInp)
+		err = encrypt(&updateInp)
+		if err != nil {
+			return nil, err
+		}
 		creds, err = json.Marshal(credentials{
 			Username: updateInp.Username,
 			Password: updateInp.Password,

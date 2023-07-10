@@ -24,7 +24,7 @@ func NewReadInput(specificUid string) *ReadInput {
 
 func NewReadRequest(ctx context.Context, client http.Client, readReq ReadInput) *http.Request {
 
-	url := url.ReadIosConfig(client.BaseUrl(), readReq.SpecificUid)
+	url := url.ReadDevice(client.BaseUrl(), readReq.SpecificUid)
 
 	req := client.NewGet(ctx, url)
 

@@ -3,13 +3,12 @@ package ios
 import (
 	"context"
 	"fmt"
-	"github.com/cisco-lockhart/go-client/device/ios/iosconfig"
-	"strings"
-
 	"github.com/cisco-lockhart/go-client/device"
+	"github.com/cisco-lockhart/go-client/device/ios/iosconfig"
 	"github.com/cisco-lockhart/go-client/device/sdc"
 	"github.com/cisco-lockhart/go-client/internal/http"
 	"github.com/cisco-lockhart/go-client/internal/retry"
+	"strings"
 )
 
 type CreateInput struct {
@@ -60,38 +59,6 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		return nil, err
 	}
 
-	client.Logger.Println("reading specific device uid")
-
-	iosReadSpecOutp, err := device.ReadSpecific(ctx, client, *device.NewReadSpecificInput(
-		deviceCreateOutp.Uid,
-	))
-	if err != nil {
-		return nil, err
-	}
-
-	client.Logger.Println("waiting for ios config state done")
-
-	// poll until ios config state done
-	err = retry.Do(iosconfig.UntilStateDone(ctx, client, iosReadSpecOutp.SpecificUid), *retry.NewOptionsWithLogger(client.Logger))
-
-	// error during polling, but we maybe able to handle it
-	if err != nil {
-		// no idea what I am doing here, but that is what the cdo frontend ui is doing
-		if createInp.IgnoreCertifcate {
-			// update device with ignore certificate
-			client.Logger.Println("retrying with ignore certificate")
-			_, err := device.Update(ctx, client, device.UpdateInput{
-				Uid:              deviceCreateOutp.Uid,
-				IgnoreCertifcate: true,
-			})
-			if err != nil {
-				return nil, fmt.Errorf("error while updating config to ignore certificate, cause=%w", err)
-			}
-		} else {
-			return nil, err
-		}
-	}
-
 	// encrypt credentials for SDC on prem lar
 	var publicKey *sdc.PublicKey
 	if strings.EqualFold(deviceCreateOutp.LarType, "SDC") {
@@ -113,11 +80,16 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		publicKey = &larReadRes.PublicKey
 	}
 
+	err = retry.Do(iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, "$PRE_READ_METADATA"), *retry.NewOptionsWithLogger(client.Logger))
+	if err != nil {
+		return nil, err
+	}
+
 	// update ios config credentials
 	client.Logger.Println("updating ios config credentials")
 
 	iosConfigUpdateInp := iosconfig.NewUpdateInput(
-		iosReadSpecOutp.SpecificUid,
+		deviceCreateOutp.Uid,
 		createInp.Username,
 		createInp.Password,
 		publicKey,
@@ -130,7 +102,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	// poll until ios config state done
 	client.Logger.Println("waiting for device to reach state done")
 
-	err = retry.Do(iosconfig.UntilStateDone(ctx, client, iosReadSpecOutp.SpecificUid), *retry.NewOptionsWithLogger(client.Logger))
+	err = retry.Do(iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, "DONE"), *retry.NewOptionsWithLogger(client.Logger))
 	if err != nil {
 		return nil, err
 	}
@@ -145,8 +117,6 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		Ipv4:       deviceCreateOutp.Ipv4,
 		LarUid:     deviceCreateOutp.LarUid,
 		LarType:    deviceCreateOutp.LarType,
-
-		specificUid: iosReadSpecOutp.SpecificUid,
 	}
 	return &createOutp, nil
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/cisco-lockhart/go-client/internal/retry"
 )
 
-func UntilStateDone(ctx context.Context, client http.Client, specificUid string) retry.Func {
+func UntilState(ctx context.Context, client http.Client, specificUid string, state string) retry.Func {
 
 	// create ios config read request
 	readReq := NewReadRequest(ctx, client, *NewReadInput(
@@ -22,7 +22,7 @@ func UntilStateDone(ctx context.Context, client http.Client, specificUid string)
 		readReq.Send(&readOutp)
 
 		client.Logger.Printf("ios config state=%s\n", readOutp.State)
-		if strings.EqualFold(readOutp.State, "DONE") {
+		if strings.EqualFold(readOutp.State, state) {
 			return true, nil
 		}
 		if strings.EqualFold(readOutp.State, "ERROR") {

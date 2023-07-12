@@ -18,8 +18,8 @@ type Config struct {
 
 const (
 	DefaultRetries = 3
-	DefaultDelay   = 1 * time.Second
-	DefaultTimeout = 1 * time.Minute
+	DefaultDelay   = 3 * time.Second
+	DefaultTimeout = 3 * time.Minute
 )
 
 var (

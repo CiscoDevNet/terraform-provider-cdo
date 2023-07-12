@@ -11,8 +11,8 @@ import (
 const (
 	testDeviceName      = "test-ios-device-1"
 	testDeviceName2     = "test-ios-device-2"
-	testIpv4            = "10.10.6.53:22"
-	testHost            = "10.10.6.53"
+	testIpv4            = "10.10.0.198:22"
+	testHost            = "10.10.0.198"
 	testPort            = "22"
 	testSdcTypeSDC      = "SDC"
 	testSdcTypeCDG      = "CDG"
@@ -42,8 +42,6 @@ var accTestIosDeviceResourceConfig_CDG = fmt.Sprintf(iosResourceTemplate, testDe
 var accTestIosDeviceResourceConfig_CDG_NewName = fmt.Sprintf(iosResourceTemplate, testDeviceName2, testIpv4, testSdcTypeCDG, testUsername, testPassword, testDoNotIgnoreCert, testCdgUid)
 
 func TestAccIosDeviceResource_SDC(t *testing.T) {
-	t.Skip("requires SDC set up in CI")
-
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { acctest.PreCheck(t) },
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,

@@ -250,7 +250,7 @@ func (r *IosDeviceResource) Delete(ctx context.Context, req resource.DeleteReque
 	deleteInp := ios.NewDeleteInput(stateData.ID.ValueString())
 	_, err := r.client.DeleteIos(ctx, *deleteInp)
 	if err != nil {
-		res.Diagnostics.AddError("failed to delete ASA device", err.Error())
+		res.Diagnostics.AddError("failed to delete IOS device", err.Error())
 		return
 	}
 

@@ -5,6 +5,7 @@ package provider
 
 import (
 	"context"
+	"github.com/cisco-lockhart/terraform-provider-cdo/internal/connector/sdc"
 	"github.com/cisco-lockhart/terraform-provider-cdo/internal/device/ios"
 	"os"
 
@@ -17,7 +18,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/cisco-lockhart/terraform-provider-cdo/internal/device/asa"
-	"github.com/cisco-lockhart/terraform-provider-cdo/internal/device/sdc"
 )
 
 var _ provider.Provider = &CdoProvider{}

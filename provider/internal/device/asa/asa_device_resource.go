@@ -3,6 +3,8 @@ package asa
 import (
 	"context"
 	"fmt"
+	"github.com/cisco-lockhart/terraform-provider-cdo/validators"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"strconv"
 
 	cdoClient "github.com/cisco-lockhart/go-client"
@@ -64,8 +66,11 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				Computed:            true,
 			},
 			"sdc_type": schema.StringAttribute{
-				MarkdownDescription: "The type of SDC that will be used to communicate with the device",
+				MarkdownDescription: "The type of SDC that will be used to communicate with the device (Valid values: [CDG, SDC])",
 				Required:            true,
+				Validators: []validator.String{
+					validators.OneOf("CDG", "SDC"),
+				},
 			},
 			"ipv4": schema.StringAttribute{
 				MarkdownDescription: "The ipv4 address of the device",

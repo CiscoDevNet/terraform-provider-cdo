@@ -20,7 +20,7 @@ IOS Device resource
 - `ipv4` (String) The ipv4 address of the device
 - `name` (String) Name to assign the device
 - `password` (String, Sensitive) The password used to authenticate with the device
-- `sdc_type` (String) The type of SDC that will be used to communicate with the device, only "CDG" or "SDC"
+- `sdc_type` (String) The type of SDC that will be used to communicate with the device (Valid values: [CDG, SDC])
 - `username` (String) The username used to authenticate with the device
 
 ### Optional

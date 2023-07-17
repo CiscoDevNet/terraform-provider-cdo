@@ -33,8 +33,8 @@ func (v oneOfValidator) ValidateString(ctx context.Context, request validator.St
 
 	value := request.ConfigValue
 
-	for _, otherValue := range v.values {
-		if value.Equal(otherValue) {
+	for _, validValue := range v.values {
+		if value.Equal(validValue) {
 			return
 		}
 	}

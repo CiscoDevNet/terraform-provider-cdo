@@ -66,7 +66,7 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				Computed:            true,
 			},
 			"sdc_type": schema.StringAttribute{
-				MarkdownDescription: "The type of SDC that will be used to communicate with the device, only \"CDG\" or \"SDC\"",
+				MarkdownDescription: "The type of SDC that will be used to communicate with the device (Valid values: [CDG, SDC])",
 				Required:            true,
 				Validators: []validator.String{
 					validators.OneOf("CDG", "SDC"),

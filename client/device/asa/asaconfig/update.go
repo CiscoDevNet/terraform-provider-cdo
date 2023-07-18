@@ -3,8 +3,8 @@ package asaconfig
 import (
 	"context"
 	"encoding/json"
+	"github.com/cisco-lockhart/go-client/connector/sdc"
 
-	"github.com/cisco-lockhart/go-client/device/sdc"
 	"github.com/cisco-lockhart/go-client/internal/crypto/rsa"
 	"github.com/cisco-lockhart/go-client/internal/http"
 	"github.com/cisco-lockhart/go-client/internal/url"
@@ -71,7 +71,7 @@ type credentials struct {
 	KeyId    string `json:"keyId,omitempty"`
 }
 
-func encrypt(req UpdateInput) error {
+func encrypt(req *UpdateInput) error {
 	ciper, err := rsa.NewCiper(req.PublicKey.EncodedKey)
 	if err != nil {
 		return err
@@ -92,7 +92,7 @@ func makeCredentials(updateInp UpdateInput) ([]byte, error) {
 	var creds []byte
 	var err error
 	if updateInp.PublicKey != nil {
-		encrypt(updateInp)
+		encrypt(&updateInp)
 		creds, err = json.Marshal(credentials{
 			Username: updateInp.Username,
 			Password: updateInp.Password,

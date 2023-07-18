@@ -4,12 +4,12 @@ package client
 
 import (
 	"context"
+	"github.com/cisco-lockhart/go-client/connector/sdc"
 	"github.com/cisco-lockhart/go-client/device/ios"
 	"net/http"
 
 	"github.com/cisco-lockhart/go-client/device/asa"
 	"github.com/cisco-lockhart/go-client/device/asa/asaconfig"
-	"github.com/cisco-lockhart/go-client/device/sdc"
 	internalhttp "github.com/cisco-lockhart/go-client/internal/http"
 )
 
@@ -32,6 +32,10 @@ func NewWithHttpClient(httpClient *http.Client, hostname, apiToken string) *Clie
 
 func (c *Client) ReadAllSdcs(ctx context.Context, r sdc.ReadAllInput) (*sdc.ReadAllOutput, error) {
 	return sdc.ReadAll(ctx, c.client, r)
+}
+
+func (c *Client) ReadSdcByName(ctx context.Context, r sdc.ReadByNameInput) (*sdc.ReadOutput, error) {
+	return sdc.ReadByName(ctx, c.client, r)
 }
 
 func (c *Client) ReadAsa(ctx context.Context, r asa.ReadInput) (*asa.ReadOutput, error) {

@@ -20,13 +20,13 @@ ASA Device resource
 - `ipv4` (String) The ipv4 address of the device
 - `name` (String) Name to assign the device
 - `password` (String, Sensitive) The password used to authenticate with the device
+- `sdc_name` (String) The SDC name that will be used to communicate with the device
 - `sdc_type` (String) The type of SDC that will be used to communicate with the device (Valid values: [CDG, SDC])
 - `username` (String) The username used to authenticate with the device
 
 ### Optional
 
 - `ignore_certificate` (Boolean) Whether to ignore certificate validation
-- `sdc_uid` (String) The SDC UID that will be used to communicate with the device
 
 ### Read-Only
 

@@ -3,11 +3,11 @@ package asa
 import (
 	"context"
 	"fmt"
+	"github.com/cisco-lockhart/go-client/connector/sdc"
 	"strings"
 
 	"github.com/cisco-lockhart/go-client/device"
 	"github.com/cisco-lockhart/go-client/device/asa/asaconfig"
-	"github.com/cisco-lockhart/go-client/device/sdc"
 	"github.com/cisco-lockhart/go-client/internal/http"
 	"github.com/cisco-lockhart/go-client/internal/retry"
 )
@@ -104,7 +104,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		}
 
 		// read lar public key
-		larReadRes, err := sdc.Read(ctx, client, sdc.ReadInput{
+		larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadInput{
 			LarUid: deviceCreateOutp.LarUid,
 		})
 		if err != nil {

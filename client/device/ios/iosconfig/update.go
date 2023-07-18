@@ -3,8 +3,8 @@ package iosconfig
 import (
 	"context"
 	"encoding/json"
+	"github.com/cisco-lockhart/go-client/connector/sdc"
 
-	"github.com/cisco-lockhart/go-client/device/sdc"
 	"github.com/cisco-lockhart/go-client/internal/crypto/rsa"
 	"github.com/cisco-lockhart/go-client/internal/http"
 	"github.com/cisco-lockhart/go-client/internal/url"

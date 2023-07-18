@@ -3,9 +3,9 @@ package ios
 import (
 	"context"
 	"fmt"
+	"github.com/cisco-lockhart/go-client/connector/sdc"
 	"github.com/cisco-lockhart/go-client/device"
 	"github.com/cisco-lockhart/go-client/device/ios/iosconfig"
-	"github.com/cisco-lockhart/go-client/device/sdc"
 	"github.com/cisco-lockhart/go-client/internal/http"
 	"github.com/cisco-lockhart/go-client/internal/retry"
 	"strings"
@@ -71,7 +71,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		}
 
 		// read lar public key
-		larReadRes, err := sdc.Read(ctx, client, sdc.ReadInput{
+		larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadInput{
 			LarUid: deviceCreateOutp.LarUid,
 		})
 		if err != nil {

@@ -3,6 +3,7 @@ package asa
 import (
 	"context"
 	"fmt"
+	"github.com/cisco-lockhart/go-client/connector/sdc"
 	"github.com/cisco-lockhart/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"strconv"
@@ -30,7 +31,7 @@ type AsaDeviceResource struct {
 type AsaDeviceResourceModel struct {
 	ID      types.String `tfsdk:"id"`
 	SdcType types.String `tfsdk:"sdc_type"`
-	SdcUid  types.String `tfsdk:"sdc_uid"`
+	SdcName types.String `tfsdk:"sdc_name"`
 	Name    types.String `tfsdk:"name"`
 	Ipv4    types.String `tfsdk:"ipv4"`
 	Host    types.String `tfsdk:"host"`
@@ -60,10 +61,9 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				MarkdownDescription: "Name to assign the device",
 				Required:            true,
 			},
-			"sdc_uid": schema.StringAttribute{
-				MarkdownDescription: "The SDC UID that will be used to communicate with the device",
-				Optional:            true,
-				Computed:            true,
+			"sdc_name": schema.StringAttribute{
+				MarkdownDescription: "The SDC name that will be used to communicate with the device",
+				Required:            true,
 			},
 			"sdc_type": schema.StringAttribute{
 				MarkdownDescription: "The type of SDC that will be used to communicate with the device (Valid values: [CDG, SDC])",
@@ -152,7 +152,6 @@ func (r *AsaDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 
 	stateData.ID = types.StringValue(readOutp.Uid)
 	stateData.SdcType = types.StringValue(readOutp.LarType)
-	stateData.SdcUid = types.StringValue(readOutp.LarUid)
 	stateData.Name = types.StringValue(readOutp.Name)
 	stateData.Ipv4 = types.StringValue(readOutp.Ipv4)
 	stateData.Host = types.StringValue(readOutp.Host)
@@ -178,9 +177,19 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 
+	readSdcByNameInp := sdc.NewReadByNameInput(
+		planData.SdcName.ValueString(),
+	)
+
+	specificSdcOutp, err := r.client.ReadSdcByName(ctx, *readSdcByNameInp)
+	if err != nil {
+		res.Diagnostics.AddError("failed to read SDC by name", err.Error())
+		return
+	}
+
 	createInp := asa.NewCreateRequestInput(
 		planData.Name.ValueString(),
-		planData.SdcUid.ValueString(),
+		specificSdcOutp.Uid,
 		planData.SdcType.ValueString(),
 		planData.Ipv4.ValueString(),
 		planData.Username.ValueString(),
@@ -196,7 +205,7 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 
 	planData.ID = types.StringValue(createOutp.Uid)
 	planData.SdcType = types.StringValue(createOutp.LarType)
-	planData.SdcUid = types.StringValue(createOutp.LarUid)
+	planData.SdcName = types.StringValue(planData.SdcName.ValueString())
 	planData.Name = types.StringValue(createOutp.Name)
 	planData.Host = types.StringValue(createOutp.Host)
 

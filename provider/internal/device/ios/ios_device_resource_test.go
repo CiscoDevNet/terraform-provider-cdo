@@ -15,7 +15,7 @@ const (
 	testHost        = "10.10.0.198"
 	testPort        = "22"
 	testSdcTypeSDC  = "SDC"
-	testSdcUid      = "39784a3c-0013-4e2f-af26-219560904636"
+	testSdcName     = "CDO_terraform-provider-cdo-SDC-1"
 	testUsername    = "lockhart"
 	testPassword    = "BlueSkittles123!!"
 	testIgnoreCert  = true
@@ -27,13 +27,13 @@ const (
 	username = %[4]q
 	password = %[5]q
 	ignore_certificate = %[6]t
-	sdc_uid = %[7]q
+	sdc_name = %[7]q
 }
 `
 )
 
-var accTestIosDeviceResourceConfig_SDC = fmt.Sprintf(iosResourceTemplate, testDeviceName, testIpv4, testSdcTypeSDC, testUsername, testPassword, testIgnoreCert, testSdcUid)
-var accTestIosDeviceResourceConfig_SDC_NewName = fmt.Sprintf(iosResourceTemplate, testDeviceName2, testIpv4, testSdcTypeSDC, testUsername, testPassword, testIgnoreCert, testSdcUid)
+var accTestIosDeviceResourceConfig_SDC = fmt.Sprintf(iosResourceTemplate, testDeviceName, testIpv4, testSdcTypeSDC, testUsername, testPassword, testIgnoreCert, testSdcName)
+var accTestIosDeviceResourceConfig_SDC_NewName = fmt.Sprintf(iosResourceTemplate, testDeviceName2, testIpv4, testSdcTypeSDC, testUsername, testPassword, testIgnoreCert, testSdcName)
 
 func TestAccIosDeviceResource_SDC(t *testing.T) {
 	resource.Test(t, resource.TestCase{

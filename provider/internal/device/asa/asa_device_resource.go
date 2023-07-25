@@ -7,6 +7,7 @@ import (
 	"github.com/cisco-lockhart/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"strconv"
+	"strings"
 
 	cdoClient "github.com/cisco-lockhart/go-client"
 	"github.com/cisco-lockhart/go-client/device/asa"
@@ -63,7 +64,8 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 			},
 			"sdc_name": schema.StringAttribute{
 				MarkdownDescription: "The SDC name that will be used to communicate with the device",
-				Required:            true,
+				Optional:            true,
+				Computed:            true,
 			},
 			"sdc_type": schema.StringAttribute{
 				MarkdownDescription: "The type of SDC that will be used to communicate with the device (Valid values: [CDG, SDC])",
@@ -177,14 +179,21 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 
-	readSdcByNameInp := sdc.NewReadByNameInput(
-		planData.SdcName.ValueString(),
-	)
+	var specificSdcOutp *sdc.ReadOutput
+	if strings.EqualFold(planData.SdcType.ValueString(), "SDC") {
+		readSdcByNameInp := sdc.NewReadByNameInput(
+			planData.SdcName.ValueString(),
+		)
 
-	specificSdcOutp, err := r.client.ReadSdcByName(ctx, *readSdcByNameInp)
-	if err != nil {
-		res.Diagnostics.AddError("failed to read SDC by name", err.Error())
-		return
+		var err error
+		specificSdcOutp, err = r.client.ReadSdcByName(ctx, *readSdcByNameInp)
+		if err != nil {
+			res.Diagnostics.AddError("failed to read SDC by name", err.Error())
+			return
+		}
+
+	} else {
+		specificSdcOutp = &sdc.ReadOutput{}
 	}
 
 	createInp := asa.NewCreateRequestInput(
@@ -234,20 +243,38 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
-	updateInp := asa.NewUpdateInput(
-		stateData.ID.ValueString(),
-		planData.Name.ValueString(),
-	)
+	var updateInp asa.UpdateInput
+	if isCredentialUpdated(planData, stateData) {
+		updateInp = *asa.NewUpdateInput(
+			stateData.ID.ValueString(),
+			planData.Name.ValueString(),
+			planData.Username.ValueString(),
+			planData.Password.ValueString(),
+		)
+	} else {
+		updateInp = *asa.NewUpdateInput(
+			stateData.ID.ValueString(),
+			planData.Name.ValueString(),
+			"",
+			"",
+		)
+	}
 
-	updateOutp, err := r.client.UpdateAsa(ctx, *updateInp)
+	updateOutp, err := r.client.UpdateAsa(ctx, updateInp)
 	if err != nil {
 		res.Diagnostics.AddError("failed to update ASA device", err.Error())
 		return
 	}
 
 	stateData.Name = types.StringValue(updateOutp.Name)
+	stateData.Username = types.StringValue(planData.Username.ValueString())
+	stateData.Password = types.StringValue(planData.Password.ValueString())
 
 	res.Diagnostics.Append(res.State.Set(ctx, &stateData)...)
+}
+
+func isCredentialUpdated(planData *AsaDeviceResourceModel, stateData *AsaDeviceResourceModel) bool {
+	return planData.Username.ValueString() != stateData.Username.ValueString() || planData.Password.ValueString() != stateData.Password.ValueString()
 }
 
 func (r *AsaDeviceResource) Delete(ctx context.Context, req resource.DeleteRequest, res *resource.DeleteResponse) {

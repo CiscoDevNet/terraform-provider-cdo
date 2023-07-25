@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/cisco-lockhart/go-client/connector/sdc"
+	"github.com/cisco-lockhart/go-client/internal/device/asaconfig"
 	"strings"
 
 	"github.com/cisco-lockhart/go-client/device"
-	"github.com/cisco-lockhart/go-client/device/asa/asaconfig"
 	"github.com/cisco-lockhart/go-client/internal/http"
 	"github.com/cisco-lockhart/go-client/internal/retry"
 )
@@ -121,6 +121,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		createInp.Username,
 		createInp.Password,
 		publicKey,
+		asaReadSpecOutp.State,
 	)
 	_, err = asaconfig.Update(ctx, client, *asaConfigUpdateInp)
 	if err != nil {

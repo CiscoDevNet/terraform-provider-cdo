@@ -20,6 +20,7 @@ const (
 	testCdgUid          = "" // cdg can be figured out automatically
 	testUsername        = "lockhart"
 	testPassword        = "BlueSkittles123!!"
+	testNewPassword     = "WrongPassword"
 	testIgnoreCert      = true
 	testDoNotIgnoreCert = false
 
@@ -37,9 +38,11 @@ const (
 
 var accTestAsaDeviceResourceConfig_SDC = fmt.Sprintf(asaResourceTemplate, testDeviceName, testIpv4, testSdcTypeSDC, testUsername, testPassword, testIgnoreCert, testSdcName)
 var accTestAsaDeviceResourceConfig_SDC_NewName = fmt.Sprintf(asaResourceTemplate, testDeviceName2, testIpv4, testSdcTypeSDC, testUsername, testPassword, testIgnoreCert, testSdcName)
+var accTestAsaDeviceResourceConfig_SDC_NewCreds = fmt.Sprintf(asaResourceTemplate, testDeviceName, testIpv4, testSdcTypeSDC, testUsername, testNewPassword, testIgnoreCert, testSdcName)
 
 var accTestAsaDeviceResourceConfig_CDG = fmt.Sprintf(asaResourceTemplate, testDeviceName, testIpv4, testSdcTypeCDG, testUsername, testPassword, testDoNotIgnoreCert, testCdgUid)
 var accTestAsaDeviceResourceConfig_CDG_NewName = fmt.Sprintf(asaResourceTemplate, testDeviceName2, testIpv4, testSdcTypeCDG, testUsername, testPassword, testDoNotIgnoreCert, testCdgUid)
+var accTestAsaDeviceResourceConfig_CDG_NewCreds = fmt.Sprintf(asaResourceTemplate, testDeviceName, testIpv4, testSdcTypeCDG, testUsername, testNewPassword, testDoNotIgnoreCert, testCdgUid)
 
 func TestAccAsaDeviceResource_SDC(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -66,6 +69,18 @@ func TestAccAsaDeviceResource_SDC(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testDeviceName2),
 				),
 			},
+			{
+				Config: acctest.ProviderConfig() + accTestAsaDeviceResourceConfig_SDC_NewCreds,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testNewPassword),
+				),
+			},
+			{
+				Config: acctest.ProviderConfig() + accTestAsaDeviceResourceConfig_SDC,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testPassword),
+				),
+			},
 			// Delete testing automatically occurs in TestCase
 		},
 	})
@@ -83,7 +98,7 @@ func TestAccAsaDeviceResource_CDG(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testDeviceName),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "ipv4", testIpv4),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "host", testHost),
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "port", fmt.Sprint(testPort)),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "port", testPort),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "sdc_type", testSdcTypeCDG),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "username", testUsername),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testPassword),
@@ -94,6 +109,18 @@ func TestAccAsaDeviceResource_CDG(t *testing.T) {
 				Config: acctest.ProviderConfig() + accTestAsaDeviceResourceConfig_CDG_NewName,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testDeviceName2),
+				),
+			},
+			{
+				Config: acctest.ProviderConfig() + accTestAsaDeviceResourceConfig_CDG_NewCreds,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testNewPassword),
+				),
+			},
+			{
+				Config: acctest.ProviderConfig() + accTestAsaDeviceResourceConfig_CDG,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testPassword),
 				),
 			},
 			// Delete testing automatically occurs in TestCase

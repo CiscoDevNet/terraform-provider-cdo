@@ -27,10 +27,9 @@ type Options struct {
 // err: if not nil, stop retrying
 type Func func() (ok bool, err error)
 
-// The default is retry for 1 minute with 1 second delay in between, without retry limit
 const (
-	DefaultTimeout = 1 * time.Minute
-	DefaultDelay   = 1 * time.Second
+	DefaultTimeout = 3 * time.Minute
+	DefaultDelay   = 3 * time.Second
 	DefaultRetries = -1
 )
 

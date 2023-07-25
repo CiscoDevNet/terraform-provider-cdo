@@ -4,30 +4,31 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/cisco-lockhart/go-client/connector/sdc"
-
 	"github.com/cisco-lockhart/go-client/internal/crypto/rsa"
 	"github.com/cisco-lockhart/go-client/internal/http"
 	"github.com/cisco-lockhart/go-client/internal/url"
+	"strings"
 )
 
 type UpdateInput struct {
 	SpecificUid string
+	Username    string
+	Password    string
 	PublicKey   *sdc.PublicKey
-
-	Username string
-	Password string
+	State       string
 }
 
 type UpdateOutput struct {
 	Uid string `json:"uid"`
 }
 
-func NewUpdateInput(specificUid string, username string, password string, publicKey *sdc.PublicKey) *UpdateInput {
+func NewUpdateInput(specificUid string, username string, password string, publicKey *sdc.PublicKey, state string) *UpdateInput {
 	return &UpdateInput{
 		SpecificUid: specificUid,
 		Username:    username,
 		Password:    password,
 		PublicKey:   publicKey,
+		State:       state,
 	}
 }
 
@@ -53,10 +54,50 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 	return &outp, nil
 }
 
+func UpdateCredentials(ctx context.Context, client http.Client, updateInput UpdateInput) (*UpdateOutput, error) {
+
+	client.Logger.Println("updating asaconfig credentials")
+
+	url := url.UpdateAsaConfig(client.BaseUrl(), updateInput.SpecificUid)
+
+	creds, err := makeCredentials(updateInput)
+	if err != nil {
+		return nil, err
+	}
+
+	isWaitForUserToUpdateCreds := strings.EqualFold(updateInput.State, "WAIT_FOR_USER_TO_UPDATE_CREDS") || strings.EqualFold(updateInput.State, "$PRE_WAIT_FOR_USER_TO_UPDATE_CREDS")
+	req := client.NewPut(ctx, url, makeUpdateCredentialsReqBody(isWaitForUserToUpdateCreds, creds))
+
+	var outp UpdateOutput
+	err = req.Send(&outp)
+	if err != nil {
+		return nil, err
+	}
+
+	return &outp, nil
+}
+
 func makeReqBody(creds []byte) *updateBody {
 	return &updateBody{
 		State:       "CERT_VALIDATED", // question: should this be hardcoded?
 		Credentials: string(creds),
+	}
+}
+
+func makeUpdateCredentialsReqBody(isWaitForUserToUpdateCreds bool, creds []byte) interface{} {
+	if isWaitForUserToUpdateCreds {
+		return &updateCredentialsBody{
+			SmContext: SmContext{
+				Credentials: string(creds),
+			},
+		}
+	} else {
+		return &updateCredentialsBodyWithState{
+			State: "WAIT_FOR_USER_TO_UPDATE_CREDS",
+			SmContext: SmContext{
+				Credentials: string(creds),
+			},
+		}
 	}
 }
 
@@ -65,10 +106,23 @@ type updateBody struct {
 	Credentials string `json:"credentials"`
 }
 
+type updateCredentialsBodyWithState struct {
+	State     string    `json:"state"`
+	SmContext SmContext `json:"stateMachineContext"`
+}
+
+type updateCredentialsBody struct {
+	SmContext SmContext `json:"stateMachineContext"`
+}
+
 type credentials struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	KeyId    string `json:"keyId,omitempty"`
+}
+
+type SmContext struct {
+	Credentials string `json:"credentials"`
 }
 
 func encrypt(req *UpdateInput) error {

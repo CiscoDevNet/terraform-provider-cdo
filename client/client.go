@@ -6,10 +6,10 @@ import (
 	"context"
 	"github.com/cisco-lockhart/go-client/connector/sdc"
 	"github.com/cisco-lockhart/go-client/device/ios"
+	"github.com/cisco-lockhart/go-client/internal/device/asaconfig"
 	"net/http"
 
 	"github.com/cisco-lockhart/go-client/device/asa"
-	"github.com/cisco-lockhart/go-client/device/asa/asaconfig"
 	internalhttp "github.com/cisco-lockhart/go-client/internal/http"
 )
 

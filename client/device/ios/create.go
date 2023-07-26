@@ -3,12 +3,13 @@ package ios
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/cisco-lockhart/go-client/connector/sdc"
 	"github.com/cisco-lockhart/go-client/device"
 	"github.com/cisco-lockhart/go-client/device/ios/iosconfig"
 	"github.com/cisco-lockhart/go-client/internal/http"
 	"github.com/cisco-lockhart/go-client/internal/retry"
-	"strings"
 )
 
 type CreateInput struct {
@@ -32,8 +33,6 @@ type CreateOutput struct {
 	Ipv4       string `json:"ipv4"`
 	LarType    string `json:"larType"`
 	LarUid     string `json:"larUid"`
-
-	specificUid string `json:"-"`
 }
 
 func NewCreateRequestInput(name, larUid, larType, ipv4, username, password string, ignoreCertificate bool) *CreateInput {

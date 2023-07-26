@@ -94,7 +94,6 @@ func ReadByName(ctx context.Context, client http.Client, readInp ReadByNameInput
 		return nil, fmt.Errorf("multiple SDCs found with the name: %s", readInp.LarName)
 	}
 
-	var outp ReadOutput
-	outp = arrayOutp[0]
+	outp := arrayOutp[0]
 	return &outp, nil
 }

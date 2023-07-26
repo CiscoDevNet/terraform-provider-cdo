@@ -19,7 +19,10 @@ func UntilStateDone(ctx context.Context, client http.Client, specificUid string)
 	var readOutp ReadOutput
 
 	return func() (bool, error) {
-		readReq.Send(&readOutp)
+		err := readReq.Send(&readOutp)
+		if err != nil {
+			return false, err
+		}
 
 		client.Logger.Printf("asa config state=%s\n", readOutp.State)
 		if strings.EqualFold(readOutp.State, "DONE") {

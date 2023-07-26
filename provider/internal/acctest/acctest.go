@@ -32,10 +32,12 @@ func GetApiToken() (string, error) {
 	return "", fmt.Errorf("failed to retrieve api token from environment variable and secret manager.\nenvironment variable name=%s\nsecret manager secret token name=%s\nplease set one of them.\ncause=%v", apiTokenEnvName, apiTokenSecretName, err)
 }
 
-func PreCheck(t *testing.T) {
-	_, err := GetApiToken()
-	if err != nil {
-		t.Fatalf("Precheck failed, cause=%v", err)
+func PreCheckFunc(t *testing.T) func() {
+	return func() {
+		_, err := GetApiToken()
+		if err != nil {
+			t.Fatalf("Precheck failed, cause=%v", err)
+		}
 	}
 }
 

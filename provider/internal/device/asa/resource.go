@@ -3,11 +3,12 @@ package asa
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"strings"
+
 	"github.com/cisco-lockhart/go-client/connector/sdc"
 	"github.com/cisco-lockhart/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"strconv"
-	"strings"
 
 	cdoClient "github.com/cisco-lockhart/go-client"
 	"github.com/cisco-lockhart/go-client/device/asa"

@@ -19,7 +19,10 @@ func UntilState(ctx context.Context, client http.Client, specificUid string, sta
 	var readOutp ReadOutput
 
 	return func() (bool, error) {
-		readReq.Send(&readOutp)
+		err := readReq.Send(&readOutp)
+		if err != nil {
+			return false, err
+		}
 
 		client.Logger.Printf("ios config state=%s\n", readOutp.State)
 		if strings.EqualFold(readOutp.State, state) {

@@ -5,9 +5,10 @@ package provider
 
 import (
 	"context"
+	"os"
+
 	"github.com/cisco-lockhart/terraform-provider-cdo/internal/connector/sdc"
 	"github.com/cisco-lockhart/terraform-provider-cdo/internal/device/ios"
-	"os"
 
 	cdoClient "github.com/cisco-lockhart/go-client"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -137,6 +138,8 @@ func (p *CdoProvider) DataSources(ctx context.Context) []func() datasource.DataS
 	return []func() datasource.DataSource{
 		NewExampleDataSource,
 		sdc.NewSdcDataSource,
+		asa.NewAsaDataSource,
+		ios.NewIosDataSource,
 	}
 }
 

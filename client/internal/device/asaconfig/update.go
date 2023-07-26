@@ -3,11 +3,12 @@ package asaconfig
 import (
 	"context"
 	"encoding/json"
+	"strings"
+
 	"github.com/cisco-lockhart/go-client/connector/sdc"
 	"github.com/cisco-lockhart/go-client/internal/crypto/rsa"
 	"github.com/cisco-lockhart/go-client/internal/http"
 	"github.com/cisco-lockhart/go-client/internal/url"
-	"strings"
 )
 
 type UpdateInput struct {
@@ -146,12 +147,14 @@ func makeCredentials(updateInp UpdateInput) ([]byte, error) {
 	var creds []byte
 	var err error
 	if updateInp.PublicKey != nil {
-		encrypt(&updateInp)
-		creds, err = json.Marshal(credentials{
-			Username: updateInp.Username,
-			Password: updateInp.Password,
-			KeyId:    updateInp.PublicKey.KeyId,
-		})
+		err = encrypt(&updateInp)
+		if err == nil {
+			creds, err = json.Marshal(credentials{
+				Username: updateInp.Username,
+				Password: updateInp.Password,
+				KeyId:    updateInp.PublicKey.KeyId,
+			})
+		}
 	} else {
 		creds, err = json.Marshal(credentials{
 			Username: updateInp.Username,

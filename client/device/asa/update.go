@@ -2,10 +2,11 @@ package asa
 
 import (
 	"context"
-	"fmt"	
+	"fmt"
+	"strings"
+
 	"github.com/cisco-lockhart/go-client/connector/sdc"
 	"github.com/cisco-lockhart/go-client/internal/device/asaconfig"
-	"strings"
 
 	"github.com/cisco-lockhart/go-client/device"
 	"github.com/cisco-lockhart/go-client/internal/http"
@@ -13,20 +14,20 @@ import (
 )
 
 type UpdateInput struct {
-	Uid       string `json:"-"`
-	Name      string `json:"name"`
-	Username  string
-	Password  string
+	Uid      string `json:"-"`
+	Name     string `json:"name"`
+	Username string
+	Password string
 }
 
 type UpdateOutput = device.UpdateOutput
 
 func NewUpdateInput(uid string, name string, username string, password string) *UpdateInput {
 	return &UpdateInput{
-		Uid:       uid,
-		Name:      name,
-		Username:  username,
-		Password:  password,
+		Uid:      uid,
+		Name:     name,
+		Username: username,
+		Password: password,
 	}
 }
 
@@ -64,7 +65,7 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 			if asaReadOutp.LarUid == "" {
 				return nil, fmt.Errorf("sdc uid not found")
 			}
-	
+
 			larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadInput{
 				LarUid: asaReadOutp.LarUid,
 			})

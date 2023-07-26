@@ -3,9 +3,10 @@ package asa
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/cisco-lockhart/go-client/connector/sdc"
 	"github.com/cisco-lockhart/go-client/internal/device/asaconfig"
-	"strings"
 
 	"github.com/cisco-lockhart/go-client/device"
 	"github.com/cisco-lockhart/go-client/internal/http"

@@ -93,3 +93,9 @@ Examples are provided so that you can do the usual `plan`, `apply`, `destroy` et
     |
     ... rest
    ```
+#### Troubleshooting
+- Error: Inconsistent dependency lock file
+  ```
+  provider hashicorp/cisco-lockhart/cdo: required by this configuration but no version is selected
+  ```
+  - This means you have not setup the dev override properly, make sure your `~/.terraformrc` has the right override for the provider in question.

@@ -24,12 +24,9 @@ IOS Device resource
 - `sdc_type` (String) The type of SDC that will be used to communicate with the device (Valid values: [CDG, SDC])
 - `username` (String) The username used to authenticate with the device
 
-### Optional
-
-- `ignore_certificate` (Boolean) Whether to ignore certificate validation
-
 ### Read-Only
 
 - `host` (String) The host used to connect to the device
 - `id` (String) Uid used to represent the device
+- `ignore_certificate` (Boolean) Whether to ignore certificate validation
 - `port` (Number) The port used to connect to the device

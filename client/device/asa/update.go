@@ -7,6 +7,7 @@ import (
 
 	"github.com/cisco-lockhart/go-client/connector/sdc"
 	"github.com/cisco-lockhart/go-client/internal/device/asaconfig"
+	"github.com/cisco-lockhart/go-client/internal/retry"
 
 	"github.com/cisco-lockhart/go-client/device"
 	"github.com/cisco-lockhart/go-client/internal/http"
@@ -16,6 +17,7 @@ import (
 type UpdateInput struct {
 	Uid      string `json:"-"`
 	Name     string `json:"name"`
+	Location string
 	Username string
 	Password string
 }
@@ -44,7 +46,7 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 
 	client.Logger.Println("updating asa device")
 
-	if updateInp.Username != "" {
+	if isSpecificDeviceIsRequired(updateInp) {
 
 		asaReadSpecOutp, err := device.ReadSpecific(ctx, client, *device.NewReadSpecificInput(
 			updateInp.Uid,
@@ -60,32 +62,48 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 			return nil, err
 		}
 
-		var publicKey *sdc.PublicKey
-		if strings.EqualFold(asaReadOutp.LarType, "SDC") {
-			if asaReadOutp.LarUid == "" {
-				return nil, fmt.Errorf("sdc uid not found")
+		if updateInp.Username != "" || updateInp.Password != "" {
+			var publicKey *sdc.PublicKey
+			if strings.EqualFold(asaReadOutp.LarType, "SDC") {
+				if asaReadOutp.LarUid == "" {
+					return nil, fmt.Errorf("sdc uid not found")
+				}
+
+				larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadInput{
+					LarUid: asaReadOutp.LarUid,
+				})
+				if err != nil {
+					return nil, err
+				}
+				publicKey = &larReadRes.PublicKey
 			}
 
-			larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadInput{
-				LarUid: asaReadOutp.LarUid,
+			updateAsaConfigInp := asaconfig.NewUpdateInput(
+				asaReadSpecOutp.SpecificUid,
+				updateInp.Username,
+				updateInp.Password,
+				publicKey,
+				asaReadSpecOutp.State,
+			)
+			_, err = asaconfig.UpdateCredentials(ctx, client, *updateAsaConfigInp)
+			if err != nil {
+				_ = fmt.Errorf("failed to update credentials for ASA device: %s", err.Error())
+				return nil, err
+			}
+		}
+
+		if updateInp.Location != "" {
+			_, err := asaconfig.UpdateLocation(ctx, client, asaconfig.UpdateLocationOptions{
+				SpecificUid: asaReadSpecOutp.SpecificUid,
+				Location:    updateInp.Location,
 			})
 			if err != nil {
 				return nil, err
 			}
-			publicKey = &larReadRes.PublicKey
-		}
 
-		updateAsaConfigInp := asaconfig.NewUpdateInput(
-			asaReadSpecOutp.SpecificUid,
-			updateInp.Username,
-			updateInp.Password,
-			publicKey,
-			asaReadSpecOutp.State,
-		)
-		_, err = asaconfig.UpdateCredentials(ctx, client, *updateAsaConfigInp)
-		if err != nil {
-			_ = fmt.Errorf("failed to update credentials for ASA device: %s", err.Error())
-			return nil, err
+			if err := retry.Do(asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), retry.DefaultOpts); err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -97,4 +115,8 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 	}
 
 	return &outp, nil
+}
+
+func isSpecificDeviceIsRequired(updateInput UpdateInput) bool {
+	return updateInput.Username != "" || updateInput.Password != "" || updateInput.Location != ""
 }

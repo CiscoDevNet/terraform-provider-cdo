@@ -246,21 +246,19 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
-	var updateInp asa.UpdateInput
+	updateInp := asa.UpdateInput{Uid: stateData.ID.ValueString(), Name: stateData.Name.ValueString()}
+
+	if isNameUpdated(planData, stateData) {
+		updateInp.Name = planData.Name.ValueString()
+	}
+
+	if isLocationUpdated(planData, stateData) {
+		updateInp.Location = planData.Ipv4.ValueString()
+	}
+
 	if isCredentialUpdated(planData, stateData) {
-		updateInp = *asa.NewUpdateInput(
-			stateData.ID.ValueString(),
-			planData.Name.ValueString(),
-			planData.Username.ValueString(),
-			planData.Password.ValueString(),
-		)
-	} else {
-		updateInp = *asa.NewUpdateInput(
-			stateData.ID.ValueString(),
-			planData.Name.ValueString(),
-			"",
-			"",
-		)
+		updateInp.Username = planData.Username.ValueString()
+		updateInp.Password = planData.Password.ValueString()
 	}
 
 	updateOutp, err := r.client.UpdateAsa(ctx, updateInp)
@@ -269,15 +267,24 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
+	port, err := parsePort(updateOutp.Port)
+	if err != nil {
+		res.Diagnostics.AddError("unable to parse port", err.Error())
+		return
+	}
+
+	stateData.ID = types.StringValue(updateOutp.Uid)
+	stateData.SdcType = types.StringValue(planData.SdcType.ValueString())
+	stateData.SdcName = types.StringValue(planData.SdcName.ValueString())
 	stateData.Name = types.StringValue(updateOutp.Name)
-	stateData.Username = types.StringValue(planData.Username.ValueString())
-	stateData.Password = types.StringValue(planData.Password.ValueString())
+	stateData.Ipv4 = types.StringValue(updateOutp.Ipv4)
+	stateData.Host = types.StringValue(updateOutp.Host)
+	stateData.Port = types.Int64Value(port)
+	stateData.Username = planData.Username
+	stateData.Password = planData.Password
+	stateData.IgnoreCertifcate = planData.IgnoreCertifcate
 
 	res.Diagnostics.Append(res.State.Set(ctx, &stateData)...)
-}
-
-func isCredentialUpdated(planData *AsaDeviceResourceModel, stateData *AsaDeviceResourceModel) bool {
-	return planData.Username.ValueString() != stateData.Username.ValueString() || planData.Password.ValueString() != stateData.Password.ValueString()
 }
 
 func (r *AsaDeviceResource) Delete(ctx context.Context, req resource.DeleteRequest, res *resource.DeleteResponse) {
@@ -302,4 +309,21 @@ func (r *AsaDeviceResource) Delete(ctx context.Context, req resource.DeleteReque
 
 func (r *AsaDeviceResource) ImportState(ctx context.Context, req resource.ImportStateRequest, res *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, res)
+}
+
+func isCredentialUpdated(planData, stateData *AsaDeviceResourceModel) bool {
+	return planData.Username.ValueString() != stateData.Username.ValueString() || planData.Password.ValueString() != stateData.Password.ValueString()
+}
+
+func isNameUpdated(planData, stateData *AsaDeviceResourceModel) bool {
+	return !planData.Name.Equal(stateData.Name)
+}
+
+func isLocationUpdated(planData, stateData *AsaDeviceResourceModel) bool {
+	return !planData.Ipv4.Equal(stateData.Ipv4)
+}
+
+func parsePort(rawPort string) (int64, error) {
+	return strconv.ParseInt(rawPort, 10, 16)
+
 }

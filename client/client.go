@@ -4,10 +4,11 @@ package client
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/cisco-lockhart/go-client/connector/sdc"
 	"github.com/cisco-lockhart/go-client/device/ios"
 	"github.com/cisco-lockhart/go-client/internal/device/asaconfig"
-	"net/http"
 
 	"github.com/cisco-lockhart/go-client/device/asa"
 	internalhttp "github.com/cisco-lockhart/go-client/internal/http"

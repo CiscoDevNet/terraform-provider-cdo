@@ -46,6 +46,9 @@ var testAsaResource_SDC = testAsaResourceType{
 	Host: "vasa-gb-ravpn-03-mgmt.dev.lockhart.io",
 	Port: "443",
 }
+
+const alternativeDeviceLocation = "35.177.20.218:443"
+
 var testAsaResourceConfig_SDC = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC)
 
 // new name config.
@@ -59,6 +62,9 @@ var testAsaResource_SDC_NewCreds = acctest.MustOverrideFields(testAsaResource_SD
 	"Password": "WrongPassword",
 })
 var testAsaResourceConfig_SDC_NewCreds = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC_NewCreds)
+
+var testAsaResource_SDC_NewLocation = acctest.MustOverrideFields(testAsaResource_SDC, map[string]any{"Ipv4": alternativeDeviceLocation})
+var testAsaResourceConfig_SDC_NewLocation = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC_NewLocation)
 
 // CDG configs
 
@@ -88,6 +94,9 @@ var testAsaResource_CDG_NewCreds = acctest.MustOverrideFields(testAsaResource_CD
 	"Password": "WrongPassword",
 })
 var testAsaResourceConfig_CDG_NewCreds = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_CDG_NewCreds)
+
+var testAsaResource_CDG_NewLocation = acctest.MustOverrideFields(testAsaResource_CDG, map[string]any{"Ipv4": alternativeDeviceLocation})
+var testAsaResourceConfig_CDG_NewLocation = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_CDG_NewLocation)
 
 func TestAccAsaDeviceResource_SDC(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -126,6 +135,12 @@ func TestAccAsaDeviceResource_SDC(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_SDC.Name),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_SDC.Password),
+				),
+			},
+			{
+				Config: acctest.ProviderConfig() + testAsaResourceConfig_SDC_NewLocation,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "ipv4", testAsaResource_SDC_NewLocation.Ipv4),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -170,6 +185,12 @@ func TestAccAsaDeviceResource_CDG(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_CDG.Name),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_CDG.Password),
+				),
+			},
+			{
+				Config: acctest.ProviderConfig() + testAsaResourceConfig_CDG_NewLocation,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "ipv4", testAsaResource_CDG_NewLocation.Ipv4),
 				),
 			},
 			// Delete testing automatically occurs in TestCase

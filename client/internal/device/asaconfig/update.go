@@ -78,6 +78,39 @@ func UpdateCredentials(ctx context.Context, client http.Client, updateInput Upda
 	return &outp, nil
 }
 
+type UpdateLocationOptions struct {
+	SpecificUid string
+	Location    string
+}
+
+type updateLocationRequestBody struct {
+	QueueTriggerState string                         `json:"queueTriggerState"`
+	SmContext         pendingLocationUpdateSmContext `json:"stateMachineContext"`
+}
+
+type pendingLocationUpdateSmContext struct {
+	Ipv4 string `json:"ipv4"`
+}
+
+func UpdateLocation(ctx context.Context, client http.Client, options UpdateLocationOptions) (*UpdateOutput, error) {
+	url := url.UpdateAsaConfig(client.BaseUrl(), options.SpecificUid)
+
+	req := client.NewPut(ctx, url, updateLocationRequestBody{
+		QueueTriggerState: "PENDING_LOCATION_UPDATE",
+		SmContext: pendingLocationUpdateSmContext{
+			options.Location,
+		},
+	})
+
+	var outp UpdateOutput
+	err := req.Send(&outp)
+	if err != nil {
+		return nil, err
+	}
+
+	return &outp, nil
+}
+
 func makeReqBody(creds []byte) *updateBody {
 	return &updateBody{
 		State:       "CERT_VALIDATED", // question: should this be hardcoded?
@@ -144,22 +177,20 @@ func encrypt(req *UpdateInput) error {
 }
 
 func makeCredentials(updateInp UpdateInput) ([]byte, error) {
-	var creds []byte
-	var err error
 	if updateInp.PublicKey != nil {
-		err = encrypt(&updateInp)
-		if err == nil {
-			creds, err = json.Marshal(credentials{
-				Username: updateInp.Username,
-				Password: updateInp.Password,
-				KeyId:    updateInp.PublicKey.KeyId,
-			})
+		if err := encrypt(&updateInp); err != nil {
+			return nil, err
 		}
-	} else {
-		creds, err = json.Marshal(credentials{
+
+		return json.Marshal(credentials{
 			Username: updateInp.Username,
 			Password: updateInp.Password,
+			KeyId:    updateInp.PublicKey.KeyId,
 		})
 	}
-	return creds, err
+
+	return json.Marshal(credentials{
+		Username: updateInp.Username,
+		Password: updateInp.Password,
+	})
 }

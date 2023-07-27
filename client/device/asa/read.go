@@ -20,7 +20,8 @@ type ReadOutput struct {
 	Port            string `json:"port"`
 	Host            string `json:"host"`
 
-	IgnoreCertifcate bool `json:"ignoreCertificate"`
+	IgnoreCertifcate  bool `json:"ignoreCertificate"`
+	ConnectivityState int  `json:"connectivityState"`
 }
 
 func NewReadInput(uid string) *ReadInput {

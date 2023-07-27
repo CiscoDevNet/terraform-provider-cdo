@@ -25,11 +25,11 @@ ASA Device resource
 
 ### Optional
 
-- `ignore_certificate` (Boolean) Whether to ignore certificate validation
 - `sdc_name` (String) The SDC name that will be used to communicate with the device
 
 ### Read-Only
 
 - `host` (String) The host used to connect to the device
 - `id` (String) Uid used to represent the device
+- `ignore_certificate` (Boolean) Whether to ignore certificate validation
 - `port` (Number) The port used to connect to the device

@@ -3,16 +3,18 @@ package ios
 import (
 	"context"
 	"fmt"
+	"strconv"
+
 	"github.com/cisco-lockhart/go-client/connector/sdc"
 	"github.com/cisco-lockhart/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"strconv"
 
 	cdoClient "github.com/cisco-lockhart/go-client"
 	"github.com/cisco-lockhart/go-client/device/ios"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -95,7 +97,8 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 			},
 			"ignore_certificate": schema.BoolAttribute{
 				MarkdownDescription: "Whether to ignore certificate validation",
-				Optional:            true,
+				Computed:            true,
+				Default:             booldefault.StaticBool(false),
 			},
 		},
 	}

@@ -16,7 +16,7 @@ var testIosDataSource = struct {
 	Port              string
 	IgnoreCertificate string
 }{
-	Id:                "99844204-f604-4acf-b702-d2bdccfabd51",
+	Id:                "cd0483d0-5ec5-4d8e-b92d-8eb389f88417",
 	SdcType:           "SDC",
 	Name:              "weilue-test-ios",
 	Ipv4:              "10.10.0.198:22",
@@ -43,10 +43,9 @@ func TestAccIosDeviceDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "id", testIosDataSource.Id),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "sdc_type", testIosDataSource.SdcType),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "name", testIosDataSource.Name),
-					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "ipv4", testIosDataSource.Ipv4),
+					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "socket_address", testIosDataSource.Ipv4),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "host", testIosDataSource.Host),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "port", testIosDataSource.Port),
-					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "sdc_type", testIosDataSource.SdcType),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "ignore_certificate", testIosDataSource.IgnoreCertificate),
 				),
 			},

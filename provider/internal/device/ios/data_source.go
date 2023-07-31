@@ -39,7 +39,7 @@ type IosDataSourceModel struct {
 	SdcType          types.String `tfsdk:"sdc_type"`
 	SdcName          types.String `tfsdk:"sdc_name"`
 	Name             types.String `tfsdk:"name"`
-	Ipv4             types.String `tfsdk:"ipv4"`
+	Ipv4             types.String `tfsdk:"socket_address"`
 	Host             types.String `tfsdk:"host"`
 	Port             types.Int64  `tfsdk:"port"`
 	IgnoreCertifcate types.Bool   `tfsdk:"ignore_certificate"`
@@ -77,8 +77,8 @@ func (d *IosDataSource) Schema(ctx context.Context, req datasource.SchemaRequest
 					validators.OneOf("CDG", "SDC"),
 				},
 			},
-			"ipv4": schema.StringAttribute{
-				MarkdownDescription: "The ipv4 address of the device",
+			"socket_address": schema.StringAttribute{
+				MarkdownDescription: "The socket address of the device (combination of a host and port)",
 				Computed:            true,
 			},
 			"port": schema.Int64Attribute{

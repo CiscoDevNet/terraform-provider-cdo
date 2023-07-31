@@ -17,16 +17,16 @@ IOS Device resource
 
 ### Required
 
-- `ipv4` (String) The ipv4 address of the device
+- `ignore_certificate` (Boolean) Whether to ignore certificate validation
 - `name` (String) Name to assign the device
 - `password` (String, Sensitive) The password used to authenticate with the device
 - `sdc_name` (String) The SDC name that will be used to communicate with the device
 - `sdc_type` (String) The type of SDC that will be used to communicate with the device (Valid values: [CDG, SDC])
+- `socket_address` (String) The socket address of the device (combination of a host and port)
 - `username` (String) The username used to authenticate with the device
 
 ### Read-Only
 
 - `host` (String) The host used to connect to the device
 - `id` (String) Uid used to represent the device
-- `ignore_certificate` (Boolean) Whether to ignore certificate validation
 - `port` (Number) The port used to connect to the device

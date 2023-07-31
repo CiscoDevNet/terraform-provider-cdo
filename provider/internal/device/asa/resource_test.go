@@ -23,7 +23,7 @@ type testAsaResourceType struct {
 const asaResourceTemplate = `
 resource "cdo_asa_device" "test" {
 	name = "{{.Name}}"
-	ipv4 = "{{.Ipv4}}"
+	socket_address = "{{.Ipv4}}"
 	sdc_type = "{{.SdcType}}"
 	username = "{{.Username}}"
 	password = "{{.Password}}"
@@ -108,7 +108,7 @@ func TestAccAsaDeviceResource_SDC(t *testing.T) {
 				Config: acctest.ProviderConfig() + testAsaResourceConfig_SDC,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_SDC.Name),
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "ipv4", testAsaResource_SDC.Ipv4),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "socket_address", testAsaResource_SDC.Ipv4),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "host", testAsaResource_SDC.Host),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "port", testAsaResource_SDC.Port),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "sdc_type", testAsaResource_SDC.SdcType),
@@ -158,7 +158,7 @@ func TestAccAsaDeviceResource_CDG(t *testing.T) {
 				Config: acctest.ProviderConfig() + testAsaResourceConfig_CDG,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_CDG.Name),
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "ipv4", testAsaResource_CDG.Ipv4),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "socket_address", testAsaResource_CDG.Ipv4),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "host", testAsaResource_CDG.Host),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "port", testAsaResource_CDG.Port),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "sdc_type", testAsaResource_CDG.SdcType),

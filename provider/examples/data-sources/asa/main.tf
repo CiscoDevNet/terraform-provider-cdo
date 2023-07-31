@@ -24,8 +24,8 @@ output "asa_sdc_name" {
 output "asa_name" {
   value = data.cdo_asa_device.my_asa.name
 }
-output "asa_ipv4" {
-  value = data.cdo_asa_device.my_asa.ipv4
+output "asa_socket_address" {
+  value = data.cdo_asa_device.my_asa.socket_address
 }
 output "asa_host" {
   value = data.cdo_asa_device.my_asa.host

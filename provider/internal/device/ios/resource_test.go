@@ -23,7 +23,7 @@ type testIosResourceType struct {
 const testIosResourceTemplate = `
 resource "cdo_ios_device" "test" {
 	name = "{{.Name}}"
-	ipv4 = "{{.Ipv4}}"
+	socket_address = "{{.Ipv4}}"
 	sdc_type = "{{.SdcType}}"
 	username = "{{.Username}}"
 	password = "{{.Password}}"
@@ -60,7 +60,7 @@ func TestAccIosDeviceResource_SDC(t *testing.T) {
 				Config: acctest.ProviderConfig() + testIosResourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "name", testIosResource.Name),
-					resource.TestCheckResourceAttr("cdo_ios_device.test", "ipv4", testIosResource.Ipv4),
+					resource.TestCheckResourceAttr("cdo_ios_device.test", "socket_address", testIosResource.Ipv4),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "host", testIosResource.Host),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "port", testIosResource.Port),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "sdc_type", testIosResource.SdcType),

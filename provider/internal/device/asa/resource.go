@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -36,7 +35,7 @@ type AsaDeviceResourceModel struct {
 	SdcType types.String `tfsdk:"sdc_type"`
 	SdcName types.String `tfsdk:"sdc_name"`
 	Name    types.String `tfsdk:"name"`
-	Ipv4    types.String `tfsdk:"ipv4"`
+	Ipv4    types.String `tfsdk:"socket_address"`
 	Host    types.String `tfsdk:"host"`
 	Port    types.Int64  `tfsdk:"port"`
 
@@ -76,8 +75,8 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 					validators.OneOf("CDG", "SDC"),
 				},
 			},
-			"ipv4": schema.StringAttribute{
-				MarkdownDescription: "The ipv4 address of the device",
+			"socket_address": schema.StringAttribute{
+				MarkdownDescription: "The socket address of the device (combination of a host and port)",
 				Required:            true,
 			},
 			"port": schema.Int64Attribute{
@@ -99,8 +98,7 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 			},
 			"ignore_certificate": schema.BoolAttribute{
 				MarkdownDescription: "Whether to ignore certificate validation",
-				Computed:            true,
-				Default:             booldefault.StaticBool(false),
+				Required:            true,
 			},
 		},
 	}

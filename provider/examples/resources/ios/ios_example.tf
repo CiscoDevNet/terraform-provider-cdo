@@ -12,10 +12,11 @@ provider "cdo" {
 }
 
 resource "cdo_ios_device" "my_ios" {
-  name     = "my_ios"
-  sdc_type = "SDC"
-  sdc_name = "<FILL_ME>"
-  ipv4     = "<FILL_ME>"
-  username = "<FILL_ME>"
-  password = "<FILL_ME>"
+  name               = "my_ios"
+  sdc_type           = "SDC"
+  sdc_name           = "<FILL_ME>"
+  socket_address     = "<FILL_ME>"
+  username           = "<FILL_ME>"
+  password           = "<FILL_ME>"
+  ignore_certificate = "<FILL_ME>"
 }

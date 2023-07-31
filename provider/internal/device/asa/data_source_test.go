@@ -44,7 +44,7 @@ func TestAccAsaDeviceDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "id", testAsaDataSource.Id),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "sdc_type", testAsaDataSource.SdcType),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "name", testAsaDataSource.Name),
-					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "ipv4", testAsaDataSource.Ipv4),
+					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "socket_address", testAsaDataSource.Ipv4),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "host", testAsaDataSource.Host),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "port", testAsaDataSource.Port),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "ignore_certificate", testAsaDataSource.IgnoreCertificate),

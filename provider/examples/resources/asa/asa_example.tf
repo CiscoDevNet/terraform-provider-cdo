@@ -12,10 +12,11 @@ provider "cdo" {
 }
 
 resource "cdo_asa_device" "my_asa" {
-  name     = "my_asa"
-  sdc_type = "CDG"
-  sdc_name = "<FILL_ME>"
-  ipv4     = "<FILL_ME>"
-  username = "<FILL_ME>"
-  password = "<FILL_ME>"
+  name               = "my_asa"
+  sdc_type           = "<FILL_ME>"
+  sdc_name           = "<FILL_ME>"
+  ipv4               = "<FILL_ME>"
+  username           = "<FILL_ME>"
+  password           = "<FILL_ME>"
+  ignore_certificate = "<FILL_ME>"
 }

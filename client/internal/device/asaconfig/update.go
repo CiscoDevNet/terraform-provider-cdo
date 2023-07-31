@@ -178,6 +178,7 @@ func encrypt(req *UpdateInput) error {
 
 func makeCredentials(updateInp UpdateInput) ([]byte, error) {
 	if updateInp.PublicKey != nil {
+
 		if err := encrypt(&updateInp); err != nil {
 			return nil, err
 		}

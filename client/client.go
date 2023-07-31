@@ -8,9 +8,9 @@ import (
 
 	"github.com/cisco-lockhart/go-client/connector/sdc"
 	"github.com/cisco-lockhart/go-client/device/ios"
-	"github.com/cisco-lockhart/go-client/internal/device/asaconfig"
 
 	"github.com/cisco-lockhart/go-client/device/asa"
+	"github.com/cisco-lockhart/go-client/internal/device/asaconfig"
 	internalhttp "github.com/cisco-lockhart/go-client/internal/http"
 )
 
@@ -31,50 +31,50 @@ func NewWithHttpClient(httpClient *http.Client, hostname, apiToken string) *Clie
 	}
 }
 
-func (c *Client) ReadAllSdcs(ctx context.Context, r sdc.ReadAllInput) (*sdc.ReadAllOutput, error) {
-	return sdc.ReadAll(ctx, c.client, r)
+func (c *Client) ReadAllSdcs(ctx context.Context, inp sdc.ReadAllInput) (*sdc.ReadAllOutput, error) {
+	return sdc.ReadAll(ctx, c.client, inp)
 }
 
-func (c *Client) ReadSdcByName(ctx context.Context, r sdc.ReadByNameInput) (*sdc.ReadOutput, error) {
-	return sdc.ReadByName(ctx, c.client, r)
+func (c *Client) ReadSdcByName(ctx context.Context, inp sdc.ReadByNameInput) (*sdc.ReadOutput, error) {
+	return sdc.ReadByName(ctx, c.client, inp)
 }
 
-func (c *Client) ReadAsa(ctx context.Context, r asa.ReadInput) (*asa.ReadOutput, error) {
-	return asa.Read(ctx, c.client, r)
+func (c *Client) ReadAsa(ctx context.Context, inp asa.ReadInput) (*asa.ReadOutput, error) {
+	return asa.Read(ctx, c.client, inp)
 }
 
-func (c *Client) CreateAsa(ctx context.Context, r asa.CreateInput) (*asa.CreateOutput, error) {
-	return asa.Create(ctx, c.client, r)
+func (c *Client) CreateAsa(ctx context.Context, inp asa.CreateInput) (*asa.CreateOutput, error) {
+	return asa.Create(ctx, c.client, inp)
 }
 
-func (c *Client) UpdateAsa(ctx context.Context, r asa.UpdateInput) (*asa.UpdateOutput, error) {
-	return asa.Update(ctx, c.client, r)
+func (c *Client) UpdateAsa(ctx context.Context, inp asa.UpdateInput) (*asa.UpdateOutput, error) {
+	return asa.Update(ctx, c.client, inp)
 }
 
-func (c *Client) DeleteAsa(ctx context.Context, r asa.DeleteInput) (*asa.DeleteOutput, error) {
-	return asa.Delete(ctx, c.client, r)
+func (c *Client) DeleteAsa(ctx context.Context, inp asa.DeleteInput) (*asa.DeleteOutput, error) {
+	return asa.Delete(ctx, c.client, inp)
 }
 
-func (c *Client) ReadIos(ctx context.Context, r ios.ReadInput) (*ios.ReadOutput, error) {
-	return ios.Read(ctx, c.client, r)
+func (c *Client) ReadIos(ctx context.Context, inp ios.ReadInput) (*ios.ReadOutput, error) {
+	return ios.Read(ctx, c.client, inp)
 }
 
-func (c *Client) CreateIos(ctx context.Context, r ios.CreateInput) (*ios.CreateOutput, error) {
-	return ios.Create(ctx, c.client, r)
+func (c *Client) CreateIos(ctx context.Context, inp ios.CreateInput) (*ios.CreateOutput, error) {
+	return ios.Create(ctx, c.client, inp)
 }
 
-func (c *Client) UpdateIos(ctx context.Context, r ios.UpdateInput) (*ios.UpdateOutput, error) {
-	return ios.Update(ctx, c.client, r)
+func (c *Client) UpdateIos(ctx context.Context, inp ios.UpdateInput) (*ios.UpdateOutput, error) {
+	return ios.Update(ctx, c.client, inp)
 }
 
-func (c *Client) DeleteIos(ctx context.Context, r ios.DeleteInput) (*ios.DeleteOutput, error) {
-	return ios.Delete(ctx, c.client, r)
+func (c *Client) DeleteIos(ctx context.Context, inp ios.DeleteInput) (*ios.DeleteOutput, error) {
+	return ios.Delete(ctx, c.client, inp)
 }
 
-func (c *Client) ReadAsaConfig(ctx context.Context, r asaconfig.ReadInput) (*asaconfig.ReadOutput, error) {
-	return asaconfig.Read(ctx, c.client, r)
+func (c *Client) ReadAsaConfig(ctx context.Context, inp asaconfig.ReadInput) (*asaconfig.ReadOutput, error) {
+	return asaconfig.Read(ctx, c.client, inp)
 }
 
-func (c *Client) ReadSpecificAsa(ctx context.Context, r asa.ReadSpecificInput) (*asa.ReadSpecificOutput, error) {
-	return asa.ReadSpecific(ctx, c.client, r)
+func (c *Client) ReadSpecificAsa(ctx context.Context, inp asa.ReadSpecificInput) (*asa.ReadSpecificOutput, error) {
+	return asa.ReadSpecific(ctx, c.client, inp)
 }

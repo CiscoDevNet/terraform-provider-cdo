@@ -160,10 +160,6 @@ func (d *IosDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	configData.Host = types.StringValue(readOutp.Host)
 	configData.IgnoreCertifcate = types.BoolValue(readOutp.IgnoreCertifcate)
 
-	// Fix: where to find them? We need them for import statement
-	// stateData.Username = types.StringNull()
-	// stateData.Password = types.StringNull()
-
 	tflog.Trace(ctx, "done read IOS device data source")
 
 	// Save data into Terraform state

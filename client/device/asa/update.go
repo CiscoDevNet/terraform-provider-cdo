@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cisco-lockhart/go-client/connector/sdc"
 	"github.com/cisco-lockhart/go-client/internal/device/asaconfig"
 	"github.com/cisco-lockhart/go-client/internal/retry"
+
+	"github.com/cisco-lockhart/go-client/connector/sdc"
 
 	"github.com/cisco-lockhart/go-client/device"
 	"github.com/cisco-lockhart/go-client/internal/http"
@@ -31,15 +32,6 @@ func NewUpdateInput(uid string, name string, username string, password string) *
 		Username: username,
 		Password: password,
 	}
-}
-
-func NewUpdateRequest(ctx context.Context, client http.Client, updateInp UpdateInput) *http.Request {
-
-	url := url.UpdateDevice(client.BaseUrl(), updateInp.Uid)
-
-	req := client.NewPut(ctx, url, updateInp)
-
-	return req
 }
 
 func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*UpdateOutput, error) {
@@ -107,7 +99,9 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 		}
 	}
 
-	req := NewUpdateRequest(ctx, client, updateInp)
+	url := url.UpdateDevice(client.BaseUrl(), updateInp.Uid)
+
+	req := client.NewPut(ctx, url, updateInp)
 
 	var outp UpdateOutput
 	if err := req.Send(&outp); err != nil {

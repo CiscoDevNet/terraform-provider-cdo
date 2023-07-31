@@ -22,20 +22,13 @@ func NewUpdateInput(uid string, name string) *UpdateInput {
 	}
 }
 
-func NewUpdateRequest(ctx context.Context, client http.Client, updateInp UpdateInput) *http.Request {
-
-	url := url.UpdateDevice(client.BaseUrl(), updateInp.Uid)
-
-	req := client.NewPut(ctx, url, updateInp)
-
-	return req
-}
-
 func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*UpdateOutput, error) {
 
 	client.Logger.Println("updating ios device")
 
-	req := NewUpdateRequest(ctx, client, updateInp)
+	url := url.UpdateDevice(client.BaseUrl(), updateInp.Uid)
+
+	req := client.NewPut(ctx, url, updateInp)
 
 	var outp UpdateOutput
 	if err := req.Send(&outp); err != nil {

@@ -3,19 +3,18 @@ package ios
 import (
 	"context"
 	"fmt"
-	"strconv"
 
-	"github.com/cisco-lockhart/go-client/connector/sdc"
 	"github.com/cisco-lockhart/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	cdoClient "github.com/cisco-lockhart/go-client"
-	"github.com/cisco-lockhart/go-client/device/ios"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -77,6 +76,9 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 			"ipv4": schema.StringAttribute{
 				MarkdownDescription: "The ipv4 address of the device",
 				Required:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"port": schema.Int64Attribute{
 				MarkdownDescription: "The port used to connect to the device",
@@ -89,11 +91,17 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 			"username": schema.StringAttribute{
 				MarkdownDescription: "The username used to authenticate with the device",
 				Required:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"password": schema.StringAttribute{
 				MarkdownDescription: "The password used to authenticate with the device",
 				Required:            true,
 				Sensitive:           true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"ignore_certificate": schema.BoolAttribute{
 				MarkdownDescription: "Whether to ignore certificate validation",
@@ -128,45 +136,19 @@ func (r *IosDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 
 	tflog.Trace(ctx, "read IOS device resource")
 
-	var stateData *IosDeviceResourceModel
-
-	// Read Terraform plan data into the model
+	// 1. read state data
+	var stateData IosDeviceResourceModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &stateData)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	// read ios
-	readInp := ios.ReadInput{
-		Uid: stateData.ID.ValueString(),
-	}
-	readOutp, err := r.client.ReadIos(ctx, readInp)
-	if err != nil {
-		resp.Diagnostics.AddError("unable to read IOS Device", err.Error())
-		return
+	// 2. do read
+	if err := Read(ctx, r, &stateData); err != nil {
+		resp.Diagnostics.AddError("failed to read IOS device", err.Error())
 	}
 
-	port, err := strconv.ParseInt(readOutp.Port, 10, 16)
-	if err != nil {
-		resp.Diagnostics.AddError("unable to read IOS Device", err.Error())
-		return
-	}
-	stateData.Port = types.Int64Value(port)
-
-	stateData.ID = types.StringValue(readOutp.Uid)
-	stateData.SdcType = types.StringValue(readOutp.LarType)
-	stateData.Name = types.StringValue(readOutp.Name)
-	stateData.Ipv4 = types.StringValue(readOutp.Ipv4)
-	stateData.Host = types.StringValue(readOutp.Host)
-	stateData.IgnoreCertifcate = types.BoolValue(readOutp.IgnoreCertifcate)
-
-	// Fix: where to find them? We need them for import statement
-	// stateData.Username = types.StringNull()
-	// stateData.Password = types.StringNull()
-
-	tflog.Trace(ctx, "done read IOS device resource")
-
-	// Save data into Terraform state
+	// 3. save data into terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &stateData)...)
 }
 
@@ -174,50 +156,20 @@ func (r *IosDeviceResource) Create(ctx context.Context, req resource.CreateReque
 
 	tflog.Trace(ctx, "create IOS device resource")
 
+	// 1. read plan data into planData
 	var planData IosDeviceResourceModel
 	res.Diagnostics.Append(req.Plan.Get(ctx, &planData)...)
 	if res.Diagnostics.HasError() {
 		return
 	}
 
-	readSdcByNameInp := sdc.NewReadByNameInput(
-		planData.SdcName.ValueString(),
-	)
-
-	specificSdcOutp, err := r.client.ReadSdcByName(ctx, *readSdcByNameInp)
-	if err != nil {
-		res.Diagnostics.AddError("failed to read SDC by name", err.Error())
+	// 2. use plan data to create device and fill up rest of the model
+	if err := Create(ctx, r, &planData); err != nil {
+		res.Diagnostics.AddError("failed to create IOS device", err.Error())
 		return
 	}
 
-	createInp := ios.NewCreateRequestInput(
-		planData.Name.ValueString(),
-		specificSdcOutp.Uid,
-		planData.SdcType.ValueString(),
-		planData.Ipv4.ValueString(),
-		planData.Username.ValueString(),
-		planData.Password.ValueString(),
-		planData.IgnoreCertifcate.ValueBool(),
-	)
-
-	createOutp, err := r.client.CreateIos(ctx, *createInp)
-	if err != nil {
-		res.Diagnostics.AddError("failed to create IOS", err.Error())
-		return
-	}
-
-	planData.ID = types.StringValue(createOutp.Uid)
-	planData.SdcType = types.StringValue(createOutp.LarType)
-	planData.SdcName = types.StringValue(planData.SdcName.ValueString())
-	planData.Name = types.StringValue(createOutp.Name)
-	planData.Host = types.StringValue(createOutp.Host)
-
-	port, err := strconv.ParseInt(createOutp.Port, 10, 16)
-	if err != nil {
-		res.Diagnostics.AddError("failed to parse IOS port", err.Error())
-	}
-	planData.Port = types.Int64Value(port)
-
+	// 3. set state using filled model
 	res.Diagnostics.Append(res.State.Set(ctx, &planData)...)
 }
 
@@ -225,31 +177,26 @@ func (r *IosDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 
 	tflog.Trace(ctx, "update IOS device resource")
 
-	var planData *IosDeviceResourceModel
+	// 1. read plan data
+	var planData IosDeviceResourceModel
 	res.Diagnostics.Append(req.Plan.Get(ctx, &planData)...)
 	if res.Diagnostics.HasError() {
 		return
 	}
 
-	var stateData *IosDeviceResourceModel
+	// 2. read state data
+	var stateData IosDeviceResourceModel
 	res.Diagnostics.Append(req.State.Get(ctx, &stateData)...)
 	if res.Diagnostics.HasError() {
 		return
 	}
 
-	updateInp := ios.NewUpdateInput(
-		stateData.ID.ValueString(),
-		planData.Name.ValueString(),
-	)
-
-	updateOutp, err := r.client.UpdateIos(ctx, *updateInp)
-	if err != nil {
+	// 3. do update
+	if err := Update(ctx, r, &planData, &stateData); err != nil {
 		res.Diagnostics.AddError("failed to update IOS device", err.Error())
-		return
 	}
 
-	stateData.Name = types.StringValue(updateOutp.Name)
-
+	// 4. set resulting state
 	res.Diagnostics.Append(res.State.Set(ctx, &stateData)...)
 }
 
@@ -258,19 +205,14 @@ func (r *IosDeviceResource) Delete(ctx context.Context, req resource.DeleteReque
 	tflog.Trace(ctx, "delete IOS device resource")
 
 	var stateData IosDeviceResourceModel
-
 	res.Diagnostics.Append(req.State.Get(ctx, &stateData)...)
 	if res.Diagnostics.HasError() {
 		return
 	}
 
-	deleteInp := ios.NewDeleteInput(stateData.ID.ValueString())
-	_, err := r.client.DeleteIos(ctx, *deleteInp)
-	if err != nil {
+	if err := Delete(ctx, r, &stateData); err != nil {
 		res.Diagnostics.AddError("failed to delete IOS device", err.Error())
-		return
 	}
-
 }
 
 func (r *IosDeviceResource) ImportState(ctx context.Context, req resource.ImportStateRequest, res *resource.ImportStateResponse) {

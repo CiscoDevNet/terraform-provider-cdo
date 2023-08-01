@@ -9,6 +9,13 @@ import (
 	"github.com/cisco-lockhart/go-client/internal/retry"
 )
 
+// TODO: Create AsaConfigState type
+const (
+	AsaConfigStateDone           = "DONE"
+	AsaConfigStateError          = "ERROR"
+	AsaConfigStateBadCredentials = "BAD_CREDENTIALS"
+)
+
 func UntilStateDone(ctx context.Context, client http.Client, specificUid string) retry.Func {
 
 	// create asa config read request
@@ -25,13 +32,13 @@ func UntilStateDone(ctx context.Context, client http.Client, specificUid string)
 		}
 
 		client.Logger.Printf("asa config state=%s\n", readOutp.State)
-		if strings.EqualFold(readOutp.State, "DONE") {
+		if strings.EqualFold(readOutp.State, AsaConfigStateDone) {
 			return true, nil
 		}
-		if strings.EqualFold(readOutp.State, "ERROR") {
+		if strings.EqualFold(readOutp.State, AsaConfigStateError) {
 			return false, fmt.Errorf("workflow ended in ERROR")
 		}
-		if strings.EqualFold(readOutp.State, "BAD_CREDENTIALS") {
+		if strings.EqualFold(readOutp.State, AsaConfigStateBadCredentials) {
 			return false, fmt.Errorf("bad credentials")
 		}
 		return false, nil

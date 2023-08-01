@@ -24,6 +24,7 @@ func NewReadAllRequest(ctx context.Context, client http.Client, readAllInp ReadA
 	return req
 }
 
+// TODO: Change the return type to return value type over pointer (*ReadAllOutput -> ReadAllOutput). Slices are references in golang.
 func ReadAll(ctx context.Context, client http.Client, readAllInp ReadAllInput) (*ReadAllOutput, error) {
 
 	client.Logger.Println("reading all sdcs")

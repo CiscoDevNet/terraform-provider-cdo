@@ -43,7 +43,7 @@ func NewReadByNameInput(larName string) *ReadByNameInput {
 	}
 }
 
-func NewReadByUidRequest(ctx context.Context, client http.Client, readInp ReadInput) *http.Request {
+func newReadByUidRequest(ctx context.Context, client http.Client, readInp ReadInput) *http.Request {
 
 	url := url.ReadSdcByUid(client.BaseUrl(), readInp.LarUid)
 
@@ -52,7 +52,7 @@ func NewReadByUidRequest(ctx context.Context, client http.Client, readInp ReadIn
 	return req
 }
 
-func NewReadByNameRequest(ctx context.Context, client http.Client, readInp ReadByNameInput) *http.Request {
+func newReadByNameRequest(ctx context.Context, client http.Client, readInp ReadByNameInput) *http.Request {
 
 	url := url.ReadSdcByName(client.BaseUrl(), readInp.LarName)
 
@@ -65,7 +65,7 @@ func ReadByUid(ctx context.Context, client http.Client, readInp ReadInput) (*Rea
 
 	client.Logger.Println("reading sdc")
 
-	req := NewReadByUidRequest(ctx, client, readInp)
+	req := newReadByUidRequest(ctx, client, readInp)
 
 	var outp ReadOutput
 	if err := req.Send(&outp); err != nil {
@@ -79,7 +79,7 @@ func ReadByName(ctx context.Context, client http.Client, readInp ReadByNameInput
 
 	client.Logger.Println("reading sdc by name")
 
-	req := NewReadByNameRequest(ctx, client, readInp)
+	req := newReadByNameRequest(ctx, client, readInp)
 
 	var arrayOutp []ReadOutput
 	if err := req.Send(&arrayOutp); err != nil {

@@ -15,8 +15,8 @@ data "cdo_asa_device" "my_asa" {
   id = "b66fcd42-f12b-497f-b39e-51fc7d7b8687"
 }
 
-output "asa_sdc_type" {
-  value = data.cdo_asa_device.my_asa.sdc_type
+output "asa_connector_type" {
+  value = data.cdo_asa_device.my_asa.connector_type
 }
 output "asa_sdc_name" {
   value = data.cdo_asa_device.my_asa.sdc_name

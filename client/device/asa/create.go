@@ -133,11 +133,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	client.Logger.Println("waiting for device to reach state done")
 
 	err = retry.Do(asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), *retry.NewOptionsWithLogger(client.Logger))
-	if err != nil {
-		return nil, err
-	}
 
-	// done!
 	createOutp := CreateOutput{
 		Uid:        deviceCreateOutp.Uid,
 		Name:       deviceCreateOutp.Name,
@@ -150,5 +146,5 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 
 		specificUid: asaReadSpecOutp.SpecificUid,
 	}
-	return &createOutp, nil
+	return &createOutp, err
 }

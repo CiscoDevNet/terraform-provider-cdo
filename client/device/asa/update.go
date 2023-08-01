@@ -82,6 +82,10 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 				_ = fmt.Errorf("failed to update credentials for ASA device: %s", err.Error())
 				return nil, err
 			}
+
+			if err := retry.Do(asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), retry.DefaultOpts); err != nil {
+				return nil, err
+			}
 		}
 
 		if updateInp.Location != "" {
@@ -105,6 +109,10 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 
 	var outp UpdateOutput
 	if err := req.Send(&outp); err != nil {
+		return nil, err
+	}
+
+	if err := retry.Do(UntilStateDoneAndConnectivityOk(ctx, client, outp.Uid), retry.DefaultOpts); err != nil {
 		return nil, err
 	}
 

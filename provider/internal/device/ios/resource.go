@@ -30,7 +30,7 @@ type IosDeviceResource struct {
 
 type IosDeviceResourceModel struct {
 	ID      types.String `tfsdk:"id"`
-	SdcType types.String `tfsdk:"sdc_type"`
+	SdcType types.String `tfsdk:"connector_type"`
 	SdcName types.String `tfsdk:"sdc_name"`
 	Name    types.String `tfsdk:"name"`
 	Ipv4    types.String `tfsdk:"socket_address"`
@@ -50,52 +50,52 @@ func (r *IosDeviceResource) Metadata(ctx context.Context, req resource.MetadataR
 func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "IOS Device resource",
+		MarkdownDescription: "Provides an iOS device resource. This allows iOS devices to be onboarded, updated, and deleted on CDO.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "Uid used to represent the device",
+				MarkdownDescription: "Unique identifier of the device. This is a UUID and will be automatically generated when the device is created.",
 				Computed:            true,
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "Name to assign the device",
+				MarkdownDescription: "A human-readable name for the device.",
 				Required:            true,
 			},
 			"sdc_name": schema.StringAttribute{
-				MarkdownDescription: "The SDC name that will be used to communicate with the device",
+				MarkdownDescription: "The name of the Secure Device Connector (SDC) that will be used to communicate with the device. This value is not required if the connector type selected is Cloud Device Gateway (CDG).",
 				Required:            true,
 			},
-			"sdc_type": schema.StringAttribute{
-				MarkdownDescription: "The type of SDC that will be used to communicate with the device (Valid values: [CDG, SDC])",
+			"connector_type": schema.StringAttribute{
+				MarkdownDescription: "The type of the connector that will be used to communicate with the device. You can communicate with your device using either a Cloud Connector (CDG) or a Secure Device Connector (SDC); see [the CDO documentation](https://docs.defenseorchestrator.com/c-connect-cisco-defense-orchestratortor-the-secure-device-connector.html) to learn mor (Valid values: [CDG, SDC]).",
 				Required:            true,
 				Validators: []validator.String{
 					validators.OneOf("CDG", "SDC"),
 				},
 			},
 			"socket_address": schema.StringAttribute{
-				MarkdownDescription: "The socket address of the device (combination of a host and port)",
+				MarkdownDescription: "The address of the device to onboard, specified in the format `host:port`.",
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"port": schema.Int64Attribute{
-				MarkdownDescription: "The port used to connect to the device",
+				MarkdownDescription: "The port used to connect to the device.",
 				Computed:            true,
 			},
 			"host": schema.StringAttribute{
-				MarkdownDescription: "The host used to connect to the device",
+				MarkdownDescription: "The host used to connect to the device.",
 				Computed:            true,
 			},
 			"username": schema.StringAttribute{
-				MarkdownDescription: "The username used to authenticate with the device",
+				MarkdownDescription: "The username used to authenticate with the device.",
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"password": schema.StringAttribute{
-				MarkdownDescription: "The password used to authenticate with the device",
+				MarkdownDescription: "The password used to authenticate with the device.",
 				Required:            true,
 				Sensitive:           true,
 				PlanModifiers: []planmodifier.String{
@@ -103,7 +103,7 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				},
 			},
 			"ignore_certificate": schema.BoolAttribute{
-				MarkdownDescription: "Whether to ignore certificate validation",
+				MarkdownDescription: "Set this attribute to true if you do not wish for CDO to validate the certificate of this device before onboarding.",
 				Required:            true,
 			},
 		},

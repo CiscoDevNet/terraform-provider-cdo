@@ -42,7 +42,7 @@ func TestAccAsaDeviceDataSource(t *testing.T) {
 				Config: acctest.ProviderConfig() + testAsaDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "id", testAsaDataSource.Id),
-					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "sdc_type", testAsaDataSource.SdcType),
+					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "connector_type", testAsaDataSource.SdcType),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "name", testAsaDataSource.Name),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "socket_address", testAsaDataSource.Ipv4),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "host", testAsaDataSource.Host),

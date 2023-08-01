@@ -41,6 +41,9 @@ func UntilStateDone(ctx context.Context, client http.Client, specificUid string)
 		if strings.EqualFold(readOutp.State, AsaConfigStateBadCredentials) {
 			return false, fmt.Errorf("bad credentials")
 		}
+		if strings.EqualFold(readOutp.State, "$PRE_WAIT_FOR_USER_TO_UPDATE_CREDS") {
+			return false, fmt.Errorf("bad credentials")
+		}
 		return false, nil
 	}
 }

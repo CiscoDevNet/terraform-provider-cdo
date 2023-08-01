@@ -24,7 +24,7 @@ const asaResourceTemplate = `
 resource "cdo_asa_device" "test" {
 	name = "{{.Name}}"
 	socket_address = "{{.Ipv4}}"
-	sdc_type = "{{.SdcType}}"
+	connector_type = "{{.SdcType}}"
 	username = "{{.Username}}"
 	password = "{{.Password}}"
 	ignore_certificate = "{{.IgnoreCertificate}}"
@@ -111,7 +111,7 @@ func TestAccAsaDeviceResource_SDC(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "socket_address", testAsaResource_SDC.Ipv4),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "host", testAsaResource_SDC.Host),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "port", testAsaResource_SDC.Port),
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "sdc_type", testAsaResource_SDC.SdcType),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "connector_type", testAsaResource_SDC.SdcType),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "username", testAsaResource_SDC.Username),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_SDC.Password),
 				),
@@ -161,7 +161,7 @@ func TestAccAsaDeviceResource_CDG(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "socket_address", testAsaResource_CDG.Ipv4),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "host", testAsaResource_CDG.Host),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "port", testAsaResource_CDG.Port),
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "sdc_type", testAsaResource_CDG.SdcType),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "connector_type", testAsaResource_CDG.SdcType),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "username", testAsaResource_CDG.Username),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_CDG.Password),
 				),

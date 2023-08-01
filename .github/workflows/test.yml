@@ -53,11 +53,12 @@ jobs:
         with:
           go-version: '1.20'
           cache: true
-      - run: go generate ./...
+      - run: go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --provider-name cdo --rendered-provider-name "CDO Provider"
       - name: git diff
         run: |
           git diff --compact-summary --exit-code || \
-            (echo; echo "Unexpected difference in directories after code generation. Run 'go generate ./...' command and commit."; exit 1)
+            (echo; echo "Unexpected difference in directories after docs generation. Run 'go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --provider-name cdo --rendered-provider-name "CDO Provider"' command from the provider directory and commit."; exit 1)
+
 
   # Run acceptance tests in a matrix with Terraform CLI versions
   test:

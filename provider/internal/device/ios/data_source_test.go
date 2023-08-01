@@ -41,7 +41,7 @@ func TestAccIosDeviceDataSource(t *testing.T) {
 				Config: acctest.ProviderConfig() + testIosDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "id", testIosDataSource.Id),
-					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "sdc_type", testIosDataSource.SdcType),
+					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "connector_type", testIosDataSource.SdcType),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "name", testIosDataSource.Name),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "socket_address", testIosDataSource.Ipv4),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "host", testIosDataSource.Host),

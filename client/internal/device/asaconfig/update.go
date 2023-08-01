@@ -90,6 +90,7 @@ type updateLocationRequestBody struct {
 
 type pendingLocationUpdateSmContext struct {
 	Ipv4 string `json:"ipv4"`
+	CertificateAccepted bool `json:"certificateAccepted"`
 }
 
 func UpdateLocation(ctx context.Context, client http.Client, options UpdateLocationOptions) (*UpdateOutput, error) {
@@ -99,6 +100,7 @@ func UpdateLocation(ctx context.Context, client http.Client, options UpdateLocat
 		QueueTriggerState: "PENDING_LOCATION_UPDATE",
 		SmContext: pendingLocationUpdateSmContext{
 			options.Location,
+			true,
 		},
 	})
 

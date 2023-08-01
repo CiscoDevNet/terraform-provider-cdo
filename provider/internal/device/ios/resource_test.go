@@ -24,7 +24,7 @@ const testIosResourceTemplate = `
 resource "cdo_ios_device" "test" {
 	name = "{{.Name}}"
 	socket_address = "{{.Ipv4}}"
-	sdc_type = "{{.SdcType}}"
+	connector_type = "{{.SdcType}}"
 	username = "{{.Username}}"
 	password = "{{.Password}}"
 	sdc_name = "{{.SdcName}}"
@@ -63,7 +63,7 @@ func TestAccIosDeviceResource_SDC(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "socket_address", testIosResource.Ipv4),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "host", testIosResource.Host),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "port", testIosResource.Port),
-					resource.TestCheckResourceAttr("cdo_ios_device.test", "sdc_type", testIosResource.SdcType),
+					resource.TestCheckResourceAttr("cdo_ios_device.test", "connector_type", testIosResource.SdcType),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "username", testIosResource.Username),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "password", testIosResource.Password),
 				),

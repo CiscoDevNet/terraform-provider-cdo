@@ -13,7 +13,7 @@ provider "cdo" {
 
 resource "cdo_ios_device" "my_ios" {
   name               = "my_ios"
-  sdc_type           = "SDC"
+  connector_type     = "SDC"
   sdc_name           = "<FILL_ME>"
   socket_address     = "<FILL_ME>"
   username           = "<FILL_ME>"

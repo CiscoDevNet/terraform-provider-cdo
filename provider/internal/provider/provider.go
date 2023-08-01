@@ -43,6 +43,7 @@ func (p *CdoProvider) Metadata(ctx context.Context, req provider.MetadataRequest
 
 func (p *CdoProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		Description: "Use the Cisco Defense Orchestrator (CDO) provider to onboard and manage the many devices and other resources supported by CDO. You must configure the provider with the proper credentials and region before you can use it.",
 		Attributes: map[string]schema.Attribute{
 			"api_token": schema.StringAttribute{
 				MarkdownDescription: "The API token used to authenticate with the Cisco CDO platform",
@@ -128,7 +129,6 @@ func (p *CdoProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 func (p *CdoProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		NewExampleResource,
 		asa.NewAsaDeviceResource,
 		ios.NewIosDeviceResource,
 	}
@@ -136,7 +136,6 @@ func (p *CdoProvider) Resources(ctx context.Context) []func() resource.Resource 
 
 func (p *CdoProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
-		NewExampleDataSource,
 		sdc.NewSdcDataSource,
 		asa.NewAsaDataSource,
 		ios.NewIosDataSource,

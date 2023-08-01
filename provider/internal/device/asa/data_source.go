@@ -36,7 +36,7 @@ type AsaDataSource struct {
 
 type AsaDataSourceModel struct {
 	ID               types.String `tfsdk:"id"`
-	SdcType          types.String `tfsdk:"sdc_type"`
+	SdcType          types.String `tfsdk:"connector_type"`
 	SdcName          types.String `tfsdk:"sdc_name"`
 	Name             types.String `tfsdk:"name"`
 	Ipv4             types.String `tfsdk:"socket_address"`
@@ -70,7 +70,7 @@ func (d *AsaDataSource) Schema(ctx context.Context, req datasource.SchemaRequest
 				MarkdownDescription: "The SDC name that will be used to communicate with the device",
 				Computed:            true,
 			},
-			"sdc_type": schema.StringAttribute{
+			"connector_type": schema.StringAttribute{
 				MarkdownDescription: "The type of SDC that will be used to communicate with the device (Valid values: [CDG, SDC])",
 				Computed:            true,
 				Validators: []validator.String{

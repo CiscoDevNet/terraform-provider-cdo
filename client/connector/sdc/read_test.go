@@ -15,14 +15,14 @@ func TestReadByUid(t *testing.T) {
 	defer httpmock.DeactivateAndReset()
 
 	validCdg := NewSdcResponseBuilder().
-		AsDefaultCdg().
+		AsDefaultCloudConnector().
 		WithUid(cdgUid).
 		WithName(cdgName).
 		WithTenantUid(tenantUid).
 		Build()
 
 	validSdc := NewSdcResponseBuilder().
-		AsSdc().
+		AsOnPremConnector().
 		WithUid(sdcUid).
 		WithName(sdcName).
 		WithTenantUid(tenantUid).
@@ -125,8 +125,8 @@ func TestReadByUid(t *testing.T) {
 					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
 				}
 
-				if err != nil {
-					t.Errorf("expected err to be nil, got: %s", err.Error())
+				if err == nil {
+					t.Error("error was nil!")
 				}
 			},
 		},
@@ -150,14 +150,14 @@ func TestReadByName(t *testing.T) {
 	defer httpmock.DeactivateAndReset()
 
 	validCdg := NewSdcResponseBuilder().
-		AsDefaultCdg().
+		AsDefaultCloudConnector().
 		WithUid(cdgUid).
 		WithName(cdgName).
 		WithTenantUid(tenantUid).
 		Build()
 
 	validSdc := NewSdcResponseBuilder().
-		AsSdc().
+		AsOnPremConnector().
 		WithUid(sdcUid).
 		WithName(sdcName).
 		WithTenantUid(tenantUid).
@@ -292,8 +292,8 @@ func TestReadByName(t *testing.T) {
 					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
 				}
 
-				if err != nil {
-					t.Errorf("expected err to be nil, got: %s", err.Error())
+				if err == nil {
+					t.Error("error was nil!")
 				}
 			},
 		},

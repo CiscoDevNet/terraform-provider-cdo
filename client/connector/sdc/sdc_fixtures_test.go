@@ -3,9 +3,8 @@ package sdc
 import (
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/x509"
-	"encoding/base64"
-	"encoding/pem"
+
+	internalRsa "github.com/cisco-lockhart/go-client/internal/crypto/rsa"
 )
 
 const (
@@ -28,17 +27,17 @@ func (builder *sdcResponseBuilder) Build() ReadOutput {
 	return builder.readOutput
 }
 
-func (builder *sdcResponseBuilder) AsDefaultCdg() *sdcResponseBuilder {
+func (builder *sdcResponseBuilder) AsDefaultCloudConnector() *sdcResponseBuilder {
 	builder.readOutput.DefaultLar = true
 	builder.readOutput.Cdg = true
 
 	return builder
 }
 
-func (builder *sdcResponseBuilder) AsSdc() *sdcResponseBuilder {
+func (builder *sdcResponseBuilder) AsOnPremConnector() *sdcResponseBuilder {
 	builder.readOutput.Cdg = false
 	builder.readOutput.PublicKey = PublicKey{
-		EncodedKey: generateBase64PublicKey(),
+		EncodedKey: mustGenerateBase64PublicKey(),
 		Version:    164,
 		KeyId:      "01010101-0101-0101-0101-010101010101",
 	}
@@ -64,23 +63,11 @@ func (builder *sdcResponseBuilder) WithTenantUid(tenantUid string) *sdcResponseB
 	return builder
 }
 
-func generateBase64PublicKey() string {
+func mustGenerateBase64PublicKey() string {
 	key, err := rsa.GenerateKey(rand.Reader, 512)
 	if err != nil {
 		panic(err)
 	}
 
-	pub := key.Public()
-
-	pubPem := pem.EncodeToMemory(
-		&pem.Block{
-			Type:  "RSA PUBLIC KEY",
-			Bytes: x509.MarshalPKCS1PublicKey(pub.(*rsa.PublicKey)),
-		},
-	)
-
-	base64Bytes := make([]byte, base64.StdEncoding.EncodedLen(len(pubPem)))
-	base64.StdEncoding.Encode(base64Bytes, pubPem)
-
-	return string(base64Bytes)
+	return internalRsa.MustBase64PublicKeyFromRsaKey(key)
 }

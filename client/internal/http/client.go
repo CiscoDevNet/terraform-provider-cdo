@@ -17,12 +17,12 @@ type Client struct {
 }
 
 // NewWithDefault instantiates a new Client with default HTTP configuration
-func NewWithDefault(baseUrl, string, apiToken string) *Client {
+func NewWithDefault(baseUrl, apiToken string) *Client {
 	return NewWithHttpClient(cdo.DefaultHttpClient, baseUrl, apiToken)
 }
 
 // NewWithHttpClient instantiates a new Client with provided HTTP configuration
-func NewWithHttpClient(client *http.Client, baseUrl string, apiToken string) *Client {
+func NewWithHttpClient(client *http.Client, baseUrl, apiToken string) *Client {
 	return New(client, cdo.DefaultLogger, baseUrl, apiToken, cdo.DefaultRetries, cdo.DefaultDelay, cdo.DefaultTimeout)
 }
 

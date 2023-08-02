@@ -11,6 +11,7 @@ type DeleteInput struct {
 	Uid string `json:"uid"`
 }
 
+// TODO: Remove empty struct
 type DeleteOutput struct {
 }
 
@@ -29,6 +30,7 @@ func NewDeleteRequest(ctx context.Context, client http.Client, deleteInp DeleteI
 	return req
 }
 
+// TODO: Change so func only returns error
 func Delete(ctx context.Context, client http.Client, deleteInp DeleteInput) (*DeleteOutput, error) {
 
 	client.Logger.Println("deleting device")

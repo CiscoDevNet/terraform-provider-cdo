@@ -9,6 +9,7 @@ import (
 
 	"github.com/cisco-lockhart/go-client/internal/http"
 	"github.com/cisco-lockhart/go-client/internal/retry"
+	internalTesting "github.com/cisco-lockhart/go-client/internal/testing"
 	"github.com/jarcoal/httpmock"
 )
 
@@ -64,7 +65,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
 
-				assertCallCounts("GET", makeFetchAsaConfigUrl(asaConfigUid), 3, t)
+				internalTesting.AssertEndpointCalledTimes("GET", makeFetchAsaConfigUrl(asaConfigUid), 3, t)
 			},
 		},
 		{
@@ -100,7 +101,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 					t.Error("expected error to be returned")
 				}
 
-				assertCallCounts("GET", makeFetchAsaConfigUrl(asaConfigUid), 3, t)
+				internalTesting.AssertEndpointCalledTimes("GET", makeFetchAsaConfigUrl(asaConfigUid), 3, t)
 			},
 		},
 		{
@@ -136,7 +137,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 					t.Error("expected error to be returned")
 				}
 
-				assertCallCounts("GET", makeFetchAsaConfigUrl(asaConfigUid), 3, t)
+				internalTesting.AssertEndpointCalledTimes("GET", makeFetchAsaConfigUrl(asaConfigUid), 3, t)
 			},
 		},
 	}
@@ -154,13 +155,5 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 
 			testCase.assertFunc(err, t)
 		})
-	}
-}
-
-func assertCallCounts(method, path string, count int, t *testing.T) {
-	callCounts := httpmock.GetCallCountInfo()
-	callCount := callCounts[fmt.Sprintf("%s %s", method, path)]
-	if callCount != count {
-		t.Errorf("expected %d calls, got: %d\nAll calls: %+v", count, callCount, callCounts)
 	}
 }

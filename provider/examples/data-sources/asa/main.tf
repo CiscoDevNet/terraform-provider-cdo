@@ -1,18 +1,18 @@
 terraform {
   required_providers {
     cdo = {
-      source = "hashicorp/cisco-lockhart/cdo"
+      source = "hashicorp.com/cisco-lockhart/cdo"
     }
   }
 }
 
 provider "cdo" {
-  base_url  = "https://staging.dev.lockhart.io"
-  api_token = "<FILL_ME>"
+  base_url  = "<replace-with-cdo-base-url>"
+  api_token = "<replace-with-api-token-generated-from-cdo>"
 }
 
 data "cdo_asa_device" "my_asa" {
-  id = "b66fcd42-f12b-497f-b39e-51fc7d7b8687"
+  name = "<enter-device-name>"
 }
 
 output "asa_connector_type" {

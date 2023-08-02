@@ -13,8 +13,8 @@ Use the Cisco Defense Orchestrator (CDO) provider to onboard and manage the many
 
 ### Required
 
-- `base_url` (String) The base URL used to communicate with the Cisco CDO platform
+- `base_url` (String) The base CDO URL. This is the URL you enter when logging into your CDO account.
 
 ### Optional
 
-- `api_token` (String, Sensitive) The API token used to authenticate with the Cisco CDO platform
+- `api_token` (String, Sensitive) The API token used to authenticate with CDO. [See here](https://docs.defenseorchestrator.com/c_api-tokens.html#!t-generatean-api-token.html) to learn how to generate an API token.

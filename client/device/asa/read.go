@@ -8,6 +8,7 @@ import (
 )
 
 type ReadInput = device.ReadInput
+
 type ReadOutput struct {
 	Uid             string `json:"uid"`
 	Name            string `json:"name"`

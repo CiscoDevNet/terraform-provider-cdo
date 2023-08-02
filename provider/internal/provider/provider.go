@@ -11,11 +11,13 @@ import (
 	"github.com/cisco-lockhart/terraform-provider-cdo/internal/device/ios"
 
 	cdoClient "github.com/cisco-lockhart/go-client"
+	"github.com/cisco-lockhart/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/cisco-lockhart/terraform-provider-cdo/internal/device/asa"
@@ -46,13 +48,16 @@ func (p *CdoProvider) Schema(ctx context.Context, req provider.SchemaRequest, re
 		Description: "Use the Cisco Defense Orchestrator (CDO) provider to onboard and manage the many devices and other resources supported by CDO. You must configure the provider with the proper credentials and region before you can use it.",
 		Attributes: map[string]schema.Attribute{
 			"api_token": schema.StringAttribute{
-				MarkdownDescription: "The API token used to authenticate with the Cisco CDO platform",
+				MarkdownDescription: "The API token used to authenticate with CDO. [See here](https://docs.defenseorchestrator.com/c_api-tokens.html#!t-generatean-api-token.html) to learn how to generate an API token.",
 				Optional:            true,
 				Sensitive:           true,
 			},
 			"base_url": schema.StringAttribute{
-				MarkdownDescription: "The base URL used to communicate with the Cisco CDO platform",
+				MarkdownDescription: "The base CDO URL. This is the URL you enter when logging into your CDO account.",
 				Required:            true,
+				Validators: []validator.String{
+					validators.OneOf("https://www.defenseorchestrator.com", "https://www.defenseorchestrator.eu", "https://apj.cdo.cisco.com", "https://staging.dev.lockhart.io", "https://ci.dev.lockhart.io", "https://scale.dev.lockhart.io"),
+				},
 			},
 		},
 	}

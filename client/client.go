@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/cisco-lockhart/go-client/connector/sdc"
+	"github.com/cisco-lockhart/go-client/device"
 	"github.com/cisco-lockhart/go-client/device/ios"
 
 	"github.com/cisco-lockhart/go-client/device/asa"
@@ -41,6 +42,11 @@ func (c *Client) ReadSdcByName(ctx context.Context, inp sdc.ReadByNameInput) (*s
 
 func (c *Client) ReadAsa(ctx context.Context, inp asa.ReadInput) (*asa.ReadOutput, error) {
 	return asa.Read(ctx, c.client, inp)
+}
+
+
+func (c *Client) ReadDeviceByName(ctx context.Context, inp device.ReadByNameAndDeviceTypeInput) (*device.ReadOutput, error) {
+	return device.ReadByNameAndDeviceType(ctx, c.client, inp)
 }
 
 func (c *Client) CreateAsa(ctx context.Context, inp asa.CreateInput) (*asa.CreateOutput, error) {

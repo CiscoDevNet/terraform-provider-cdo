@@ -77,7 +77,7 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				},
 			},
 			"connector_type": schema.StringAttribute{
-				MarkdownDescription: "The type of the connector that will be used to communicate with the device. You can communicate with your device using either a Cloud Connector (CDG) or a Secure Device Connector (SDC); see [the CDO documentation](https://docs.defenseorchestrator.com/c-connect-cisco-defense-orchestratortor-the-secure-device-connector.html) to learn mor (Valid values: [CDG, SDC]).",
+				MarkdownDescription: "The type of the connector that will be used to communicate with the device. CDO can communicate with your device using either a Cloud Connector (CDG) or a Secure Device Connector (SDC); see [the CDO documentation](https://docs.defenseorchestrator.com/c-connect-cisco-defense-orchestratortor-the-secure-device-connector.html) to learn mor (Valid values: [CDG, SDC]).",
 				Required:            true,
 				Validators: []validator.String{
 					validators.OneOf("CDG", "SDC"),

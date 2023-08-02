@@ -9,7 +9,7 @@ import (
 	"strconv"
 
 	cdoClient "github.com/cisco-lockhart/go-client"
-	"github.com/cisco-lockhart/go-client/device/asa"
+	"github.com/cisco-lockhart/go-client/device"
 	"github.com/cisco-lockhart/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -59,38 +59,38 @@ func (d *AsaDataSource) Schema(ctx context.Context, req datasource.SchemaRequest
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "Uid used to represent the device",
-				Required:            true,
-			},
-			"name": schema.StringAttribute{
-				MarkdownDescription: "Name assigned to the device",
+				MarkdownDescription: "Universally unique identifier of the device.",
 				Computed:            true,
 			},
+			"name": schema.StringAttribute{
+				MarkdownDescription: "The human-readable name of the device. This is the name that is displayed in the CDO inventory page. Device names are unique across a CDO tenant.",
+				Required:            true,
+			},
 			"sdc_name": schema.StringAttribute{
-				MarkdownDescription: "The SDC name that will be used to communicate with the device",
+				MarkdownDescription: "The name of the Secure Device Connector (SDC) that is used by CDO to communicate with the device. This value will be empty if the device was onboarded using a Cloud Connector (CDG).",
 				Computed:            true,
 			},
 			"connector_type": schema.StringAttribute{
-				MarkdownDescription: "The type of SDC that will be used to communicate with the device (Valid values: [CDG, SDC])",
+				MarkdownDescription: "The type of the connector that is used to communicate with the device. CDO can communicate with your device using either a Cloud Connector (CDG) or a Secure Device Connector (SDC); see [the CDO documentation](https://docs.defenseorchestrator.com/c-connect-cisco-defense-orchestratortor-the-secure-device-connector.html) to learn mor (Valid values: [CDG, SDC]).",
 				Computed:            true,
 				Validators: []validator.String{
 					validators.OneOf("CDG", "SDC"),
 				},
 			},
 			"socket_address": schema.StringAttribute{
-				MarkdownDescription: "The socket address of the device (combination of a host and port)",
+				MarkdownDescription: "The address of the device to onboard, specified in the format `host:port`.",
 				Computed:            true,
 			},
 			"port": schema.Int64Attribute{
-				MarkdownDescription: "The port used to connect to the device",
+				MarkdownDescription: "The port used to connect to the device.",
 				Computed:            true,
 			},
 			"host": schema.StringAttribute{
-				MarkdownDescription: "The host used to connect to the device",
+				MarkdownDescription: "The host used to connect to the device.",
 				Computed:            true,
 			},
 			"ignore_certificate": schema.BoolAttribute{
-				MarkdownDescription: "Whether to ignore certificate validation",
+				MarkdownDescription: "This attribute indicates whether certificates were ignored when onboarding this device.",
 				Computed:            true,
 			},
 		},
@@ -137,18 +137,19 @@ func (d *AsaDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	}
 
 	// read asa
-	readInp := asa.ReadInput{
-		Uid: configData.ID.ValueString(),
+	readInp := device.ReadByNameAndDeviceTypeInput{
+		Name:       configData.Name.ValueString(),
+		DeviceType: "ASA",
 	}
-	readOutp, err := d.client.ReadAsa(ctx, readInp)
+	readOutp, err := d.client.ReadDeviceByName(ctx, readInp)
 	if err != nil {
-		resp.Diagnostics.AddError("unable to read ASA Device", err.Error())
+		resp.Diagnostics.AddError("unable to find ASA Device", err.Error())
 		return
 	}
 
 	port, err := strconv.ParseInt(readOutp.Port, 10, 16)
 	if err != nil {
-		resp.Diagnostics.AddError("unable to read ASA Device", err.Error())
+		resp.Diagnostics.AddError("unable to find ASA Device", err.Error())
 		return
 	}
 	configData.Port = types.Int64Value(port)

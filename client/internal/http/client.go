@@ -40,7 +40,7 @@ func New(
 
 ) *Client {
 	return &Client{
-		config:     *cdo.NewConfig(baseUrl, apiToken, retries, delay, timeout),
+		config:     cdo.NewConfig(baseUrl, apiToken, retries, delay, timeout),
 		httpClient: client,
 		Logger:     logger,
 	}
@@ -64,4 +64,8 @@ func (c *Client) NewPut(ctx context.Context, url string, body any) *Request {
 
 func (c *Client) BaseUrl() string {
 	return c.config.BaseUrl
+}
+
+func (c *Client) Host() (string, error) {
+	return c.config.Host()
 }

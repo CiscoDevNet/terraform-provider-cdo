@@ -44,7 +44,6 @@ func (c *Client) ReadAsa(ctx context.Context, inp asa.ReadInput) (*asa.ReadOutpu
 	return asa.Read(ctx, c.client, inp)
 }
 
-
 func (c *Client) ReadDeviceByName(ctx context.Context, inp device.ReadByNameAndDeviceTypeInput) (*device.ReadOutput, error) {
 	return device.ReadByNameAndDeviceType(ctx, c.client, inp)
 }

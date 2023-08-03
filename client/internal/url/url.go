@@ -48,3 +48,11 @@ func ReadSdcByUid(baseUrl string, larUid string) string {
 func ReadSdcByName(baseUrl string, larName string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/proxies?q=name:%s", baseUrl, larName)
 }
+
+func CreateSdc(baseUrl string) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/proxies", baseUrl)
+}
+
+func UserToken(baseUrl string) string {
+	return fmt.Sprintf("%s/anubis/rest/v1/oauth/token", baseUrl)
+}

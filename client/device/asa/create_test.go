@@ -54,7 +54,7 @@ func TestAsaCreate(t *testing.T) {
 		testName   string
 		input      CreateInput
 		setupFunc  func(input CreateInput)
-		assertFunc func(output *CreateOutput, err error, t *testing.T)
+		assertFunc func(output *CreateOutput, err *CreateError, t *testing.T)
 	}{
 		{
 			testName: "successfully onboards ASA when using CDG",
@@ -74,7 +74,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-			assertFunc: func(output *CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -131,7 +131,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-			assertFunc: func(output *CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -183,7 +183,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-			assertFunc: func(output *CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -243,7 +243,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-			assertFunc: func(output *CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -304,7 +304,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-			assertFunc: func(output *CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -343,7 +343,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-			assertFunc: func(output *CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -376,7 +376,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-			assertFunc: func(output *CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -415,7 +415,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-			assertFunc: func(output *CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -454,7 +454,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-			assertFunc: func(output *CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -493,7 +493,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondWithError(asaConfig.Uid)
 			},
 
-			assertFunc: func(output *CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}

@@ -35,7 +35,7 @@ func TestIosCreate(t *testing.T) {
 		testName   string
 		input      CreateInput
 		setupFunc  func(input CreateInput)
-		assertFunc func(output *CreateOutput, err error, t *testing.T)
+		assertFunc func(output *CreateOutput, err *CreateError, t *testing.T)
 	}{
 		{
 			testName: "successfully onboards iOS when using SDC",
@@ -59,7 +59,7 @@ func TestIosCreate(t *testing.T) {
 				configureDeviceUpdateToRespondSuccessfully(iosDevice)
 			},
 
-			assertFunc: func(output *CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -111,7 +111,7 @@ func TestIosCreate(t *testing.T) {
 				configureDeviceUpdateToRespondSuccessfully(iosDevice)
 			},
 
-			assertFunc: func(output *CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -144,7 +144,7 @@ func TestIosCreate(t *testing.T) {
 				configureDeviceUpdateToRespondSuccessfully(iosDevice)
 			},
 
-			assertFunc: func(output *CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -176,7 +176,7 @@ func TestIosCreate(t *testing.T) {
 				configureDeviceUpdateToRespondSuccessfully(iosDevice)
 			},
 
-			assertFunc: func(output *CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -209,7 +209,7 @@ func TestIosCreate(t *testing.T) {
 				configureDeviceUpdateToRespondWithError(iosDevice.Uid)
 			},
 
-			assertFunc: func(output *CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}

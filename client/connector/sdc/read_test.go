@@ -8,6 +8,7 @@ import (
 
 	"github.com/cisco-lockhart/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestReadByUid(t *testing.T) {
@@ -103,9 +104,7 @@ func TestReadByUid(t *testing.T) {
 					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
 				}
 
-				if err != nil {
-					t.Errorf("expected err to be nil, got: %s", err.Error())
-				}
+				assert.NotNil(t, err)
 			},
 		},
 		{
@@ -269,9 +268,7 @@ func TestReadByName(t *testing.T) {
 					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
 				}
 
-				if err != nil {
-					t.Errorf("expected err to be nil, got: %s", err.Error())
-				}
+				assert.NotNil(t, err)
 			},
 		},
 		{

@@ -35,6 +35,15 @@ type CreateOutput struct {
 	LarUid     string `json:"larUid"`
 }
 
+type CreateError struct {
+	Err               error
+	CreatedResourceId *string
+}
+
+func (r *CreateError) Error() string {
+	return r.Err.Error()
+}
+
 const (
 	IosStatePreReadMetadata = "$PRE_READ_METADATA"
 	IosStateDone            = "DONE"
@@ -52,15 +61,23 @@ func NewCreateRequestInput(name, larUid, larType, ipv4, username, password strin
 	}
 }
 
-func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, error) {
+func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, *CreateError) {
 
 	client.Logger.Println("creating ios device")
 
 	deviceCreateOutp, err := device.Create(ctx, client, *device.NewCreateRequestInput(
 		createInp.Name, "IOS", createInp.LarUid, createInp.LarType, createInp.Ipv4, false, createInp.IgnoreCertifcate,
 	))
+	var createdResourceId *string = nil
+	if deviceCreateOutp != nil {
+		createdResourceId = &deviceCreateOutp.Uid
+	}
+
 	if err != nil {
-		return nil, err
+		return nil, &CreateError{
+			Err:               err,
+			CreatedResourceId: createdResourceId,
+		}
 	}
 
 	// encrypt credentials for SDC on prem lar
@@ -71,7 +88,11 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		client.Logger.Println("decrypting public key from sdc for encrpytion")
 
 		if deviceCreateOutp.LarUid == "" {
-			return nil, fmt.Errorf("sdc uid not found")
+			return nil, &CreateError{
+				Err:               fmt.Errorf("sdc uid not found"),
+				CreatedResourceId: createdResourceId,
+			}
+
 		}
 
 		// read lar public key
@@ -79,14 +100,20 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 			LarUid: deviceCreateOutp.LarUid,
 		})
 		if err != nil {
-			return nil, err
+			return nil, &CreateError{
+				Err:               err,
+				CreatedResourceId: createdResourceId,
+			}
 		}
 		publicKey = &larReadRes.PublicKey
 	}
 
 	err = retry.Do(iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, IosStatePreReadMetadata), *retry.NewOptionsWithLogger(client.Logger))
 	if err != nil {
-		return nil, err
+		return nil, &CreateError{
+			Err:               err,
+			CreatedResourceId: createdResourceId,
+		}
 	}
 
 	// update ios config credentials
@@ -100,7 +127,10 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	)
 	_, err = iosconfig.Update(ctx, client, *iosConfigUpdateInp)
 	if err != nil {
-		return nil, err
+		return nil, &CreateError{
+			Err:               err,
+			CreatedResourceId: createdResourceId,
+		}
 	}
 
 	// poll until ios config state done
@@ -108,7 +138,10 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 
 	err = retry.Do(iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, IosStateDone), *retry.NewOptionsWithLogger(client.Logger))
 	if err != nil {
-		return nil, err
+		return nil, &CreateError{
+			Err:               err,
+			CreatedResourceId: createdResourceId,
+		}
 	}
 
 	// done!

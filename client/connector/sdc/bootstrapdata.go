@@ -5,8 +5,8 @@ import (
 	"encoding/base64"
 	"fmt"
 
-	"github.com/cisco-lockhart/go-client/internal/http"
-	"github.com/cisco-lockhart/go-client/user"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/user"
 )
 
 func generateBootstrapData(ctx context.Context, client http.Client, sdcName string) (string, error) {

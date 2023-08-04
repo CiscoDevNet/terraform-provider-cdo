@@ -2,13 +2,14 @@ package asa_test
 
 import (
 	"context"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/http"
 	"reflect"
 	"testing"
 
-	"github.com/CiscoDevnet/go-client/connector/sdc"
-	"github.com/CiscoDevnet/go-client/device"
-	"github.com/CiscoDevnet/go-client/device/asa"
-	"github.com/CiscoDevnet/go-client/internal/device/asaconfig"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/device"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/device/asa"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/device/asaconfig"
 	"github.com/jarcoal/httpmock"
 )
 
@@ -52,15 +53,9 @@ func TestAsaCreate(t *testing.T) {
 
 	testCases := []struct {
 		testName   string
-<<<<<<< HEAD
 		input      asa.CreateInput
 		setupFunc  func(input asa.CreateInput)
 		assertFunc func(output *asa.CreateOutput, err error, t *testing.T)
-=======
-		input      CreateInput
-		setupFunc  func(input CreateInput)
-		assertFunc func(output *CreateOutput, err *CreateError, t *testing.T)
->>>>>>> main
 	}{
 		{
 			testName: "successfully onboards ASA when using CDG",
@@ -80,11 +75,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-<<<<<<< HEAD
 			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
-=======
-			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
->>>>>>> main
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -140,11 +131,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-<<<<<<< HEAD
 			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
-=======
-			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
->>>>>>> main
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -195,11 +182,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-<<<<<<< HEAD
 			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
-=======
-			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
->>>>>>> main
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -258,11 +241,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-<<<<<<< HEAD
 			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
-=======
-			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
->>>>>>> main
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -322,11 +301,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-<<<<<<< HEAD
 			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
-=======
-			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
->>>>>>> main
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -365,11 +340,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-<<<<<<< HEAD
 			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
-=======
-			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
->>>>>>> main
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -402,11 +373,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-<<<<<<< HEAD
 			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
-=======
-			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
->>>>>>> main
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -445,11 +412,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-<<<<<<< HEAD
 			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
-=======
-			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
->>>>>>> main
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -487,12 +450,7 @@ func TestAsaCreate(t *testing.T) {
 				configureDeviceUpdateToRespondWithError(asaDeviceUsingSdc.Uid)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
-
-<<<<<<< HEAD
 			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
-=======
-			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
->>>>>>> main
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -531,11 +489,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondWithError(asaConfig.Uid)
 			},
 
-<<<<<<< HEAD
 			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
-=======
-			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
->>>>>>> main
 				if err == nil {
 					t.Error("error is nil!")
 				}

@@ -13,9 +13,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/CiscoDevnet/go-client/internal/cdo"
-	"github.com/CiscoDevnet/go-client/internal/jsonutil"
-	"github.com/CiscoDevnet/go-client/internal/retry"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/cdo"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/jsonutil"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/retry"
 )
 
 type Request struct {

@@ -7,8 +7,8 @@ import (
 	"context"
 	"fmt"
 
-	cdoClient "github.com/CiscoDevnet/go-client"
-	"github.com/CiscoDevnet/go-client/connector/sdc"
+	cdoClient "github.com/CiscoDevNet/terraform-provider-cdo/go-client"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"

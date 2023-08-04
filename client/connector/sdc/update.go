@@ -3,8 +3,8 @@ package sdc
 import (
 	"context"
 
-	"github.com/cisco-lockhart/go-client/internal/http"
-	"github.com/cisco-lockhart/go-client/internal/url"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/url"
 )
 
 type UpdateInput struct {

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/CiscoDevnet/go-client/connector/sdc"
-	"github.com/CiscoDevnet/go-client/device/ios"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/device/ios"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )

@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"strconv"
 
-	cdoClient "github.com/CiscoDevnet/go-client"
-	"github.com/CiscoDevnet/go-client/device"
-	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
+	cdoClient "github.com/CiscoDevNet/terraform-provider-cdo/go-client"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/device"
+	"github.com/CiscoDevNet/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"

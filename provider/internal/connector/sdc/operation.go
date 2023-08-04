@@ -3,7 +3,7 @@ package sdc
 import (
 	"context"
 
-	"github.com/cisco-lockhart/go-client/connector/sdc"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 

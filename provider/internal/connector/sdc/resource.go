@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	cdoClient "github.com/cisco-lockhart/go-client"
+	cdoClient "github.com/CiscoDevNet/terraform-provider-cdo/go-client"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"

@@ -3,12 +3,12 @@ package sdc_test
 import (
 	"context"
 	"fmt"
-	"github.com/cisco-lockhart/go-client/user"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/user"
 	"reflect"
 	"testing"
 
-	"github.com/cisco-lockhart/go-client/connector/sdc"
-	"github.com/cisco-lockhart/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
 )
 

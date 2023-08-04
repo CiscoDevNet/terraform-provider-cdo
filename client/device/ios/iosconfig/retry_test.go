@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/CiscoDevnet/go-client/internal/http"
-	"github.com/CiscoDevnet/go-client/internal/retry"
-	internalTesting "github.com/CiscoDevnet/go-client/internal/testing"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/retry"
+	internalTesting "github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/testing"
 	"github.com/jarcoal/httpmock"
 )
 

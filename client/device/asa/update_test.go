@@ -5,11 +5,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/CiscoDevnet/go-client/connector/sdc"
-	"github.com/CiscoDevnet/go-client/device"
-	"github.com/CiscoDevnet/go-client/device/asa"
-	"github.com/CiscoDevnet/go-client/internal/device/asaconfig"
-	"github.com/CiscoDevnet/go-client/internal/http"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/device"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/device/asa"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/device/asaconfig"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
 )
 

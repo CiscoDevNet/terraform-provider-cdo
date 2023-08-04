@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/CiscoDevnet/go-client/connector/sdc"
-	"github.com/CiscoDevnet/go-client/device"
-	"github.com/CiscoDevnet/go-client/internal/device/asaconfig"
-	internalTesting "github.com/CiscoDevnet/go-client/internal/testing"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/device"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/device/asaconfig"
+	internalTesting "github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/testing"
 	"github.com/jarcoal/httpmock"
 )
 

@@ -8,7 +8,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/CiscoDevnet/go-client/internal/cdo"
+	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/cdo"
 )
 
 // Note that there can also be retries and delay within the http.Requese.

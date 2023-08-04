@@ -35,6 +35,11 @@ type CreateOutput struct {
 	LarUid     string `json:"larUid"`
 }
 
+const (
+	IosStatePreReadMetadata = "$PRE_READ_METADATA"
+	IosStateDone            = "DONE"
+)
+
 func NewCreateRequestInput(name, larUid, larType, ipv4, username, password string, ignoreCertificate bool) *CreateInput {
 	return &CreateInput{
 		Name:             name,
@@ -79,7 +84,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		publicKey = &larReadRes.PublicKey
 	}
 
-	err = retry.Do(iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, "$PRE_READ_METADATA"), *retry.NewOptionsWithLogger(client.Logger))
+	err = retry.Do(iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, IosStatePreReadMetadata), *retry.NewOptionsWithLogger(client.Logger))
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +106,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	// poll until ios config state done
 	client.Logger.Println("waiting for device to reach state done")
 
-	err = retry.Do(iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, "DONE"), *retry.NewOptionsWithLogger(client.Logger))
+	err = retry.Do(iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, IosStateDone), *retry.NewOptionsWithLogger(client.Logger))
 	if err != nil {
 		return nil, err
 	}

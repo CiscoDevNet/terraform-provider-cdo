@@ -24,16 +24,18 @@ func TestAsaUpdate(t *testing.T) {
 		Build()
 
 	asaDevice := device.NewReadOutputBuilder().
+		AsAsa().
 		WithUid("11111111-1111-1111-1111-111111111111").
 		WithName("my-asa").
-		OnboardedUsingCdg("88888888-8888-8888-8888-888888888888").
+		OnboardedUsingCloudConnector("88888888-8888-8888-8888-888888888888").
 		WithLocation("10.10.0.1", 443).
 		Build()
 
 	asaDeviceOnboardedByOnPremConnector := device.NewReadOutputBuilder().
+		AsAsa().
 		WithUid("33333333-3333-3333-3333-333333333333").
 		WithName("my-asa").
-		OnboardedUsingSdc(onPremConnector.Uid).
+		OnboardedUsingOnPremConnector(onPremConnector.Uid).
 		WithLocation("10.10.0.1", 443).
 		Build()
 

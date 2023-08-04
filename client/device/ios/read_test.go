@@ -1,4 +1,4 @@
-package asa
+package ios
 
 import (
 	"context"
@@ -10,15 +10,15 @@ import (
 	"github.com/jarcoal/httpmock"
 )
 
-func TestAsaRead(t *testing.T) {
+func TestIosRead(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	asaDevice := device.NewReadOutputBuilder().
-		AsAsa().
+	iosDevice := device.NewReadOutputBuilder().
+		AsIos().
 		WithUid("11111111-1111-1111-1111-111111111111").
-		WithName("my-asa").
-		OnboardedUsingCloudConnector("88888888-8888-8888-8888-888888888888").
+		WithName("my-ios").
+		OnboardedUsingOnPremConnector("88888888-8888-8888-8888-888888888888").
 		WithLocation("10.10.0.1", 443).
 		Build()
 
@@ -29,13 +29,13 @@ func TestAsaRead(t *testing.T) {
 		assertFunc func(output *ReadOutput, err error, t *testing.T)
 	}{
 		{
-			testName: "successfully reads ASA",
+			testName: "successfully reads iOS",
 			input: ReadInput{
-				Uid: asaDevice.Uid,
+				Uid: iosDevice.Uid,
 			},
 
 			setupFunc: func() {
-				configureDeviceReadToRespondSuccessfully(asaDevice)
+				configureDeviceReadToRespondSuccessfully(iosDevice)
 			},
 
 			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
@@ -48,31 +48,31 @@ func TestAsaRead(t *testing.T) {
 				}
 
 				expectedReadOutput := ReadOutput{
-					Uid:             asaDevice.Uid,
-					Name:            asaDevice.Name,
-					CreatedDate:     asaDevice.CreatedDate,
-					LastUpdatedDate: asaDevice.LastUpdatedDate,
-					DeviceType:      asaDevice.DeviceType,
-					LarUid:          asaDevice.LarUid,
-					LarType:         asaDevice.LarType,
-					Ipv4:            asaDevice.Ipv4,
-					Host:            asaDevice.Host,
-					Port:            asaDevice.Port,
+					Uid:             iosDevice.Uid,
+					Name:            iosDevice.Name,
+					CreatedDate:     iosDevice.CreatedDate,
+					LastUpdatedDate: iosDevice.LastUpdatedDate,
+					DeviceType:      iosDevice.DeviceType,
+					LarUid:          iosDevice.LarUid,
+					LarType:         iosDevice.LarType,
+					Ipv4:            iosDevice.Ipv4,
+					Host:            iosDevice.Host,
+					Port:            iosDevice.Port,
 				}
 				if !reflect.DeepEqual(expectedReadOutput, *output) {
-					t.Errorf("expected: %+v, got: %+v", asaDevice, *output)
+					t.Errorf("expected: %+v, got: %+v", iosDevice, *output)
 				}
 			},
 		},
 
 		{
-			testName: "returns error when the remote service reading the ASA encounters an issue",
+			testName: "returns error when the remote service reading the iOS encounters an issue",
 			input: ReadInput{
-				Uid: asaDevice.Uid,
+				Uid: iosDevice.Uid,
 			},
 
 			setupFunc: func() {
-				configureDeviceReadToRespondWithError(asaDevice.Uid)
+				configureDeviceReadToRespondWithError(iosDevice.Uid)
 			},
 
 			assertFunc: func(output *ReadOutput, err error, t *testing.T) {

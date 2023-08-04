@@ -17,7 +17,6 @@ Provides an iOS device resource. This allows iOS devices to be onboarded, update
 
 ### Required
 
-- `connector_type` (String) The type of the connector that will be used to communicate with the device. You can communicate with your device using either a Cloud Connector (CDG) or a Secure Device Connector (SDC); see [the CDO documentation](https://docs.defenseorchestrator.com/c-connect-cisco-defense-orchestratortor-the-secure-device-connector.html) to learn mor (Valid values: [CDG, SDC]).
 - `ignore_certificate` (Boolean) Set this attribute to true if you do not wish for CDO to validate the certificate of this device before onboarding.
 - `name` (String) A human-readable name for the device.
 - `password` (String, Sensitive) The password used to authenticate with the device.

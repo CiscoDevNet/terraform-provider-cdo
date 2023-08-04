@@ -44,12 +44,11 @@ func (c *Client) ReadAsa(ctx context.Context, inp asa.ReadInput) (*asa.ReadOutpu
 	return asa.Read(ctx, c.client, inp)
 }
 
-
 func (c *Client) ReadDeviceByName(ctx context.Context, inp device.ReadByNameAndDeviceTypeInput) (*device.ReadOutput, error) {
 	return device.ReadByNameAndDeviceType(ctx, c.client, inp)
 }
 
-func (c *Client) CreateAsa(ctx context.Context, inp asa.CreateInput) (*asa.CreateOutput, error) {
+func (c *Client) CreateAsa(ctx context.Context, inp asa.CreateInput) (*asa.CreateOutput, *asa.CreateError) {
 	return asa.Create(ctx, c.client, inp)
 }
 
@@ -65,7 +64,7 @@ func (c *Client) ReadIos(ctx context.Context, inp ios.ReadInput) (*ios.ReadOutpu
 	return ios.Read(ctx, c.client, inp)
 }
 
-func (c *Client) CreateIos(ctx context.Context, inp ios.CreateInput) (*ios.CreateOutput, error) {
+func (c *Client) CreateIos(ctx context.Context, inp ios.CreateInput) (*ios.CreateOutput, *ios.CreateError) {
 	return ios.Create(ctx, c.client, inp)
 }
 

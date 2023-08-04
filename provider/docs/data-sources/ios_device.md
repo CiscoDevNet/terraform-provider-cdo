@@ -17,14 +17,13 @@ IOS data source
 
 ### Required
 
-- `id` (String) Uid used to represent the device
+- `name` (String) The human-readable name of the device. This is the name that is displayed in the CDO inventory page. Device names are unique across a CDO tenant.
 
 ### Read-Only
 
-- `connector_type` (String) The type of SDC that will be used to communicate with the device (Valid values: [CDG, SDC])
-- `host` (String) The host used to connect to the device
-- `ignore_certificate` (Boolean) Whether to ignore certificate validation
-- `name` (String) Name assigned to the device
-- `port` (Number) The port used to connect to the device
-- `sdc_name` (String) The SDC name that will be used to communicate with the device
-- `socket_address` (String) The socket address of the device (combination of a host and port)
+- `host` (String) The host used to connect to the device.
+- `id` (String) Universally unique identifier of the device.
+- `ignore_certificate` (Boolean) This attribute indicates whether certificates were ignored when onboarding this device.
+- `port` (Number) The port used to connect to the device.
+- `sdc_name` (String) The name of the Secure Device Connector (SDC) that is used by CDO to communicate with the device.
+- `socket_address` (String) The address of the device to onboard, specified in the format `host:port`.

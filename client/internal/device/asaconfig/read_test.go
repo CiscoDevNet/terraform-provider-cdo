@@ -8,6 +8,7 @@ import (
 
 	"github.com/cisco-lockhart/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAsaConfigReadByUid(t *testing.T) {
@@ -40,13 +41,8 @@ func TestAsaConfigReadByUid(t *testing.T) {
 			},
 
 			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
 
 				if !reflect.DeepEqual(validAsaConfig, *output) {
 					t.Errorf("expected: %+v\ngot: %+v", validAsaConfig, output)
@@ -66,13 +62,8 @@ func TestAsaConfigReadByUid(t *testing.T) {
 			},
 
 			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
-				}
-
-				if err != nil {
-					t.Errorf("expected err to be nil, got: %s", err.Error())
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 			},
 		},
 		{
@@ -88,13 +79,8 @@ func TestAsaConfigReadByUid(t *testing.T) {
 			},
 
 			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
-				}
-
-				if err == nil {
-					t.Error("error is nil!")
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 			},
 		},
 	}

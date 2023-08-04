@@ -8,6 +8,7 @@ import (
 	"github.com/cisco-lockhart/go-client/connector/sdc"
 	"github.com/cisco-lockhart/go-client/device/ios"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 func Read(ctx context.Context, resource *IosDeviceResource, stateData *IosDeviceResourceModel) error {
@@ -28,7 +29,6 @@ func Read(ctx context.Context, resource *IosDeviceResource, stateData *IosDevice
 
 	stateData.Port = types.Int64Value(port)
 	stateData.ID = types.StringValue(readOutp.Uid)
-	stateData.SdcType = types.StringValue(readOutp.LarType)
 	stateData.Name = types.StringValue(readOutp.Name)
 	stateData.Ipv4 = types.StringValue(readOutp.Ipv4)
 	stateData.Host = types.StringValue(readOutp.Host)
@@ -51,20 +51,29 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 	createInp := ios.NewCreateRequestInput(
 		planData.Name.ValueString(),
 		readSdcOutp.Uid,
-		planData.SdcType.ValueString(),
+		"SDC",
 		planData.Ipv4.ValueString(),
 		planData.Username.ValueString(),
 		planData.Password.ValueString(),
 		planData.IgnoreCertifcate.ValueBool(),
 	)
 
-	createOutp, err := resource.client.CreateIos(ctx, *createInp)
-	if err != nil {
-		return err
+	createOutp, createErr := resource.client.CreateIos(ctx, *createInp)
+	tflog.Debug(ctx, fmt.Sprintf("Creation error: %v", createErr))
+	if createErr != nil {
+		if createErr.CreatedResourceId != nil {
+			deleteInp := ios.NewDeleteInput(*createErr.CreatedResourceId)
+			_, deletionErr := resource.client.DeleteIos(ctx, *deleteInp)
+			if deletionErr != nil {
+				tflog.Error(ctx, "Failed to delete iOS device that we failed to create")
+				return deletionErr
+			}
+		}
+
+		return createErr.Err
 	}
 
 	planData.ID = types.StringValue(createOutp.Uid)
-	planData.SdcType = types.StringValue(createOutp.LarType)
 	planData.SdcName = types.StringValue(planData.SdcName.ValueString())
 	planData.Name = types.StringValue(createOutp.Name)
 	planData.Host = types.StringValue(createOutp.Host)

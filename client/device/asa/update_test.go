@@ -61,6 +61,8 @@ func TestAsaUpdate(t *testing.T) {
 				updatedDevice := asaDevice
 				updatedDevice.Name = input.Name
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, updatedDevice)
+				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: asaconfig.AsaConfigStateDone})
+				configureDeviceReadToRespondSuccessfully(device.ReadOutput{Uid: input.Uid, State: "DONE", Status: "IDLE", ConnectivityState: 1})
 			},
 
 			assertFunc: func(input UpdateInput, output *UpdateOutput, err error, t *testing.T) {
@@ -92,7 +94,9 @@ func TestAsaUpdate(t *testing.T) {
 				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
 				configureDeviceReadToRespondSuccessfully(asaDevice)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
+				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: asaconfig.AsaConfigStateDone})
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, asaDevice)
+				configureDeviceReadToRespondSuccessfully(device.ReadOutput{Uid: input.Uid, State: "DONE", Status: "IDLE", ConnectivityState: 1})
 			},
 
 			assertFunc: func(input UpdateInput, output *UpdateOutput, err error, t *testing.T) {
@@ -125,7 +129,9 @@ func TestAsaUpdate(t *testing.T) {
 				configureSdcReadToRespondSuccessfully(onPremConnector)
 
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
+				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: asaconfig.AsaConfigStateDone})
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, asaDeviceOnboardedByOnPremConnector)
+				configureDeviceReadToRespondSuccessfully(device.ReadOutput{Uid: input.Uid, State: "DONE", Status: "IDLE", ConnectivityState: 1})
 			},
 
 			assertFunc: func(input UpdateInput, output *UpdateOutput, err error, t *testing.T) {
@@ -160,6 +166,7 @@ func TestAsaUpdate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
 				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: asaconfig.AsaConfigStateDone})
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, updatedDevice)
+				configureDeviceReadToRespondSuccessfully(device.ReadOutput{Uid: input.Uid, State: "DONE", Status: "IDLE", ConnectivityState: 1})
 			},
 
 			assertFunc: func(input UpdateInput, output *UpdateOutput, err error, t *testing.T) {

@@ -3,6 +3,7 @@ package ios
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/cisco-lockhart/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -30,7 +31,6 @@ type IosDeviceResource struct {
 
 type IosDeviceResourceModel struct {
 	ID      types.String `tfsdk:"id"`
-	SdcType types.String `tfsdk:"connector_type"`
 	SdcName types.String `tfsdk:"sdc_name"`
 	Name    types.String `tfsdk:"name"`
 	Ipv4    types.String `tfsdk:"socket_address"`
@@ -56,6 +56,9 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Unique identifier of the device. This is a UUID and will be automatically generated when the device is created.",
 				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"name": schema.StringAttribute{
 				MarkdownDescription: "A human-readable name for the device.",
@@ -64,12 +67,8 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 			"sdc_name": schema.StringAttribute{
 				MarkdownDescription: "The name of the Secure Device Connector (SDC) that will be used to communicate with the device. This value is not required if the connector type selected is Cloud Device Gateway (CDG).",
 				Required:            true,
-			},
-			"connector_type": schema.StringAttribute{
-				MarkdownDescription: "The type of the connector that will be used to communicate with the device. You can communicate with your device using either a Cloud Connector (CDG) or a Secure Device Connector (SDC); see [the CDO documentation](https://docs.defenseorchestrator.com/c-connect-cisco-defense-orchestratortor-the-secure-device-connector.html) to learn mor (Valid values: [CDG, SDC]).",
-				Required:            true,
-				Validators: []validator.String{
-					validators.OneOf("CDG", "SDC"),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"socket_address": schema.StringAttribute{
@@ -77,6 +76,9 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
+				},
+				Validators: []validator.String{
+					validators.ValidateSocketAddress(),
 				},
 			},
 			"port": schema.Int64Attribute{
@@ -215,4 +217,29 @@ func (r *IosDeviceResource) Delete(ctx context.Context, req resource.DeleteReque
 
 func (r *IosDeviceResource) ImportState(ctx context.Context, req resource.ImportStateRequest, res *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, res)
+}
+
+func (r *IosDeviceResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, res *resource.ModifyPlanResponse) {
+	if !req.State.Raw.IsNull() {
+		// this is an update
+		var stateData *IosDeviceResourceModel
+		res.Diagnostics.Append(req.State.Get(ctx, &stateData)...)
+		if res.Diagnostics.HasError() {
+			return
+		}
+
+		var planData *IosDeviceResourceModel
+		res.Diagnostics.Append(req.Plan.Get(ctx, &planData)...)
+		if res.Diagnostics.HasError() {
+			return
+		}
+
+		if planData != nil && stateData != nil && strings.EqualFold(planData.Ipv4.ValueString(), stateData.Ipv4.ValueString()) {
+			tflog.Debug(ctx, "There is no change in the IPv4; remove host and port diffs")
+			planData.Host = stateData.Host
+			planData.Port = stateData.Port
+		}
+
+		res.Diagnostics.Append(res.Plan.Set(ctx, &planData)...)
+	}
 }

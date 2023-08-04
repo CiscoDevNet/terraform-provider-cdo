@@ -7,6 +7,7 @@ import (
 
 	"github.com/cisco-lockhart/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestIosConfigRead(t *testing.T) {
@@ -63,13 +64,8 @@ func TestIosConfigRead(t *testing.T) {
 			},
 
 			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
-				}
-
-				if err != nil {
-					t.Errorf("expected err to be nil, got: %s", err.Error())
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 			},
 		},
 		{

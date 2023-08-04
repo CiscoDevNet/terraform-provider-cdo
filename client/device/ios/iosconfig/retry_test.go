@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cisco-lockhart/go-client/internal/http"
-	"github.com/cisco-lockhart/go-client/internal/retry"
-	internalTesting "github.com/cisco-lockhart/go-client/internal/testing"
+	"github.com/CiscoDevnet/go-client/internal/http"
+	"github.com/CiscoDevnet/go-client/internal/retry"
+	internalTesting "github.com/CiscoDevnet/go-client/internal/testing"
 	"github.com/jarcoal/httpmock"
 )
 

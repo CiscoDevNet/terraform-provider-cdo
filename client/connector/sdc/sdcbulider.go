@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 
-	internalRsa "github.com/cisco-lockhart/go-client/internal/crypto/rsa"
+	internalRsa "github.com/CiscoDevnet/go-client/internal/crypto/rsa"
 )
 
 type sdcResponseBuilder struct {

@@ -9,10 +9,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/cisco-lockhart/go-client/connector/sdc"
-	internalRsa "github.com/cisco-lockhart/go-client/internal/crypto/rsa"
-	internalHttp "github.com/cisco-lockhart/go-client/internal/http"
-	"github.com/cisco-lockhart/go-client/internal/jsonutil"
+	"github.com/CiscoDevnet/go-client/connector/sdc"
+	internalRsa "github.com/CiscoDevnet/go-client/internal/crypto/rsa"
+	internalHttp "github.com/CiscoDevnet/go-client/internal/http"
+	"github.com/CiscoDevnet/go-client/internal/jsonutil"
 	"github.com/jarcoal/httpmock"
 )
 

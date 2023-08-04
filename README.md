@@ -9,7 +9,7 @@ Eventually the client will be moved to its own repo, but in the interest of hitt
 
 ```
 .
-├── client        # Golang CDO client - currently using the module name github.com/cisco-lockhart/go-client
+├── client        # Golang CDO client - currently using the module name github.com/CiscoDevnet/go-client
 ├── provider      # Terraform provider
 └── README.md
 ```
@@ -66,7 +66,7 @@ Examples are provided so that you can do the usual `plan`, `apply`, `destroy` et
       provider_installation {
    
         dev_overrides {
-            "hashicorp.com/cisco-lockhart/cdo" = "<DIRECTORY_OF_YOUR_EXECUTABLE>"
+            "hashicorp.com/CiscoDevnet/cdo" = "<DIRECTORY_OF_YOUR_EXECUTABLE>"
         }
   
         # For all other providers, install them directly from their origin provider
@@ -87,7 +87,7 @@ Examples are provided so that you can do the usual `plan`, `apply`, `destroy` et
     │ Warning: Provider development overrides are in effect
     │
     │ The following provider development overrides are set in the CLI configuration:
-    │  - hashicorp.com/cisco-lockhart/cdo in /Users/weilluo/go/bin
+    │  - hashicorp.com/CiscoDevnet/cdo in /Users/weilluo/go/bin
     │
     │ The behavior may therefore not match any released version of the provider and applying changes may cause the state to become incompatible with published releases.
     |
@@ -96,6 +96,6 @@ Examples are provided so that you can do the usual `plan`, `apply`, `destroy` et
 #### Troubleshooting
 - Error: Inconsistent dependency lock file
   ```
-  provider hashicorp/cisco-lockhart/cdo: required by this configuration but no version is selected
+  provider hashicorp/CiscoDevnet/cdo: required by this configuration but no version is selected
   ```
   - This means you have not setup the dev override properly, make sure your `~/.terraformrc` has the right override for the provider in question.

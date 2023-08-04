@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cisco-lockhart/go-client/internal/http"
-	"github.com/cisco-lockhart/go-client/internal/retry"
+	"github.com/CiscoDevnet/go-client/internal/http"
+	"github.com/CiscoDevnet/go-client/internal/retry"
 )
 
 func UntilStateDoneAndConnectivityOk(ctx context.Context, client http.Client, uid string) retry.Func {

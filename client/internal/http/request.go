@@ -13,9 +13,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/cisco-lockhart/go-client/internal/cdo"
-	"github.com/cisco-lockhart/go-client/internal/jsonutil"
-	"github.com/cisco-lockhart/go-client/internal/retry"
+	"github.com/CiscoDevnet/go-client/internal/cdo"
+	"github.com/CiscoDevnet/go-client/internal/jsonutil"
+	"github.com/CiscoDevnet/go-client/internal/retry"
 )
 
 type Request struct {

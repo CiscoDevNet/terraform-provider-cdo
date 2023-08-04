@@ -1,4 +1,4 @@
-package asa
+package asa_test
 
 import (
 	"fmt"

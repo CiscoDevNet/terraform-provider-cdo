@@ -10,7 +10,7 @@ import (
 func Read(ctx context.Context, resource *SdcResource, stateData *SdcResourceModel) error {
 
 	// do read
-	readSdcOutp, err := resource.client.ReadSdcByName(ctx, *sdc.NewReadByNameInput(stateData.Name.ValueString()))
+	readSdcOutp, err := resource.client.ReadSdcByUid(ctx, *sdc.NewReadByUidInput(stateData.ID.ValueString()))
 	if err != nil {
 		return err
 	}
@@ -47,9 +47,9 @@ func Update(ctx context.Context, resource *SdcResource, planData *SdcResourceMod
 	}
 
 	// map return struct to sdc model
-	planData.ID = types.StringValue(updateSdcOutp.Uid)
-	planData.Name = types.StringValue(updateSdcOutp.Name)
-	planData.BootstrapData = types.StringValue(updateSdcOutp.BootstrapData) // bootstrap data contains sdc name, it is not fixed
+	stateData.ID = types.StringValue(updateSdcOutp.Uid)
+	stateData.Name = types.StringValue(updateSdcOutp.Name)
+	stateData.BootstrapData = types.StringValue(updateSdcOutp.BootstrapData) // bootstrap data contains sdc name, it is not fixed
 
 	return nil
 }

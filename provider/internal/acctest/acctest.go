@@ -50,7 +50,7 @@ func ProviderConfig() string {
 	return fmt.Sprintf(`
 	provider "cdo" {
 		api_token = "%s"
-		base_url = "https://ci.dev.lockhart.io"
+		base_url = "https://staging.dev.lockhart.io"
 	}
 	// New line
 	`, token)

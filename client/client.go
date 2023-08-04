@@ -40,6 +40,10 @@ func (c *Client) ReadSdcByName(ctx context.Context, inp sdc.ReadByNameInput) (*s
 	return sdc.ReadByName(ctx, c.client, inp)
 }
 
+func (c *Client) ReadSdcByUid(ctx context.Context, inp sdc.ReadByUidInput) (*sdc.ReadOutput, error) {
+	return sdc.ReadByUid(ctx, c.client, inp)
+}
+
 func (c *Client) ReadAsa(ctx context.Context, inp asa.ReadInput) (*asa.ReadOutput, error) {
 	return asa.Read(ctx, c.client, inp)
 }
@@ -84,7 +88,7 @@ func (c *Client) ReadSpecificAsa(ctx context.Context, inp asa.ReadSpecificInput)
 	return asa.ReadSpecific(ctx, c.client, inp)
 }
 
-func (c *Client) CreateSdc(ctx context.Context, inp sdc.CreateInput) (*sdc.UpdateOutput, error) {
+func (c *Client) CreateSdc(ctx context.Context, inp sdc.CreateInput) (*sdc.CreateOutput, error) {
 	return sdc.Create(ctx, c.client, inp)
 }
 

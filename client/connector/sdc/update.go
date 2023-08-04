@@ -19,18 +19,39 @@ func NewUpdateInput(uid string, name string) UpdateInput {
 	}
 }
 
-type UpdateSdcOutput = UpdateOutput
+type UpdateOutput struct {
+	*updateRequestOutput
+	BootstrapData string
+}
 
-func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*UpdateSdcOutput, error) {
+type updateRequestOutput struct {
+	Uid                      string `json:"uid"`
+	Name                     string `json:"name"`
+	Status                   string `json:"status"`
+	State                    string `json:"state"`
+	TenantUid                string `json:"tenantUid"`
+	ServiceConnectivityState string `json:"serviceConnectivityState"`
+}
+
+func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*UpdateOutput, error) {
 
 	url := url.UpdateSdc(client.BaseUrl(), updateInp.Uid)
 
 	req := client.NewPut(ctx, url, updateInp)
 
-	var updateOutp UpdateSdcOutput
+	var updateOutp updateRequestOutput
 	if err := req.Send(&updateOutp); err != nil {
-		return &UpdateSdcOutput{}, nil
+		return &UpdateOutput{}, nil
 	}
 
-	return &updateOutp, nil
+	bootstrapData, err := generateBootstrapData(ctx, client, updateOutp.Name)
+	if err != nil {
+		return &UpdateOutput{}, nil
+	}
+
+	// 3. done!
+	return &UpdateOutput{
+		updateRequestOutput: &updateOutp,
+		BootstrapData:       bootstrapData,
+	}, nil
 }

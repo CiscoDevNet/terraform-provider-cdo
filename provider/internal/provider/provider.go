@@ -134,6 +134,7 @@ func (p *CdoProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 func (p *CdoProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
+		sdc.NewSdcResource,
 		asa.NewAsaDeviceResource,
 		ios.NewIosDeviceResource,
 	}

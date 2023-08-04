@@ -5,7 +5,6 @@ import (
 
 	"github.com/cisco-lockhart/go-client/internal/http"
 	"github.com/cisco-lockhart/go-client/internal/url"
-	"github.com/cisco-lockhart/go-client/user"
 )
 
 type CreateInput struct {
@@ -23,7 +22,7 @@ type createRequestBody struct {
 	OnPremLarConfigured bool   `json:"onPremLarConfigured"`
 }
 
-type createRequestOutput struct {
+type CreateRequestOutput struct {
 	Uid                      string `json:"uid"`
 	Name                     string `json:"name"`
 	Status                   string `json:"status"`
@@ -32,12 +31,12 @@ type createRequestOutput struct {
 	ServiceConnectivityState string `json:"serviceConnectivityState"`
 }
 
-type UpdateOutput struct {
-	*createRequestOutput
+type CreateOutput struct {
+	*CreateRequestOutput
 	BootstrapData string
 }
 
-func Create(ctx context.Context, client http.Client, createInp CreateInput) (*UpdateOutput, error) {
+func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, error) {
 
 	client.Logger.Println("create SDC")
 
@@ -49,28 +48,21 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Up
 	}
 	req := client.NewPost(ctx, url, body)
 
-	var createOutp createRequestOutput
+	var createOutp CreateRequestOutput
 	if err := req.Send(&createOutp); err != nil {
-		return &UpdateOutput{}, err
+		return &CreateOutput{}, err
 	}
 
 	// 2. generate bootstrap data
 	// get user data from authentication service
-	userToken, err := user.GetToken(ctx, client, user.NewGetTokenInput())
+	bootstrapData, err := generateBootstrapData(ctx, client, createInp.Name)
 	if err != nil {
-		return &UpdateOutput{}, err
+		return &CreateOutput{}, nil
 	}
-	host, err := client.Host()
-	if err != nil {
-		return &UpdateOutput{}, err
-	}
-	bootstrapData := computeBootstrapData(
-		createInp.Name, userToken.AccessToken, userToken.TenantName, client.BaseUrl(), host,
-	)
 
 	// 3. done!
-	return &UpdateOutput{
-		createRequestOutput: &createOutp,
+	return &CreateOutput{
+		CreateRequestOutput: &createOutp,
 		BootstrapData:       bootstrapData,
 	}, nil
 }

@@ -1,4 +1,4 @@
-package asa
+package asa_test
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/cisco-lockhart/go-client/device"
+	"github.com/cisco-lockhart/go-client/device/asa"
 	"github.com/cisco-lockhart/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
 )
@@ -23,13 +24,13 @@ func TestAsaDelete(t *testing.T) {
 
 	testCases := []struct {
 		testName   string
-		input      DeleteInput
+		input      asa.DeleteInput
 		setupFunc  func()
-		assertFunc func(output *DeleteOutput, err error, t *testing.T)
+		assertFunc func(output *asa.DeleteOutput, err error, t *testing.T)
 	}{
 		{
 			testName: "successfully deletes ASA",
-			input: DeleteInput{
+			input: asa.DeleteInput{
 				Uid: asaDevice.Uid,
 			},
 
@@ -37,7 +38,7 @@ func TestAsaDelete(t *testing.T) {
 				configureDeviceDeleteToRespondSuccessfully(asaDevice.Uid)
 			},
 
-			assertFunc: func(output *DeleteOutput, err error, t *testing.T) {
+			assertFunc: func(output *asa.DeleteOutput, err error, t *testing.T) {
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -46,7 +47,7 @@ func TestAsaDelete(t *testing.T) {
 					t.Fatalf("output is nil!")
 				}
 
-				expectedDeleteOutput := DeleteOutput{}
+				expectedDeleteOutput := asa.DeleteOutput{}
 				if !reflect.DeepEqual(expectedDeleteOutput, *output) {
 					t.Errorf("expected: %+v, got: %+v", expectedDeleteOutput, output)
 				}
@@ -55,7 +56,7 @@ func TestAsaDelete(t *testing.T) {
 
 		{
 			testName: "returns error when the remote service deleting the ASA encounters an issue",
-			input: DeleteInput{
+			input: asa.DeleteInput{
 				Uid: asaDevice.Uid,
 			},
 
@@ -63,7 +64,7 @@ func TestAsaDelete(t *testing.T) {
 				configureDeviceDeleteToRespondWithError(asaDevice.Uid)
 			},
 
-			assertFunc: func(output *DeleteOutput, err error, t *testing.T) {
+			assertFunc: func(output *asa.DeleteOutput, err error, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -81,7 +82,7 @@ func TestAsaDelete(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := Delete(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := asa.Delete(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
 
 			testCase.assertFunc(output, err, t)
 		})

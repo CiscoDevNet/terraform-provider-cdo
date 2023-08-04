@@ -55,7 +55,8 @@ func (r *SdcResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 			"bootstrap_data": schema.StringAttribute{
 				MarkdownDescription: "SDC bootstrap data",
 				Computed:            true,
-				Sensitive:           true, // bootstrap data contais user api token
+				// TODO: uncomment to make it sensitive
+				// Sensitive:           true, // bootstrap data contais user api token
 			},
 		},
 	}

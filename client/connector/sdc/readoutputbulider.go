@@ -7,26 +7,26 @@ import (
 	internalRsa "github.com/cisco-lockhart/go-client/internal/crypto/rsa"
 )
 
-type sdcResponseBuilder struct {
+type sdcReadOutputBuilder struct {
 	readOutput ReadOutput
 }
 
-func NewSdcResponseBuilder() *sdcResponseBuilder {
-	return &sdcResponseBuilder{}
+func NewSdcOutputBuilder() *sdcReadOutputBuilder {
+	return &sdcReadOutputBuilder{}
 }
 
-func (builder *sdcResponseBuilder) Build() ReadOutput {
+func (builder *sdcReadOutputBuilder) Build() ReadOutput {
 	return builder.readOutput
 }
 
-func (builder *sdcResponseBuilder) AsDefaultCloudConnector() *sdcResponseBuilder {
+func (builder *sdcReadOutputBuilder) AsDefaultCloudConnector() *sdcReadOutputBuilder {
 	builder.readOutput.DefaultSdc = true
 	builder.readOutput.Cdg = true
 
 	return builder
 }
 
-func (builder *sdcResponseBuilder) AsOnPremConnector() *sdcResponseBuilder {
+func (builder *sdcReadOutputBuilder) AsOnPremConnector() *sdcReadOutputBuilder {
 	builder.readOutput.Cdg = false
 	builder.readOutput.PublicKey = PublicKey{
 		EncodedKey: mustGenerateBase64PublicKey(),
@@ -37,19 +37,19 @@ func (builder *sdcResponseBuilder) AsOnPremConnector() *sdcResponseBuilder {
 	return builder
 }
 
-func (builder *sdcResponseBuilder) WithUid(uid string) *sdcResponseBuilder {
+func (builder *sdcReadOutputBuilder) WithUid(uid string) *sdcReadOutputBuilder {
 	builder.readOutput.Uid = uid
 
 	return builder
 }
 
-func (builder *sdcResponseBuilder) WithName(name string) *sdcResponseBuilder {
+func (builder *sdcReadOutputBuilder) WithName(name string) *sdcReadOutputBuilder {
 	builder.readOutput.Name = name
 
 	return builder
 }
 
-func (builder *sdcResponseBuilder) WithTenantUid(tenantUid string) *sdcResponseBuilder {
+func (builder *sdcReadOutputBuilder) WithTenantUid(tenantUid string) *sdcReadOutputBuilder {
 	builder.readOutput.TenantUid = tenantUid
 
 	return builder

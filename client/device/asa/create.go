@@ -34,8 +34,6 @@ type CreateOutput struct {
 	Ipv4       string `json:"ipv4"`
 	LarType    string `json:"larType"`
 	LarUid     string `json:"larUid"`
-
-	specificUid string `json:"-"`
 }
 
 func NewCreateRequestInput(name, larUid, larType, ipv4, username, password string, ignoreCertificate bool) *CreateInput {
@@ -143,8 +141,6 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		Ipv4:       deviceCreateOutp.Ipv4,
 		LarUid:     deviceCreateOutp.LarUid,
 		LarType:    deviceCreateOutp.LarType,
-
-		specificUid: asaReadSpecOutp.SpecificUid,
 	}
 	return &createOutp, err
 }

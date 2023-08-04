@@ -1,4 +1,4 @@
-package asa
+package asa_test
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/cisco-lockhart/go-client/device"
+	"github.com/cisco-lockhart/go-client/device/asa"
 	"github.com/cisco-lockhart/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
 )
@@ -16,20 +17,20 @@ func TestAsaReadSpecific(t *testing.T) {
 
 	deviceUid := "00000000-0000-0000-0000-000000000000"
 
-	specificDevice := NewReadSpecificOutputBuilder().
+	specificDevice := asa.NewReadSpecificOutputBuilder().
 		WithSpecificUid("11111111-1111-1111-1111-111111111111").
 		InDoneState().
 		Build()
 
 	testCases := []struct {
 		testName   string
-		input      ReadSpecificInput
+		input      asa.ReadSpecificInput
 		setupFunc  func()
-		assertFunc func(output *ReadSpecificOutput, err error, t *testing.T)
+		assertFunc func(output *asa.ReadSpecificOutput, err error, t *testing.T)
 	}{
 		{
 			testName: "successfully reads ASA specific device",
-			input: ReadSpecificInput{
+			input: asa.ReadSpecificInput{
 				Uid: deviceUid,
 			},
 
@@ -37,7 +38,7 @@ func TestAsaReadSpecific(t *testing.T) {
 				configureDeviceReadSpecificToRespondSuccessfully(deviceUid, device.ReadSpecificOutput(specificDevice))
 			},
 
-			assertFunc: func(output *ReadSpecificOutput, err error, t *testing.T) {
+			assertFunc: func(output *asa.ReadSpecificOutput, err error, t *testing.T) {
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -54,7 +55,7 @@ func TestAsaReadSpecific(t *testing.T) {
 
 		{
 			testName: "returns error when the remote service reading the ASA specific device encounters an issue",
-			input: ReadSpecificInput{
+			input: asa.ReadSpecificInput{
 				Uid: deviceUid,
 			},
 
@@ -62,7 +63,7 @@ func TestAsaReadSpecific(t *testing.T) {
 				configureDeviceReadSpecificToRespondWithError(deviceUid)
 			},
 
-			assertFunc: func(output *ReadSpecificOutput, err error, t *testing.T) {
+			assertFunc: func(output *asa.ReadSpecificOutput, err error, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -80,7 +81,7 @@ func TestAsaReadSpecific(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := ReadSpecific(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := asa.ReadSpecific(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
 
 			testCase.assertFunc(output, err, t)
 		})

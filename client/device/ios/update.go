@@ -3,9 +3,9 @@ package ios
 import (
 	"context"
 
-	"github.com/cisco-lockhart/go-client/device"
-	"github.com/cisco-lockhart/go-client/internal/http"
-	"github.com/cisco-lockhart/go-client/internal/url"
+	"github.com/CiscoDevnet/go-client/device"
+	"github.com/CiscoDevnet/go-client/internal/http"
+	"github.com/CiscoDevnet/go-client/internal/url"
 )
 
 type UpdateInput struct {

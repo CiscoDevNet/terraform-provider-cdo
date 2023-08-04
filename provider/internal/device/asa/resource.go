@@ -6,13 +6,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cisco-lockhart/go-client/connector/sdc"
-	"github.com/cisco-lockhart/terraform-provider-cdo/validators"
+	"github.com/CiscoDevnet/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
-	cdoClient "github.com/cisco-lockhart/go-client"
-	"github.com/cisco-lockhart/go-client/device/asa"
+	cdoClient "github.com/CiscoDevnet/go-client"
+	"github.com/CiscoDevnet/go-client/device/asa"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"

@@ -1,10 +1,10 @@
-module github.com/cisco-lockhart/terraform-provider-cdo
+module github.com/CiscoDevnet/terraform-provider-cdo
 
 go 1.20
 
 require (
 	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.19.10
-	github.com/cisco-lockhart/go-client v0.0.0-00010101000000-000000000000
+	github.com/CiscoDevnet/go-client v0.0.0-00010101000000-000000000000
 	github.com/hashicorp/terraform-plugin-framework v1.3.3
 	github.com/hashicorp/terraform-plugin-framework-validators v0.10.0
 	github.com/hashicorp/terraform-plugin-go v0.18.0
@@ -92,4 +92,4 @@ require (
 	google.golang.org/protobuf v1.31.0 // indirect
 )
 
-replace github.com/cisco-lockhart/go-client => ../client
+replace github.com/CiscoDevnet/go-client => ../client

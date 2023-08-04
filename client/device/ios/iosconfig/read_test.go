@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/cisco-lockhart/go-client/internal/http"
+	"github.com/CiscoDevnet/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 )

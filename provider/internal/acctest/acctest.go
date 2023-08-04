@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/cisco-lockhart/terraform-provider-cdo/internal/provider"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/provider"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 )

@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/cisco-lockhart/go-client/connector/sdc"
-	"github.com/cisco-lockhart/go-client/device"
-	internalTesting "github.com/cisco-lockhart/go-client/internal/testing"
+	"github.com/CiscoDevnet/go-client/connector/sdc"
+	"github.com/CiscoDevnet/go-client/device"
+	internalTesting "github.com/CiscoDevnet/go-client/internal/testing"
 	"github.com/jarcoal/httpmock"
 )
 

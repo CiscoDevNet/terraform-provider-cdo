@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/cisco-lockhart/go-client/connector/sdc"
-	"github.com/cisco-lockhart/go-client/internal/crypto/rsa"
-	"github.com/cisco-lockhart/go-client/internal/http"
-	"github.com/cisco-lockhart/go-client/internal/url"
+	"github.com/CiscoDevnet/go-client/connector/sdc"
+	"github.com/CiscoDevnet/go-client/internal/crypto/rsa"
+	"github.com/CiscoDevnet/go-client/internal/http"
+	"github.com/CiscoDevnet/go-client/internal/url"
 )
 
 type UpdateInput struct {
@@ -89,8 +89,8 @@ type updateLocationRequestBody struct {
 }
 
 type pendingLocationUpdateSmContext struct {
-	Ipv4 string `json:"ipv4"`
-	CertificateAccepted bool `json:"certificateAccepted"`
+	Ipv4                string `json:"ipv4"`
+	CertificateAccepted bool   `json:"certificateAccepted"`
 }
 
 func UpdateLocation(ctx context.Context, client http.Client, options UpdateLocationOptions) (*UpdateOutput, error) {

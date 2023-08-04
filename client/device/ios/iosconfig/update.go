@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/cisco-lockhart/go-client/connector/sdc"
+	"github.com/CiscoDevnet/go-client/connector/sdc"
 
-	"github.com/cisco-lockhart/go-client/internal/crypto/rsa"
-	"github.com/cisco-lockhart/go-client/internal/http"
-	"github.com/cisco-lockhart/go-client/internal/url"
+	"github.com/CiscoDevnet/go-client/internal/crypto/rsa"
+	"github.com/CiscoDevnet/go-client/internal/http"
+	"github.com/CiscoDevnet/go-client/internal/url"
 )
 
 type UpdateInput struct {

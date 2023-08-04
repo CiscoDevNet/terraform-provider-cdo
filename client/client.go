@@ -6,13 +6,13 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/cisco-lockhart/go-client/connector/sdc"
-	"github.com/cisco-lockhart/go-client/device"
-	"github.com/cisco-lockhart/go-client/device/ios"
+	"github.com/CiscoDevnet/go-client/connector/sdc"
+	"github.com/CiscoDevnet/go-client/device"
+	"github.com/CiscoDevnet/go-client/device/ios"
 
-	"github.com/cisco-lockhart/go-client/device/asa"
-	"github.com/cisco-lockhart/go-client/internal/device/asaconfig"
-	internalhttp "github.com/cisco-lockhart/go-client/internal/http"
+	"github.com/CiscoDevnet/go-client/device/asa"
+	"github.com/CiscoDevnet/go-client/internal/device/asaconfig"
+	internalhttp "github.com/CiscoDevnet/go-client/internal/http"
 )
 
 type Client struct {

@@ -12,7 +12,6 @@ type readOutputBuilder struct {
 func NewReadOutputBuilder() *readOutputBuilder {
 	return &readOutputBuilder{
 		readOutput: CreateOutput{
-			DeviceType:      "ASA",
 			CreatedDate:     time.Now().Unix(),
 			LastUpdatedDate: time.Now().Unix(),
 		},
@@ -21,6 +20,16 @@ func NewReadOutputBuilder() *readOutputBuilder {
 
 func (builder *readOutputBuilder) Build() ReadOutput {
 	return builder.readOutput
+}
+
+func (builder *readOutputBuilder) AsAsa() *readOutputBuilder {
+	builder.readOutput.DeviceType = "ASA"
+	return builder
+}
+
+func (builder *readOutputBuilder) AsIos() *readOutputBuilder {
+	builder.readOutput.DeviceType = "IOS"
+	return builder
 }
 
 func (builder *readOutputBuilder) WithUid(uid string) *readOutputBuilder {
@@ -55,14 +64,14 @@ func (builder *readOutputBuilder) WithLastUpdatedDate(date time.Time) *readOutpu
 	return builder
 }
 
-func (builder *readOutputBuilder) OnboardedUsingSdc(sdcUid string) *readOutputBuilder {
+func (builder *readOutputBuilder) OnboardedUsingOnPremConnector(sdcUid string) *readOutputBuilder {
 	builder.readOutput.LarType = "SDC"
 	builder.readOutput.LarUid = sdcUid
 
 	return builder
 }
 
-func (builder *readOutputBuilder) OnboardedUsingCdg(cdgUid string) *readOutputBuilder {
+func (builder *readOutputBuilder) OnboardedUsingCloudConnector(cdgUid string) *readOutputBuilder {
 	builder.readOutput.LarType = "CDG"
 	builder.readOutput.LarUid = cdgUid
 

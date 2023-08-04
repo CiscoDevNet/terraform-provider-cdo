@@ -1,4 +1,4 @@
-package asa
+package ios
 
 import (
 	"context"
@@ -10,15 +10,15 @@ import (
 	"github.com/jarcoal/httpmock"
 )
 
-func TestAsaDelete(t *testing.T) {
+func TestIosDelete(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	asaDevice := device.NewReadOutputBuilder().
-		AsAsa().
+	iosDevice := device.NewReadOutputBuilder().
+		AsIos().
 		WithUid("11111111-1111-1111-1111-111111111111").
-		WithName("my-asa").
-		OnboardedUsingCloudConnector("88888888-8888-8888-8888-888888888888").
+		WithName("my-ios").
+		OnboardedUsingOnPremConnector("88888888-8888-8888-8888-888888888888").
 		WithLocation("10.10.0.1", 443).
 		Build()
 
@@ -29,13 +29,13 @@ func TestAsaDelete(t *testing.T) {
 		assertFunc func(output *DeleteOutput, err error, t *testing.T)
 	}{
 		{
-			testName: "successfully deletes ASA",
+			testName: "successfully deletes iOS device",
 			input: DeleteInput{
-				Uid: asaDevice.Uid,
+				Uid: iosDevice.Uid,
 			},
 
 			setupFunc: func() {
-				configureDeviceDeleteToRespondSuccessfully(asaDevice.Uid)
+				configureDeviceDeleteToRespondSuccessfully(iosDevice.Uid)
 			},
 
 			assertFunc: func(output *DeleteOutput, err error, t *testing.T) {
@@ -55,13 +55,13 @@ func TestAsaDelete(t *testing.T) {
 		},
 
 		{
-			testName: "returns error when the remote service deleting the ASA encounters an issue",
+			testName: "returns error when the remote service deleting the iOS device encounters an issue",
 			input: DeleteInput{
-				Uid: asaDevice.Uid,
+				Uid: iosDevice.Uid,
 			},
 
 			setupFunc: func() {
-				configureDeviceDeleteToRespondWithError(asaDevice.Uid)
+				configureDeviceDeleteToRespondWithError(iosDevice.Uid)
 			},
 
 			assertFunc: func(output *DeleteOutput, err error, t *testing.T) {

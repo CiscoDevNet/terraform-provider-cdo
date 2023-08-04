@@ -17,16 +17,18 @@ func TestAsaCreate(t *testing.T) {
 	defer httpmock.DeactivateAndReset()
 
 	asaDevice := device.NewReadOutputBuilder().
+		AsAsa().
 		WithUid("11111111-1111-1111-1111-111111111111").
 		WithName("my-asa").
-		OnboardedUsingCdg("88888888-8888-8888-8888-888888888888").
+		OnboardedUsingCloudConnector("88888888-8888-8888-8888-888888888888").
 		WithLocation("10.10.0.1", 443).
 		Build()
 
 	asaDeviceUsingSdc := device.NewReadOutputBuilder().
+		AsAsa().
 		WithUid("11111111-1111-1111-1111-111111111111").
 		WithName("my-asa").
-		OnboardedUsingSdc("99999999-9999-9999-9999-999999999999").
+		OnboardedUsingOnPremConnector("99999999-9999-9999-9999-999999999999").
 		WithLocation("10.10.0.1", 443).
 		Build()
 

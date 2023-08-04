@@ -20,7 +20,7 @@ func (builder *sdcResponseBuilder) Build() ReadOutput {
 }
 
 func (builder *sdcResponseBuilder) AsDefaultCloudConnector() *sdcResponseBuilder {
-	builder.readOutput.DefaultLar = true
+	builder.readOutput.DefaultSdc = true
 	builder.readOutput.Cdg = true
 
 	return builder

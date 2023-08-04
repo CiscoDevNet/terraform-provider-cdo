@@ -61,8 +61,8 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 					return nil, fmt.Errorf("sdc uid not found")
 				}
 
-				larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadInput{
-					LarUid: asaReadOutp.LarUid,
+				larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadByUidInput{
+					SdcUid: asaReadOutp.LarUid,
 				})
 				if err != nil {
 					return nil, err

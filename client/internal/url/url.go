@@ -53,6 +53,14 @@ func CreateSdc(baseUrl string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/proxies", baseUrl)
 }
 
+func UpdateSdc(baseUrl string, sdcUid string) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/proxies/%s", baseUrl, sdcUid)
+}
+
+func DeleteSdc(baseUrl string, sdcUid string) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/proxies/%s", baseUrl, sdcUid)
+}
+
 func UserToken(baseUrl string) string {
 	return fmt.Sprintf("%s/anubis/rest/v1/oauth/token", baseUrl)
 }

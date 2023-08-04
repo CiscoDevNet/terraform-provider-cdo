@@ -8,18 +8,18 @@ import (
 	"github.com/cisco-lockhart/go-client/internal/url"
 )
 
-type ReadInput struct {
-	LarUid string
+type ReadByUidInput struct {
+	SdcUid string
 }
 
 type ReadByNameInput struct {
-	LarName string
+	SdcName string
 }
 
 type ReadOutput struct {
 	Uid        string    `json:"uid"`
 	Name       string    `json:"name"`
-	DefaultLar bool      `json:"defaultLar"`
+	DefaultSdc bool      `json:"defaultLar"`
 	Cdg        bool      `json:"cdg"`
 	TenantUid  string    `json:"tenantUid"`
 	PublicKey  PublicKey `json:"larPublicKey"`
@@ -31,21 +31,21 @@ type PublicKey struct {
 	KeyId      string `json:"keyId"`
 }
 
-func NewReadInput(larUid string) *ReadInput {
-	return &ReadInput{
-		LarUid: larUid,
+func NewReadByUidInput(sdcUid string) *ReadByUidInput {
+	return &ReadByUidInput{
+		SdcUid: sdcUid,
 	}
 }
 
-func NewReadByNameInput(larName string) *ReadByNameInput {
+func NewReadByNameInput(sdcName string) *ReadByNameInput {
 	return &ReadByNameInput{
-		LarName: larName,
+		SdcName: sdcName,
 	}
 }
 
-func newReadByUidRequest(ctx context.Context, client http.Client, readInp ReadInput) *http.Request {
+func newReadByUidRequest(ctx context.Context, client http.Client, readInp ReadByUidInput) *http.Request {
 
-	url := url.ReadSdcByUid(client.BaseUrl(), readInp.LarUid)
+	url := url.ReadSdcByUid(client.BaseUrl(), readInp.SdcUid)
 
 	req := client.NewGet(ctx, url)
 
@@ -54,14 +54,14 @@ func newReadByUidRequest(ctx context.Context, client http.Client, readInp ReadIn
 
 func newReadByNameRequest(ctx context.Context, client http.Client, readInp ReadByNameInput) *http.Request {
 
-	url := url.ReadSdcByName(client.BaseUrl(), readInp.LarName)
+	url := url.ReadSdcByName(client.BaseUrl(), readInp.SdcName)
 
 	req := client.NewGet(ctx, url)
 
 	return req
 }
 
-func ReadByUid(ctx context.Context, client http.Client, readInp ReadInput) (*ReadOutput, error) {
+func ReadByUid(ctx context.Context, client http.Client, readInp ReadByUidInput) (*ReadOutput, error) {
 
 	client.Logger.Println("reading sdc")
 
@@ -91,7 +91,7 @@ func ReadByName(ctx context.Context, client http.Client, readInp ReadByNameInput
 	}
 
 	if len(arrayOutp) > 1 {
-		return nil, fmt.Errorf("multiple SDCs found with the name: %s", readInp.LarName)
+		return nil, fmt.Errorf("multiple SDCs found with the name: %s", readInp.SdcName)
 	}
 
 	outp := arrayOutp[0]

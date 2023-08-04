@@ -105,8 +105,8 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		}
 
 		// read lar public key
-		larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadInput{
-			LarUid: deviceCreateOutp.LarUid,
+		larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadByUidInput{
+			SdcUid: deviceCreateOutp.LarUid,
 		})
 		if err != nil {
 			return nil, err

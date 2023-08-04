@@ -83,3 +83,15 @@ func (c *Client) ReadAsaConfig(ctx context.Context, inp asaconfig.ReadInput) (*a
 func (c *Client) ReadSpecificAsa(ctx context.Context, inp asa.ReadSpecificInput) (*asa.ReadSpecificOutput, error) {
 	return asa.ReadSpecific(ctx, c.client, inp)
 }
+
+func (c *Client) CreateSdc(ctx context.Context, inp sdc.CreateInput) (*sdc.UpdateOutput, error) {
+	return sdc.Create(ctx, c.client, inp)
+}
+
+func (c *Client) UpdateSdc(ctx context.Context, inp sdc.UpdateInput) (*sdc.UpdateOutput, error) {
+	return sdc.Update(ctx, c.client, inp)
+}
+
+func (c *Client) DeleteSdc(ctx context.Context, inp sdc.DeleteInput) (*sdc.DeleteOutput, error) {
+	return sdc.Delete(ctx, c.client, inp)
+}

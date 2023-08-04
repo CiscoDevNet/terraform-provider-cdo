@@ -138,7 +138,7 @@ func TestReadByUid(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := ReadByUid(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), ReadInput{LarUid: testCase.targetUid})
+			output, err := ReadByUid(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), ReadByUidInput{SdcUid: testCase.targetUid})
 
 			testCase.assertFunc(output, err, t)
 		})
@@ -305,7 +305,7 @@ func TestReadByName(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := ReadByName(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), ReadByNameInput{LarName: testCase.targetName})
+			output, err := ReadByName(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), ReadByNameInput{SdcName: testCase.targetName})
 
 			testCase.assertFunc(output, err, t)
 		})

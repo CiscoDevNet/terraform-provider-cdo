@@ -4,16 +4,15 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/rsa"
-	"encoding/json"
 	"fmt"
-	"io"
 	h "net/http"
 	"reflect"
 	"testing"
 
-	"github.com/cisco-lockhart/go-client/connector/sdc"
-	internalRsa "github.com/cisco-lockhart/go-client/internal/crypto/rsa"
-	"github.com/cisco-lockhart/go-client/internal/http"
+	"github.com/CiscoDevnet/go-client/connector/sdc"
+	internalRsa "github.com/CiscoDevnet/go-client/internal/crypto/rsa"
+	"github.com/CiscoDevnet/go-client/internal/http"
+	"github.com/CiscoDevnet/go-client/internal/jsonutil"
 	"github.com/jarcoal/httpmock"
 )
 
@@ -54,7 +53,7 @@ func TestAsaConfigUpdate(t *testing.T) {
 					"PUT",
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *h.Request) (*h.Response, error) {
-						requestBody, err := readBody[updateBody](r)
+						requestBody, err := http.ReadRequestBody[updateBody](r)
 						if err != nil {
 							t.Fatalf("could not read body because: %s", err.Error())
 						}
@@ -105,7 +104,7 @@ func TestAsaConfigUpdate(t *testing.T) {
 					"PUT",
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *h.Request) (*h.Response, error) {
-						requestBody, err := readBody[updateBody](r)
+						requestBody, err := http.ReadRequestBody[updateBody](r)
 						if err != nil {
 							t.Fatalf("could not read body because: %s", err.Error())
 						}
@@ -114,7 +113,7 @@ func TestAsaConfigUpdate(t *testing.T) {
 							t.Errorf("expected 'State' to equal 'CERT_VALIDATED', got: %s", requestBody.State)
 						}
 
-						credentials, err := unmarshalStruct[credentials]([]byte(requestBody.Credentials))
+						credentials, err := jsonutil.UnmarshalStruct[credentials]([]byte(requestBody.Credentials))
 						if err != nil {
 							t.Fatalf("could not unmarshal credentials because: %s", err.Error())
 						}
@@ -256,7 +255,7 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 					"PUT",
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *h.Request) (*h.Response, error) {
-						requestBody, err := readBody[updateCredentialsBodyWithState](r)
+						requestBody, err := http.ReadRequestBody[updateCredentialsBodyWithState](r)
 						if err != nil {
 							t.Fatalf("could not read body because: %s", err.Error())
 						}
@@ -310,7 +309,7 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 					"PUT",
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *h.Request) (*h.Response, error) {
-						requestBody, err := readBody[updateCredentialsBodyWithState](r)
+						requestBody, err := http.ReadRequestBody[updateCredentialsBodyWithState](r)
 						if err != nil {
 							t.Fatalf("could not read body because: %s", err.Error())
 						}
@@ -320,7 +319,7 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 							t.Errorf("expected 'State' to equal '%s', got: %s", expectedState, requestBody.State)
 						}
 
-						credentials, err := unmarshalStruct[credentials]([]byte(requestBody.SmContext.Credentials))
+						credentials, err := jsonutil.UnmarshalStruct[credentials]([]byte(requestBody.SmContext.Credentials))
 						if err != nil {
 							t.Fatalf("could not unmarshal credentials because: %s", err.Error())
 						}
@@ -371,7 +370,7 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 					"PUT",
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *h.Request) (*h.Response, error) {
-						requestBody, err := readBody[updateCredentialsBody](r)
+						requestBody, err := http.ReadRequestBody[updateCredentialsBody](r)
 						if err != nil {
 							t.Fatalf("could not read body because: %s", err.Error())
 						}
@@ -424,12 +423,12 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 					"PUT",
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *h.Request) (*h.Response, error) {
-						requestBody, err := readBody[updateCredentialsBody](r)
+						requestBody, err := http.ReadRequestBody[updateCredentialsBody](r)
 						if err != nil {
 							t.Fatalf("could not read body because: %s", err.Error())
 						}
 
-						credentials, err := unmarshalStruct[credentials]([]byte(requestBody.SmContext.Credentials))
+						credentials, err := jsonutil.UnmarshalStruct[credentials]([]byte(requestBody.SmContext.Credentials))
 						if err != nil {
 							t.Fatalf("could not unmarshal credentials because: %s", err.Error())
 						}
@@ -533,25 +532,6 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 			testCase.assertFunc(output, err, t)
 		})
 	}
-}
-
-func readBody[T any](req *h.Request) (*T, error) {
-	body, err := io.ReadAll(req.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	return unmarshalStruct[T](body)
-}
-
-func unmarshalStruct[T any](bytes []byte) (*T, error) {
-	var out T
-
-	if err := json.Unmarshal(bytes, &out); err != nil {
-		return &out, err
-	}
-
-	return &out, nil
 }
 
 func buildUpdateAsaConfigUrl(uid string) string {

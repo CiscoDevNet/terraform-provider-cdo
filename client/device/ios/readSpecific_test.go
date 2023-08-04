@@ -1,4 +1,4 @@
-package asa_test
+package ios
 
 import (
 	"context"
@@ -6,31 +6,33 @@ import (
 	"testing"
 
 	"github.com/CiscoDevnet/go-client/device"
-	"github.com/CiscoDevnet/go-client/device/asa"
+	"github.com/CiscoDevnet/go-client/device/ios/iosconfig"
 	"github.com/CiscoDevnet/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
 )
 
-func TestAsaReadSpecific(t *testing.T) {
+func TestIosReadSpecific(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
 	deviceUid := "00000000-0000-0000-0000-000000000000"
 
-	specificDevice := asa.NewReadSpecificOutputBuilder().
-		WithSpecificUid("11111111-1111-1111-1111-111111111111").
-		InDoneState().
-		Build()
+	specificDevice := ReadSpecificOutput{
+		SpecificUid: "11111111-1111-1111-1111-111111111111",
+		State:       iosconfig.IosConfigStateDone,
+		Namespace:   "targets",
+		Type:        "device",
+	}
 
 	testCases := []struct {
 		testName   string
-		input      asa.ReadSpecificInput
+		input      ReadSpecificInput
 		setupFunc  func()
-		assertFunc func(output *asa.ReadSpecificOutput, err error, t *testing.T)
+		assertFunc func(output *ReadSpecificOutput, err error, t *testing.T)
 	}{
 		{
-			testName: "successfully reads ASA specific device",
-			input: asa.ReadSpecificInput{
+			testName: "successfully reads iOS specific device",
+			input: ReadSpecificInput{
 				Uid: deviceUid,
 			},
 
@@ -38,7 +40,7 @@ func TestAsaReadSpecific(t *testing.T) {
 				configureDeviceReadSpecificToRespondSuccessfully(deviceUid, device.ReadSpecificOutput(specificDevice))
 			},
 
-			assertFunc: func(output *asa.ReadSpecificOutput, err error, t *testing.T) {
+			assertFunc: func(output *ReadSpecificOutput, err error, t *testing.T) {
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -54,8 +56,8 @@ func TestAsaReadSpecific(t *testing.T) {
 		},
 
 		{
-			testName: "returns error when the remote service reading the ASA specific device encounters an issue",
-			input: asa.ReadSpecificInput{
+			testName: "returns error when the remote service reading the iOS specific device encounters an issue",
+			input: ReadSpecificInput{
 				Uid: deviceUid,
 			},
 
@@ -63,7 +65,7 @@ func TestAsaReadSpecific(t *testing.T) {
 				configureDeviceReadSpecificToRespondWithError(deviceUid)
 			},
 
-			assertFunc: func(output *asa.ReadSpecificOutput, err error, t *testing.T) {
+			assertFunc: func(output *ReadSpecificOutput, err error, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -81,7 +83,7 @@ func TestAsaReadSpecific(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := asa.ReadSpecific(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := ReadSpecific(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
 
 			testCase.assertFunc(output, err, t)
 		})

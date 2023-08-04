@@ -6,13 +6,13 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/cisco-lockhart/go-client/connector/sdc"
-	"github.com/cisco-lockhart/go-client/device"
-	"github.com/cisco-lockhart/go-client/device/ios"
+	"github.com/CiscoDevnet/go-client/connector/sdc"
+	"github.com/CiscoDevnet/go-client/device"
+	"github.com/CiscoDevnet/go-client/device/ios"
 
-	"github.com/cisco-lockhart/go-client/device/asa"
-	"github.com/cisco-lockhart/go-client/internal/device/asaconfig"
-	internalhttp "github.com/cisco-lockhart/go-client/internal/http"
+	"github.com/CiscoDevnet/go-client/device/asa"
+	"github.com/CiscoDevnet/go-client/internal/device/asaconfig"
+	internalhttp "github.com/CiscoDevnet/go-client/internal/http"
 )
 
 type Client struct {
@@ -52,7 +52,7 @@ func (c *Client) ReadDeviceByName(ctx context.Context, inp device.ReadByNameAndD
 	return device.ReadByNameAndDeviceType(ctx, c.client, inp)
 }
 
-func (c *Client) CreateAsa(ctx context.Context, inp asa.CreateInput) (*asa.CreateOutput, error) {
+func (c *Client) CreateAsa(ctx context.Context, inp asa.CreateInput) (*asa.CreateOutput, *asa.CreateError) {
 	return asa.Create(ctx, c.client, inp)
 }
 
@@ -68,7 +68,7 @@ func (c *Client) ReadIos(ctx context.Context, inp ios.ReadInput) (*ios.ReadOutpu
 	return ios.Read(ctx, c.client, inp)
 }
 
-func (c *Client) CreateIos(ctx context.Context, inp ios.CreateInput) (*ios.CreateOutput, error) {
+func (c *Client) CreateIos(ctx context.Context, inp ios.CreateInput) (*ios.CreateOutput, *ios.CreateError) {
 	return ios.Create(ctx, c.client, inp)
 }
 

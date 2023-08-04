@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cisco-lockhart/go-client/internal/http"
-	"github.com/cisco-lockhart/go-client/internal/url"
+	"github.com/CiscoDevnet/go-client/internal/http"
+	"github.com/CiscoDevnet/go-client/internal/url"
 )
 
 type ReadInput struct {
@@ -17,7 +17,7 @@ type ReadByNameInput struct {
 }
 
 type ReadByNameAndDeviceTypeInput struct {
-	Name string `json:"name"`
+	Name       string `json:"name"`
 	DeviceType string `json:"deviceType"`
 }
 
@@ -77,7 +77,6 @@ func Read(ctx context.Context, client http.Client, readInp ReadInput) (*ReadOutp
 
 	return &outp, nil
 }
-
 
 func ReadByNameAndDeviceType(ctx context.Context, client http.Client, readInp ReadByNameAndDeviceTypeInput) (*ReadOutput, error) {
 

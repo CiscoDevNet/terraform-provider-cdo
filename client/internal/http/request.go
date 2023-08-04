@@ -13,8 +13,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/cisco-lockhart/go-client/internal/cdo"
-	"github.com/cisco-lockhart/go-client/internal/retry"
+	"github.com/CiscoDevnet/go-client/internal/cdo"
+	"github.com/CiscoDevnet/go-client/internal/jsonutil"
+	"github.com/CiscoDevnet/go-client/internal/retry"
 )
 
 type Request struct {
@@ -164,4 +165,13 @@ func toReader(v any) (io.Reader, error) {
 		reader = bytes.NewReader(b)
 	}
 	return reader, nil
+}
+
+func ReadRequestBody[T any](req *http.Request) (*T, error) {
+	body, err := io.ReadAll(req.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return jsonutil.UnmarshalStruct[T](body)
 }

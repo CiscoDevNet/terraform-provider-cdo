@@ -5,8 +5,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cisco-lockhart/go-client/internal/http"
-	"github.com/cisco-lockhart/go-client/internal/retry"
+	"github.com/CiscoDevnet/go-client/internal/http"
+	"github.com/CiscoDevnet/go-client/internal/retry"
+)
+
+const (
+	IosConfigStateDone           = "DONE"
+	IosConfigStateError          = "ERROR"
+	IosConfigStateBadCredentials = "BAD_CREDENTIALS"
 )
 
 func UntilState(ctx context.Context, client http.Client, specificUid string, state string) retry.Func {
@@ -28,10 +34,10 @@ func UntilState(ctx context.Context, client http.Client, specificUid string, sta
 		if strings.EqualFold(readOutp.State, state) {
 			return true, nil
 		}
-		if strings.EqualFold(readOutp.State, "ERROR") {
-			return false, fmt.Errorf("workflow ended in ERROR")
+		if strings.EqualFold(readOutp.State, IosConfigStateError) {
+			return false, fmt.Errorf("workflow ended in %s", IosConfigStateError)
 		}
-		if strings.EqualFold(readOutp.State, "BAD_CREDENTIALS") {
+		if strings.EqualFold(readOutp.State, IosConfigStateBadCredentials) {
 			return false, fmt.Errorf("bad credentials")
 		}
 		return false, nil

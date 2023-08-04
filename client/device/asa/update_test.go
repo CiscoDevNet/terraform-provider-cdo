@@ -5,11 +5,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/cisco-lockhart/go-client/connector/sdc"
-	"github.com/cisco-lockhart/go-client/device"
-	"github.com/cisco-lockhart/go-client/device/asa"
-	"github.com/cisco-lockhart/go-client/internal/device/asaconfig"
-	"github.com/cisco-lockhart/go-client/internal/http"
+	"github.com/CiscoDevnet/go-client/connector/sdc"
+	"github.com/CiscoDevnet/go-client/device"
+	"github.com/CiscoDevnet/go-client/device/asa"
+	"github.com/CiscoDevnet/go-client/internal/device/asaconfig"
+	"github.com/CiscoDevnet/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
 )
 
@@ -25,16 +25,18 @@ func TestAsaUpdate(t *testing.T) {
 		Build()
 
 	asaDevice := device.NewReadOutputBuilder().
+		AsAsa().
 		WithUid("11111111-1111-1111-1111-111111111111").
 		WithName("my-asa").
-		OnboardedUsingCdg("88888888-8888-8888-8888-888888888888").
+		OnboardedUsingCloudConnector("88888888-8888-8888-8888-888888888888").
 		WithLocation("10.10.0.1", 443).
 		Build()
 
 	asaDeviceOnboardedByOnPremConnector := device.NewReadOutputBuilder().
+		AsAsa().
 		WithUid("33333333-3333-3333-3333-333333333333").
 		WithName("my-asa").
-		OnboardedUsingSdc(onPremConnector.Uid).
+		OnboardedUsingOnPremConnector(onPremConnector.Uid).
 		WithLocation("10.10.0.1", 443).
 		Build()
 
@@ -60,6 +62,8 @@ func TestAsaUpdate(t *testing.T) {
 				updatedDevice := asaDevice
 				updatedDevice.Name = input.Name
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, updatedDevice)
+				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: asaconfig.AsaConfigStateDone})
+				configureDeviceReadToRespondSuccessfully(device.ReadOutput{Uid: input.Uid, State: "DONE", Status: "IDLE", ConnectivityState: 1})
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
@@ -91,7 +95,9 @@ func TestAsaUpdate(t *testing.T) {
 				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
 				configureDeviceReadToRespondSuccessfully(asaDevice)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
+				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: asaconfig.AsaConfigStateDone})
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, asaDevice)
+				configureDeviceReadToRespondSuccessfully(device.ReadOutput{Uid: input.Uid, State: "DONE", Status: "IDLE", ConnectivityState: 1})
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
@@ -124,7 +130,9 @@ func TestAsaUpdate(t *testing.T) {
 				configureSdcReadToRespondSuccessfully(onPremConnector)
 
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
+				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: asaconfig.AsaConfigStateDone})
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, asaDeviceOnboardedByOnPremConnector)
+				configureDeviceReadToRespondSuccessfully(device.ReadOutput{Uid: input.Uid, State: "DONE", Status: "IDLE", ConnectivityState: 1})
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
@@ -159,6 +167,7 @@ func TestAsaUpdate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
 				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: asaconfig.AsaConfigStateDone})
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, updatedDevice)
+				configureDeviceReadToRespondSuccessfully(device.ReadOutput{Uid: input.Uid, State: "DONE", Status: "IDLE", ConnectivityState: 1})
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {

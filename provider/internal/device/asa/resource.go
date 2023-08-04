@@ -6,13 +6,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cisco-lockhart/go-client/connector/sdc"
-	"github.com/cisco-lockhart/terraform-provider-cdo/validators"
+	"github.com/CiscoDevnet/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
-	cdoClient "github.com/cisco-lockhart/go-client"
-	"github.com/cisco-lockhart/go-client/device/asa"
+	cdoClient "github.com/CiscoDevnet/go-client"
+	"github.com/CiscoDevnet/go-client/device/asa"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -223,15 +223,18 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 		planData.IgnoreCertifcate.ValueBool(),
 	)
 
-	createOutp, err := r.client.CreateAsa(ctx, *createInp)
-	if err != nil {
-		tflog.Debug(ctx, fmt.Sprintf("%+v", *createOutp))
-		res.Diagnostics.AddError("failed to onboard ASA", err.Error())
-		deleteInp := asa.NewDeleteInput(createOutp.Uid)
-		_, err := r.client.DeleteAsa(ctx, *deleteInp)
-		if err != nil {
-			res.Diagnostics.AddError("failed to delete ASA device", err.Error())
+	createOutp, createErr := r.client.CreateAsa(ctx, *createInp)
+	if createErr != nil {
+		tflog.Error(ctx, "Failed to create ASA device")
+		if createErr.CreatedResourceId != nil {
+			deleteInp := asa.NewDeleteInput(*createErr.CreatedResourceId)
+			_, err := r.client.DeleteAsa(ctx, *deleteInp)
+			if err != nil {
+				res.Diagnostics.AddError("failed to delete ASA device", err.Error())
+			}
 		}
+
+		res.Diagnostics.AddError("failed to create ASA device", createErr.Error())
 		return
 	}
 
@@ -350,7 +353,7 @@ func (r *AsaDeviceResource) ModifyPlan(ctx context.Context, req resource.ModifyP
 			return
 		}
 
-		if strings.EqualFold(planData.Ipv4.ValueString(), stateData.Ipv4.ValueString()) {
+		if planData != nil && stateData != nil && strings.EqualFold(planData.Ipv4.ValueString(), stateData.Ipv4.ValueString()) {
 			tflog.Debug(ctx, "There is no change in the IPv4; remove host and port diffs")
 			planData.Host = stateData.Host
 			planData.Port = stateData.Port

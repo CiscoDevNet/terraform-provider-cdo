@@ -1,4 +1,4 @@
-package asa_test
+package ios
 
 import (
 	"fmt"
@@ -7,7 +7,6 @@ import (
 
 	"github.com/CiscoDevnet/go-client/connector/sdc"
 	"github.com/CiscoDevnet/go-client/device"
-	"github.com/CiscoDevnet/go-client/internal/device/asaconfig"
 	internalTesting "github.com/CiscoDevnet/go-client/internal/testing"
 	"github.com/jarcoal/httpmock"
 )
@@ -22,10 +21,6 @@ func buildDeviceReadSpecificPath(deviceUid string) string {
 
 func buildDevicePath(deviceUid string) string {
 	return fmt.Sprintf("/aegis/rest/v1/services/targets/devices/%s", deviceUid)
-}
-
-func buildAsaConfigPath(specificUid string) string {
-	return fmt.Sprintf("/aegis/rest/v1/services/asa/configs/%s", specificUid)
 }
 
 func buildSdcPath(sdcUid string) string {
@@ -48,10 +43,10 @@ func configureDeviceCreateToRespondWithError() {
 	)
 }
 
-func configureDeviceUpdateToRespondSuccessfully(deviceUid string, updateOutput device.UpdateOutput) {
+func configureDeviceUpdateToRespondSuccessfully(updateOutput device.UpdateOutput) {
 	httpmock.RegisterResponder(
 		http.MethodPut,
-		buildDevicePath(deviceUid),
+		buildDevicePath(updateOutput.Uid),
 		httpmock.NewJsonResponderOrPanic(200, updateOutput),
 	)
 }
@@ -111,50 +106,18 @@ func configureDeviceDeleteToRespondWithError(deviceUid string) {
 	)
 }
 
-func configureAsaConfigReadToRespondSuccessfully(specificUid string, readOutput asaconfig.ReadOutput) {
-	httpmock.RegisterResponder(
-		http.MethodGet,
-		buildAsaConfigPath(specificUid),
-		httpmock.NewJsonResponderOrPanic(200, readOutput),
-	)
-}
-
-func configureAsaConfigReadToRespondWithCalls(specificUid string, responders []httpmock.Responder) {
+func configureIosConfigReadToSucceedWithSubsequentCalls(specificUid string, responders []httpmock.Responder) {
 	count := 0
 
 	httpmock.RegisterResponder(
 		http.MethodGet,
-		buildAsaConfigPath(specificUid),
+		buildDevicePath(specificUid),
 		func(r *http.Request) (*http.Response, error) {
 			responder := responders[count]
 			count += 1
 
 			return responder(r)
 		},
-	)
-}
-
-func configureAsaConfigReadToRespondWithError(specificUid string) {
-	httpmock.RegisterResponder(
-		http.MethodGet,
-		buildAsaConfigPath(specificUid),
-		httpmock.NewStringResponder(500, ""),
-	)
-}
-
-func configureAsaConfigUpdateToRespondSuccessfully(specificUid string, updateOutput asaconfig.UpdateOutput) {
-	httpmock.RegisterResponder(
-		http.MethodPut,
-		buildAsaConfigPath(specificUid),
-		httpmock.NewJsonResponderOrPanic(200, updateOutput),
-	)
-}
-
-func configureAsaConfigUpdateToRespondWithError(specificUid string) {
-	httpmock.RegisterResponder(
-		http.MethodPut,
-		buildAsaConfigPath(specificUid),
-		httpmock.NewStringResponder(500, ""),
 	)
 }
 
@@ -178,20 +141,12 @@ func assertDeviceCreateWasCalledOnce(t *testing.T) {
 	internalTesting.AssertEndpointCalledTimes(http.MethodPost, deviceCreatePath, 1, t)
 }
 
-func assertDeviceReadSpecificWasCalledOnce(uid string, t *testing.T) {
-	internalTesting.AssertEndpointCalledTimes(http.MethodGet, buildDeviceReadSpecificPath(uid), 1, t)
+func assertDeviceReadWasCalledTimes(deviceUid string, times int, t *testing.T) {
+	internalTesting.AssertEndpointCalledTimes(http.MethodGet, buildDevicePath(deviceUid), times, t)
 }
 
 func assertDeviceUpdateWasCalledOnce(deviceUid string, t *testing.T) {
 	internalTesting.AssertEndpointCalledTimes(http.MethodPut, buildDevicePath(deviceUid), 1, t)
-}
-
-func assertAsaConfigReadWasCalledTimes(specificUid string, times int, t *testing.T) {
-	internalTesting.AssertEndpointCalledTimes(http.MethodGet, buildAsaConfigPath(specificUid), times, t)
-}
-
-func assertAsaConfigUpdateWasCalledOnce(specificUid string, t *testing.T) {
-	internalTesting.AssertEndpointCalledTimes(http.MethodPut, buildAsaConfigPath(specificUid), 1, t)
 }
 
 func assertSdcReadByUidWasCalledOnce(sdcUid string, t *testing.T) {

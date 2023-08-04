@@ -1,8 +1,7 @@
-package asaconfig
+package iosconfig
 
 import (
 	"context"
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -11,15 +10,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAsaConfigReadByUid(t *testing.T) {
+func TestIosConfigRead(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	urlTemplate := "/aegis/rest/v1/services/asa/configs/%s"
-
-	validAsaConfig := ReadOutput{
-		Uid:   asaConfigUid,
-		State: AsaConfigStateDone,
+	validIosConfig := ReadOutput{
+		Uid:   iosConfigUid,
+		State: IosConfigStateDone,
 	}
 
 	testCases := []struct {
@@ -29,34 +26,39 @@ func TestAsaConfigReadByUid(t *testing.T) {
 		assertFunc func(output *ReadOutput, err error, t *testing.T)
 	}{
 		{
-			testName:  "successfully fetch ASA config",
-			targetUid: asaConfigUid,
+			testName:  "successfully fetch iOS config",
+			targetUid: iosConfigUid,
 
 			setupFunc: func() {
 				httpmock.RegisterResponder(
 					"GET",
-					fmt.Sprintf(urlTemplate, asaConfigUid),
-					httpmock.NewJsonResponderOrPanic(200, validAsaConfig),
+					buildIosConfigPath(iosConfigUid),
+					httpmock.NewJsonResponderOrPanic(200, validIosConfig),
 				)
 			},
 
 			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
-				assert.Nil(t, err)
-				assert.NotNil(t, output)
+				if err != nil {
+					t.Errorf("unexpected error: %s", err.Error())
+				}
 
-				if !reflect.DeepEqual(validAsaConfig, *output) {
-					t.Errorf("expected: %+v\ngot: %+v", validAsaConfig, output)
+				if output == nil {
+					t.Fatal("output is nil!")
+				}
+
+				if !reflect.DeepEqual(validIosConfig, *output) {
+					t.Errorf("expected: %+v\ngot: %+v", validIosConfig, output)
 				}
 			},
 		},
 		{
-			testName:  "returns nil ouput when ASA config not found",
-			targetUid: asaConfigUid,
+			testName:  "returns nil ouput when iOS config not found",
+			targetUid: iosConfigUid,
 
 			setupFunc: func() {
 				httpmock.RegisterResponder(
 					"GET",
-					fmt.Sprintf(urlTemplate, asaConfigUid),
+					buildIosConfigPath(iosConfigUid),
 					httpmock.NewStringResponder(404, ""),
 				)
 			},
@@ -67,20 +69,25 @@ func TestAsaConfigReadByUid(t *testing.T) {
 			},
 		},
 		{
-			testName:  "return error when fetching ASA Config and remote service encounters issue",
-			targetUid: asaConfigUid,
+			testName:  "return error when fetching iOS Config and remote service encounters issue",
+			targetUid: iosConfigUid,
 
 			setupFunc: func() {
 				httpmock.RegisterResponder(
 					"GET",
-					fmt.Sprintf(urlTemplate, asaConfigUid),
+					buildIosConfigPath(iosConfigUid),
 					httpmock.NewStringResponder(500, "service is experiencing issues"),
 				)
 			},
 
 			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
-				assert.Nil(t, output)
-				assert.NotNil(t, err)
+				if output != nil {
+					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
+				}
+
+				if err == nil {
+					t.Error("error is nil!")
+				}
 			},
 		},
 	}
@@ -91,7 +98,7 @@ func TestAsaConfigReadByUid(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := Read(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), *NewReadInput(asaConfigUid))
+			output, err := Read(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), *NewReadInput(iosConfigUid))
 
 			testCase.assertFunc(output, err, t)
 		})

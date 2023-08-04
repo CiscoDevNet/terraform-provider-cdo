@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cisco-lockhart/go-client/internal/http"
-	"github.com/cisco-lockhart/go-client/internal/retry"
+	"github.com/CiscoDevnet/go-client/internal/http"
+	"github.com/CiscoDevnet/go-client/internal/retry"
 )
 
 func UntilStateDoneAndConnectivityOk(ctx context.Context, client http.Client, uid string) retry.Func {
@@ -17,7 +17,7 @@ func UntilStateDoneAndConnectivityOk(ctx context.Context, client http.Client, ui
 			return false, err
 		}
 
-		client.Logger.Printf("asa state=%s\n", readOutp.State)
+		client.Logger.Printf("device state=%s\n", readOutp.State)
 
 		if strings.EqualFold(readOutp.State, "DONE") && strings.EqualFold(readOutp.Status, "IDLE") {
 

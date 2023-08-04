@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cisco-lockhart/go-client/internal/cdo"
+	"github.com/CiscoDevnet/go-client/internal/cdo"
 )
 
 type Client struct {

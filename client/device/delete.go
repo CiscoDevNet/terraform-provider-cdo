@@ -3,8 +3,8 @@ package device
 import (
 	"context"
 
-	"github.com/cisco-lockhart/go-client/internal/http"
-	"github.com/cisco-lockhart/go-client/internal/url"
+	"github.com/CiscoDevnet/go-client/internal/http"
+	"github.com/CiscoDevnet/go-client/internal/url"
 )
 
 type DeleteInput struct {

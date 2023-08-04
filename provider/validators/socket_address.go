@@ -10,7 +10,7 @@ import (
 
 var _ validator.String = socketAddressValidator{}
 
-var socketAddressRegex = regexp.MustCompile(`.*:\\d+`)
+var socketAddressRegex = regexp.MustCompile(`.+:\d+`)
 
 // socketAddressValidator validates that the socket address has a host and a port.
 type socketAddressValidator struct {

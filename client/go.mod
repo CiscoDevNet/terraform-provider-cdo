@@ -1,4 +1,4 @@
-module github.com/cisco-lockhart/go-client
+module github.com/CiscoDevnet/go-client
 
 go 1.20
 

@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cisco-lockhart/go-client/internal/device/asaconfig"
-	"github.com/cisco-lockhart/go-client/internal/retry"
+	"github.com/CiscoDevnet/go-client/internal/device/asaconfig"
+	"github.com/CiscoDevnet/go-client/internal/retry"
 
-	"github.com/cisco-lockhart/go-client/connector/sdc"
+	"github.com/CiscoDevnet/go-client/connector/sdc"
 
-	"github.com/cisco-lockhart/go-client/device"
-	"github.com/cisco-lockhart/go-client/internal/http"
-	"github.com/cisco-lockhart/go-client/internal/url"
+	"github.com/CiscoDevnet/go-client/device"
+	"github.com/CiscoDevnet/go-client/internal/http"
+	"github.com/CiscoDevnet/go-client/internal/url"
 )
 
 type UpdateInput struct {

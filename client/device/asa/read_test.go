@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/cisco-lockhart/go-client/device"
-	"github.com/cisco-lockhart/go-client/device/asa"
-	"github.com/cisco-lockhart/go-client/internal/http"
+	"github.com/CiscoDevnet/go-client/device"
+	"github.com/CiscoDevnet/go-client/device/asa"
+	"github.com/CiscoDevnet/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
 )
 
@@ -16,9 +16,10 @@ func TestAsaRead(t *testing.T) {
 	defer httpmock.DeactivateAndReset()
 
 	asaDevice := device.NewReadOutputBuilder().
+		AsAsa().
 		WithUid("11111111-1111-1111-1111-111111111111").
 		WithName("my-asa").
-		OnboardedUsingCdg("88888888-8888-8888-8888-888888888888").
+		OnboardedUsingCloudConnector("88888888-8888-8888-8888-888888888888").
 		WithLocation("10.10.0.1", 443).
 		Build()
 

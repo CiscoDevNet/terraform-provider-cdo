@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cisco-lockhart/go-client/connector/sdc"
-	"github.com/cisco-lockhart/go-client/internal/device/asaconfig"
+	"github.com/CiscoDevnet/go-client/connector/sdc"
+	"github.com/CiscoDevnet/go-client/internal/device/asaconfig"
 
-	"github.com/cisco-lockhart/go-client/device"
-	"github.com/cisco-lockhart/go-client/internal/http"
-	"github.com/cisco-lockhart/go-client/internal/retry"
+	"github.com/CiscoDevnet/go-client/device"
+	"github.com/CiscoDevnet/go-client/internal/http"
+	"github.com/CiscoDevnet/go-client/internal/retry"
 )
 
 type CreateInput struct {
@@ -36,6 +36,15 @@ type CreateOutput struct {
 	LarUid     string `json:"larUid"`
 }
 
+type CreateError struct {
+	Err               error
+	CreatedResourceId *string
+}
+
+func (r *CreateError) Error() string {
+	return r.Err.Error()
+}
+
 func NewCreateRequestInput(name, larUid, larType, ipv4, username, password string, ignoreCertificate bool) *CreateInput {
 	return &CreateInput{
 		Name:             name,
@@ -48,15 +57,22 @@ func NewCreateRequestInput(name, larUid, larType, ipv4, username, password strin
 	}
 }
 
-func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, error) {
+func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, *CreateError) {
 
 	client.Logger.Println("creating asa device")
 
 	deviceCreateOutp, err := device.Create(ctx, client, *device.NewCreateRequestInput(
 		createInp.Name, "ASA", createInp.LarUid, createInp.LarType, createInp.Ipv4, false, createInp.IgnoreCertifcate,
 	))
+	var createdResourceId *string = nil
+	if deviceCreateOutp != nil {
+		createdResourceId = &deviceCreateOutp.Uid
+	}
 	if err != nil {
-		return nil, err
+		return nil, &CreateError{
+			CreatedResourceId: createdResourceId,
+			Err:               err,
+		}
 	}
 
 	client.Logger.Println("reading specific device uid")
@@ -65,7 +81,10 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		deviceCreateOutp.Uid,
 	))
 	if err != nil {
-		return nil, err
+		return nil, &CreateError{
+			CreatedResourceId: createdResourceId,
+			Err:               err,
+		}
 	}
 
 	client.Logger.Println("waiting for asa config state done")
@@ -84,10 +103,18 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 				IgnoreCertifcate: true,
 			})
 			if err != nil {
-				return nil, fmt.Errorf("error while updating config to ignore certificate, cause=%w", err)
+				return nil,
+					&CreateError{
+						CreatedResourceId: createdResourceId,
+						Err:               fmt.Errorf("error while updating config to ignore certificate, cause=%w", err),
+					}
+
 			}
 		} else {
-			return nil, err
+			return nil, &CreateError{
+				CreatedResourceId: createdResourceId,
+				Err:               err,
+			}
 		}
 	}
 
@@ -99,7 +126,11 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		client.Logger.Println("decrypting public key from sdc for encrpytion")
 
 		if deviceCreateOutp.LarUid == "" {
-			return nil, fmt.Errorf("sdc uid not found")
+			return nil, &CreateError{
+				CreatedResourceId: createdResourceId,
+				Err:               fmt.Errorf("sdc uid not found"),
+			}
+
 		}
 
 		// read lar public key
@@ -107,7 +138,10 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 			SdcUid: deviceCreateOutp.LarUid,
 		})
 		if err != nil {
-			return nil, err
+			return nil, &CreateError{
+				CreatedResourceId: createdResourceId,
+				Err:               err,
+			}
 		}
 		publicKey = &larReadRes.PublicKey
 	}
@@ -124,14 +158,24 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	)
 	_, err = asaconfig.Update(ctx, client, *asaConfigUpdateInp)
 	if err != nil {
-		return nil, err
+		return nil, &CreateError{
+			CreatedResourceId: createdResourceId,
+			Err:               err,
+		}
 	}
 
 	// poll until asa config state done
 	client.Logger.Println("waiting for device to reach state done")
 
 	err = retry.Do(asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), *retry.NewOptionsWithLogger(client.Logger))
+	if err != nil {
+		return nil, &CreateError{
+			CreatedResourceId: createdResourceId,
+			Err:               err,
+		}
+	}
 
+	// successful
 	createOutp := CreateOutput{
 		Uid:        deviceCreateOutp.Uid,
 		Name:       deviceCreateOutp.Name,
@@ -142,5 +186,5 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		LarUid:     deviceCreateOutp.LarUid,
 		LarType:    deviceCreateOutp.LarType,
 	}
-	return &createOutp, err
+	return &createOutp, nil
 }

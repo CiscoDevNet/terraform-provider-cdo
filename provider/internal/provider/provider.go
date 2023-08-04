@@ -7,11 +7,11 @@ import (
 	"context"
 	"os"
 
-	"github.com/cisco-lockhart/terraform-provider-cdo/internal/connector/sdc"
-	"github.com/cisco-lockhart/terraform-provider-cdo/internal/device/ios"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/device/ios"
 
-	cdoClient "github.com/cisco-lockhart/go-client"
-	"github.com/cisco-lockhart/terraform-provider-cdo/validators"
+	cdoClient "github.com/CiscoDevnet/go-client"
+	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -20,7 +20,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"github.com/cisco-lockhart/terraform-provider-cdo/internal/device/asa"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/device/asa"
 )
 
 var _ provider.Provider = &CdoProvider{}

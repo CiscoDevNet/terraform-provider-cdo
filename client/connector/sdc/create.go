@@ -57,7 +57,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	// get user data from authentication service
 	bootstrapData, err := generateBootstrapData(ctx, client, createInp.Name)
 	if err != nil {
-		return &CreateOutput{}, nil
+		return &CreateOutput{}, err
 	}
 
 	// 3. done!

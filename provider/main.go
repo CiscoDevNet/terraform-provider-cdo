@@ -38,7 +38,7 @@ func main() {
 	flag.Parse()
 
 	opts := providerserver.ServeOpts{
-		Address: "registry.terraform.io/CiscoDevnet/cisco-cdo-provider",
+		Address: "registry.terraform.io/CiscoDevNet/cisco-cdo-provider",
 		Debug:   debug,
 	}
 

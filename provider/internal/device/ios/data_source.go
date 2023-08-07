@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"strconv"
 
-	cdoClient "github.com/CiscoDevNet/terraform-provider-cdo/go-client"
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/device"
+	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"

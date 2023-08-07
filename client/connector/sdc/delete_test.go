@@ -3,9 +3,9 @@ package sdc_test
 import (
 	"context"
 	"fmt"
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/connector/sdc"
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/http"
-	internalTesting "github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/testing"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	internalTesting "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/testing"
 	"testing"
 
 	"github.com/jarcoal/httpmock"

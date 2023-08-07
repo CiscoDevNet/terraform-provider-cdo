@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/http"
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/retry"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 )
 
 func UntilStateDoneAndConnectivityOk(ctx context.Context, client http.Client, uid string) retry.Func {

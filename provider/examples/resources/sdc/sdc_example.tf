@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     cdo = {
-      source = "hashicorp.com/CiscoDevNet/cdo"
+      source = "hashicorp.com/CiscoDevnet/cdo"
     }
   }
 }

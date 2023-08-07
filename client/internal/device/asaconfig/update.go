@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/connector/sdc"
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/crypto/rsa"
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/http"
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/url"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto/rsa"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 )
 
 type UpdateInput struct {

@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/connector/sdc"
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/device"
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/device/ios/iosconfig"
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/http"
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/retry"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios/iosconfig"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 )
 
 type CreateInput struct {

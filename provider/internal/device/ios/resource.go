@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/CiscoDevNet/terraform-provider-cdo/validators"
+	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	cdoClient "github.com/CiscoDevNet/terraform-provider-cdo/go-client"
+	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"

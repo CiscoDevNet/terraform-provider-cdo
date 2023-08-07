@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/connector/sdc"
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
 )
 

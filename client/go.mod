@@ -1,4 +1,4 @@
-module github.com/CiscoDevNet/terraform-provider-cdo/go-client
+module github.com/CiscoDevnet/terraform-provider-cdo/go-client
 
 go 1.20
 

@@ -6,13 +6,13 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/connector/sdc"
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/device"
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/device/ios"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios"
 
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/device/asa"
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/device/asaconfig"
-	internalhttp "github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/device/asaconfig"
+	internalhttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 )
 
 type Client struct {

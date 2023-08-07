@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/CiscoDevNet/terraform-provider-cdo/go-client/internal/cdo"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/cdo"
 )
 
 type Client struct {

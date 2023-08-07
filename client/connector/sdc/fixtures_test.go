@@ -1,6 +1,6 @@
 package sdc_test
 
-import "github.com/CiscoDevNet/terraform-provider-cdo/go-client/connector/sdc"
+import "github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 
 const (
 	cdgUid                   = "11111111-1111-1111-1111-111111111111"

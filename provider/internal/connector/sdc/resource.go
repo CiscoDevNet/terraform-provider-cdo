@@ -14,30 +14,29 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
-var _ resource.Resource = &SdcResource{}
-var _ resource.ResourceWithImportState = &SdcResource{}
+var _ resource.Resource = &Resource{}
+var _ resource.ResourceWithImportState = &Resource{}
 
-func NewSdcResource() resource.Resource {
-	return &SdcResource{}
+func NewResource() resource.Resource {
+	return &Resource{}
 }
 
-type SdcResource struct {
+type Resource struct {
 	client *cdoClient.Client
 }
 
-type SdcResourceModel struct {
+type ResourceModel struct {
 	ID            types.String `tfsdk:"id"`
 	Name          types.String `tfsdk:"name"`
 	BootstrapData types.String `tfsdk:"bootstrap_data"`
 }
 
-func (r *SdcResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_sdc"
 }
 
-func (r *SdcResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "Provides an SDC connector resource. This allows SDC to be onboarded, updated, and deleted on CDO.",
 
 		Attributes: map[string]schema.Attribute{
@@ -55,15 +54,13 @@ func (r *SdcResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 			"bootstrap_data": schema.StringAttribute{
 				MarkdownDescription: "SDC bootstrap data",
 				Computed:            true,
-				// TODO: uncomment to make it sensitive
-				// Sensitive:           true, // bootstrap data contais user api token
+				Sensitive:           true, // bootstrap data contains user api token
 			},
 		},
 	}
 }
 
-func (r *SdcResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	// Prevent panic if the provider has not been configured.
+func (r *Resource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -82,11 +79,11 @@ func (r *SdcResource) Configure(ctx context.Context, req resource.ConfigureReque
 	r.client = client
 }
 
-func (r *SdcResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	tflog.Trace(ctx, "read SDC resource")
 
 	// 1. read terraform plan data into the model
-	var stateData SdcResourceModel
+	var stateData ResourceModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &stateData)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -103,11 +100,11 @@ func (r *SdcResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 	tflog.Trace(ctx, "read SDC resource done")
 }
 
-func (r *SdcResource) Create(ctx context.Context, req resource.CreateRequest, res *resource.CreateResponse) {
+func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, res *resource.CreateResponse) {
 	tflog.Trace(ctx, "create SDC resource")
 
 	// 1. read terraform plan data into model
-	var planData SdcResourceModel
+	var planData ResourceModel
 	res.Diagnostics.Append(req.Plan.Get(ctx, &planData)...)
 	if res.Diagnostics.HasError() {
 		return
@@ -124,16 +121,16 @@ func (r *SdcResource) Create(ctx context.Context, req resource.CreateRequest, re
 	tflog.Trace(ctx, "create SDC resource done")
 }
 
-func (r *SdcResource) Update(ctx context.Context, req resource.UpdateRequest, res *resource.UpdateResponse) {
+func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, res *resource.UpdateResponse) {
 	tflog.Trace(ctx, "update SDC resource")
 
 	// 1. read plan and state data from terraform
-	var planData SdcResourceModel
+	var planData ResourceModel
 	res.Diagnostics.Append(req.Plan.Get(ctx, &planData)...)
 	if res.Diagnostics.HasError() {
 		return
 	}
-	var stateData SdcResourceModel
+	var stateData ResourceModel
 	res.Diagnostics.Append(req.State.Get(ctx, &stateData)...)
 	if res.Diagnostics.HasError() {
 		return
@@ -150,11 +147,11 @@ func (r *SdcResource) Update(ctx context.Context, req resource.UpdateRequest, re
 	tflog.Trace(ctx, "update SDC resource done")
 }
 
-func (r *SdcResource) Delete(ctx context.Context, req resource.DeleteRequest, res *resource.DeleteResponse) {
+func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, res *resource.DeleteResponse) {
 	tflog.Trace(ctx, "delete SDC resource")
 
 	// 1. read state data from terraform state
-	var stateData SdcResourceModel
+	var stateData ResourceModel
 	res.Diagnostics.Append(req.State.Get(ctx, &stateData)...)
 	if res.Diagnostics.HasError() {
 		return
@@ -166,6 +163,6 @@ func (r *SdcResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 	}
 }
 
-func (r *SdcResource) ImportState(ctx context.Context, req resource.ImportStateRequest, res *resource.ImportStateResponse) {
+func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequest, res *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, res)
 }

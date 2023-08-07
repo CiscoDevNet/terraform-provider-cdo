@@ -134,7 +134,7 @@ func (p *CdoProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 func (p *CdoProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		sdc.NewSdcResource,
+		sdc.NewResource,
 		asa.NewAsaDeviceResource,
 		ios.NewIosDeviceResource,
 	}
@@ -142,7 +142,7 @@ func (p *CdoProvider) Resources(ctx context.Context) []func() resource.Resource 
 
 func (p *CdoProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
-		sdc.NewSdcDataSource,
+		sdc.NewDataSource,
 		asa.NewAsaDataSource,
 		ios.NewIosDataSource,
 	}

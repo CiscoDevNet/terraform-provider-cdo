@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-func Read(ctx context.Context, resource *SdcResource, stateData *SdcResourceModel) error {
+func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) error {
 
 	// do read
 	readSdcOutp, err := resource.client.ReadSdcByUid(ctx, *sdc.NewReadByUidInput(stateData.ID.ValueString()))
@@ -22,7 +22,7 @@ func Read(ctx context.Context, resource *SdcResource, stateData *SdcResourceMode
 	return nil
 }
 
-func Create(ctx context.Context, resource *SdcResource, planData *SdcResourceModel) error {
+func Create(ctx context.Context, resource *Resource, planData *ResourceModel) error {
 
 	// do create
 	createSdcOutp, err := resource.client.CreateSdc(ctx, *sdc.NewCreateInput(planData.Name.ValueString()))
@@ -38,7 +38,7 @@ func Create(ctx context.Context, resource *SdcResource, planData *SdcResourceMod
 	return nil
 }
 
-func Update(ctx context.Context, resource *SdcResource, planData *SdcResourceModel, stateData *SdcResourceModel) error {
+func Update(ctx context.Context, resource *Resource, planData *ResourceModel, stateData *ResourceModel) error {
 
 	// do update
 	updateSdcOutp, err := resource.client.UpdateSdc(ctx, sdc.NewUpdateInput(planData.ID.ValueString(), planData.Name.ValueString()))
@@ -54,7 +54,7 @@ func Update(ctx context.Context, resource *SdcResource, planData *SdcResourceMod
 	return nil
 }
 
-func Delete(ctx context.Context, resource *SdcResource, stateData *SdcResourceModel) error {
+func Delete(ctx context.Context, resource *Resource, stateData *ResourceModel) error {
 
 	// do delete
 	_, err := resource.client.DeleteSdc(ctx, sdc.NewDeleteInput(stateData.ID.ValueString()))

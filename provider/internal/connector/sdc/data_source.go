@@ -15,48 +15,38 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-// Used in provider.go to include this data source.
-func NewSdcDataSource() datasource.DataSource {
-	return &SdcDataSource{}
+func NewDataSource() datasource.DataSource {
+	return &DataSource{}
 }
 
-// The data source object consumed by terraform.
-type SdcDataSource struct {
+type DataSource struct {
 	client *cdoClient.Client
 }
 
-/////
-// Model classes: define mapping from Go types to Terraform types.
-/////
-
-type SdcDataSourceModel struct {
+type DataSourceModel struct {
 	Id   types.String `tfsdk:"id"`
-	Sdcs []SdcModel   `tfsdk:"sdcs"`
+	Sdcs []Model      `tfsdk:"sdcs"`
 }
 
-type SdcModel struct {
-	Uid          types.String      `tfsdk:"uid"`
-	Name         types.String      `tfsdk:"name"`
-	TenantUid    types.String      `tfsdk:"tenant_uid"`
-	SdcPublicKey SdcPublicKeyModel `tfsdk:"sdc_public_key"`
+type Model struct {
+	Uid          types.String   `tfsdk:"uid"`
+	Name         types.String   `tfsdk:"name"`
+	TenantUid    types.String   `tfsdk:"tenant_uid"`
+	SdcPublicKey PublicKeyModel `tfsdk:"sdc_public_key"`
 }
 
-type SdcPublicKeyModel struct {
+type PublicKeyModel struct {
 	EncodedKey types.String `tfsdk:"encoded_key"`
 	Version    types.Int64  `tfsdk:"version"`
 	KeyId      types.String `tfsdk:"key_id"`
 }
 
-// define the name for this data source.
-func (d *SdcDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *DataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_sdc_device"
 }
 
-// define the terraform schema for this data source.
-// it needs to be consistent with the Model classes' `tfsdk:"xxx"` above.
-func (d *SdcDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "SDC data source",
 
 		Attributes: map[string]schema.Attribute{
@@ -97,10 +87,7 @@ func (d *SdcDataSource) Schema(ctx context.Context, req datasource.SchemaRequest
 	}
 }
 
-// initial configuration for CRUD operations, here we set the cdo go client to use.
-// the go client is configured in the provider, and it is available here, so we just set it directly.
-func (d *SdcDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	// Prevent panic if the provider has not been configured.
+func (d *DataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -119,14 +106,9 @@ func (d *SdcDataSource) Configure(ctx context.Context, req datasource.ConfigureR
 	d.client = client
 }
 
-// define the read operation.
-// this function is responsible for:
-// 1. mapping the cdo go client's data to the model classes we defined above.
-// 2. report any error using `resp.Diagnostics`.
-// 3. set model classes to the terraform state.
-func (d *SdcDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 
-	var configData SdcDataSourceModel
+	var configData DataSourceModel
 
 	// Read Terraform configuration data into the model
 	resp.Diagnostics.Append(req.Config.Get(ctx, &configData)...)
@@ -146,14 +128,14 @@ func (d *SdcDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	}
 	configData.Id = types.StringValue((*res)[0].TenantUid)
 
-	var sdcModels []SdcModel
+	var sdcModels []Model
 	for _, sdc := range *res {
-		sdcModel := SdcModel{
+		sdcModel := Model{
 			Uid:       types.StringValue(sdc.Uid),
 			Name:      types.StringValue(sdc.Name),
 			TenantUid: types.StringValue(sdc.TenantUid),
 
-			SdcPublicKey: SdcPublicKeyModel{
+			SdcPublicKey: PublicKeyModel{
 				EncodedKey: types.StringValue(sdc.PublicKey.EncodedKey),
 				Version:    types.Int64Value(sdc.PublicKey.Version),
 				KeyId:      types.StringValue(sdc.PublicKey.KeyId),

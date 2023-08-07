@@ -55,13 +55,13 @@ func TestAsaCreate(t *testing.T) {
 		testName   string
 		input      asa.CreateInput
 		setupFunc  func(input asa.CreateInput)
-		assertFunc func(output *asa.CreateOutput, err error, t *testing.T)
+		assertFunc func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T)
 	}{
 		{
 			testName: "successfully onboards ASA when using CDG",
 			input: asa.CreateInput{
 				Name:             asaDevice.Name,
-				LarType:          asaDevice.LarType,
+				SdcType:          asaDevice.LarType,
 				Ipv4:             asaDevice.Ipv4,
 				Username:         "unittestuser",
 				Password:         "not a real password",
@@ -75,7 +75,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -91,8 +91,8 @@ func TestAsaCreate(t *testing.T) {
 					Host:       asaDevice.Host,
 					Port:       asaDevice.Port,
 					Ipv4:       asaDevice.Ipv4,
-					LarType:    asaDevice.LarType,
-					LarUid:     asaDevice.LarUid,
+					SdcType:    asaDevice.LarType,
+					SdcUid:     asaDevice.LarUid,
 				}
 				if !reflect.DeepEqual(expectedCreatedOutput, *output) {
 					t.Errorf("expected: %+v, got: %+v", expectedCreatedOutput, output)
@@ -110,7 +110,7 @@ func TestAsaCreate(t *testing.T) {
 
 			input: asa.CreateInput{
 				Name:             asaDevice.Name,
-				LarType:          asaDevice.LarType,
+				SdcType:          asaDevice.LarType,
 				Ipv4:             asaDevice.Ipv4,
 				Username:         "unittestuser",
 				Password:         "not a real password",
@@ -131,7 +131,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -147,8 +147,8 @@ func TestAsaCreate(t *testing.T) {
 					Host:       asaDevice.Host,
 					Port:       asaDevice.Port,
 					Ipv4:       asaDevice.Ipv4,
-					LarType:    asaDevice.LarType,
-					LarUid:     asaDevice.LarUid,
+					SdcType:    asaDevice.LarType,
+					SdcUid:     asaDevice.LarUid,
 				}
 				if !reflect.DeepEqual(expectedCreatedOutput, *output) {
 					t.Errorf("expected: %+v, got: %+v", expectedCreatedOutput, output)
@@ -166,8 +166,8 @@ func TestAsaCreate(t *testing.T) {
 			testName: "successfully onboards ASA when using SDC",
 			input: asa.CreateInput{
 				Name:             asaDeviceUsingSdc.Name,
-				LarType:          asaDeviceUsingSdc.LarType,
-				LarUid:           asaDeviceUsingSdc.LarUid,
+				SdcType:          asaDeviceUsingSdc.LarType,
+				SdcUid:           asaDeviceUsingSdc.LarUid,
 				Ipv4:             asaDeviceUsingSdc.Ipv4,
 				Username:         "unittestuser",
 				Password:         "not a real password",
@@ -182,7 +182,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -198,8 +198,8 @@ func TestAsaCreate(t *testing.T) {
 					Host:       asaDeviceUsingSdc.Host,
 					Port:       asaDeviceUsingSdc.Port,
 					Ipv4:       asaDeviceUsingSdc.Ipv4,
-					LarType:    asaDeviceUsingSdc.LarType,
-					LarUid:     asaDeviceUsingSdc.LarUid,
+					SdcType:    asaDeviceUsingSdc.LarType,
+					SdcUid:     asaDeviceUsingSdc.LarUid,
 				}
 				if !reflect.DeepEqual(expectedCreatedOutput, *output) {
 					t.Errorf("expected: %+v, got: %+v", expectedCreatedOutput, output)
@@ -218,8 +218,8 @@ func TestAsaCreate(t *testing.T) {
 
 			input: asa.CreateInput{
 				Name:             asaDeviceUsingSdc.Name,
-				LarType:          asaDeviceUsingSdc.LarType,
-				LarUid:           asaDeviceUsingSdc.LarUid,
+				SdcType:          asaDeviceUsingSdc.LarType,
+				SdcUid:           asaDeviceUsingSdc.LarUid,
 				Ipv4:             asaDeviceUsingSdc.Ipv4,
 				Username:         "unittestuser",
 				Password:         "not a real password",
@@ -241,7 +241,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -257,8 +257,8 @@ func TestAsaCreate(t *testing.T) {
 					Host:       asaDeviceUsingSdc.Host,
 					Port:       asaDeviceUsingSdc.Port,
 					Ipv4:       asaDeviceUsingSdc.Ipv4,
-					LarType:    asaDeviceUsingSdc.LarType,
-					LarUid:     asaDeviceUsingSdc.LarUid,
+					SdcType:    asaDeviceUsingSdc.LarType,
+					SdcUid:     asaDeviceUsingSdc.LarUid,
 				}
 				if !reflect.DeepEqual(expectedCreatedOutput, *output) {
 					t.Errorf("expected: %+v, got: %+v", expectedCreatedOutput, output)
@@ -278,8 +278,8 @@ func TestAsaCreate(t *testing.T) {
 
 			input: asa.CreateInput{
 				Name:             asaDeviceUsingSdc.Name,
-				LarType:          asaDeviceUsingSdc.LarType,
-				LarUid:           asaDeviceUsingSdc.LarUid,
+				SdcType:          asaDeviceUsingSdc.LarType,
+				SdcUid:           asaDeviceUsingSdc.LarUid,
 				Ipv4:             asaDeviceUsingSdc.Ipv4,
 				Username:         "unittestuser",
 				Password:         "not a real password",
@@ -301,7 +301,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -317,8 +317,8 @@ func TestAsaCreate(t *testing.T) {
 
 			input: asa.CreateInput{
 				Name:             asaDeviceUsingSdc.Name,
-				LarType:          asaDeviceUsingSdc.LarType,
-				LarUid:           asaDeviceUsingSdc.LarUid,
+				SdcType:          asaDeviceUsingSdc.LarType,
+				SdcUid:           asaDeviceUsingSdc.LarUid,
 				Ipv4:             asaDeviceUsingSdc.Ipv4,
 				Username:         "unittestuser",
 				Password:         "not a real password",
@@ -340,7 +340,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -356,8 +356,8 @@ func TestAsaCreate(t *testing.T) {
 
 			input: asa.CreateInput{
 				Name:             asaDeviceUsingSdc.Name,
-				LarType:          asaDeviceUsingSdc.LarType,
-				LarUid:           asaDeviceUsingSdc.LarUid,
+				SdcType:          asaDeviceUsingSdc.LarType,
+				SdcUid:           asaDeviceUsingSdc.LarUid,
 				Ipv4:             asaDeviceUsingSdc.Ipv4,
 				Username:         "unittestuser",
 				Password:         "not a real password",
@@ -373,7 +373,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -389,8 +389,8 @@ func TestAsaCreate(t *testing.T) {
 
 			input: asa.CreateInput{
 				Name:             asaDeviceUsingSdc.Name,
-				LarType:          asaDeviceUsingSdc.LarType,
-				LarUid:           asaDeviceUsingSdc.LarUid,
+				SdcType:          asaDeviceUsingSdc.LarType,
+				SdcUid:           asaDeviceUsingSdc.LarUid,
 				Ipv4:             asaDeviceUsingSdc.Ipv4,
 				Username:         "unittestuser",
 				Password:         "not a real password",
@@ -412,7 +412,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
-			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -428,8 +428,8 @@ func TestAsaCreate(t *testing.T) {
 
 			input: asa.CreateInput{
 				Name:             asaDeviceUsingSdc.Name,
-				LarType:          asaDeviceUsingSdc.LarType,
-				LarUid:           asaDeviceUsingSdc.LarUid,
+				SdcType:          asaDeviceUsingSdc.LarType,
+				SdcUid:           asaDeviceUsingSdc.LarUid,
 				Ipv4:             asaDeviceUsingSdc.Ipv4,
 				Username:         "unittestuser",
 				Password:         "not a real password",
@@ -450,7 +450,7 @@ func TestAsaCreate(t *testing.T) {
 				configureDeviceUpdateToRespondWithError(asaDeviceUsingSdc.Uid)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
-			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -466,8 +466,8 @@ func TestAsaCreate(t *testing.T) {
 
 			input: asa.CreateInput{
 				Name:             asaDeviceUsingSdc.Name,
-				LarType:          asaDeviceUsingSdc.LarType,
-				LarUid:           asaDeviceUsingSdc.LarUid,
+				SdcType:          asaDeviceUsingSdc.LarType,
+				SdcUid:           asaDeviceUsingSdc.LarUid,
 				Ipv4:             asaDeviceUsingSdc.Ipv4,
 				Username:         "unittestuser",
 				Password:         "not a real password",
@@ -489,7 +489,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondWithError(asaConfig.Uid)
 			},
 
-			assertFunc: func(output *asa.CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}

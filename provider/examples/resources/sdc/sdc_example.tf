@@ -16,13 +16,13 @@ resource "cdo_sdc" "example" {
 }
 
 output "sdc_name" {
-    value = cdo_sdc.example.name
+  value = cdo_sdc.example.name
 }
 
 output "sdc_uid" {
-    value = cdo_sdc.example.id
+  value = cdo_sdc.example.id
 }
 
 output "sdc_bootstrap_data" {
-    value = cdo_sdc.example.bootstrap_data
+  value = cdo_sdc.example.bootstrap_data
 }

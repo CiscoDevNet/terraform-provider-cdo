@@ -16,7 +16,7 @@ func TestIosCreate(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	sdc := sdc.NewSdcResponseBuilder().
+	sdc := sdc.NewSdcOutputBuilder().
 		WithName("MyOnPremConnector").
 		WithUid("88888888-8888-8888-8888-888888888888").
 		WithTenantUid("00000000-0000-0000-0000-000000000000").
@@ -40,13 +40,13 @@ func TestIosCreate(t *testing.T) {
 		{
 			testName: "successfully onboards iOS when using SDC",
 			input: CreateInput{
-				Name:             iosDevice.Name,
-				LarType:          iosDevice.LarType,
-				LarUid:           iosDevice.LarUid,
-				Ipv4:             iosDevice.Ipv4,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: false,
+				Name:              iosDevice.Name,
+				SdcType:           iosDevice.LarType,
+				SdcUid:            iosDevice.LarUid,
+				Ipv4:              iosDevice.Ipv4,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: false,
 			},
 
 			setupFunc: func(input CreateInput) {
@@ -75,8 +75,8 @@ func TestIosCreate(t *testing.T) {
 					Host:       iosDevice.Host,
 					Port:       iosDevice.Port,
 					Ipv4:       iosDevice.Ipv4,
-					LarType:    iosDevice.LarType,
-					LarUid:     iosDevice.LarUid,
+					SdcType:    iosDevice.LarType,
+					SdcUid:     iosDevice.LarUid,
 				}
 				if !reflect.DeepEqual(expectedCreatedOutput, *output) {
 					t.Errorf("expected: %+v, got: %+v", expectedCreatedOutput, output)
@@ -92,13 +92,13 @@ func TestIosCreate(t *testing.T) {
 		{
 			testName: "returns error when device create call encounters error",
 			input: CreateInput{
-				Name:             iosDevice.Name,
-				LarType:          iosDevice.LarType,
-				LarUid:           iosDevice.LarUid,
-				Ipv4:             iosDevice.Ipv4,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: false,
+				Name:              iosDevice.Name,
+				SdcType:           iosDevice.LarType,
+				SdcUid:            iosDevice.LarUid,
+				Ipv4:              iosDevice.Ipv4,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: false,
 			},
 
 			setupFunc: func(input CreateInput) {
@@ -125,13 +125,13 @@ func TestIosCreate(t *testing.T) {
 		{
 			testName: "returns error when sdc read call encounters error",
 			input: CreateInput{
-				Name:             iosDevice.Name,
-				LarType:          iosDevice.LarType,
-				LarUid:           iosDevice.LarUid,
-				Ipv4:             iosDevice.Ipv4,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: false,
+				Name:              iosDevice.Name,
+				SdcType:           iosDevice.LarType,
+				SdcUid:            iosDevice.LarUid,
+				Ipv4:              iosDevice.Ipv4,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: false,
 			},
 
 			setupFunc: func(input CreateInput) {
@@ -158,13 +158,13 @@ func TestIosCreate(t *testing.T) {
 		{
 			testName: "returns error when iOS config read call encounters error",
 			input: CreateInput{
-				Name:             iosDevice.Name,
-				LarType:          iosDevice.LarType,
-				LarUid:           iosDevice.LarUid,
-				Ipv4:             iosDevice.Ipv4,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: false,
+				Name:              iosDevice.Name,
+				SdcType:           iosDevice.LarType,
+				SdcUid:            iosDevice.LarUid,
+				Ipv4:              iosDevice.Ipv4,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: false,
 			},
 
 			setupFunc: func(input CreateInput) {
@@ -190,13 +190,13 @@ func TestIosCreate(t *testing.T) {
 		{
 			testName: "returns error when device update call encounters error",
 			input: CreateInput{
-				Name:             iosDevice.Name,
-				LarType:          iosDevice.LarType,
-				LarUid:           iosDevice.LarUid,
-				Ipv4:             iosDevice.Ipv4,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: false,
+				Name:              iosDevice.Name,
+				SdcType:           iosDevice.LarType,
+				SdcUid:            iosDevice.LarUid,
+				Ipv4:              iosDevice.Ipv4,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: false,
 			},
 
 			setupFunc: func(input CreateInput) {

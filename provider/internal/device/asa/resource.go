@@ -239,7 +239,7 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 	}
 
 	planData.ID = types.StringValue(createOutp.Uid)
-	planData.SdcType = types.StringValue(createOutp.LarType)
+	planData.SdcType = types.StringValue(createOutp.SdcType)
 	planData.SdcName = getSdcName(&planData)
 	planData.Name = types.StringValue(createOutp.Name)
 	planData.Host = types.StringValue(createOutp.Host)

@@ -15,7 +15,7 @@ func TestIosUpdate(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	onPremConnector := sdc.NewSdcResponseBuilder().
+	onPremConnector := sdc.NewSdcOutputBuilder().
 		AsOnPremConnector().
 		WithUid("00000000-0000-0000-0000-000000000000").
 		WithName("MyOnPremConnector").

@@ -93,6 +93,14 @@ Examples are provided so that you can do the usual `plan`, `apply`, `destroy` et
     |
     ... rest
    ```
+
+## Regenerating docs
+
+If you make any changes to the resources and data sources provided by this provider, you will need to regenerate the docs, otherwise the Github actions triggered by this pull request will fail. To do this, run:
+```
+go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --provider-name cdo --rendered-provider-name "CDO Provider" --rendered-website-dir ../docs
+```
+
 ## Releasing
 
 To release a new version of the Terraform CDO Provider, perform the following steps.

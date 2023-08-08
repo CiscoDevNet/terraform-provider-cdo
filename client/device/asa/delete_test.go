@@ -2,13 +2,12 @@ package asa_test
 
 import (
 	"context"
-	"reflect"
-	"testing"
-
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestAsaDelete(t *testing.T) {
@@ -40,18 +39,11 @@ func TestAsaDelete(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.DeleteOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatalf("output is nil!")
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
 
 				expectedDeleteOutput := asa.DeleteOutput{}
-				if !reflect.DeepEqual(expectedDeleteOutput, *output) {
-					t.Errorf("expected: %+v, got: %+v", expectedDeleteOutput, output)
-				}
+				assert.Equal(t, expectedDeleteOutput, *output)
 			},
 		},
 
@@ -66,13 +58,8 @@ func TestAsaDelete(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.DeleteOutput, err error, t *testing.T) {
-				if err == nil {
-					t.Error("error is nil!")
-				}
-
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
 			},
 		},
 	}

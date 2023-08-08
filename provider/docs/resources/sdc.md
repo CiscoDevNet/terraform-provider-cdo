@@ -17,9 +17,10 @@ Provides an SDC connector resource. This allows SDC to be onboarded, updated, an
 
 ### Required
 
-- `name` (String) A human-readable name for the Secure Device Connector (SDC). This should be unique among SDCs
+- `name` (String) A human-readable name for the Secure Device Connector (SDC) to be created. This should be unique among SDCs.
 
 ### Read-Only
 
-- `bootstrap_data` (String, Sensitive) SDC bootstrap data
+- `bootstrap_data` (String) The bootstrap data is used to configure the SDC when it starts up. If creating an SDC using the [cdo-sdc  Terraform module](https://registry.terraform.io/modules/CiscoDevNet/cdo-sdc/),
+ pass this data in to the cdo_bootstrap_data input. If deploying the VM into vSphere, you will be prompted for 'CDO Bootstrap Data'. Copy the data below and paste it into the CDO Bootstrap Data input field in vSphere. It is only valid for an hour.
 - `id` (String) Unique identifier of the device. This is a UUID and will be automatically generated when the device is created.

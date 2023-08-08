@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	h "net/http"
 	"reflect"
 	"testing"
@@ -54,9 +55,7 @@ func TestAsaConfigUpdate(t *testing.T) {
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *h.Request) (*h.Response, error) {
 						requestBody, err := http.ReadRequestBody[updateBody](r)
-						if err != nil {
-							t.Fatalf("could not read body because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						expectedBody := updateBody{
 							State:       "CERT_VALIDATED",
@@ -73,13 +72,9 @@ func TestAsaConfigUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
+				assert.Nil(t, err)
 
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
+				assert.NotNil(t, output)
 
 				if !reflect.DeepEqual(UpdateOutput{Uid: asaConfigUid}, *output) {
 					t.Errorf("expected: %+v\ngot: %+v", validAsaConfig, output)
@@ -105,18 +100,14 @@ func TestAsaConfigUpdate(t *testing.T) {
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *h.Request) (*h.Response, error) {
 						requestBody, err := http.ReadRequestBody[updateBody](r)
-						if err != nil {
-							t.Fatalf("could not read body because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						if requestBody.State != "CERT_VALIDATED" {
 							t.Errorf("expected 'State' to equal 'CERT_VALIDATED', got: %s", requestBody.State)
 						}
 
 						credentials, err := jsonutil.UnmarshalStruct[credentials]([]byte(requestBody.Credentials))
-						if err != nil {
-							t.Fatalf("could not unmarshal credentials because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						decryptedUsername := internalRsa.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Username))
 						if input.Username != decryptedUsername {
@@ -138,13 +129,9 @@ func TestAsaConfigUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
+				assert.Nil(t, err)
 
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
+				assert.NotNil(t, output)
 
 				if !reflect.DeepEqual(UpdateOutput{Uid: asaConfigUid}, *output) {
 					t.Errorf("expected: %+v\ngot: %+v", validAsaConfig, output)
@@ -168,13 +155,9 @@ func TestAsaConfigUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
+				assert.Nil(t, output)
 
-				if err == nil {
-					t.Fatal("err is nil!")
-				}
+				assert.NotNil(t, err)
 			},
 		},
 		{
@@ -194,13 +177,9 @@ func TestAsaConfigUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
+				assert.Nil(t, output)
 
-				if err == nil {
-					t.Fatal("err is nil!")
-				}
+				assert.NotNil(t, err)
 			},
 		},
 	}
@@ -256,9 +235,7 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *h.Request) (*h.Response, error) {
 						requestBody, err := http.ReadRequestBody[updateCredentialsBodyWithState](r)
-						if err != nil {
-							t.Fatalf("could not read body because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						expectedBody := updateCredentialsBodyWithState{
 							State: "WAIT_FOR_USER_TO_UPDATE_CREDS",
@@ -277,13 +254,9 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
+				assert.Nil(t, err)
 
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
+				assert.NotNil(t, output)
 
 				if !reflect.DeepEqual(UpdateOutput{Uid: asaConfigUid}, *output) {
 					t.Errorf("expected: %+v\ngot: %+v", validAsaConfig, output)
@@ -310,9 +283,7 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *h.Request) (*h.Response, error) {
 						requestBody, err := http.ReadRequestBody[updateCredentialsBodyWithState](r)
-						if err != nil {
-							t.Fatalf("could not read body because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						expectedState := "WAIT_FOR_USER_TO_UPDATE_CREDS"
 						if requestBody.State != expectedState {
@@ -320,9 +291,7 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 						}
 
 						credentials, err := jsonutil.UnmarshalStruct[credentials]([]byte(requestBody.SmContext.Credentials))
-						if err != nil {
-							t.Fatalf("could not unmarshal credentials because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						decryptedUsername := internalRsa.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Username))
 						if input.Username != decryptedUsername {
@@ -343,13 +312,9 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
+				assert.Nil(t, err)
 
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
+				assert.NotNil(t, output)
 
 				if !reflect.DeepEqual(UpdateOutput{Uid: asaConfigUid}, *output) {
 					t.Errorf("expected: %+v\ngot: %+v", validAsaConfig, output)
@@ -371,9 +336,7 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *h.Request) (*h.Response, error) {
 						requestBody, err := http.ReadRequestBody[updateCredentialsBody](r)
-						if err != nil {
-							t.Fatalf("could not read body because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						expectedBody := updateCredentialsBody{
 							SmContext: SmContext{
@@ -391,13 +354,9 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
+				assert.Nil(t, err)
 
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
+				assert.NotNil(t, output)
 
 				if !reflect.DeepEqual(UpdateOutput{Uid: asaConfigUid}, *output) {
 					t.Errorf("expected: %+v\ngot: %+v", validAsaConfig, output)
@@ -424,14 +383,10 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *h.Request) (*h.Response, error) {
 						requestBody, err := http.ReadRequestBody[updateCredentialsBody](r)
-						if err != nil {
-							t.Fatalf("could not read body because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						credentials, err := jsonutil.UnmarshalStruct[credentials]([]byte(requestBody.SmContext.Credentials))
-						if err != nil {
-							t.Fatalf("could not unmarshal credentials because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						decryptedUsername := internalRsa.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Username))
 						if input.Username != decryptedUsername {
@@ -452,13 +407,9 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
+				assert.Nil(t, err)
 
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
+				assert.NotNil(t, output)
 
 				if !reflect.DeepEqual(UpdateOutput{Uid: asaConfigUid}, *output) {
 					t.Errorf("expected: %+v\ngot: %+v", validAsaConfig, output)
@@ -483,13 +434,9 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
+				assert.Nil(t, output)
 
-				if err == nil {
-					t.Fatal("err is nil!")
-				}
+				assert.NotNil(t, err)
 			},
 		},
 
@@ -510,13 +457,9 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
+				assert.Nil(t, output)
 
-				if err == nil {
-					t.Fatal("err is nil!")
-				}
+				assert.NotNil(t, err)
 			},
 		},
 	}

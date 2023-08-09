@@ -9,7 +9,7 @@ Eventually the client will be moved to its own repo, but in the interest of hitt
 
 ```
 .
-├── client        # Golang CDO client - currently using the module name github.com/CiscoDevnet/go-client
+├── client        # Golang CDO client - currently using the module name github.com/CiscoDevnet/terraform-provider-cdo/go-client
 ├── provider      # Terraform provider
 └── README.md
 ```

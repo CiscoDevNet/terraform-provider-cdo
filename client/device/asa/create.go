@@ -5,18 +5,18 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/CiscoDevnet/go-client/connector/sdc"
-	"github.com/CiscoDevnet/go-client/internal/device/asaconfig"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/device/asaconfig"
 
-	"github.com/CiscoDevnet/go-client/device"
-	"github.com/CiscoDevnet/go-client/internal/http"
-	"github.com/CiscoDevnet/go-client/internal/retry"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 )
 
 type CreateInput struct {
 	Name    string
-	LarUid  string
-	LarType string
+	SdcUid  string
+	SdcType string
 	Ipv4    string
 
 	Username string
@@ -32,10 +32,8 @@ type CreateOutput struct {
 	Host       string `json:"host"`
 	Port       string `json:"port"`
 	Ipv4       string `json:"ipv4"`
-	LarType    string `json:"larType"`
-	LarUid     string `json:"larUid"`
-
-	specificUid string `json:"-"`
+	SdcType    string `json:"larType"`
+	SdcUid     string `json:"larUid"`
 }
 
 type CreateError struct {
@@ -50,8 +48,8 @@ func (r *CreateError) Error() string {
 func NewCreateRequestInput(name, larUid, larType, ipv4, username, password string, ignoreCertificate bool) *CreateInput {
 	return &CreateInput{
 		Name:             name,
-		LarUid:           larUid,
-		LarType:          larType,
+		SdcUid:           larUid,
+		SdcType:          larType,
 		Ipv4:             ipv4,
 		Username:         username,
 		Password:         password,
@@ -64,7 +62,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	client.Logger.Println("creating asa device")
 
 	deviceCreateOutp, err := device.Create(ctx, client, *device.NewCreateRequestInput(
-		createInp.Name, "ASA", createInp.LarUid, createInp.LarType, createInp.Ipv4, false, createInp.IgnoreCertifcate,
+		createInp.Name, "ASA", createInp.SdcUid, createInp.SdcType, createInp.Ipv4, false, createInp.IgnoreCertifcate,
 	))
 	var createdResourceId *string = nil
 	if deviceCreateOutp != nil {
@@ -136,8 +134,8 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		}
 
 		// read lar public key
-		larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadInput{
-			LarUid: deviceCreateOutp.LarUid,
+		larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadByUidInput{
+			SdcUid: deviceCreateOutp.LarUid,
 		})
 		if err != nil {
 			return nil, &CreateError{
@@ -185,10 +183,8 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		Host:       deviceCreateOutp.Host,
 		Port:       deviceCreateOutp.Port,
 		Ipv4:       deviceCreateOutp.Ipv4,
-		LarUid:     deviceCreateOutp.LarUid,
-		LarType:    deviceCreateOutp.LarType,
-
-		specificUid: asaReadSpecOutp.SpecificUid,
+		SdcUid:     deviceCreateOutp.LarUid,
+		SdcType:    deviceCreateOutp.LarType,
 	}
 	return &createOutp, nil
 }

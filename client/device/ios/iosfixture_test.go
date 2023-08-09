@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/CiscoDevnet/go-client/connector/sdc"
-	"github.com/CiscoDevnet/go-client/device"
-	internalTesting "github.com/CiscoDevnet/go-client/internal/testing"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
+	internalTesting "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/testing"
 	"github.com/jarcoal/httpmock"
 )
 

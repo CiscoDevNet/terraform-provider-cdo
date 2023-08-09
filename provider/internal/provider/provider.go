@@ -10,7 +10,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/device/ios"
 
-	cdoClient "github.com/CiscoDevnet/go-client"
+	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -134,6 +134,7 @@ func (p *CdoProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 func (p *CdoProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
+		sdc.NewResource,
 		asa.NewAsaDeviceResource,
 		ios.NewIosDeviceResource,
 	}
@@ -141,7 +142,7 @@ func (p *CdoProvider) Resources(ctx context.Context) []func() resource.Resource 
 
 func (p *CdoProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
-		sdc.NewSdcDataSource,
+		sdc.NewDataSource,
 		asa.NewAsaDataSource,
 		ios.NewIosDataSource,
 	}

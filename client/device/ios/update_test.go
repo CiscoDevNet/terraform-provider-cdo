@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/CiscoDevnet/go-client/connector/sdc"
-	"github.com/CiscoDevnet/go-client/device"
-	"github.com/CiscoDevnet/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
 )
 
@@ -15,7 +15,7 @@ func TestIosUpdate(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	onPremConnector := sdc.NewSdcResponseBuilder().
+	onPremConnector := sdc.NewSdcOutputBuilder().
 		AsOnPremConnector().
 		WithUid("00000000-0000-0000-0000-000000000000").
 		WithName("MyOnPremConnector").

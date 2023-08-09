@@ -3,8 +3,8 @@ package sdc
 import (
 	"context"
 
-	"github.com/CiscoDevnet/go-client/internal/http"
-	"github.com/CiscoDevnet/go-client/internal/url"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 )
 
 type ReadAllInput struct{}

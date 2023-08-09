@@ -1,12 +1,13 @@
-package asa
+package asa_test
 
 import (
 	"context"
 	"reflect"
 	"testing"
 
-	"github.com/CiscoDevnet/go-client/device"
-	"github.com/CiscoDevnet/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
 )
 
@@ -24,13 +25,13 @@ func TestAsaRead(t *testing.T) {
 
 	testCases := []struct {
 		testName   string
-		input      ReadInput
+		input      asa.ReadInput
 		setupFunc  func()
-		assertFunc func(output *ReadOutput, err error, t *testing.T)
+		assertFunc func(output *asa.ReadOutput, err error, t *testing.T)
 	}{
 		{
 			testName: "successfully reads ASA",
-			input: ReadInput{
+			input: asa.ReadInput{
 				Uid: asaDevice.Uid,
 			},
 
@@ -38,7 +39,7 @@ func TestAsaRead(t *testing.T) {
 				configureDeviceReadToRespondSuccessfully(asaDevice)
 			},
 
-			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *asa.ReadOutput, err error, t *testing.T) {
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -47,7 +48,7 @@ func TestAsaRead(t *testing.T) {
 					t.Fatalf("output is nil!")
 				}
 
-				expectedReadOutput := ReadOutput{
+				expectedReadOutput := asa.ReadOutput{
 					Uid:             asaDevice.Uid,
 					Name:            asaDevice.Name,
 					CreatedDate:     asaDevice.CreatedDate,
@@ -67,7 +68,7 @@ func TestAsaRead(t *testing.T) {
 
 		{
 			testName: "returns error when the remote service reading the ASA encounters an issue",
-			input: ReadInput{
+			input: asa.ReadInput{
 				Uid: asaDevice.Uid,
 			},
 
@@ -75,7 +76,7 @@ func TestAsaRead(t *testing.T) {
 				configureDeviceReadToRespondWithError(asaDevice.Uid)
 			},
 
-			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *asa.ReadOutput, err error, t *testing.T) {
 				if err == nil {
 					t.Error("error is nil!")
 				}
@@ -93,7 +94,7 @@ func TestAsaRead(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := Read(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := asa.Read(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
 
 			testCase.assertFunc(output, err, t)
 		})

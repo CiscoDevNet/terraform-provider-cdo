@@ -6,13 +6,13 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/CiscoDevnet/go-client/connector/sdc"
-	"github.com/CiscoDevnet/go-client/device"
-	"github.com/CiscoDevnet/go-client/device/ios"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios"
 
-	"github.com/CiscoDevnet/go-client/device/asa"
-	"github.com/CiscoDevnet/go-client/internal/device/asaconfig"
-	internalhttp "github.com/CiscoDevnet/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/device/asaconfig"
+	internalhttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 )
 
 type Client struct {
@@ -38,6 +38,10 @@ func (c *Client) ReadAllSdcs(ctx context.Context, inp sdc.ReadAllInput) (*sdc.Re
 
 func (c *Client) ReadSdcByName(ctx context.Context, inp sdc.ReadByNameInput) (*sdc.ReadOutput, error) {
 	return sdc.ReadByName(ctx, c.client, inp)
+}
+
+func (c *Client) ReadSdcByUid(ctx context.Context, inp sdc.ReadByUidInput) (*sdc.ReadOutput, error) {
+	return sdc.ReadByUid(ctx, c.client, inp)
 }
 
 func (c *Client) ReadAsa(ctx context.Context, inp asa.ReadInput) (*asa.ReadOutput, error) {
@@ -82,4 +86,16 @@ func (c *Client) ReadAsaConfig(ctx context.Context, inp asaconfig.ReadInput) (*a
 
 func (c *Client) ReadSpecificAsa(ctx context.Context, inp asa.ReadSpecificInput) (*asa.ReadSpecificOutput, error) {
 	return asa.ReadSpecific(ctx, c.client, inp)
+}
+
+func (c *Client) CreateSdc(ctx context.Context, inp sdc.CreateInput) (*sdc.CreateOutput, error) {
+	return sdc.Create(ctx, c.client, inp)
+}
+
+func (c *Client) UpdateSdc(ctx context.Context, inp sdc.UpdateInput) (*sdc.UpdateOutput, error) {
+	return sdc.Update(ctx, c.client, inp)
+}
+
+func (c *Client) DeleteSdc(ctx context.Context, inp sdc.DeleteInput) (*sdc.DeleteOutput, error) {
+	return sdc.Delete(ctx, c.client, inp)
 }

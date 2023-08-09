@@ -5,23 +5,23 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/CiscoDevnet/go-client/connector/sdc"
-	"github.com/CiscoDevnet/go-client/device"
-	"github.com/CiscoDevnet/go-client/device/ios/iosconfig"
-	"github.com/CiscoDevnet/go-client/internal/http"
-	"github.com/CiscoDevnet/go-client/internal/retry"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios/iosconfig"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 )
 
 type CreateInput struct {
 	Name    string
-	LarUid  string
-	LarType string
+	SdcUid  string
+	SdcType string
 	Ipv4    string
 
 	Username string
 	Password string
 
-	IgnoreCertifcate bool
+	IgnoreCertificate bool
 }
 
 type CreateOutput struct {
@@ -31,8 +31,8 @@ type CreateOutput struct {
 	Host       string `json:"host"`
 	Port       string `json:"port"`
 	Ipv4       string `json:"ipv4"`
-	LarType    string `json:"larType"`
-	LarUid     string `json:"larUid"`
+	SdcType    string `json:"larType"`
+	SdcUid     string `json:"larUid"`
 }
 
 type CreateError struct {
@@ -49,15 +49,15 @@ const (
 	IosStateDone            = "DONE"
 )
 
-func NewCreateRequestInput(name, larUid, larType, ipv4, username, password string, ignoreCertificate bool) *CreateInput {
+func NewCreateRequestInput(name, sdcUid, sdcType, ipv4, username, password string, ignoreCertificate bool) *CreateInput {
 	return &CreateInput{
-		Name:             name,
-		LarUid:           larUid,
-		LarType:          larType,
-		Ipv4:             ipv4,
-		Username:         username,
-		Password:         password,
-		IgnoreCertifcate: ignoreCertificate,
+		Name:              name,
+		SdcUid:            sdcUid,
+		SdcType:           sdcType,
+		Ipv4:              ipv4,
+		Username:          username,
+		Password:          password,
+		IgnoreCertificate: ignoreCertificate,
 	}
 }
 
@@ -66,7 +66,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	client.Logger.Println("creating ios device")
 
 	deviceCreateOutp, err := device.Create(ctx, client, *device.NewCreateRequestInput(
-		createInp.Name, "IOS", createInp.LarUid, createInp.LarType, createInp.Ipv4, false, createInp.IgnoreCertifcate,
+		createInp.Name, "IOS", createInp.SdcUid, createInp.SdcType, createInp.Ipv4, false, createInp.IgnoreCertificate,
 	))
 	var createdResourceId *string = nil
 	if deviceCreateOutp != nil {
@@ -96,8 +96,8 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		}
 
 		// read lar public key
-		larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadInput{
-			LarUid: deviceCreateOutp.LarUid,
+		larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadByUidInput{
+			SdcUid: deviceCreateOutp.LarUid,
 		})
 		if err != nil {
 			return nil, &CreateError{
@@ -152,8 +152,8 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		Host:       deviceCreateOutp.Host,
 		Port:       deviceCreateOutp.Port,
 		Ipv4:       deviceCreateOutp.Ipv4,
-		LarUid:     deviceCreateOutp.LarUid,
-		LarType:    deviceCreateOutp.LarType,
+		SdcUid:     deviceCreateOutp.LarUid,
+		SdcType:    deviceCreateOutp.LarType,
 	}
 	return &createOutp, nil
 }

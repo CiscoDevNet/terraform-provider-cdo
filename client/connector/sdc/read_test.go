@@ -1,4 +1,4 @@
-package sdc
+package sdc_test
 
 import (
 	"context"
@@ -6,7 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/CiscoDevnet/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,14 +16,14 @@ func TestReadByUid(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	validCdg := NewSdcResponseBuilder().
+	validCdg := sdc.NewSdcOutputBuilder().
 		AsDefaultCloudConnector().
 		WithUid(cdgUid).
 		WithName(cdgName).
 		WithTenantUid(tenantUid).
 		Build()
 
-	validSdc := NewSdcResponseBuilder().
+	validSdc := sdc.NewSdcOutputBuilder().
 		AsOnPremConnector().
 		WithUid(sdcUid).
 		WithName(sdcName).
@@ -33,7 +34,7 @@ func TestReadByUid(t *testing.T) {
 		testName   string
 		targetUid  string
 		setupFunc  func()
-		assertFunc func(output *ReadOutput, err error, t *testing.T)
+		assertFunc func(output *sdc.ReadOutput, err error, t *testing.T)
 	}{
 		{
 			testName:  "successfully fetch CDG by uid",
@@ -47,7 +48,7 @@ func TestReadByUid(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -73,7 +74,7 @@ func TestReadByUid(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -99,7 +100,7 @@ func TestReadByUid(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
 				if output != nil {
 					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
 				}
@@ -119,7 +120,7 @@ func TestReadByUid(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
 				if output != nil {
 					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
 				}
@@ -137,7 +138,7 @@ func TestReadByUid(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := ReadByUid(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), ReadInput{LarUid: testCase.targetUid})
+			output, err := sdc.ReadByUid(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), sdc.ReadByUidInput{SdcUid: testCase.targetUid})
 
 			testCase.assertFunc(output, err, t)
 		})
@@ -148,14 +149,14 @@ func TestReadByName(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	validCdg := NewSdcResponseBuilder().
+	validCdg := sdc.NewSdcOutputBuilder().
 		AsDefaultCloudConnector().
 		WithUid(cdgUid).
 		WithName(cdgName).
 		WithTenantUid(tenantUid).
 		Build()
 
-	validSdc := NewSdcResponseBuilder().
+	validSdc := sdc.NewSdcOutputBuilder().
 		AsOnPremConnector().
 		WithUid(sdcUid).
 		WithName(sdcName).
@@ -166,7 +167,7 @@ func TestReadByName(t *testing.T) {
 		testName   string
 		targetName string
 		setupFunc  func()
-		assertFunc func(output *ReadOutput, err error, t *testing.T)
+		assertFunc func(output *sdc.ReadOutput, err error, t *testing.T)
 	}{
 		{
 			testName:   "successfully fetch CDG by name",
@@ -177,11 +178,11 @@ func TestReadByName(t *testing.T) {
 					"GET",
 					"/aegis/rest/v1/services/targets/proxies",
 					fmt.Sprintf("q=name:%s", cdgName),
-					httpmock.NewJsonResponderOrPanic(200, []ReadOutput{validCdg}),
+					httpmock.NewJsonResponderOrPanic(200, []sdc.ReadOutput{validCdg}),
 				)
 			},
 
-			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -204,11 +205,11 @@ func TestReadByName(t *testing.T) {
 					"GET",
 					"/aegis/rest/v1/services/targets/proxies",
 					fmt.Sprintf("q=name:%s", sdcName),
-					httpmock.NewJsonResponderOrPanic(200, []ReadOutput{validSdc}),
+					httpmock.NewJsonResponderOrPanic(200, []sdc.ReadOutput{validSdc}),
 				)
 			},
 
-			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
 				if err != nil {
 					t.Errorf("unexpected error: %s", err.Error())
 				}
@@ -231,11 +232,11 @@ func TestReadByName(t *testing.T) {
 					"GET",
 					"/aegis/rest/v1/services/targets/proxies",
 					fmt.Sprintf("q=name:%s", cdgName),
-					httpmock.NewJsonResponderOrPanic(200, []ReadOutput{validCdg, validCdg}),
+					httpmock.NewJsonResponderOrPanic(200, []sdc.ReadOutput{validCdg, validCdg}),
 				)
 			},
 
-			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
 				if output != nil {
 					t.Errorf("expected output to be nil, got: %+v", output)
 				}
@@ -259,11 +260,11 @@ func TestReadByName(t *testing.T) {
 					"GET",
 					"/aegis/rest/v1/services/targets/proxies",
 					fmt.Sprintf("q=name:%s", cdgName),
-					httpmock.NewJsonResponderOrPanic(200, []ReadOutput{}),
+					httpmock.NewJsonResponderOrPanic(200, []sdc.ReadOutput{}),
 				)
 			},
 
-			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
 				if output != nil {
 					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
 				}
@@ -284,7 +285,7 @@ func TestReadByName(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
 				if output != nil {
 					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
 				}
@@ -302,7 +303,7 @@ func TestReadByName(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := ReadByName(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), ReadByNameInput{LarName: testCase.targetName})
+			output, err := sdc.ReadByName(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), sdc.ReadByNameInput{SdcName: testCase.targetName})
 
 			testCase.assertFunc(output, err, t)
 		})

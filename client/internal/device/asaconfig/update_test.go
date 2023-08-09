@@ -9,10 +9,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/CiscoDevnet/go-client/connector/sdc"
-	internalRsa "github.com/CiscoDevnet/go-client/internal/crypto/rsa"
-	"github.com/CiscoDevnet/go-client/internal/http"
-	"github.com/CiscoDevnet/go-client/internal/jsonutil"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
+	internalRsa "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto/rsa"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/jsonutil"
 	"github.com/jarcoal/httpmock"
 )
 

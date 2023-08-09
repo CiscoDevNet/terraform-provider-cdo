@@ -3,8 +3,8 @@ package asa
 import (
 	"context"
 
-	"github.com/CiscoDevnet/go-client/device"
-	"github.com/CiscoDevnet/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 )
 
 type ReadInput = device.ReadInput

@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/CiscoDevnet/go-client/internal/device/asaconfig"
-	"github.com/CiscoDevnet/go-client/internal/retry"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/device/asaconfig"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 
-	"github.com/CiscoDevnet/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 
-	"github.com/CiscoDevnet/go-client/device"
-	"github.com/CiscoDevnet/go-client/internal/http"
-	"github.com/CiscoDevnet/go-client/internal/url"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 )
 
 type UpdateInput struct {
@@ -61,8 +61,8 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 					return nil, fmt.Errorf("sdc uid not found")
 				}
 
-				larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadInput{
-					LarUid: asaReadOutp.LarUid,
+				larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadByUidInput{
+					SdcUid: asaReadOutp.LarUid,
 				})
 				if err != nil {
 					return nil, err

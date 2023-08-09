@@ -6,13 +6,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/CiscoDevnet/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
-	cdoClient "github.com/CiscoDevnet/go-client"
-	"github.com/CiscoDevnet/go-client/device/asa"
+	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -239,7 +239,7 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 	}
 
 	planData.ID = types.StringValue(createOutp.Uid)
-	planData.SdcType = types.StringValue(createOutp.LarType)
+	planData.SdcType = types.StringValue(createOutp.SdcType)
 	planData.SdcName = getSdcName(&planData)
 	planData.Name = types.StringValue(createOutp.Name)
 	planData.Host = types.StringValue(createOutp.Host)

@@ -11,6 +11,8 @@ type Config struct {
 	BaseUrl  string
 	ApiToken string
 
+	Host string
+
 	// these parameters apply to each request
 	Retries int
 	Delay   time.Duration
@@ -28,25 +30,24 @@ var (
 	DefaultHttpClient = http.DefaultClient
 )
 
-func NewConfigWithDefault(baseUrl string, apiToken string) Config {
+func NewConfigWithDefault(baseUrl string, apiToken string) (Config, error) {
 	return NewConfig(baseUrl, apiToken, DefaultRetries, DefaultDelay, DefaultTimeout)
 }
 
-func NewConfig(baseUrl string, apiToken string, retries int, delay time.Duration, timeout time.Duration) Config {
+func NewConfig(baseUrl string, apiToken string, retries int, delay time.Duration, timeout time.Duration) (Config, error) {
+	parsedUrl, err := url.Parse(baseUrl)
+	if err != nil {
+		return Config{}, err
+	}
+
 	return Config{
 		BaseUrl:  baseUrl,
 		ApiToken: apiToken,
-		Retries:  retries,
-		Delay:    delay,
-		Timeout:  timeout,
-	}
-}
 
-// FIXME: should parse url in constructor, so that error surface earlier
-func (c *Config) Host() (string, error) {
-	url, err := url.Parse(c.BaseUrl)
-	if err != nil {
-		return "", err
-	}
-	return url.Host, nil
+		Host: parsedUrl.Host,
+
+		Retries: retries,
+		Delay:   delay,
+		Timeout: timeout,
+	}, nil
 }

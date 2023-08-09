@@ -151,7 +151,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 			retryOptions := retry.DefaultOpts
 			retryOptions.Delay = 1 * time.Millisecond
 
-			err := retry.Do(UntilStateDone(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.targetUid), retryOptions)
+			err := retry.Do(UntilStateDone(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.targetUid), retryOptions)
 
 			testCase.assertFunc(err, t)
 		})

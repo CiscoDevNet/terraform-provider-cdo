@@ -1,4 +1,4 @@
-// API entrypoint, defines operations for the user.
+// Package client provides API entrypoint, defines operations for the user.
 // It simply forward requests and do nothing else.
 package client
 
@@ -20,16 +20,20 @@ type Client struct {
 }
 
 // New instantiates a new Client with default HTTP configuration
-func New(hostname, apiToken string) *Client {
+func New(hostname, apiToken string) (*Client, error) {
 	return NewWithHttpClient(http.DefaultClient, hostname, apiToken)
 }
 
 // NewWithHttpClient instantiates a new Client with provided HTTP configuration
-func NewWithHttpClient(httpClient *http.Client, hostname, apiToken string) *Client {
+func NewWithHttpClient(httpClient *http.Client, hostname, apiToken string) (*Client, error) {
 	// log.SetOutput(os.Stdout)  // TODO: set this to os.Stdout in local environment
-	return &Client{
-		client: *internalhttp.NewWithHttpClient(httpClient, hostname, apiToken),
+	client, err := internalhttp.NewWithHttpClient(httpClient, hostname, apiToken)
+	if err != nil {
+		return &Client{}, err
 	}
+	return &Client{
+		client: *client,
+	}, nil
 }
 
 func (c *Client) ReadAllSdcs(ctx context.Context, inp sdc.ReadAllInput) (*sdc.ReadAllOutput, error) {

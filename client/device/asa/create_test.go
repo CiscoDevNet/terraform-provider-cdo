@@ -507,7 +507,7 @@ func TestAsaCreate(t *testing.T) {
 
 			testCase.setupFunc(testCase.input)
 
-			output, err := asa.Create(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := asa.Create(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
 
 			testCase.assertFunc(output, err, t)
 		})

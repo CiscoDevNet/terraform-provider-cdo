@@ -66,7 +66,7 @@ func TestDelete(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := sdc.Delete(context.Background(), *http.NewWithDefault(baseUrl, "a_valid_token"), sdc.NewDeleteInput(testCase.sdcUid))
+			output, err := sdc.Delete(context.Background(), *http.MustNewWithDefault(baseUrl, "a_valid_token"), sdc.NewDeleteInput(testCase.sdcUid))
 
 			testCase.assertFunc(output, err, t)
 		})

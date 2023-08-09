@@ -95,7 +95,7 @@ func TestIosUpdate(t *testing.T) {
 
 			testCase.setupFunc(testCase.input)
 
-			output, err := Update(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := Update(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
 
 			testCase.assertFunc(testCase.input, output, err, t)
 		})

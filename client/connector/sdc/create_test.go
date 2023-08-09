@@ -133,7 +133,7 @@ func TestCreate(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := sdc.Create(context.Background(), *http.NewWithDefault(baseUrl, "a_valid_token"), *sdc.NewCreateInput(testCase.sdcName))
+			output, err := sdc.Create(context.Background(), *http.MustNewWithDefault(baseUrl, "a_valid_token"), *sdc.NewCreateInput(testCase.sdcName))
 
 			testCase.assertFunc(output, err, t)
 		})

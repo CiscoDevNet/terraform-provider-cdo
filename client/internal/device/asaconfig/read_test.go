@@ -91,7 +91,7 @@ func TestAsaConfigReadByUid(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := Read(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), *NewReadInput(asaConfigUid))
+			output, err := Read(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), *NewReadInput(asaConfigUid))
 
 			testCase.assertFunc(output, err, t)
 		})

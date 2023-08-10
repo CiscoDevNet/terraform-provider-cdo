@@ -3,7 +3,7 @@ package asa_test
 import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
-	"github.com/stretchr/testify/assert"
+	"reflect"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
@@ -76,8 +76,13 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				assert.Nil(t, err)
-				assert.NotNil(t, output)
+				if err != nil {
+					t.Errorf("unexpected error: %s", err.Error())
+				}
+
+				if output == nil {
+					t.Fatalf("output is nil!")
+				}
 
 				expectedCreatedOutput := asa.CreateOutput{
 					Uid:        asaDevice.Uid,
@@ -88,6 +93,9 @@ func TestAsaCreate(t *testing.T) {
 					Ipv4:       asaDevice.Ipv4,
 					SdcType:    asaDevice.LarType,
 					SdcUid:     asaDevice.LarUid,
+				}
+				if !reflect.DeepEqual(expectedCreatedOutput, *output) {
+					t.Errorf("expected: %+v, got: %+v", expectedCreatedOutput, output)
 				}
 				assert.Equal(t, expectedCreatedOutput, *output)
 
@@ -125,8 +133,13 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				assert.Nil(t, err)
-				assert.NotNil(t, output)
+				if err != nil {
+					t.Errorf("unexpected error: %s", err.Error())
+				}
+
+				if output == nil {
+					t.Fatalf("output is nil!")
+				}
 
 				expectedCreatedOutput := asa.CreateOutput{
 					Uid:        asaDevice.Uid,
@@ -137,6 +150,9 @@ func TestAsaCreate(t *testing.T) {
 					Ipv4:       asaDevice.Ipv4,
 					SdcType:    asaDevice.LarType,
 					SdcUid:     asaDevice.LarUid,
+				}
+				if !reflect.DeepEqual(expectedCreatedOutput, *output) {
+					t.Errorf("expected: %+v, got: %+v", expectedCreatedOutput, output)
 				}
 				assert.Equal(t, expectedCreatedOutput, *output)
 
@@ -169,8 +185,13 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				assert.Nil(t, err)
-				assert.NotNil(t, output)
+				if err != nil {
+					t.Errorf("unexpected error: %s", err.Error())
+				}
+
+				if output == nil {
+					t.Fatalf("output is nil!")
+				}
 
 				expectedCreatedOutput := asa.CreateOutput{
 					Uid:        asaDeviceUsingSdc.Uid,
@@ -181,6 +202,9 @@ func TestAsaCreate(t *testing.T) {
 					Ipv4:       asaDeviceUsingSdc.Ipv4,
 					SdcType:    asaDeviceUsingSdc.LarType,
 					SdcUid:     asaDeviceUsingSdc.LarUid,
+				}
+				if !reflect.DeepEqual(expectedCreatedOutput, *output) {
+					t.Errorf("expected: %+v, got: %+v", expectedCreatedOutput, output)
 				}
 				assert.Equal(t, expectedCreatedOutput, *output)
 
@@ -221,8 +245,13 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				assert.Nil(t, err)
-				assert.NotNil(t, output)
+				if err != nil {
+					t.Errorf("unexpected error: %s", err.Error())
+				}
+
+				if output == nil {
+					t.Fatalf("output is nil!")
+				}
 
 				expectedCreatedOutput := asa.CreateOutput{
 					Uid:        asaDeviceUsingSdc.Uid,
@@ -233,6 +262,9 @@ func TestAsaCreate(t *testing.T) {
 					Ipv4:       asaDeviceUsingSdc.Ipv4,
 					SdcType:    asaDeviceUsingSdc.LarType,
 					SdcUid:     asaDeviceUsingSdc.LarUid,
+				}
+				if !reflect.DeepEqual(expectedCreatedOutput, *output) {
+					t.Errorf("expected: %+v, got: %+v", expectedCreatedOutput, output)
 				}
 				assert.Equal(t, expectedCreatedOutput, *output)
 
@@ -274,8 +306,13 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				assert.NotNil(t, err)
-				assert.Nil(t, output)
+				if err == nil {
+					t.Error("error is nil!")
+				}
+
+				if output != nil {
+					t.Errorf("expected output to be nil, got: %+v", output)
+				}
 			},
 		},
 
@@ -308,8 +345,13 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				assert.NotNil(t, err)
-				assert.Nil(t, output)
+				if err == nil {
+					t.Error("error is nil!")
+				}
+
+				if output != nil {
+					t.Errorf("expected output to be nil, got: %+v", output)
+				}
 			},
 		},
 
@@ -336,8 +378,13 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				assert.NotNil(t, err)
-				assert.Nil(t, output)
+				if err == nil {
+					t.Error("error is nil!")
+				}
+
+				if output != nil {
+					t.Errorf("expected output to be nil, got: %+v", output)
+				}
 			},
 		},
 
@@ -370,8 +417,13 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				assert.NotNil(t, err)
-				assert.Nil(t, output)
+				if err == nil {
+					t.Error("error is nil!")
+				}
+
+				if output != nil {
+					t.Errorf("expected output to be nil, got: %+v", output)
+				}
 			},
 		},
 
@@ -403,8 +455,13 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				assert.NotNil(t, err)
-				assert.Nil(t, output)
+				if err == nil {
+					t.Error("error is nil!")
+				}
+
+				if output != nil {
+					t.Errorf("expected output to be nil, got: %+v", output)
+				}
 			},
 		},
 
@@ -437,8 +494,13 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				assert.NotNil(t, err)
-				assert.Nil(t, output)
+				if err == nil {
+					t.Error("error is nil!")
+				}
+
+				if output != nil {
+					t.Errorf("expected output to be nil, got: %+v", *output)
+				}
 			},
 		},
 	}

@@ -42,7 +42,7 @@ type PublicKeyModel struct {
 }
 
 func (d *DataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_sdc_connector"
+	resp.TypeName = req.ProviderTypeName + "_sdc_device"
 }
 
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {

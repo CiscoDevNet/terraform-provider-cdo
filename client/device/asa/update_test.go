@@ -67,8 +67,13 @@ func TestAsaUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				assert.Nil(t, err)
-				assert.NotNil(t, output)
+				if err != nil {
+					t.Errorf("unexpected error: %s", err.Error())
+				}
+
+				if output == nil {
+					t.Fatalf("output is nil!")
+				}
 
 				expectedUpdateOutput := asaDevice
 				expectedUpdateOutput.Name = input.Name
@@ -94,9 +99,17 @@ func TestAsaUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				assert.Nil(t, err)
-				assert.NotNil(t, output)
-				assert.Equal(t, asaDevice, *output)
+				if err != nil {
+					t.Errorf("unexpected error: %s", err.Error())
+				}
+
+				if output == nil {
+					t.Fatalf("output is nil!")
+				}
+
+				if !reflect.DeepEqual(asaDevice, *output) {
+					t.Errorf("expected: %+v, got: %+v", asaDevice, output)
+				}
 			},
 		},
 
@@ -121,9 +134,17 @@ func TestAsaUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				assert.Nil(t, err)
-				assert.NotNil(t, output)
-				assert.Equal(t, asaDeviceOnboardedByOnPremConnector, *output)
+				if err != nil {
+					t.Errorf("unexpected error: %s", err.Error())
+				}
+
+				if output == nil {
+					t.Fatalf("output is nil!")
+				}
+
+				if !reflect.DeepEqual(asaDeviceOnboardedByOnPremConnector, *output) {
+					t.Errorf("expected: %+v, got: %+v", asaDevice, output)
+				}
 			},
 		},
 
@@ -148,8 +169,13 @@ func TestAsaUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				assert.Nil(t, err)
-				assert.NotNil(t, output)
+				if err != nil {
+					t.Errorf("unexpected error: %s", err.Error())
+				}
+
+				if output == nil {
+					t.Fatalf("output is nil!")
+				}
 
 				updatedDevice := asaDevice
 				updatedDevice.Host = "10.10.5.4"
@@ -177,8 +203,13 @@ func TestAsaUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				assert.Nil(t, output)
-				assert.NotNil(t, err)
+				if output != nil {
+					t.Errorf("expected output to be nil, got: %+v", *output)
+				}
+
+				if err == nil {
+					t.Error("error is nil!")
+				}
 			},
 		},
 
@@ -201,8 +232,13 @@ func TestAsaUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				assert.Nil(t, output)
-				assert.NotNil(t, err)
+				if output != nil {
+					t.Errorf("expected output to be nil, got: %+v", *output)
+				}
+
+				if err == nil {
+					t.Error("error is nil!")
+				}
 			},
 		},
 
@@ -225,8 +261,13 @@ func TestAsaUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				assert.Nil(t, output)
-				assert.NotNil(t, err)
+				if output != nil {
+					t.Errorf("expected output to be nil, got: %+v", *output)
+				}
+
+				if err == nil {
+					t.Error("error is nil!")
+				}
 			},
 		},
 
@@ -249,8 +290,13 @@ func TestAsaUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				assert.Nil(t, output)
-				assert.NotNil(t, err)
+				if output != nil {
+					t.Errorf("expected output to be nil, got: %+v", *output)
+				}
+
+				if err == nil {
+					t.Error("error is nil!")
+				}
 			},
 		},
 
@@ -273,8 +319,13 @@ func TestAsaUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				assert.Nil(t, output)
-				assert.NotNil(t, err)
+				if output != nil {
+					t.Errorf("expected output to be nil, got: %+v", *output)
+				}
+
+				if err == nil {
+					t.Error("error is nil!")
+				}
 			},
 		},
 
@@ -298,8 +349,13 @@ func TestAsaUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				assert.Nil(t, output)
-				assert.NotNil(t, err)
+				if output != nil {
+					t.Errorf("expected output to be nil, got: %+v", *output)
+				}
+
+				if err == nil {
+					t.Error("error is nil!")
+				}
 			},
 		},
 	}

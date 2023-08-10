@@ -48,9 +48,17 @@ func TestReadByUid(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
-				assert.Nil(t, err)
-				assert.NotNil(t, output)
-				assert.Equal(t, validCdg, *output)
+				if err != nil {
+					t.Errorf("unexpected error: %s", err.Error())
+				}
+
+				if output == nil {
+					t.Fatal("output is nil!")
+				}
+
+				if !reflect.DeepEqual(validCdg, *output) {
+					t.Errorf("expected: %+v\ngot: %+v", validCdg, output)
+				}
 			},
 		},
 		{
@@ -66,9 +74,17 @@ func TestReadByUid(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
-				assert.Nil(t, err)
-				assert.NotNil(t, output)
-				assert.Equal(t, validSdc, *output)
+				if err != nil {
+					t.Errorf("unexpected error: %s", err.Error())
+				}
+
+				if output == nil {
+					t.Fatal("output is nil!")
+				}
+
+				if !reflect.DeepEqual(validSdc, *output) {
+					t.Errorf("expected: %+v\ngot: %+v", validSdc, output)
+				}
 			},
 		},
 		{
@@ -84,7 +100,10 @@ func TestReadByUid(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
-				assert.Nil(t, output)
+				if output != nil {
+					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
+				}
+
 				assert.NotNil(t, err)
 			},
 		},
@@ -101,8 +120,13 @@ func TestReadByUid(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
-				assert.Nil(t, output)
-				assert.NotNil(t, err)
+				if output != nil {
+					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
+				}
+
+				if err == nil {
+					t.Error("error was nil!")
+				}
 			},
 		},
 	}
@@ -158,9 +182,17 @@ func TestReadByName(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
-				assert.Nil(t, err)
-				assert.NotNil(t, output)
-				assert.Equal(t, validCdg, *output)
+				if err != nil {
+					t.Errorf("unexpected error: %s", err.Error())
+				}
+
+				if output == nil {
+					t.Fatal("output is nil!")
+				}
+
+				if !reflect.DeepEqual(validCdg, *output) {
+					t.Errorf("expected: %+v\ngot: %+v", validCdg, output)
+				}
 			},
 		},
 		{
@@ -177,9 +209,17 @@ func TestReadByName(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
-				assert.Nil(t, err)
-				assert.NotNil(t, output)
-				assert.Equal(t, validSdc, *output)
+				if err != nil {
+					t.Errorf("unexpected error: %s", err.Error())
+				}
+
+				if output == nil {
+					t.Fatal("output is nil!")
+				}
+
+				if !reflect.DeepEqual(validSdc, *output) {
+					t.Errorf("expected: %+v\ngot: %+v", validSdc, output)
+				}
 			},
 		},
 		{
@@ -196,8 +236,13 @@ func TestReadByName(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
-				assert.Nil(t, output)
-				assert.NotNil(t, err)
+				if output != nil {
+					t.Errorf("expected output to be nil, got: %+v", output)
+				}
+
+				if err == nil {
+					t.Errorf("expected error")
+				}
 
 				expectedError := fmt.Sprintf("multiple SDCs found with the name: %s", cdgName)
 				assert.Equal(t, expectedError, err.Error())
@@ -217,7 +262,10 @@ func TestReadByName(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
-				assert.Nil(t, output)
+				if output != nil {
+					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
+				}
+
 				assert.NotNil(t, err)
 			},
 		},
@@ -235,8 +283,13 @@ func TestReadByName(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
-				assert.Nil(t, output)
-				assert.NotNil(t, err)
+				if output != nil {
+					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
+				}
+
+				if err == nil {
+					t.Error("error was nil!")
+				}
 			},
 		},
 	}

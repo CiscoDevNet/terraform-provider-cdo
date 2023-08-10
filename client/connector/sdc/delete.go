@@ -22,9 +22,9 @@ type DeleteOutput struct {
 
 func Delete(ctx context.Context, client http.Client, inp DeleteInput) (*DeleteOutput, error) {
 
-	deleteUrl := url.DeleteSdc(client.BaseUrl(), inp.Uid)
+	url := url.DeleteSdc(client.BaseUrl(), inp.Uid)
 
-	req := client.NewDelete(ctx, deleteUrl)
+	req := client.NewDelete(ctx, url)
 
 	var deleteOutp DeleteOutput
 	if err := req.Send(&deleteOutp); err != nil {

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
-	"github.com/stretchr/testify/assert"
+	internalTesting "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/testing"
 	"testing"
 
 	"github.com/jarcoal/httpmock"
@@ -36,9 +36,9 @@ func TestDelete(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.DeleteOutput, err error, t *testing.T) {
-				assert.Nil(t, err, "error should be nil")
-				assert.NotNil(t, output, "output should not be nil")
-				assert.Equal(t, validDeleteOutput, *output, "output should be valid")
+				internalTesting.AssertNil(t, err, "error should be nil")
+				internalTesting.AssertNotNil(t, output, "output should not be nil")
+				internalTesting.AssertDeepEqual(t, validDeleteOutput, *output, "output should be valid")
 			},
 		},
 		{
@@ -54,8 +54,8 @@ func TestDelete(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.DeleteOutput, err error, t *testing.T) {
-				assert.NotNil(t, err, "error should be nil")
-				assert.Equal(t, &sdc.DeleteOutput{}, output, "output should be zero value")
+				internalTesting.AssertNotNil(t, err, "error should be nil")
+				internalTesting.AssertDeepEqual(t, &sdc.DeleteOutput{}, output, "output should be zero value")
 			},
 		},
 	}

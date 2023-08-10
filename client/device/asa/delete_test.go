@@ -2,6 +2,9 @@ package asa_test
 
 import (
 	"context"
+	"reflect"
+	"testing"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
@@ -39,11 +42,18 @@ func TestAsaDelete(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.DeleteOutput, err error, t *testing.T) {
-				assert.Nil(t, err)
-				assert.NotNil(t, output)
+				if err != nil {
+					t.Errorf("unexpected error: %s", err.Error())
+				}
+
+				if output == nil {
+					t.Fatalf("output is nil!")
+				}
 
 				expectedDeleteOutput := asa.DeleteOutput{}
-				assert.Equal(t, expectedDeleteOutput, *output)
+				if !reflect.DeepEqual(expectedDeleteOutput, *output) {
+					t.Errorf("expected: %+v, got: %+v", expectedDeleteOutput, output)
+				}
 			},
 		},
 
@@ -58,8 +68,13 @@ func TestAsaDelete(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.DeleteOutput, err error, t *testing.T) {
-				assert.NotNil(t, err)
-				assert.Nil(t, output)
+				if err == nil {
+					t.Error("error is nil!")
+				}
+
+				if output != nil {
+					t.Errorf("expected output to be nil, got: %+v", *output)
+				}
 			},
 		},
 	}

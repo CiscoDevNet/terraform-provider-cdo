@@ -2,7 +2,7 @@ package asa_test
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
+	"reflect"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
@@ -40,8 +40,13 @@ func TestAsaRead(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.ReadOutput, err error, t *testing.T) {
-				assert.Nil(t, err)
-				assert.NotNil(t, output)
+				if err != nil {
+					t.Errorf("unexpected error: %s", err.Error())
+				}
+
+				if output == nil {
+					t.Fatalf("output is nil!")
+				}
 
 				expectedReadOutput := asa.ReadOutput{
 					Uid:             asaDevice.Uid,
@@ -55,7 +60,9 @@ func TestAsaRead(t *testing.T) {
 					Host:            asaDevice.Host,
 					Port:            asaDevice.Port,
 				}
-				assert.Equal(t, expectedReadOutput, *output)
+				if !reflect.DeepEqual(expectedReadOutput, *output) {
+					t.Errorf("expected: %+v, got: %+v", asaDevice, *output)
+				}
 			},
 		},
 
@@ -70,8 +77,13 @@ func TestAsaRead(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.ReadOutput, err error, t *testing.T) {
-				assert.NotNil(t, err)
-				assert.Nil(t, output)
+				if err == nil {
+					t.Error("error is nil!")
+				}
+
+				if output != nil {
+					t.Errorf("expected output to be nil, got: %+v", *output)
+				}
 			},
 		},
 	}

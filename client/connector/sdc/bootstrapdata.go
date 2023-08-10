@@ -1,3 +1,5 @@
+// see also: https://github.com/cisco-lockhart/cdo-frontend-nx/blob/master/libs/secure-connectors/src/lib/shared/store/effects/create-proxy/create-proxy.effect.ts#L17
+
 package sdc
 
 import (
@@ -25,7 +27,6 @@ func generateBootstrapData(ctx context.Context, client http.Client, sdcName stri
 	), nil
 }
 
-// TODO: make this private
 func ComputeBootstrapData(sdcName, accessToken, tenantName, baseUrl, host string) string {
 	bootstrapUrl := fmt.Sprintf("%s/sdc/bootstrap/%s/%s", baseUrl, tenantName, sdcName)
 

@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	internalTesting "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/testing"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
-	"github.com/stretchr/testify/assert"
+	"reflect"
 	"testing"
 
 	"github.com/jarcoal/httpmock"
@@ -63,9 +64,17 @@ func TestCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.CreateOutput, err error, t *testing.T) {
-				assert.Nil(t, err)
-				assert.NotNil(t, output)
-				assert.Equal(t, validCreateOutput, *output)
+				if err != nil {
+					t.Fatalf("unexpected error: %s\n", err.Error())
+				}
+
+				if output == nil {
+					t.Fatal("output is nil!")
+				}
+
+				if !reflect.DeepEqual(validCreateOutput, *output) {
+					t.Errorf("expected: %+v\ngot: %+v", validCreateOutput, output)
+				}
 			},
 		},
 		{
@@ -73,10 +82,12 @@ func TestCreate(t *testing.T) {
 			sdcName:  sdcName,
 
 			setupFunc: func() {
-				httpmock.RegisterResponder(
+				internalTesting.MustResponseWithAtMostResponders(
 					"POST",
 					fmt.Sprintf("/aegis/rest/v1/services/targets/proxies"),
-					httpmock.NewJsonResponderOrPanic(500, "test error"),
+					[]httpmock.Responder{
+						httpmock.NewJsonResponderOrPanic(500, "test error"),
+					},
 				)
 				httpmock.RegisterResponder(
 					"POST",
@@ -86,8 +97,8 @@ func TestCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.CreateOutput, err error, t *testing.T) {
-				assert.NotNil(t, err, "error should not be nil")
-				assert.Equal(t, output, &sdc.CreateOutput{})
+				internalTesting.AssertNotNil(t, err, "error should not be nil")
+				internalTesting.AssertDeepEqual(t, output, &sdc.CreateOutput{}, "output should be zero value")
 			},
 		},
 		{
@@ -100,16 +111,18 @@ func TestCreate(t *testing.T) {
 					fmt.Sprintf("/aegis/rest/v1/services/targets/proxies"),
 					httpmock.NewJsonResponderOrPanic(200, validCreateRequestOutput),
 				)
-				httpmock.RegisterResponder(
+				internalTesting.MustResponseWithAtMostResponders(
 					"POST",
 					fmt.Sprintf("/anubis/rest/v1/oauth/token"),
-					httpmock.NewJsonResponderOrPanic(500, nil),
+					[]httpmock.Responder{
+						httpmock.NewJsonResponderOrPanic(500, nil),
+					},
 				)
 			},
 
 			assertFunc: func(output *sdc.CreateOutput, err error, t *testing.T) {
-				assert.NotNil(t, err, "error should not be nil")
-				assert.Equal(t, output, &sdc.CreateOutput{})
+				internalTesting.AssertNotNil(t, err, "error should not be nil")
+				internalTesting.AssertDeepEqual(t, output, &sdc.CreateOutput{}, "output should be zero value")
 			},
 		},
 	}

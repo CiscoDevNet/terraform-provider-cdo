@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	internalTesting "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/testing"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
 
@@ -62,9 +62,9 @@ func TestUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.UpdateOutput, err error, t *testing.T) {
-				assert.Nil(t, err, "error should be nil")
-				assert.NotNil(t, output, "output should not be nil")
-				assert.Equal(t, validUpdateOutput, *output, "output should be same as valid output")
+				internalTesting.AssertNil(t, err, "error should be nil")
+				internalTesting.AssertNotNil(t, output, "output should not be nil")
+				internalTesting.AssertDeepEqual(t, validUpdateOutput, *output, "output should be same as valid output")
 			},
 		},
 		{
@@ -86,8 +86,8 @@ func TestUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.UpdateOutput, err error, t *testing.T) {
-				assert.NotNil(t, err, "error should not be nil")
-				assert.Equal(t, output, &sdc.UpdateOutput{}, "output should be zero value")
+				internalTesting.AssertNotNil(t, err, "error should not be nil")
+				internalTesting.AssertDeepEqual(t, output, &sdc.UpdateOutput{}, "output should be zero value")
 			},
 		},
 		{
@@ -109,8 +109,8 @@ func TestUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.UpdateOutput, err error, t *testing.T) {
-				assert.NotNil(t, err, "error should not be nil")
-				assert.Equal(t, output, &sdc.UpdateOutput{}, "output should be zero value")
+				internalTesting.AssertNotNil(t, err, "error should not be nil")
+				internalTesting.AssertDeepEqual(t, output, &sdc.UpdateOutput{}, "output should be zero value")
 			},
 		},
 	}

@@ -48,12 +48,13 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "A human-readable name for the Secure Device Connector (SDC) to be created. This should be unique among SDCs.",
+				MarkdownDescription: "A human-readable name for the Secure Device Connector (SDC). This should be unique among SDCs",
 				Required:            true,
 			},
 			"bootstrap_data": schema.StringAttribute{
-				MarkdownDescription: "The bootstrap data is used to configure the SDC when it starts up. If creating an SDC using the [cdo-sdc  Terraform module](https://registry.terraform.io/modules/CiscoDevNet/cdo-sdc/),\n pass this data in to the cdo_bootstrap_data input. If deploying the VM into vSphere, you will be prompted for 'CDO Bootstrap Data'. Copy the data below and paste it into the CDO Bootstrap Data input field in vSphere. It is only valid for an hour.",
+				MarkdownDescription: "SDC bootstrap data",
 				Computed:            true,
+				Sensitive:           true, // bootstrap data contains user api token
 			},
 		},
 	}

@@ -2,7 +2,7 @@ package ios
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
+	"reflect"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
@@ -60,8 +60,13 @@ func TestIosCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
-				assert.Nil(t, err)
-				assert.NotNil(t, output)
+				if err != nil {
+					t.Errorf("unexpected error: %s", err.Error())
+				}
+
+				if output == nil {
+					t.Fatalf("output is nil!")
+				}
 
 				expectedCreatedOutput := CreateOutput{
 					Uid:        iosDevice.Uid,
@@ -73,7 +78,9 @@ func TestIosCreate(t *testing.T) {
 					SdcType:    iosDevice.LarType,
 					SdcUid:     iosDevice.LarUid,
 				}
-				assert.Equal(t, expectedCreatedOutput, *output)
+				if !reflect.DeepEqual(expectedCreatedOutput, *output) {
+					t.Errorf("expected: %+v, got: %+v", expectedCreatedOutput, output)
+				}
 
 				assertDeviceCreateWasCalledOnce(t)
 				assertSdcReadByUidWasCalledOnce(sdc.Uid, t)
@@ -105,8 +112,13 @@ func TestIosCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
-				assert.NotNil(t, err)
-				assert.Nil(t, output)
+				if err == nil {
+					t.Error("error is nil!")
+				}
+
+				if output != nil {
+					t.Errorf("expected output to be nil, got: %+v", *output)
+				}
 			},
 		},
 
@@ -133,8 +145,13 @@ func TestIosCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
-				assert.NotNil(t, err)
-				assert.Nil(t, output)
+				if err == nil {
+					t.Error("error is nil!")
+				}
+
+				if output != nil {
+					t.Errorf("expected output to be nil, got: %+v", *output)
+				}
 			},
 		},
 
@@ -160,8 +177,13 @@ func TestIosCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
-				assert.NotNil(t, err)
-				assert.Nil(t, output)
+				if err == nil {
+					t.Error("error is nil!")
+				}
+
+				if output != nil {
+					t.Errorf("expected output to be nil, got: %+v", *output)
+				}
 			},
 		},
 
@@ -188,8 +210,13 @@ func TestIosCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
-				assert.NotNil(t, err)
-				assert.Nil(t, output)
+				if err == nil {
+					t.Error("error is nil!")
+				}
+
+				if output != nil {
+					t.Errorf("expected output to be nil, got: %+v", *output)
+				}
 			},
 		},
 	}

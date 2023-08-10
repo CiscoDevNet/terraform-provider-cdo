@@ -29,10 +29,10 @@ type DataSourceModel struct {
 }
 
 type Model struct {
-	Uid          types.String   `tfsdk:"uid"`
-	Name         types.String   `tfsdk:"name"`
-	TenantUid    types.String   `tfsdk:"tenant_uid"`
-	SdcPublicKey PublicKeyModel `tfsdk:"sdc_public_key"`
+	Uid       types.String   `tfsdk:"uid"`
+	Name      types.String   `tfsdk:"name"`
+	TenantUid types.String   `tfsdk:"tenant_uid"`
+	PublicKey PublicKeyModel `tfsdk:"public_key"`
 }
 
 type PublicKeyModel struct {
@@ -71,7 +71,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 							MarkdownDescription: "The tenant uid this SDC belongs to",
 							Computed:            true,
 						},
-						"sdc_public_key": schema.ObjectAttribute{
+						"public_key": schema.ObjectAttribute{
 							MarkdownDescription: "SDC public key",
 							Computed:            true,
 							AttributeTypes: map[string]attr.Type{
@@ -135,7 +135,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 			Name:      types.StringValue(sdc.Name),
 			TenantUid: types.StringValue(sdc.TenantUid),
 
-			SdcPublicKey: PublicKeyModel{
+			PublicKey: PublicKeyModel{
 				EncodedKey: types.StringValue(sdc.PublicKey.EncodedKey),
 				Version:    types.Int64Value(sdc.PublicKey.Version),
 				KeyId:      types.StringValue(sdc.PublicKey.KeyId),

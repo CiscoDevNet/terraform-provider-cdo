@@ -1,8 +1,8 @@
-### CDO Terraform Provider
+# CDO Terraform Provider
 
 This repo provides a terraform provider to provision resources on the Cisco CDO platform.
 
-#### Structure
+## Structure
 
 We make use of Go workspaces - this is to split the repsonsibility of the provider and the Go CDO client. 
 Eventually the client will be moved to its own repo, but in the interest of hitting the ground running they both live in here.
@@ -14,14 +14,14 @@ Eventually the client will be moved to its own repo, but in the interest of hitt
 └── README.md
 ```
 
-#### Requirements
+## Requirements
 
 * Go (1.20)
   - macos install: `brew install go`
 * tfenv 
   - macos install: `brew install tfenv`
 
-#### Acceptance Tests
+## Acceptance Tests
 
 **Acceptance tests will create real resources!**
 
@@ -40,7 +40,7 @@ cd ./provider
 ACC_TEST_CISCO_CDO_API_TOKEN=<CDO_API_TOKEN> make testacc
 ```
 
-### Running Examples
+## Running Examples
 Examples are provided so that you can do the usual `plan`, `apply`, `destroy` etc in the folders under `provider/examples` directory.
 #### Setup
 1. Build provider locally.
@@ -75,7 +75,7 @@ Examples are provided so that you can do the usual `plan`, `apply`, `destroy` et
         direct {}
       }
       ```
-#### Running
+## Running
 1. Navigate to a folder under `provider/examples`, e.g. `provider/examples/resources/asa`.
 2. Run
    ```bash
@@ -93,7 +93,22 @@ Examples are provided so that you can do the usual `plan`, `apply`, `destroy` et
     |
     ... rest
    ```
-#### Troubleshooting
+
+## Regenerating docs
+
+If you make any changes to the resources and data sources provided by this provider, you will need to regenerate the docs, otherwise the Github actions triggered by this pull request will fail. To do this, run:
+```
+go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --provider-name cdo --rendered-provider-name "CDO Provider" --rendered-website-dir ../docs
+```
+
+## Releasing
+
+To release a new version of the Terraform CDO Provider, perform the following steps.
+
+- In the main branch, add a tag: `git tag vMAJOR.MINOR.PATCH` (following semver conventions as described in https://www.semver.org)
+- Push the tag: `git push --tags origin main`
+
+## Troubleshooting
 - Error: Inconsistent dependency lock file
   ```
   provider hashicorp/CiscoDevnet/cdo: required by this configuration but no version is selected

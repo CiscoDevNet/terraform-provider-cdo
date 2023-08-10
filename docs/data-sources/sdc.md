@@ -26,12 +26,12 @@ SDC data source
 Read-Only:
 
 - `name` (String) Name
-- `sdc_public_key` (Object) SDC public key (see [below for nested schema](#nestedatt--sdcs--sdc_public_key))
+- `public_key` (Object) SDC public key (see [below for nested schema](#nestedatt--sdcs--public_key))
 - `tenant_uid` (String) The tenant uid this SDC belongs to
 - `uid` (String) Uid
 
-<a id="nestedatt--sdcs--sdc_public_key"></a>
-### Nested Schema for `sdcs.sdc_public_key`
+<a id="nestedatt--sdcs--public_key"></a>
+### Nested Schema for `sdcs.public_key`
 
 Read-Only:
 

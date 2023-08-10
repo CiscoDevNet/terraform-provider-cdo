@@ -3,7 +3,6 @@ package asaconfig
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
@@ -43,10 +42,7 @@ func TestAsaConfigReadByUid(t *testing.T) {
 			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
-
-				if !reflect.DeepEqual(validAsaConfig, *output) {
-					t.Errorf("expected: %+v\ngot: %+v", validAsaConfig, output)
-				}
+				assert.Equal(t, validAsaConfig, *output)
 			},
 		},
 		{

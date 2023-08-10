@@ -73,9 +73,6 @@ func TestIosCreate(t *testing.T) {
 					SdcType:    iosDevice.LarType,
 					SdcUid:     iosDevice.LarUid,
 				}
-				if !reflect.DeepEqual(expectedCreatedOutput, *output) {
-					t.Errorf("expected: %+v, got: %+v", expectedCreatedOutput, output)
-				}
 				assert.Equal(t, expectedCreatedOutput, *output)
 
 				assertDeviceCreateWasCalledOnce(t)

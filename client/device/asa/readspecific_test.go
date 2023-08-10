@@ -38,17 +38,9 @@ func TestAsaReadSpecific(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.ReadSpecificOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatalf("output is nil!")
-				}
-
-				if !reflect.DeepEqual(specificDevice, *output) {
-					t.Errorf("expected: %+v, got: %+v", specificDevice, *output)
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+				assert.Equal(t, specificDevice, *output)
 			},
 		},
 
@@ -63,13 +55,8 @@ func TestAsaReadSpecific(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.ReadSpecificOutput, err error, t *testing.T) {
-				if err == nil {
-					t.Error("error is nil!")
-				}
-
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
 			},
 		},
 	}

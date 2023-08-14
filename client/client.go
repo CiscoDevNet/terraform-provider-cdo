@@ -4,6 +4,7 @@ package client
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"net/http"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
@@ -11,7 +12,6 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/device/asaconfig"
 	internalhttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 )
 

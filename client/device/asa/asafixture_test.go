@@ -2,12 +2,12 @@ package asa_test
 
 import (
 	"fmt"
+	asaconfig2 "github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"net/http"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/device/asaconfig"
 	internalTesting "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/testing"
 	"github.com/jarcoal/httpmock"
 )
@@ -111,7 +111,7 @@ func configureDeviceDeleteToRespondWithError(deviceUid string) {
 	)
 }
 
-func configureAsaConfigReadToRespondSuccessfully(specificUid string, readOutput asaconfig.ReadOutput) {
+func configureAsaConfigReadToRespondSuccessfully(specificUid string, readOutput asaconfig2.ReadOutput) {
 	httpmock.RegisterResponder(
 		http.MethodGet,
 		buildAsaConfigPath(specificUid),
@@ -142,7 +142,7 @@ func configureAsaConfigReadToRespondWithError(specificUid string) {
 	)
 }
 
-func configureAsaConfigUpdateToRespondSuccessfully(specificUid string, updateOutput asaconfig.UpdateOutput) {
+func configureAsaConfigUpdateToRespondSuccessfully(specificUid string, updateOutput asaconfig2.UpdateOutput) {
 	httpmock.RegisterResponder(
 		http.MethodPut,
 		buildAsaConfigPath(specificUid),

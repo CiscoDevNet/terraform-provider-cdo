@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	h "net/http"
 	"reflect"
 	"testing"
@@ -31,7 +32,7 @@ func TestAsaConfigUpdate(t *testing.T) {
 
 	validAsaConfig := ReadOutput{
 		Uid:   asaConfigUid,
-		State: AsaConfigStateDone,
+		State: state.DONE,
 	}
 
 	testCases := []struct {
@@ -233,7 +234,7 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 
 	validAsaConfig := ReadOutput{
 		Uid:   asaConfigUid,
-		State: AsaConfigStateDone,
+		State: state.DONE,
 	}
 
 	testCases := []struct {

@@ -3,6 +3,7 @@ package asaconfig
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"reflect"
 	"testing"
 
@@ -19,7 +20,7 @@ func TestAsaConfigReadByUid(t *testing.T) {
 
 	validAsaConfig := ReadOutput{
 		Uid:   asaConfigUid,
-		State: AsaConfigStateDone,
+		State: state.DONE,
 	}
 
 	testCases := []struct {

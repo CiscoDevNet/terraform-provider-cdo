@@ -40,8 +40,7 @@ func (v socketAddressValidator) ValidateString(ctx context.Context, request vali
 	}
 }
 
-// OneOf checks that the String held in the attribute
-// is one of the given `values`.
+// ValidateSocketAddress checks that the given socket address is valid
 func ValidateSocketAddress() validator.String {
 	return socketAddressValidator{}
 }

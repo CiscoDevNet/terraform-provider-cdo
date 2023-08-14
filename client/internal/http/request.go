@@ -49,7 +49,7 @@ func NewRequest(config cdo.Config, httpClient *http.Client, logger *log.Logger, 
 	}
 }
 
-// Send() wrap send() with retry & delay & timeout... stuff
+// Send wrap send() with retry & delay & timeout... stuff
 // TODO: cancel retry when context done
 // output: if given, will unmarshal response body into this object, should be a pointer for it to be useful
 func (r *Request) Send(output any) error {

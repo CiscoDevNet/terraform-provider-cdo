@@ -23,7 +23,7 @@ type testAsaResourceType struct {
 const asaResourceTemplate = `
 resource "cdo_asa_device" "test" {
 	name = "{{.Name}}"
-	socket_address = "{{.Ipv4}}"
+	socket_address = "{{.SocketAddress}}"
 	connector_type = "{{.SdcType}}"
 	username = "{{.Username}}"
 	password = "{{.Password}}"
@@ -63,7 +63,7 @@ var testAsaResource_SDC_NewCreds = acctest.MustOverrideFields(testAsaResource_SD
 })
 var testAsaResourceConfig_SDC_NewCreds = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC_NewCreds)
 
-var testAsaResource_SDC_NewLocation = acctest.MustOverrideFields(testAsaResource_SDC, map[string]any{"Ipv4": alternativeDeviceLocation})
+var testAsaResource_SDC_NewLocation = acctest.MustOverrideFields(testAsaResource_SDC, map[string]any{"SocketAddress": alternativeDeviceLocation})
 var testAsaResourceConfig_SDC_NewLocation = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC_NewLocation)
 
 // CDG configs
@@ -95,7 +95,7 @@ var testAsaResource_CDG_NewCreds = acctest.MustOverrideFields(testAsaResource_CD
 })
 var testAsaResourceConfig_CDG_NewCreds = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_CDG_NewCreds)
 
-var testAsaResource_CDG_NewLocation = acctest.MustOverrideFields(testAsaResource_CDG, map[string]any{"Ipv4": alternativeDeviceLocation})
+var testAsaResource_CDG_NewLocation = acctest.MustOverrideFields(testAsaResource_CDG, map[string]any{"SocketAddress": alternativeDeviceLocation})
 var testAsaResourceConfig_CDG_NewLocation = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_CDG_NewLocation)
 
 func TestAccAsaDeviceResource_SDC(t *testing.T) {

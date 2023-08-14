@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"net/http"
 	"reflect"
 	"testing"
@@ -31,7 +32,7 @@ func TestIosConfigUpdate(t *testing.T) {
 
 	validIosConfig := ReadOutput{
 		Uid:   iosConfigUid,
-		State: IosConfigStateDone,
+		State: state.DONE,
 	}
 
 	testCases := []struct {

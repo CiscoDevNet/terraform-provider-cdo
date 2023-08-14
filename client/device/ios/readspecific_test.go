@@ -2,11 +2,11 @@ package ios
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"reflect"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios/iosconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
 )
@@ -19,7 +19,7 @@ func TestIosReadSpecific(t *testing.T) {
 
 	specificDevice := ReadSpecificOutput{
 		SpecificUid: "11111111-1111-1111-1111-111111111111",
-		State:       iosconfig.IosConfigStateDone,
+		State:       state.DONE,
 		Namespace:   "targets",
 		Type:        "device",
 	}

@@ -1,5 +1,7 @@
 package asa
 
+import "github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
+
 type ReadSpecificOutputBuilder struct {
 	output ReadSpecificOutput
 }
@@ -24,7 +26,7 @@ func (builder *ReadSpecificOutputBuilder) WithSpecificUid(uid string) *ReadSpeci
 }
 
 func (builder *ReadSpecificOutputBuilder) InDoneState() *ReadSpecificOutputBuilder {
-	builder.output.State = "DONE"
+	builder.output.State = state.DONE
 
 	return builder
 }

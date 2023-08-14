@@ -15,8 +15,12 @@ var testSdc = struct {
 	Uid:  "39784a3c-0013-4e2f-af26-219560904636",
 }
 
-const testSdcConfig = `
-data "cdo_sdc" "test" {}`
+const testSdcTemplate = `
+data "cdo_sdc_connector" "test" {
+	name = "{{.Name}}"
+}`
+
+var testSdcConfig = acctest.MustParseTemplate(testSdcTemplate, testSdc)
 
 func TestAccSdcDeviceDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -27,7 +31,8 @@ func TestAccSdcDeviceDataSource(t *testing.T) {
 			{
 				Config: acctest.ProviderConfig() + testSdcConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.cdo_sdc.test", "id", testSdc.TenantId),
+					resource.TestCheckResourceAttr("data.cdo_sdc_connector.test", "name", testSdc.Name),
+					resource.TestCheckResourceAttr("data.cdo_sdc_connector.test", "id", testSdc.Uid),
 				),
 			},
 		},

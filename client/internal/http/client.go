@@ -1,8 +1,9 @@
-// Client wrap Request and Respose to provide a slightly higher level API for internal use
+// Package http provides a Client that wrap Request and Response to provide a slightly higher level API for internal use
 package http
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -17,13 +18,25 @@ type Client struct {
 }
 
 // NewWithDefault instantiates a new Client with default HTTP configuration
-func NewWithDefault(baseUrl, apiToken string) *Client {
+func NewWithDefault(baseUrl, apiToken string) (*Client, error) {
 	return NewWithHttpClient(cdo.DefaultHttpClient, baseUrl, apiToken)
 }
 
 // NewWithHttpClient instantiates a new Client with provided HTTP configuration
-func NewWithHttpClient(client *http.Client, baseUrl, apiToken string) *Client {
+func NewWithHttpClient(client *http.Client, baseUrl, apiToken string) (*Client, error) {
 	return New(client, cdo.DefaultLogger, baseUrl, apiToken, cdo.DefaultRetries, cdo.DefaultDelay, cdo.DefaultTimeout)
+}
+
+func MustNewWithDefault(baseUrl, apiToken string) *Client {
+	return MustNewWithHttpClient(cdo.DefaultHttpClient, baseUrl, apiToken)
+}
+
+func MustNewWithHttpClient(client *http.Client, baseUrl, apiToken string) *Client {
+	internalClient, err := New(client, cdo.DefaultLogger, baseUrl, apiToken, cdo.DefaultRetries, cdo.DefaultDelay, cdo.DefaultTimeout)
+	if err != nil {
+		panic(fmt.Sprint("failed to create http client, cause=%w", err))
+	}
+	return internalClient
 }
 
 func New(
@@ -38,12 +51,16 @@ func New(
 	delay time.Duration,
 	timeout time.Duration,
 
-) *Client {
+) (*Client, error) {
+	config, err := cdo.NewConfig(baseUrl, apiToken, retries, delay, timeout)
+	if err != nil {
+		return &Client{}, err
+	}
 	return &Client{
-		config:     cdo.NewConfig(baseUrl, apiToken, retries, delay, timeout),
+		config:     config,
 		httpClient: client,
 		Logger:     logger,
-	}
+	}, nil
 }
 
 func (c *Client) NewGet(ctx context.Context, url string) *Request {
@@ -66,6 +83,6 @@ func (c *Client) BaseUrl() string {
 	return c.config.BaseUrl
 }
 
-func (c *Client) Host() (string, error) {
-	return c.config.Host()
+func (c *Client) Host() string {
+	return c.config.Host
 }

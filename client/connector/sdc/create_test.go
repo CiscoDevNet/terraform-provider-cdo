@@ -2,7 +2,6 @@ package sdc_test
 
 import (
 	"context"
-	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
@@ -80,7 +79,7 @@ func TestCreate(t *testing.T) {
 				)
 				httpmock.RegisterResponder(
 					"POST",
-					fmt.Sprintf("/anubis/rest/v1/oauth/token"),
+					"/anubis/rest/v1/oauth/token",
 					httpmock.NewJsonResponderOrPanic(200, validUserToken),
 				)
 			},
@@ -97,12 +96,12 @@ func TestCreate(t *testing.T) {
 			setupFunc: func() {
 				httpmock.RegisterResponder(
 					"POST",
-					fmt.Sprintf("/aegis/rest/v1/services/targets/proxies"),
+					"/aegis/rest/v1/services/targets/proxies",
 					httpmock.NewJsonResponderOrPanic(200, validCreateRequestOutput),
 				)
 				httpmock.RegisterResponder(
 					"POST",
-					fmt.Sprintf("/anubis/rest/v1/oauth/token"),
+					"/anubis/rest/v1/oauth/token",
 					httpmock.NewJsonResponderOrPanic(500, nil),
 				)
 			},

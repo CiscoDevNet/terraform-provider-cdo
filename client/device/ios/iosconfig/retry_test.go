@@ -19,7 +19,7 @@ func TestIosConfigUntilState(t *testing.T) {
 
 	validIosConfig := ReadOutput{
 		Uid:   iosConfigUid,
-		State: IosConfigStateDone,
+		State: state.DONE,
 	}
 
 	inProgressIosConfig := ReadOutput{

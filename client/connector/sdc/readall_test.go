@@ -2,7 +2,7 @@ package sdc_test
 
 import (
 	"context"
-	"reflect"
+	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
@@ -45,18 +45,11 @@ func TestReadAll(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadAllOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
 
 				expectedResponse := sdc.ReadAllOutput{validCdg, validSdc}
-				if !reflect.DeepEqual(expectedResponse, *output) {
-					t.Errorf("expected: %+v\ngot: %+v", expectedResponse, output)
-				}
+				assert.Equal(t, expectedResponse, *output)
 			},
 		},
 		{
@@ -71,17 +64,9 @@ func TestReadAll(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadAllOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("expected err to be nil, got: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatal("returned slice was nil!")
-				}
-
-				if len(*output) != 0 {
-					t.Errorf("expected empty slice, got: %+v", *output)
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+				assert.Len(t, *output, 0)
 			},
 		},
 		{
@@ -96,13 +81,8 @@ func TestReadAll(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadAllOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
-				}
-
-				if err == nil {
-					t.Error("error was nil!")
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 			},
 		},
 	}

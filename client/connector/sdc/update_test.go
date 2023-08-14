@@ -56,7 +56,7 @@ func TestUpdate(t *testing.T) {
 				)
 				httpmock.RegisterResponder(
 					http.MethodPost,
-					fmt.Sprintf("/anubis/rest/v1/oauth/token"),
+					"/anubis/rest/v1/oauth/token",
 					httpmock.NewJsonResponderOrPanic(200, validUserToken),
 				)
 			},
@@ -80,7 +80,7 @@ func TestUpdate(t *testing.T) {
 				)
 				httpmock.RegisterResponder(
 					http.MethodPost,
-					fmt.Sprintf("/anubis/rest/v1/oauth/token"),
+					"/anubis/rest/v1/oauth/token",
 					httpmock.NewJsonResponderOrPanic(200, validUserToken),
 				)
 			},
@@ -103,7 +103,7 @@ func TestUpdate(t *testing.T) {
 				)
 				httpmock.RegisterResponder(
 					http.MethodPost,
-					fmt.Sprintf("/anubis/rest/v1/oauth/token"),
+					"/anubis/rest/v1/oauth/token",
 					httpmock.NewJsonResponderOrPanic(500, nil),
 				)
 			},

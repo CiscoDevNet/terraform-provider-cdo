@@ -107,7 +107,7 @@ func TestIosConfigUntilState(t *testing.T) {
 			retryOptions := retry.DefaultOpts
 			retryOptions.Delay = 1 * time.Millisecond
 
-			err := retry.Do(UntilState(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.targetUid, state.ERROR), retryOptions)
+			err := retry.Do(UntilState(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.targetUid, state.DONE), retryOptions)
 
 			testCase.assertFunc(err, t)
 		})

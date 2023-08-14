@@ -40,7 +40,7 @@ func (v socketAddressValidator) ValidateString(ctx context.Context, request vali
 	}
 }
 
-// ValidateSocketAddress checks that the given socket address is valid
+// ValidateSocketAddress checks that the given socket address is valid.
 func ValidateSocketAddress() validator.String {
 	return socketAddressValidator{}
 }

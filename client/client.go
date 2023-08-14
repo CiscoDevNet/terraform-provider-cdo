@@ -29,7 +29,7 @@ func NewWithHttpClient(httpClient *http.Client, hostname, apiToken string) (*Cli
 	// log.SetOutput(os.Stdout)  // TODO: set this to os.Stdout in local environment
 	client, err := internalhttp.NewWithHttpClient(httpClient, hostname, apiToken)
 	if err != nil {
-		return &Client{}, err
+		return nil, err
 	}
 	return &Client{
 		client: *client,

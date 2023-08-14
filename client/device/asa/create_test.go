@@ -6,7 +6,6 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/stretchr/testify/assert"
-	"reflect"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
@@ -91,9 +90,7 @@ func TestAsaCreate(t *testing.T) {
 					SdcType:    asaDevice.LarType,
 					SdcUid:     asaDevice.LarUid,
 				}
-				if !reflect.DeepEqual(expectedCreatedOutput, *output) {
-					t.Errorf("expected: %+v, got: %+v", expectedCreatedOutput, output)
-				}
+				assert.Equal(t, expectedCreatedOutput, *output)
 
 				assertDeviceCreateWasCalledOnce(t)
 				assertDeviceReadSpecificWasCalledOnce(asaDevice.Uid, t)
@@ -142,9 +139,7 @@ func TestAsaCreate(t *testing.T) {
 					SdcType:    asaDevice.LarType,
 					SdcUid:     asaDevice.LarUid,
 				}
-				if !reflect.DeepEqual(expectedCreatedOutput, *output) {
-					t.Errorf("expected: %+v, got: %+v", expectedCreatedOutput, output)
-				}
+				assert.Equal(t, expectedCreatedOutput, *output)
 
 				assertDeviceCreateWasCalledOnce(t)
 				assertDeviceReadSpecificWasCalledOnce(asaDevice.Uid, t)

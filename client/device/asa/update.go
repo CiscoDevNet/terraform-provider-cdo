@@ -3,7 +3,7 @@ package asa
 import (
 	"context"
 	"fmt"
-	asaconfig2 "github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"strings"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
@@ -70,26 +70,26 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 				publicKey = &larReadRes.PublicKey
 			}
 
-			updateAsaConfigInp := asaconfig2.NewUpdateInput(
+			updateAsaConfigInp := asaconfig.NewUpdateInput(
 				asaReadSpecOutp.SpecificUid,
 				updateInp.Username,
 				updateInp.Password,
 				publicKey,
 				asaReadSpecOutp.State,
 			)
-			_, err = asaconfig2.UpdateCredentials(ctx, client, *updateAsaConfigInp)
+			_, err = asaconfig.UpdateCredentials(ctx, client, *updateAsaConfigInp)
 			if err != nil {
 				_ = fmt.Errorf("failed to update credentials for ASA device: %s", err.Error())
 				return nil, err
 			}
 
-			if err := retry.Do(asaconfig2.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), retry.DefaultOpts); err != nil {
+			if err := retry.Do(asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), retry.DefaultOpts); err != nil {
 				return nil, err
 			}
 		}
 
 		if updateInp.Location != "" {
-			_, err := asaconfig2.UpdateLocation(ctx, client, asaconfig2.UpdateLocationOptions{
+			_, err := asaconfig.UpdateLocation(ctx, client, asaconfig.UpdateLocationOptions{
 				SpecificUid: asaReadSpecOutp.SpecificUid,
 				Location:    updateInp.Location,
 			})
@@ -97,7 +97,7 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 				return nil, err
 			}
 
-			if err := retry.Do(asaconfig2.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), retry.DefaultOpts); err != nil {
+			if err := retry.Do(asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), retry.DefaultOpts); err != nil {
 				return nil, err
 			}
 		}

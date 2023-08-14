@@ -269,7 +269,7 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
-	updateInp := asa.UpdateInput{Uid: stateData.ID.ValueString(), Name: stateData.Name.ValueString()}
+	updateInp := asa.NewUpdateInput(stateData.ID.ValueString(), stateData.Name.ValueString(), "", "")
 
 	if isNameUpdated(planData, stateData) {
 		updateInp.Name = planData.Name.ValueString()
@@ -291,7 +291,7 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 		updateInp.Password = planData.Password.ValueString()
 	}
 
-	updateOutp, err := r.client.UpdateAsa(ctx, updateInp)
+	updateOutp, err := r.client.UpdateAsa(ctx, *updateInp)
 	if err != nil {
 		res.Diagnostics.AddError("failed to update ASA device", err.Error())
 		return

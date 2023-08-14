@@ -121,7 +121,7 @@ func TestUpdate(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := sdc.Update(context.Background(), *internalHttp.NewWithDefault(baseUrl, "a_valid_token"), sdc.NewUpdateInput(testCase.sdcUid, testCase.sdcName))
+			output, err := sdc.Update(context.Background(), *internalHttp.MustNewWithDefault(baseUrl, "a_valid_token"), sdc.NewUpdateInput(testCase.sdcUid, testCase.sdcName))
 
 			testCase.assertFunc(output, err, t)
 		})

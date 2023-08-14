@@ -5,6 +5,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/connector/sdc"
@@ -127,7 +128,12 @@ func (p *CdoProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
-	client := cdoClient.New(baseURL, apiToken)
+	client, err := cdoClient.New(baseURL, apiToken)
+	if err != nil {
+		resp.Diagnostics.AddError("Error while trying to create CDO client", fmt.Sprintf("cause=%s", err.Error()))
+		return
+	}
+
 	resp.DataSourceData = client
 	resp.ResourceData = client
 }

@@ -93,7 +93,7 @@ func TestReadAll(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := sdc.ReadAll(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), *sdc.NewReadAllInput())
+			output, err := sdc.ReadAll(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), *sdc.NewReadAllInput())
 
 			testCase.assertFunc(output, err, t)
 		})

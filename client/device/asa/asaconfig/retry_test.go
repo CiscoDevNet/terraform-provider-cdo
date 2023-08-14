@@ -3,6 +3,7 @@ package asaconfig
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/stretchr/testify/assert"
 	h "net/http"
 	"testing"
@@ -15,7 +16,7 @@ import (
 )
 
 func makeFetchAsaConfigUrl(asaconfigUid string) string {
-	return fmt.Sprintf("/aegis/rest/v1/services/asa/configs/%s", asaConfigUid)
+	return fmt.Sprintf("/aegis/rest/v1/services/asa/configs/%s", asaconfigUid)
 }
 
 func TestAsaConfigUntilStateDone(t *testing.T) {
@@ -24,7 +25,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 
 	validAsaConfig := ReadOutput{
 		Uid:   asaConfigUid,
-		State: AsaConfigStateDone,
+		State: state.DONE,
 	}
 
 	inProgressAsaConfig := ReadOutput{
@@ -80,7 +81,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 
 				errorAsaConfig := ReadOutput{
 					Uid:   asaConfigUid,
-					State: AsaConfigStateError,
+					State: state.ERROR,
 				}
 
 				callCount := 0
@@ -114,7 +115,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 
 				badCredentialsAsaConfig := ReadOutput{
 					Uid:   asaConfigUid,
-					State: AsaConfigStateBadCredentials,
+					State: state.BAD_CREDENTIALS,
 				}
 
 				callCount := 0

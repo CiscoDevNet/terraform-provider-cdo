@@ -2,6 +2,7 @@ package iosconfig
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -57,7 +58,7 @@ func TestIosConfigUntilState(t *testing.T) {
 			setupFunc: func() {
 				errorIosConfig := ReadOutput{
 					Uid:   iosConfigUid,
-					State: IosConfigStateError,
+					State: state.ERROR,
 				}
 
 				configureIosConfigReadToSucceedInSubsequentCalls(iosConfigUid, []ReadOutput{
@@ -80,7 +81,7 @@ func TestIosConfigUntilState(t *testing.T) {
 			setupFunc: func() {
 				badCredentialsIosConfig := ReadOutput{
 					Uid:   iosConfigUid,
-					State: IosConfigStateBadCredentials,
+					State: state.BAD_CREDENTIALS,
 				}
 
 				configureIosConfigReadToSucceedInSubsequentCalls(iosConfigUid, []ReadOutput{
@@ -106,7 +107,7 @@ func TestIosConfigUntilState(t *testing.T) {
 			retryOptions := retry.DefaultOpts
 			retryOptions.Delay = 1 * time.Millisecond
 
-			err := retry.Do(UntilState(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.targetUid, IosConfigStateDone), retryOptions)
+			err := retry.Do(UntilState(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.targetUid, state.ERROR), retryOptions)
 
 			testCase.assertFunc(err, t)
 		})

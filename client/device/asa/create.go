@@ -3,7 +3,7 @@ package asa
 import (
 	"context"
 	"fmt"
-	asaconfig2 "github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"strings"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
@@ -89,7 +89,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	client.Logger.Println("waiting for asa config state done")
 
 	// poll until asa config state done
-	err = retry.Do(asaconfig2.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), *retry.NewOptionsWithLogger(client.Logger))
+	err = retry.Do(asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), *retry.NewOptionsWithLogger(client.Logger))
 
 	// error during polling, but we maybe able to handle it
 	if err != nil {
@@ -148,14 +148,14 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	// update asa config credentials
 	client.Logger.Println("updating asa config credentials")
 
-	asaConfigUpdateInp := asaconfig2.NewUpdateInput(
+	asaConfigUpdateInp := asaconfig.NewUpdateInput(
 		asaReadSpecOutp.SpecificUid,
 		createInp.Username,
 		createInp.Password,
 		publicKey,
 		asaReadSpecOutp.State,
 	)
-	_, err = asaconfig2.Update(ctx, client, *asaConfigUpdateInp)
+	_, err = asaconfig.Update(ctx, client, *asaConfigUpdateInp)
 	if err != nil {
 		return nil, &CreateError{
 			CreatedResourceId: createdResourceId,
@@ -166,7 +166,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	// poll until asa config state done
 	client.Logger.Println("waiting for device to reach state done")
 
-	err = retry.Do(asaconfig2.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), *retry.NewOptionsWithLogger(client.Logger))
+	err = retry.Do(asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), *retry.NewOptionsWithLogger(client.Logger))
 	if err != nil {
 		return nil, &CreateError{
 			CreatedResourceId: createdResourceId,

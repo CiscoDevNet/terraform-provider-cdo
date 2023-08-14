@@ -5,6 +5,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
+	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
 
@@ -77,13 +78,8 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatalf("output is nil!")
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
 					Uid:        asaDevice.Uid,
@@ -133,13 +129,8 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatalf("output is nil!")
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
 					Uid:        asaDevice.Uid,
@@ -184,13 +175,8 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatalf("output is nil!")
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
 					Uid:        asaDeviceUsingSdc.Uid,
@@ -243,13 +229,8 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatalf("output is nil!")
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
 					Uid:        asaDeviceUsingSdc.Uid,

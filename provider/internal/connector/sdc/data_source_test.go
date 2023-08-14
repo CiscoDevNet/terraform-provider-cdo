@@ -16,7 +16,7 @@ var testSdc = struct {
 }
 
 const testSdcTemplate = `
-data "cdo_sdc_connector" "test" {
+data "cdo_sdc" "test" {
 	name = "{{.Name}}"
 }`
 

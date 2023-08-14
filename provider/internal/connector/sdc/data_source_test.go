@@ -8,13 +8,19 @@ import (
 )
 
 var testSdc = struct {
-	TenantId string
+	Name string
+	Uid  string
 }{
-	TenantId: "ae98d25f-1089-4286-a3c5-505dcb4431a2",
+	Name: "CDO_terraform-provider-cdo-SDC-1",
+	Uid:  "39784a3c-0013-4e2f-af26-219560904636",
 }
 
-const testSdcConfig = `
-data "cdo_sdc" "test" {}`
+const testSdcTemplate = `
+data "cdo_sdc" "test" {
+	name = "{{.Name}}"
+}`
+
+var testSdcConfig = acctest.MustParseTemplate(testSdcTemplate, testSdc)
 
 func TestAccSdcDeviceDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -25,7 +31,8 @@ func TestAccSdcDeviceDataSource(t *testing.T) {
 			{
 				Config: acctest.ProviderConfig() + testSdcConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.cdo_sdc.test", "id", testSdc.TenantId),
+					resource.TestCheckResourceAttr("data.cdo_sdc_connector.test", "name", testSdc.Name),
+					resource.TestCheckResourceAttr("data.cdo_sdc_connector.test", "id", testSdc.Uid),
 				),
 			},
 		},

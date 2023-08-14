@@ -3,6 +3,7 @@ package asaconfig
 import (
 	"context"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	h "net/http"
 	"testing"
 	"time"
@@ -61,9 +62,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 			},
 
 			assertFunc: func(err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
+				assert.Nil(t, err)
 
 				internalTesting.AssertEndpointCalledTimes("GET", makeFetchAsaConfigUrl(asaConfigUid), 3, t)
 			},
@@ -97,9 +96,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 			},
 
 			assertFunc: func(err error, t *testing.T) {
-				if err == nil {
-					t.Error("expected error to be returned")
-				}
+				assert.NotNil(t, err)
 
 				internalTesting.AssertEndpointCalledTimes("GET", makeFetchAsaConfigUrl(asaConfigUid), 3, t)
 			},
@@ -133,9 +130,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 			},
 
 			assertFunc: func(err error, t *testing.T) {
-				if err == nil {
-					t.Error("expected error to be returned")
-				}
+				assert.NotNil(t, err)
 
 				internalTesting.AssertEndpointCalledTimes("GET", makeFetchAsaConfigUrl(asaConfigUid), 3, t)
 			},

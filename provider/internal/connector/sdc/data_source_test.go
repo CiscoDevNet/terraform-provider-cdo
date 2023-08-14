@@ -14,7 +14,7 @@ var testSdc = struct {
 }
 
 const testSdcConfig = `
-data "cdo_sdc_device" "test" {}`
+data "cdo_sdc" "test" {}`
 
 func TestAccSdcDeviceDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -25,7 +25,7 @@ func TestAccSdcDeviceDataSource(t *testing.T) {
 			{
 				Config: acctest.ProviderConfig() + testSdcConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.cdo_sdc_device.test", "id", testSdc.TenantId),
+					resource.TestCheckResourceAttr("data.cdo_sdc.test", "id", testSdc.TenantId),
 				),
 			},
 		},

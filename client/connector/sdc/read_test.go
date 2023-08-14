@@ -3,7 +3,6 @@ package sdc_test
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
@@ -49,17 +48,9 @@ func TestReadByUid(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
-
-				if !reflect.DeepEqual(validCdg, *output) {
-					t.Errorf("expected: %+v\ngot: %+v", validCdg, output)
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+				assert.Equal(t, validCdg, *output)
 			},
 		},
 		{
@@ -75,17 +66,9 @@ func TestReadByUid(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
-
-				if !reflect.DeepEqual(validSdc, *output) {
-					t.Errorf("expected: %+v\ngot: %+v", validSdc, output)
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+				assert.Equal(t, validSdc, *output)
 			},
 		},
 		{
@@ -101,10 +84,7 @@ func TestReadByUid(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
-				}
-
+				assert.Nil(t, output)
 				assert.NotNil(t, err)
 			},
 		},
@@ -121,13 +101,8 @@ func TestReadByUid(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
-				}
-
-				if err == nil {
-					t.Error("error was nil!")
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 			},
 		},
 	}
@@ -183,17 +158,9 @@ func TestReadByName(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
-
-				if !reflect.DeepEqual(validCdg, *output) {
-					t.Errorf("expected: %+v\ngot: %+v", validCdg, output)
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+				assert.Equal(t, validCdg, *output)
 			},
 		},
 		{
@@ -210,17 +177,9 @@ func TestReadByName(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
-
-				if !reflect.DeepEqual(validSdc, *output) {
-					t.Errorf("expected: %+v\ngot: %+v", validSdc, output)
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+				assert.Equal(t, validSdc, *output)
 			},
 		},
 		{
@@ -237,18 +196,11 @@ func TestReadByName(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", output)
-				}
-
-				if err == nil {
-					t.Errorf("expected error")
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 
 				expectedError := fmt.Sprintf("multiple SDCs found with the name: %s", cdgName)
-				if err.Error() != expectedError {
-					t.Errorf("expected error: '%s', got: '%s'", expectedError, err.Error())
-				}
+				assert.Equal(t, expectedError, err.Error())
 			},
 		},
 		{
@@ -265,10 +217,7 @@ func TestReadByName(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
-				}
-
+				assert.Nil(t, output)
 				assert.NotNil(t, err)
 			},
 		},
@@ -286,13 +235,8 @@ func TestReadByName(t *testing.T) {
 			},
 
 			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
-				}
-
-				if err == nil {
-					t.Error("error was nil!")
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 			},
 		},
 	}

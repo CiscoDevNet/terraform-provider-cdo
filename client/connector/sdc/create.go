@@ -44,7 +44,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	url := url.CreateSdc(client.BaseUrl())
 	body := createRequestBody{
 		Name:                createInp.Name,
-		OnPremLarConfigured: true, // TODO: when will this be false? See related: https://github.com/CiscoDevnet/eos/blob/4d2a8e7414073ac466b47647e834feb60abdef79/client/app/sdc/sdc.controller.js#L177C1
+		OnPremLarConfigured: true, // always true because we do not support cloud sdc anymore
 	}
 	req := client.NewPost(ctx, url, body)
 

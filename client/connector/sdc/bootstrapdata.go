@@ -17,13 +17,8 @@ func generateBootstrapData(ctx context.Context, client http.Client, sdcName stri
 		return "", err
 	}
 
-	host, err := client.Host()
-	if err != nil {
-		return "", err
-	}
-
 	return ComputeBootstrapData(
-		sdcName, userToken.AccessToken, userToken.TenantName, client.BaseUrl(), host,
+		sdcName, userToken.AccessToken, userToken.TenantName, client.BaseUrl(), client.Host(),
 	), nil
 }
 

@@ -70,7 +70,7 @@ func TestIosReadSpecific(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := ReadSpecific(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := ReadSpecific(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
 
 			testCase.assertFunc(output, err, t)
 		})

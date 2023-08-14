@@ -3,7 +3,7 @@ package asa_test
 import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
-	"reflect"
+	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
@@ -44,7 +44,7 @@ func TestAsaCreate(t *testing.T) {
 		State: asaconfig.AsaConfigStateDone,
 	}
 
-	sdc := sdc.NewSdcOutputBuilder().
+	validSdc := sdc.NewSdcOutputBuilder().
 		WithName("CloudDeviceGateway").
 		WithUid(asaDeviceUsingSdc.LarUid).
 		WithTenantUid("44444444-4444-4444-4444-444444444444").
@@ -76,13 +76,9 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
+				assert.Nil(t, err)
 
-				if output == nil {
-					t.Fatalf("output is nil!")
-				}
+				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
 					Uid:        asaDevice.Uid,
@@ -94,9 +90,8 @@ func TestAsaCreate(t *testing.T) {
 					SdcType:    asaDevice.LarType,
 					SdcUid:     asaDevice.LarUid,
 				}
-				if !reflect.DeepEqual(expectedCreatedOutput, *output) {
-					t.Errorf("expected: %+v, got: %+v", expectedCreatedOutput, output)
-				}
+				assert.Equal(t, expectedCreatedOutput, *output)
+				assert.Equal(t, expectedCreatedOutput, *output)
 
 				assertDeviceCreateWasCalledOnce(t)
 				assertDeviceReadSpecificWasCalledOnce(asaDevice.Uid, t)
@@ -132,13 +127,9 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
+				assert.Nil(t, err)
 
-				if output == nil {
-					t.Fatalf("output is nil!")
-				}
+				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
 					Uid:        asaDevice.Uid,
@@ -150,9 +141,8 @@ func TestAsaCreate(t *testing.T) {
 					SdcType:    asaDevice.LarType,
 					SdcUid:     asaDevice.LarUid,
 				}
-				if !reflect.DeepEqual(expectedCreatedOutput, *output) {
-					t.Errorf("expected: %+v, got: %+v", expectedCreatedOutput, output)
-				}
+				assert.Equal(t, expectedCreatedOutput, *output)
+				assert.Equal(t, expectedCreatedOutput, *output)
 
 				assertDeviceCreateWasCalledOnce(t)
 				assertDeviceReadSpecificWasCalledOnce(asaDevice.Uid, t)
@@ -178,18 +168,14 @@ func TestAsaCreate(t *testing.T) {
 				configureDeviceCreateToRespondSuccessfully(asaDeviceUsingSdc)
 				configureDeviceReadSpecificToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaSpecificDevice)
 				configureAsaConfigReadToRespondSuccessfully(asaSpecificDevice.SpecificUid, asaConfig)
-				configureSdcReadToRespondSuccessfully(sdc)
+				configureSdcReadToRespondSuccessfully(validSdc)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
+				assert.Nil(t, err)
 
-				if output == nil {
-					t.Fatalf("output is nil!")
-				}
+				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
 					Uid:        asaDeviceUsingSdc.Uid,
@@ -201,14 +187,13 @@ func TestAsaCreate(t *testing.T) {
 					SdcType:    asaDeviceUsingSdc.LarType,
 					SdcUid:     asaDeviceUsingSdc.LarUid,
 				}
-				if !reflect.DeepEqual(expectedCreatedOutput, *output) {
-					t.Errorf("expected: %+v, got: %+v", expectedCreatedOutput, output)
-				}
+				assert.Equal(t, expectedCreatedOutput, *output)
+				assert.Equal(t, expectedCreatedOutput, *output)
 
 				assertDeviceCreateWasCalledOnce(t)
 				assertDeviceReadSpecificWasCalledOnce(asaDeviceUsingSdc.Uid, t)
 				assertAsaConfigReadWasCalledTimes(asaConfig.Uid, 2, t)
-				assertSdcReadByUidWasCalledOnce(sdc.Uid, t)
+				assertSdcReadByUidWasCalledOnce(validSdc.Uid, t)
 				assertAsaConfigUpdateWasCalledOnce(asaConfig.Uid, t)
 			},
 		},
@@ -236,19 +221,15 @@ func TestAsaCreate(t *testing.T) {
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
-				configureSdcReadToRespondSuccessfully(sdc)
+				configureSdcReadToRespondSuccessfully(validSdc)
 				configureDeviceUpdateToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaDeviceUsingSdc)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
+				assert.Nil(t, err)
 
-				if output == nil {
-					t.Fatalf("output is nil!")
-				}
+				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
 					Uid:        asaDeviceUsingSdc.Uid,
@@ -260,15 +241,13 @@ func TestAsaCreate(t *testing.T) {
 					SdcType:    asaDeviceUsingSdc.LarType,
 					SdcUid:     asaDeviceUsingSdc.LarUid,
 				}
-				if !reflect.DeepEqual(expectedCreatedOutput, *output) {
-					t.Errorf("expected: %+v, got: %+v", expectedCreatedOutput, output)
-				}
+				assert.Equal(t, expectedCreatedOutput, *output)
 
 				assertDeviceCreateWasCalledOnce(t)
 				assertDeviceReadSpecificWasCalledOnce(asaDeviceUsingSdc.Uid, t)
 				assertAsaConfigReadWasCalledTimes(asaConfig.Uid, 2, t)
 				assertDeviceUpdateWasCalledOnce(asaDeviceUsingSdc.Uid, t)
-				assertSdcReadByUidWasCalledOnce(sdc.Uid, t)
+				assertSdcReadByUidWasCalledOnce(validSdc.Uid, t)
 				assertAsaConfigUpdateWasCalledOnce(asaConfig.Uid, t)
 			},
 		},
@@ -296,19 +275,14 @@ func TestAsaCreate(t *testing.T) {
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
-				configureSdcReadToRespondSuccessfully(sdc)
+				configureSdcReadToRespondSuccessfully(validSdc)
 				configureDeviceUpdateToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaDeviceUsingSdc)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				if err == nil {
-					t.Error("error is nil!")
-				}
-
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", output)
-				}
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
 			},
 		},
 
@@ -335,19 +309,14 @@ func TestAsaCreate(t *testing.T) {
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
-				configureSdcReadToRespondSuccessfully(sdc)
+				configureSdcReadToRespondSuccessfully(validSdc)
 				configureDeviceUpdateToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaDeviceUsingSdc)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				if err == nil {
-					t.Error("error is nil!")
-				}
-
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", output)
-				}
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
 			},
 		},
 
@@ -368,24 +337,19 @@ func TestAsaCreate(t *testing.T) {
 				configureDeviceCreateToRespondSuccessfully(asaDeviceUsingSdc)
 				configureDeviceReadSpecificToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaSpecificDevice)
 				configureAsaConfigReadToRespondWithError(asaConfig.Uid)
-				configureSdcReadToRespondSuccessfully(sdc)
+				configureSdcReadToRespondSuccessfully(validSdc)
 				configureDeviceUpdateToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaDeviceUsingSdc)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				if err == nil {
-					t.Error("error is nil!")
-				}
-
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", output)
-				}
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
 			},
 		},
 
 		{
-			testName: "returns error when onboarding ASA and sdc read call experiences issues",
+			testName: "returns error when onboarding ASA and validSdc read call experiences issues",
 
 			input: asa.CreateInput{
 				Name:             asaDeviceUsingSdc.Name,
@@ -407,19 +371,14 @@ func TestAsaCreate(t *testing.T) {
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
-				configureSdcReadToRespondWithError(sdc.Uid)
+				configureSdcReadToRespondWithError(validSdc.Uid)
 				configureDeviceUpdateToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaDeviceUsingSdc)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				if err == nil {
-					t.Error("error is nil!")
-				}
-
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", output)
-				}
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
 			},
 		},
 
@@ -446,18 +405,13 @@ func TestAsaCreate(t *testing.T) {
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
-				configureSdcReadToRespondSuccessfully(sdc)
+				configureSdcReadToRespondSuccessfully(validSdc)
 				configureDeviceUpdateToRespondWithError(asaDeviceUsingSdc.Uid)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				if err == nil {
-					t.Error("error is nil!")
-				}
-
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", output)
-				}
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
 			},
 		},
 
@@ -484,19 +438,14 @@ func TestAsaCreate(t *testing.T) {
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
-				configureSdcReadToRespondSuccessfully(sdc)
+				configureSdcReadToRespondSuccessfully(validSdc)
 				configureDeviceUpdateToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaDeviceUsingSdc)
 				configureAsaConfigUpdateToRespondWithError(asaConfig.Uid)
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
-				if err == nil {
-					t.Error("error is nil!")
-				}
-
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
 			},
 		},
 	}
@@ -507,7 +456,7 @@ func TestAsaCreate(t *testing.T) {
 
 			testCase.setupFunc(testCase.input)
 
-			output, err := asa.Create(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := asa.Create(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
 
 			testCase.assertFunc(output, err, t)
 		})

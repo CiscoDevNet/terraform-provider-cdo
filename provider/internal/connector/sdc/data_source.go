@@ -6,7 +6,6 @@ package sdc
 import (
 	"context"
 	"fmt"
-
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -24,63 +23,44 @@ type DataSource struct {
 }
 
 type DataSourceModel struct {
-	Id   types.String `tfsdk:"id"`
-	Sdcs []Model      `tfsdk:"sdcs"`
+	Uid       types.String `tfsdk:"id"`
+	Name      types.String `tfsdk:"name"`
+	TenantUid types.String `tfsdk:"tenant_uid"`
+	PublicKey *PublicKey   `tfsdk:"public_key"`
 }
-
-type Model struct {
-	Uid          types.String   `tfsdk:"uid"`
-	Name         types.String   `tfsdk:"name"`
-	TenantUid    types.String   `tfsdk:"tenant_uid"`
-	SdcPublicKey PublicKeyModel `tfsdk:"sdc_public_key"`
-}
-
-type PublicKeyModel struct {
+type PublicKey struct {
 	EncodedKey types.String `tfsdk:"encoded_key"`
 	Version    types.Int64  `tfsdk:"version"`
 	KeyId      types.String `tfsdk:"key_id"`
 }
 
 func (d *DataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_sdc_device"
+	resp.TypeName = req.ProviderTypeName + "_sdc"
 }
 
 func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "SDC data source",
-
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "Identifier",
+				MarkdownDescription: "Id of the Secure Device Connector (SDC).",
 				Computed:            true,
 			},
-			"sdcs": schema.ListNestedAttribute{
-				MarkdownDescription: "List of sdcs",
+			"name": schema.StringAttribute{
+				MarkdownDescription: "Name of the Secure Device Connector (SDC).",
+				Required:            true,
+			},
+			"tenant_uid": schema.StringAttribute{
+				MarkdownDescription: "The tenant uid this SDC belongs to.",
 				Computed:            true,
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"uid": schema.StringAttribute{
-							MarkdownDescription: "Uid",
-							Computed:            true,
-						},
-						"name": schema.StringAttribute{
-							MarkdownDescription: "Name",
-							Computed:            true,
-						},
-						"tenant_uid": schema.StringAttribute{
-							MarkdownDescription: "The tenant uid this SDC belongs to",
-							Computed:            true,
-						},
-						"sdc_public_key": schema.ObjectAttribute{
-							MarkdownDescription: "SDC public key",
-							Computed:            true,
-							AttributeTypes: map[string]attr.Type{
-								"encoded_key": types.StringType,
-								"version":     types.Int64Type,
-								"key_id":      types.StringType,
-							},
-						},
-					},
+			},
+			"public_key": schema.ObjectAttribute{
+				MarkdownDescription: "public key of the Secure Device Connector (SDC).",
+				Computed:            true,
+				AttributeTypes: map[string]attr.Type{
+					"encoded_key": types.StringType,
+					"version":     types.Int64Type,
+					"key_id":      types.StringType,
 				},
 			},
 		},
@@ -108,44 +88,32 @@ func (d *DataSource) Configure(ctx context.Context, req datasource.ConfigureRequ
 
 func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 
-	var configData DataSourceModel
+	var planData DataSourceModel
 
 	// Read Terraform configuration data into the model
-	resp.Diagnostics.Append(req.Config.Get(ctx, &configData)...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &planData)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	res, err := d.client.ReadAllSdcs(ctx, sdc.ReadAllInput{})
+	res, err := d.client.ReadSdcByName(ctx, *sdc.NewReadByNameInput(planData.Name.ValueString()))
 	if err != nil {
 		resp.Diagnostics.AddError("Failed to read sdc devices", err.Error())
 		return
 	}
 
-	if len(*res) == 0 {
-		resp.Diagnostics.AddError("No sdc found.", "Either no sdc device is found or no default sdc is configured")
-		return
+	planData.Uid = types.StringValue(res.Uid)
+	planData.Name = types.StringValue(res.Name)
+	planData.TenantUid = types.StringValue(res.TenantUid)
+
+	planData.PublicKey = &PublicKey{
+		EncodedKey: types.StringValue(res.PublicKey.EncodedKey),
+		Version:    types.Int64Value(res.PublicKey.Version),
+		KeyId:      types.StringValue(res.PublicKey.KeyId),
 	}
-	configData.Id = types.StringValue((*res)[0].TenantUid)
 
-	var sdcModels []Model
-	for _, sdc := range *res {
-		sdcModel := Model{
-			Uid:       types.StringValue(sdc.Uid),
-			Name:      types.StringValue(sdc.Name),
-			TenantUid: types.StringValue(sdc.TenantUid),
-
-			SdcPublicKey: PublicKeyModel{
-				EncodedKey: types.StringValue(sdc.PublicKey.EncodedKey),
-				Version:    types.Int64Value(sdc.PublicKey.Version),
-				KeyId:      types.StringValue(sdc.PublicKey.KeyId),
-			},
-		}
-
-		sdcModels = append(sdcModels, sdcModel)
-	}
-	configData.Sdcs = sdcModels
+	fmt.Printf("planData.PublicKey=%+v\n", planData.PublicKey)
 
 	// Save data into Terraform state
-	resp.Diagnostics.Append(resp.State.Set(ctx, &configData)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &planData)...)
 }

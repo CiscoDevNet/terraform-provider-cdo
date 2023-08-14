@@ -3,8 +3,6 @@ package asaconfig
 import (
 	"context"
 	"fmt"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
-	"reflect"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
@@ -20,7 +18,7 @@ func TestAsaConfigReadByUid(t *testing.T) {
 
 	validAsaConfig := ReadOutput{
 		Uid:   asaConfigUid,
-		State: state.DONE,
+		State: AsaConfigStateDone,
 	}
 
 	testCases := []struct {
@@ -44,10 +42,7 @@ func TestAsaConfigReadByUid(t *testing.T) {
 			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
-
-				if !reflect.DeepEqual(validAsaConfig, *output) {
-					t.Errorf("expected: %+v\ngot: %+v", validAsaConfig, output)
-				}
+				assert.Equal(t, validAsaConfig, *output)
 			},
 		},
 		{
@@ -92,7 +87,7 @@ func TestAsaConfigReadByUid(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := Read(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), *NewReadInput(asaConfigUid))
+			output, err := Read(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), *NewReadInput(asaConfigUid))
 
 			testCase.assertFunc(output, err, t)
 		})

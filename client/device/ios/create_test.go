@@ -2,8 +2,7 @@ package ios
 
 import (
 	"context"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
-	"reflect"
+	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
@@ -54,20 +53,15 @@ func TestIosCreate(t *testing.T) {
 				configureDeviceCreateToRespondSuccessfully(iosDevice)
 				configureSdcReadToRespondSuccessfully(sdc)
 				configureIosConfigReadToSucceedWithSubsequentCalls(iosDevice.Uid, []httpmock.Responder{
-					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: state.PRE_READ_METADATA}),
-					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: state.DONE}),
+					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: IosStatePreReadMetadata}),
+					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: IosStateDone}),
 				})
 				configureDeviceUpdateToRespondSuccessfully(iosDevice)
 			},
 
 			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatalf("output is nil!")
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
 
 				expectedCreatedOutput := CreateOutput{
 					Uid:        iosDevice.Uid,
@@ -79,9 +73,7 @@ func TestIosCreate(t *testing.T) {
 					SdcType:    iosDevice.LarType,
 					SdcUid:     iosDevice.LarUid,
 				}
-				if !reflect.DeepEqual(expectedCreatedOutput, *output) {
-					t.Errorf("expected: %+v, got: %+v", expectedCreatedOutput, output)
-				}
+				assert.Equal(t, expectedCreatedOutput, *output)
 
 				assertDeviceCreateWasCalledOnce(t)
 				assertSdcReadByUidWasCalledOnce(sdc.Uid, t)
@@ -106,20 +98,15 @@ func TestIosCreate(t *testing.T) {
 				configureDeviceCreateToRespondWithError()
 				configureSdcReadToRespondSuccessfully(sdc)
 				configureIosConfigReadToSucceedWithSubsequentCalls(iosDevice.Uid, []httpmock.Responder{
-					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: state.PRE_READ_METADATA}),
-					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: state.DONE}),
+					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: IosStatePreReadMetadata}),
+					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: IosStateDone}),
 				})
 				configureDeviceUpdateToRespondSuccessfully(iosDevice)
 			},
 
 			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
-				if err == nil {
-					t.Error("error is nil!")
-				}
-
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
 			},
 		},
 
@@ -139,20 +126,15 @@ func TestIosCreate(t *testing.T) {
 				configureDeviceCreateToRespondSuccessfully(iosDevice)
 				configureSdcReadToRespondWithError(sdc.Uid)
 				configureIosConfigReadToSucceedWithSubsequentCalls(iosDevice.Uid, []httpmock.Responder{
-					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: state.PRE_READ_METADATA}),
-					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: state.DONE}),
+					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: IosStatePreReadMetadata}),
+					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: IosStateDone}),
 				})
 				configureDeviceUpdateToRespondSuccessfully(iosDevice)
 			},
 
 			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
-				if err == nil {
-					t.Error("error is nil!")
-				}
-
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
 			},
 		},
 
@@ -178,13 +160,8 @@ func TestIosCreate(t *testing.T) {
 			},
 
 			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
-				if err == nil {
-					t.Error("error is nil!")
-				}
-
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
 			},
 		},
 
@@ -204,20 +181,15 @@ func TestIosCreate(t *testing.T) {
 				configureDeviceCreateToRespondSuccessfully(iosDevice)
 				configureSdcReadToRespondSuccessfully(sdc)
 				configureIosConfigReadToSucceedWithSubsequentCalls(iosDevice.Uid, []httpmock.Responder{
-					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: state.PRE_READ_METADATA}),
-					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: state.DONE}),
+					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: IosStatePreReadMetadata}),
+					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: IosStateDone}),
 				})
 				configureDeviceUpdateToRespondWithError(iosDevice.Uid)
 			},
 
 			assertFunc: func(output *CreateOutput, err *CreateError, t *testing.T) {
-				if err == nil {
-					t.Error("error is nil!")
-				}
-
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
 			},
 		},
 	}
@@ -228,7 +200,7 @@ func TestIosCreate(t *testing.T) {
 
 			testCase.setupFunc(testCase.input)
 
-			output, err := Create(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := Create(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
 
 			testCase.assertFunc(output, err, t)
 		})

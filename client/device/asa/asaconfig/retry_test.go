@@ -3,7 +3,7 @@ package asaconfig
 import (
 	"context"
 	"fmt"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
+	"github.com/stretchr/testify/assert"
 	h "net/http"
 	"testing"
 	"time"
@@ -24,7 +24,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 
 	validAsaConfig := ReadOutput{
 		Uid:   asaConfigUid,
-		State: state.DONE,
+		State: AsaConfigStateDone,
 	}
 
 	inProgressAsaConfig := ReadOutput{
@@ -62,9 +62,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 			},
 
 			assertFunc: func(err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
+				assert.Nil(t, err)
 
 				internalTesting.AssertEndpointCalledTimes("GET", makeFetchAsaConfigUrl(asaConfigUid), 3, t)
 			},
@@ -82,7 +80,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 
 				errorAsaConfig := ReadOutput{
 					Uid:   asaConfigUid,
-					State: state.ERROR,
+					State: AsaConfigStateError,
 				}
 
 				callCount := 0
@@ -98,9 +96,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 			},
 
 			assertFunc: func(err error, t *testing.T) {
-				if err == nil {
-					t.Error("expected error to be returned")
-				}
+				assert.NotNil(t, err)
 
 				internalTesting.AssertEndpointCalledTimes("GET", makeFetchAsaConfigUrl(asaConfigUid), 3, t)
 			},
@@ -118,7 +114,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 
 				badCredentialsAsaConfig := ReadOutput{
 					Uid:   asaConfigUid,
-					State: state.BAD_CREDENTIALS,
+					State: AsaConfigStateBadCredentials,
 				}
 
 				callCount := 0
@@ -134,9 +130,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 			},
 
 			assertFunc: func(err error, t *testing.T) {
-				if err == nil {
-					t.Error("expected error to be returned")
-				}
+				assert.NotNil(t, err)
 
 				internalTesting.AssertEndpointCalledTimes("GET", makeFetchAsaConfigUrl(asaConfigUid), 3, t)
 			},
@@ -152,7 +146,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 			retryOptions := retry.DefaultOpts
 			retryOptions.Delay = 1 * time.Millisecond
 
-			err := retry.Do(UntilStateDone(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.targetUid), retryOptions)
+			err := retry.Do(UntilStateDone(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.targetUid), retryOptions)
 
 			testCase.assertFunc(err, t)
 		})

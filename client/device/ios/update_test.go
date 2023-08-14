@@ -2,7 +2,7 @@ package ios
 
 import (
 	"context"
-	"reflect"
+	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
@@ -50,19 +50,12 @@ func TestIosUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(input UpdateInput, output *UpdateOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatalf("output is nil!")
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
 
 				expectedUpdateOutput := iosDevice
 				expectedUpdateOutput.Name = input.Name
-				if !reflect.DeepEqual(expectedUpdateOutput, *output) {
-					t.Errorf("expected: %+v, got: %+v", expectedUpdateOutput, output)
-				}
+				assert.Equal(t, expectedUpdateOutput, *output)
 			},
 		},
 
@@ -78,13 +71,8 @@ func TestIosUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(input UpdateInput, output *UpdateOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
-
-				if err == nil {
-					t.Error("error is nil!")
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 			},
 		},
 	}
@@ -95,7 +83,7 @@ func TestIosUpdate(t *testing.T) {
 
 			testCase.setupFunc(testCase.input)
 
-			output, err := Update(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := Update(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
 
 			testCase.assertFunc(testCase.input, output, err, t)
 		})

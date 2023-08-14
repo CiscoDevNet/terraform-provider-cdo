@@ -5,9 +5,8 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
+	"github.com/stretchr/testify/assert"
 	"net/http"
-	"reflect"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
@@ -26,14 +25,7 @@ func TestIosConfigUpdate(t *testing.T) {
 
 	rsaKeyBits := 512
 	rsaKey, err := rsa.GenerateKey(rand.Reader, rsaKeyBits)
-	if err != nil {
-		t.Fatal("could not generate rsa key")
-	}
-
-	validIosConfig := ReadOutput{
-		Uid:   iosConfigUid,
-		State: state.DONE,
-	}
+	assert.Nil(t, err, "could not generate rsa key")
 
 	testCases := []struct {
 		testName   string
@@ -55,9 +47,7 @@ func TestIosConfigUpdate(t *testing.T) {
 					buildIosConfigPath(iosConfigUid),
 					func(r *http.Request) (*http.Response, error) {
 						requestBody, err := internalHttp.ReadRequestBody[UpdateBody](r)
-						if err != nil {
-							t.Fatalf("could not read body because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						expectedBody := UpdateBody{
 							SmContext: SmContext{
@@ -65,10 +55,7 @@ func TestIosConfigUpdate(t *testing.T) {
 							},
 							Credentials: fmt.Sprintf(`{"username":"%s","password":"%s"}`, input.Username, input.Password),
 						}
-
-						if !reflect.DeepEqual(expectedBody, *requestBody) {
-							t.Errorf("expected request body to equal: %+v, got: %+v", expectedBody, requestBody)
-						}
+						assert.Equal(t, expectedBody, *requestBody)
 
 						return httpmock.NewJsonResponse(200, UpdateOutput{Uid: iosConfigUid})
 					},
@@ -76,17 +63,9 @@ func TestIosConfigUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
-
-				if !reflect.DeepEqual(UpdateOutput{Uid: iosConfigUid}, *output) {
-					t.Errorf("expected: %+v\ngot: %+v", validIosConfig, output)
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+				assert.Equal(t, UpdateOutput{Uid: iosConfigUid}, *output)
 			},
 		},
 
@@ -109,32 +88,22 @@ func TestIosConfigUpdate(t *testing.T) {
 					buildIosConfigPath(iosConfigUid),
 					func(r *http.Request) (*http.Response, error) {
 						requestBody, err := internalHttp.ReadRequestBody[UpdateBody](r)
-						if err != nil {
-							t.Fatalf("could not read body because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						if !requestBody.SmContext.AcceptCert {
 							t.Errorf("expected 'SmContext.AcceptCert' to true got: %t", requestBody.SmContext.AcceptCert)
 						}
 
 						credentials, err := jsonutil.UnmarshalStruct[credentials]([]byte(requestBody.Credentials))
-						if err != nil {
-							t.Fatalf("could not unmarshal credentials because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						decryptedUsername := internalRsa.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Username))
-						if input.Username != decryptedUsername {
-							t.Errorf(`expected decrypted username to equal '%s', got: '%s'`, input.Username, decryptedUsername)
-						}
+						assert.Equal(t, input.Username, decryptedUsername, `expected decrypted username to equal '%s', got: '%s'`, input.Username, decryptedUsername)
 
 						decryptedPassword := internalRsa.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Password))
-						if input.Password != decryptedPassword {
-							t.Errorf(`expected decrypted password to equal '%s', got: '%s'`, input.Password, decryptedPassword)
-						}
+						assert.Equal(t, input.Password, decryptedPassword, `expected decrypted password to equal '%s', got: '%s'`, input.Password, decryptedPassword)
 
-						if input.PublicKey.KeyId != credentials.KeyId {
-							t.Errorf("expected keyId to equal '%s', got: '%s'", input.PublicKey.KeyId, credentials.KeyId)
-						}
+						assert.Equal(t, input.PublicKey.KeyId, credentials.KeyId, "expected keyId to equal '%s', got: '%s'", input.PublicKey.KeyId, credentials.KeyId)
 
 						return httpmock.NewJsonResponse(200, UpdateOutput{Uid: iosConfigUid})
 					},
@@ -142,17 +111,9 @@ func TestIosConfigUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
-
-				if !reflect.DeepEqual(UpdateOutput{Uid: iosConfigUid}, *output) {
-					t.Errorf("expected: %+v\ngot: %+v", validIosConfig, output)
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+				assert.Equal(t, UpdateOutput{Uid: iosConfigUid}, *output)
 			},
 		},
 
@@ -173,13 +134,8 @@ func TestIosConfigUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
-
-				if err == nil {
-					t.Fatal("err is nil!")
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 			},
 		},
 
@@ -200,13 +156,8 @@ func TestIosConfigUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
-
-				if err == nil {
-					t.Fatal("err is nil!")
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 			},
 		},
 	}
@@ -217,7 +168,7 @@ func TestIosConfigUpdate(t *testing.T) {
 
 			testCase.setupFunc(testCase.input, t)
 
-			output, err := Update(context.Background(), *internalHttp.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := Update(context.Background(), *internalHttp.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
 
 			testCase.assertFunc(output, err, t)
 		})

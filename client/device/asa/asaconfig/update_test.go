@@ -5,9 +5,8 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
+	"github.com/stretchr/testify/assert"
 	h "net/http"
-	"reflect"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
@@ -26,14 +25,7 @@ func TestAsaConfigUpdate(t *testing.T) {
 
 	rsaKeyBits := 512
 	rsaKey, err := rsa.GenerateKey(rand.Reader, rsaKeyBits)
-	if err != nil {
-		t.Fatal("could not generate rsa key")
-	}
-
-	validAsaConfig := ReadOutput{
-		Uid:   asaConfigUid,
-		State: state.DONE,
-	}
+	assert.Nil(t, err, "could not generate rsa key")
 
 	testCases := []struct {
 		testName   string
@@ -55,18 +47,13 @@ func TestAsaConfigUpdate(t *testing.T) {
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *h.Request) (*h.Response, error) {
 						requestBody, err := http.ReadRequestBody[updateBody](r)
-						if err != nil {
-							t.Fatalf("could not read body because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						expectedBody := updateBody{
 							State:       "CERT_VALIDATED",
 							Credentials: fmt.Sprintf(`{"username":"%s","password":"%s"}`, input.Username, input.Password),
 						}
-
-						if !reflect.DeepEqual(expectedBody, *requestBody) {
-							t.Errorf("expected request body to equal: %+v, got: %+v", expectedBody, requestBody)
-						}
+						assert.Equal(t, expectedBody, *requestBody)
 
 						return httpmock.NewJsonResponse(200, UpdateOutput{Uid: asaConfigUid})
 					},
@@ -74,17 +61,9 @@ func TestAsaConfigUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
-
-				if !reflect.DeepEqual(UpdateOutput{Uid: asaConfigUid}, *output) {
-					t.Errorf("expected: %+v\ngot: %+v", validAsaConfig, output)
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+				assert.Equal(t, UpdateOutput{Uid: asaConfigUid}, *output)
 			},
 		},
 		{
@@ -106,32 +85,18 @@ func TestAsaConfigUpdate(t *testing.T) {
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *h.Request) (*h.Response, error) {
 						requestBody, err := http.ReadRequestBody[updateBody](r)
-						if err != nil {
-							t.Fatalf("could not read body because: %s", err.Error())
-						}
-
-						if requestBody.State != "CERT_VALIDATED" {
-							t.Errorf("expected 'State' to equal 'CERT_VALIDATED', got: %s", requestBody.State)
-						}
+						assert.Nil(t, err)
+						assert.Equal(t, requestBody.State, "CERT_VALIDATED", fmt.Sprintf("expected 'State' to equal 'CERT_VALIDATED', got: %s", requestBody.State))
 
 						credentials, err := jsonutil.UnmarshalStruct[credentials]([]byte(requestBody.Credentials))
-						if err != nil {
-							t.Fatalf("could not unmarshal credentials because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						decryptedUsername := internalRsa.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Username))
-						if input.Username != decryptedUsername {
-							t.Errorf(`expected decrypted username to equal '%s', got: '%s'`, input.Username, decryptedUsername)
-						}
+						assert.Equal(t, input.Username, decryptedUsername, fmt.Sprintf(`expected decrypted username to equal '%s', got: '%s'`, input.Username, decryptedUsername))
 
 						decryptedPassword := internalRsa.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Password))
-						if input.Password != decryptedPassword {
-							t.Errorf(`expected decrypted password to equal '%s', got: '%s'`, input.Password, decryptedPassword)
-						}
-
-						if input.PublicKey.KeyId != credentials.KeyId {
-							t.Errorf("expected keyId to equal '%s', got: '%s'", input.PublicKey.KeyId, credentials.KeyId)
-						}
+						assert.Equal(t, input.Password, decryptedPassword, fmt.Sprintf(`expected decrypted password to equal '%s', got: '%s'`, input.Password, decryptedPassword))
+						assert.Equal(t, input.PublicKey.KeyId, credentials.KeyId, fmt.Sprintf("expected keyId to equal '%s', got: '%s'", input.PublicKey.KeyId, credentials.KeyId))
 
 						return httpmock.NewJsonResponse(200, UpdateOutput{Uid: asaConfigUid})
 					},
@@ -139,17 +104,9 @@ func TestAsaConfigUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
-
-				if !reflect.DeepEqual(UpdateOutput{Uid: asaConfigUid}, *output) {
-					t.Errorf("expected: %+v\ngot: %+v", validAsaConfig, output)
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+				assert.Equal(t, UpdateOutput{Uid: asaConfigUid}, *output)
 			},
 		},
 		{
@@ -169,13 +126,8 @@ func TestAsaConfigUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
-
-				if err == nil {
-					t.Fatal("err is nil!")
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 			},
 		},
 		{
@@ -195,13 +147,8 @@ func TestAsaConfigUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
-
-				if err == nil {
-					t.Fatal("err is nil!")
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 			},
 		},
 	}
@@ -212,7 +159,7 @@ func TestAsaConfigUpdate(t *testing.T) {
 
 			testCase.setupFunc(testCase.input, t)
 
-			output, err := Update(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := Update(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
 
 			testCase.assertFunc(output, err, t)
 		})
@@ -230,11 +177,6 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 	rsaKey, err := rsa.GenerateKey(rand.Reader, rsaKeyBits)
 	if err != nil {
 		t.Fatal("could not generate rsa key")
-	}
-
-	validAsaConfig := ReadOutput{
-		Uid:   asaConfigUid,
-		State: state.DONE,
 	}
 
 	testCases := []struct {
@@ -257,9 +199,7 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *h.Request) (*h.Response, error) {
 						requestBody, err := http.ReadRequestBody[updateCredentialsBodyWithState](r)
-						if err != nil {
-							t.Fatalf("could not read body because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						expectedBody := updateCredentialsBodyWithState{
 							State: "WAIT_FOR_USER_TO_UPDATE_CREDS",
@@ -267,10 +207,7 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 								Credentials: fmt.Sprintf(`{"username":"%s","password":"%s"}`, input.Username, input.Password),
 							},
 						}
-
-						if !reflect.DeepEqual(expectedBody, *requestBody) {
-							t.Errorf("expected request body to equal: %+v, got: %+v", expectedBody, requestBody)
-						}
+						assert.Equal(t, expectedBody, *requestBody)
 
 						return httpmock.NewJsonResponse(200, UpdateOutput{Uid: asaConfigUid})
 					},
@@ -278,17 +215,9 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
-
-				if !reflect.DeepEqual(UpdateOutput{Uid: asaConfigUid}, *output) {
-					t.Errorf("expected: %+v\ngot: %+v", validAsaConfig, output)
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+				assert.Equal(t, UpdateOutput{Uid: asaConfigUid}, *output)
 			},
 		},
 
@@ -311,50 +240,29 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *h.Request) (*h.Response, error) {
 						requestBody, err := http.ReadRequestBody[updateCredentialsBodyWithState](r)
-						if err != nil {
-							t.Fatalf("could not read body because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						expectedState := "WAIT_FOR_USER_TO_UPDATE_CREDS"
-						if requestBody.State != expectedState {
-							t.Errorf("expected 'State' to equal '%s', got: %s", expectedState, requestBody.State)
-						}
+						assert.Equal(t, requestBody.State, expectedState)
 
 						credentials, err := jsonutil.UnmarshalStruct[credentials]([]byte(requestBody.SmContext.Credentials))
-						if err != nil {
-							t.Fatalf("could not unmarshal credentials because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						decryptedUsername := internalRsa.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Username))
-						if input.Username != decryptedUsername {
-							t.Errorf(`expected decrypted username to equal '%s', got: '%s'`, input.Username, decryptedUsername)
-						}
+						assert.Equal(t, input.Username, decryptedUsername)
 
 						decryptedPassword := internalRsa.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Password))
-						if input.Password != decryptedPassword {
-							t.Errorf(`expected decrypted password to equal '%s', got: '%s'`, input.Password, decryptedPassword)
-						}
-
-						if input.PublicKey.KeyId != credentials.KeyId {
-							t.Errorf("expected keyId to equal '%s', got: '%s'", input.PublicKey.KeyId, credentials.KeyId)
-						}
+						assert.Equal(t, input.Password, decryptedPassword)
+						assert.Equal(t, input.PublicKey.KeyId, credentials.KeyId)
 
 						return httpmock.NewJsonResponse(200, UpdateOutput{Uid: asaConfigUid})
 					})
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
-
-				if !reflect.DeepEqual(UpdateOutput{Uid: asaConfigUid}, *output) {
-					t.Errorf("expected: %+v\ngot: %+v", validAsaConfig, output)
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+				assert.Equal(t, UpdateOutput{Uid: asaConfigUid}, *output)
 			},
 		},
 
@@ -372,19 +280,14 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *h.Request) (*h.Response, error) {
 						requestBody, err := http.ReadRequestBody[updateCredentialsBody](r)
-						if err != nil {
-							t.Fatalf("could not read body because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						expectedBody := updateCredentialsBody{
 							SmContext: SmContext{
 								Credentials: fmt.Sprintf(`{"username":"%s","password":"%s"}`, input.Username, input.Password),
 							},
 						}
-
-						if !reflect.DeepEqual(expectedBody, *requestBody) {
-							t.Errorf("expected request body to equal: %+v, got: %+v", expectedBody, requestBody)
-						}
+						assert.Equal(t, expectedBody, *requestBody)
 
 						return httpmock.NewJsonResponse(200, UpdateOutput{Uid: asaConfigUid})
 					},
@@ -392,17 +295,9 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
-
-				if !reflect.DeepEqual(UpdateOutput{Uid: asaConfigUid}, *output) {
-					t.Errorf("expected: %+v\ngot: %+v", validAsaConfig, output)
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+				assert.Equal(t, UpdateOutput{Uid: asaConfigUid}, *output)
 			},
 		},
 
@@ -425,45 +320,26 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *h.Request) (*h.Response, error) {
 						requestBody, err := http.ReadRequestBody[updateCredentialsBody](r)
-						if err != nil {
-							t.Fatalf("could not read body because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						credentials, err := jsonutil.UnmarshalStruct[credentials]([]byte(requestBody.SmContext.Credentials))
-						if err != nil {
-							t.Fatalf("could not unmarshal credentials because: %s", err.Error())
-						}
+						assert.Nil(t, err)
 
 						decryptedUsername := internalRsa.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Username))
-						if input.Username != decryptedUsername {
-							t.Errorf(`expected decrypted username to equal '%s', got: '%s'`, input.Username, decryptedUsername)
-						}
+						assert.Equal(t, input.Username, decryptedUsername)
 
 						decryptedPassword := internalRsa.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Password))
-						if input.Password != decryptedPassword {
-							t.Errorf(`expected decrypted password to equal '%s', got: '%s'`, input.Password, decryptedPassword)
-						}
-
-						if input.PublicKey.KeyId != credentials.KeyId {
-							t.Errorf("expected keyId to equal '%s', got: '%s'", input.PublicKey.KeyId, credentials.KeyId)
-						}
+						assert.Equal(t, input.Password, decryptedPassword)
+						assert.Equal(t, input.PublicKey.KeyId, credentials.KeyId)
 
 						return httpmock.NewJsonResponse(200, UpdateOutput{Uid: asaConfigUid})
 					})
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
-
-				if !reflect.DeepEqual(UpdateOutput{Uid: asaConfigUid}, *output) {
-					t.Errorf("expected: %+v\ngot: %+v", validAsaConfig, output)
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+				assert.Equal(t, UpdateOutput{Uid: asaConfigUid}, *output)
 			},
 		},
 
@@ -484,13 +360,8 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
-
-				if err == nil {
-					t.Fatal("err is nil!")
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 			},
 		},
 
@@ -511,13 +382,8 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 			},
 
 			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
-
-				if err == nil {
-					t.Fatal("err is nil!")
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 			},
 		},
 	}
@@ -528,7 +394,7 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 
 			testCase.setupFunc(testCase.input, t)
 
-			output, err := UpdateCredentials(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := UpdateCredentials(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
 
 			testCase.assertFunc(output, err, t)
 		})

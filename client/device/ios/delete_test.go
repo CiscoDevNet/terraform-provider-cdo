@@ -2,7 +2,7 @@ package ios
 
 import (
 	"context"
-	"reflect"
+	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
@@ -39,18 +39,11 @@ func TestIosDelete(t *testing.T) {
 			},
 
 			assertFunc: func(output *DeleteOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatalf("output is nil!")
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
 
 				expectedDeleteOutput := DeleteOutput{}
-				if !reflect.DeepEqual(expectedDeleteOutput, *output) {
-					t.Errorf("expected: %+v, got: %+v", expectedDeleteOutput, output)
-				}
+				assert.Equal(t, expectedDeleteOutput, *output)
 			},
 		},
 
@@ -65,13 +58,8 @@ func TestIosDelete(t *testing.T) {
 			},
 
 			assertFunc: func(output *DeleteOutput, err error, t *testing.T) {
-				if err == nil {
-					t.Error("error is nil!")
-				}
-
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
 			},
 		},
 	}
@@ -82,7 +70,7 @@ func TestIosDelete(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := Delete(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := Delete(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
 
 			testCase.assertFunc(output, err, t)
 		})

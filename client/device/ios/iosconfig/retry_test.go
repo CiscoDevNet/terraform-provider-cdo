@@ -2,6 +2,7 @@ package iosconfig
 
 import (
 	"context"
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 
@@ -44,10 +45,7 @@ func TestIosConfigUntilState(t *testing.T) {
 			},
 
 			assertFunc: func(err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
+				assert.Nil(t, err)
 				internalTesting.AssertEndpointCalledTimes("GET", buildIosConfigPath(iosConfigUid), 3, t)
 			},
 		},
@@ -70,10 +68,7 @@ func TestIosConfigUntilState(t *testing.T) {
 			},
 
 			assertFunc: func(err error, t *testing.T) {
-				if err == nil {
-					t.Error("expected error to be returned")
-				}
-
+				assert.NotNil(t, err)
 				internalTesting.AssertEndpointCalledTimes("GET", buildIosConfigPath(iosConfigUid), 3, t)
 			},
 		},
@@ -96,10 +91,7 @@ func TestIosConfigUntilState(t *testing.T) {
 			},
 
 			assertFunc: func(err error, t *testing.T) {
-				if err == nil {
-					t.Error("expected error to be returned")
-				}
-
+				assert.NotNil(t, err)
 				internalTesting.AssertEndpointCalledTimes("GET", buildIosConfigPath(iosConfigUid), 3, t)
 			},
 		},
@@ -114,7 +106,7 @@ func TestIosConfigUntilState(t *testing.T) {
 			retryOptions := retry.DefaultOpts
 			retryOptions.Delay = 1 * time.Millisecond
 
-			err := retry.Do(UntilState(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.targetUid, IosConfigStateDone), retryOptions)
+			err := retry.Do(UntilState(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.targetUid, IosConfigStateDone), retryOptions)
 
 			testCase.assertFunc(err, t)
 		})

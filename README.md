@@ -105,8 +105,11 @@ go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --pr
 
 To release a new version of the Terraform CDO Provider, perform the following steps.
 
-- In the main branch, add a tag: `git tag vMAJOR.MINOR.PATCH` (following semver conventions as described in https://www.semver.org)
-- Push the tag: `git push --tags origin main`
+- Checkout main branch.
+- List current available tags: `git tag`.
+- Add a tag: `git tag vMAJOR.MINOR.PATCH`, e.g. `git tag v0.1.3` (following semver conventions as described in https://www.semver.org).
+  - To add a tag for past commit: `git tag -a vMAJOR.MINOR.PATCH COMMIT_HASH`, e.g. `git tag -a v1.2.3 9fceb02`. 
+- Push the tag: `git push --tags origin main`.
 
 ## Troubleshooting
 - Error: Inconsistent dependency lock file

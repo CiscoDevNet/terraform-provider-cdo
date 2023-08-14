@@ -2,7 +2,6 @@ package iosconfig
 
 import (
 	"context"
-	"reflect"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
@@ -38,21 +37,13 @@ func TestIosConfigRead(t *testing.T) {
 			},
 
 			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatal("output is nil!")
-				}
-
-				if !reflect.DeepEqual(validIosConfig, *output) {
-					t.Errorf("expected: %+v\ngot: %+v", validIosConfig, output)
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+				assert.Equal(t, validIosConfig, *output)
 			},
 		},
 		{
-			testName:  "returns nil ouput when iOS config not found",
+			testName:  "returns nil output when iOS config not found",
 			targetUid: iosConfigUid,
 
 			setupFunc: func() {
@@ -81,13 +72,8 @@ func TestIosConfigRead(t *testing.T) {
 			},
 
 			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got (dereferenced): %+v", *output)
-				}
-
-				if err == nil {
-					t.Error("error is nil!")
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 			},
 		},
 	}
@@ -98,7 +84,7 @@ func TestIosConfigRead(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := Read(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), *NewReadInput(iosConfigUid))
+			output, err := Read(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), *NewReadInput(iosConfigUid))
 
 			testCase.assertFunc(output, err, t)
 		})

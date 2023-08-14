@@ -2,14 +2,13 @@ package asa_test
 
 import (
 	"context"
-	asaconfig2 "github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
-	"reflect"
+	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/device/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
 )
@@ -63,24 +62,17 @@ func TestAsaUpdate(t *testing.T) {
 				updatedDevice := asaDevice
 				updatedDevice.Name = input.Name
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, updatedDevice)
-				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig2.ReadOutput{Uid: asaConfig.SpecificUid, State: state.DONE})
-				configureDeviceReadToRespondSuccessfully(device.ReadOutput{Uid: input.Uid, State: state.DONE, Status: "IDLE", ConnectivityState: 1})
+				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: asaconfig.AsaConfigStateDone})
+				configureDeviceReadToRespondSuccessfully(device.ReadOutput{Uid: input.Uid, State: "DONE", Status: "IDLE", ConnectivityState: 1})
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatalf("output is nil!")
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
 
 				expectedUpdateOutput := asaDevice
 				expectedUpdateOutput.Name = input.Name
-				if !reflect.DeepEqual(expectedUpdateOutput, *output) {
-					t.Errorf("expected: %+v, got: %+v", expectedUpdateOutput, output)
-				}
+				assert.Equal(t, expectedUpdateOutput, *output)
 			},
 		},
 
@@ -95,24 +87,16 @@ func TestAsaUpdate(t *testing.T) {
 			setupFunc: func(input asa.UpdateInput) {
 				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
 				configureDeviceReadToRespondSuccessfully(asaDevice)
-				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig2.UpdateOutput{Uid: asaConfig.SpecificUid})
-				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig2.ReadOutput{Uid: asaConfig.SpecificUid, State: state.DONE})
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
+				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: asaconfig.AsaConfigStateDone})
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, asaDevice)
 				configureDeviceReadToRespondSuccessfully(device.ReadOutput{Uid: input.Uid, State: "DONE", Status: "IDLE", ConnectivityState: 1})
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatalf("output is nil!")
-				}
-
-				if !reflect.DeepEqual(asaDevice, *output) {
-					t.Errorf("expected: %+v, got: %+v", asaDevice, output)
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+				assert.Equal(t, asaDevice, *output)
 			},
 		},
 
@@ -130,24 +114,16 @@ func TestAsaUpdate(t *testing.T) {
 
 				configureSdcReadToRespondSuccessfully(onPremConnector)
 
-				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig2.UpdateOutput{Uid: asaConfig.SpecificUid})
-				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig2.ReadOutput{Uid: asaConfig.SpecificUid, State: state.DONE})
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
+				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: asaconfig.AsaConfigStateDone})
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, asaDeviceOnboardedByOnPremConnector)
 				configureDeviceReadToRespondSuccessfully(device.ReadOutput{Uid: input.Uid, State: "DONE", Status: "IDLE", ConnectivityState: 1})
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatalf("output is nil!")
-				}
-
-				if !reflect.DeepEqual(asaDeviceOnboardedByOnPremConnector, *output) {
-					t.Errorf("expected: %+v, got: %+v", asaDevice, output)
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+				assert.Equal(t, asaDeviceOnboardedByOnPremConnector, *output)
 			},
 		},
 
@@ -165,27 +141,20 @@ func TestAsaUpdate(t *testing.T) {
 
 				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
 				configureDeviceReadToRespondSuccessfully(asaDevice)
-				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig2.UpdateOutput{Uid: asaConfig.SpecificUid})
-				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig2.ReadOutput{Uid: asaConfig.SpecificUid, State: state.DONE})
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
+				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: asaconfig.AsaConfigStateDone})
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, updatedDevice)
 				configureDeviceReadToRespondSuccessfully(device.ReadOutput{Uid: input.Uid, State: "DONE", Status: "IDLE", ConnectivityState: 1})
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				if err != nil {
-					t.Errorf("unexpected error: %s", err.Error())
-				}
-
-				if output == nil {
-					t.Fatalf("output is nil!")
-				}
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
 
 				updatedDevice := asaDevice
 				updatedDevice.Host = "10.10.5.4"
 				updatedDevice.Port = "443"
-				if !reflect.DeepEqual(updatedDevice, *output) {
-					t.Errorf("expected: %+v, got: %+v", asaDevice, output)
-				}
+				assert.Equal(t, updatedDevice, *output)
 			},
 		},
 
@@ -203,18 +172,13 @@ func TestAsaUpdate(t *testing.T) {
 
 				configureSdcReadToRespondSuccessfully(onPremConnector)
 
-				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig2.UpdateOutput{Uid: asaConfig.SpecificUid})
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, asaDeviceOnboardedByOnPremConnector)
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
-
-				if err == nil {
-					t.Error("error is nil!")
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 			},
 		},
 
@@ -232,18 +196,13 @@ func TestAsaUpdate(t *testing.T) {
 
 				configureSdcReadToRespondSuccessfully(onPremConnector)
 
-				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig2.UpdateOutput{Uid: asaConfig.SpecificUid})
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, asaDeviceOnboardedByOnPremConnector)
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
-
-				if err == nil {
-					t.Error("error is nil!")
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 			},
 		},
 
@@ -261,18 +220,13 @@ func TestAsaUpdate(t *testing.T) {
 
 				configureSdcReadToRespondWithError(onPremConnector.Uid)
 
-				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig2.UpdateOutput{Uid: asaConfig.SpecificUid})
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, asaDeviceOnboardedByOnPremConnector)
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
-
-				if err == nil {
-					t.Error("error is nil!")
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 			},
 		},
 
@@ -295,13 +249,8 @@ func TestAsaUpdate(t *testing.T) {
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
-
-				if err == nil {
-					t.Error("error is nil!")
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 			},
 		},
 
@@ -319,18 +268,14 @@ func TestAsaUpdate(t *testing.T) {
 
 				configureSdcReadToRespondSuccessfully(onPremConnector)
 
-				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig2.UpdateOutput{Uid: asaConfig.SpecificUid})
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
 				configureDeviceUpdateToRespondWithError(asaDeviceOnboardedByOnPremConnector.Uid)
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
+				assert.Nil(t, output)
 
-				if err == nil {
-					t.Error("error is nil!")
-				}
+				assert.NotNil(t, err)
 			},
 		},
 
@@ -348,19 +293,14 @@ func TestAsaUpdate(t *testing.T) {
 
 				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
 				configureDeviceReadToRespondSuccessfully(asaDevice)
-				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig2.UpdateOutput{Uid: asaConfig.SpecificUid})
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
 				configureAsaConfigReadToRespondWithError(asaConfig.SpecificUid)
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, updatedDevice)
 			},
 
 			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
-				if output != nil {
-					t.Errorf("expected output to be nil, got: %+v", *output)
-				}
-
-				if err == nil {
-					t.Error("error is nil!")
-				}
+				assert.Nil(t, output)
+				assert.NotNil(t, err)
 			},
 		},
 	}
@@ -371,7 +311,7 @@ func TestAsaUpdate(t *testing.T) {
 
 			testCase.setupFunc(testCase.input)
 
-			output, err := asa.Update(context.Background(), *http.NewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := asa.Update(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
 
 			testCase.assertFunc(testCase.input, output, err, t)
 		})

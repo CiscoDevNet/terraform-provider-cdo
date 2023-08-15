@@ -3,6 +3,7 @@ package ios
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"strings"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
@@ -43,11 +44,6 @@ type CreateError struct {
 func (r *CreateError) Error() string {
 	return r.Err.Error()
 }
-
-const (
-	IosStatePreReadMetadata = "$PRE_READ_METADATA"
-	IosStateDone            = "DONE"
-)
 
 func NewCreateRequestInput(name, sdcUid, sdcType, ipv4, username, password string, ignoreCertificate bool) *CreateInput {
 	return &CreateInput{
@@ -108,7 +104,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		publicKey = &larReadRes.PublicKey
 	}
 
-	err = retry.Do(iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, IosStatePreReadMetadata), *retry.NewOptionsWithLogger(client.Logger))
+	err = retry.Do(iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, state.PRE_READ_METADATA), *retry.NewOptionsWithLogger(client.Logger))
 	if err != nil {
 		return nil, &CreateError{
 			Err:               err,
@@ -136,7 +132,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	// poll until ios config state done
 	client.Logger.Println("waiting for device to reach state done")
 
-	err = retry.Do(iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, IosStateDone), *retry.NewOptionsWithLogger(client.Logger))
+	err = retry.Do(iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, state.DONE), *retry.NewOptionsWithLogger(client.Logger))
 	if err != nil {
 		return nil, &CreateError{
 			Err:               err,

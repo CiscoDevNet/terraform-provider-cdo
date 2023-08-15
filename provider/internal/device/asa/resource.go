@@ -34,13 +34,13 @@ type AsaDeviceResource struct {
 }
 
 type AsaDeviceResourceModel struct {
-	ID      types.String `tfsdk:"id"`
-	SdcType types.String `tfsdk:"connector_type"`
-	SdcName types.String `tfsdk:"sdc_name"`
-	Name    types.String `tfsdk:"name"`
-	Ipv4    types.String `tfsdk:"socket_address"`
-	Host    types.String `tfsdk:"host"`
-	Port    types.Int64  `tfsdk:"port"`
+	ID            types.String `tfsdk:"id"`
+	SdcType       types.String `tfsdk:"connector_type"`
+	SdcName       types.String `tfsdk:"sdc_name"`
+	Name          types.String `tfsdk:"name"`
+	SocketAddress types.String `tfsdk:"socket_address"`
+	Host          types.String `tfsdk:"host"`
+	Port          types.Int64  `tfsdk:"port"`
 
 	Username types.String `tfsdk:"username"`
 	Password types.String `tfsdk:"password"`
@@ -138,9 +138,7 @@ func (r *AsaDeviceResource) Configure(ctx context.Context, req resource.Configur
 	r.client = client
 }
 
-// TODO PlanModifiers for when the user does not enter port in socket_address
 // TODO plan diffing should exclude host, id, port, and sdc_name (unless SDCType is changed, in which case it should be a destroy and create)
-// TODO terraform should error if the credentials entered are incorrect
 // TODO terraform should wait when credentials are updated and the device is synced
 // TODO verify changing groups of changes
 
@@ -176,7 +174,7 @@ func (r *AsaDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 	stateData.ID = types.StringValue(asaReadOutp.Uid)
 	stateData.SdcType = types.StringValue(asaReadOutp.LarType)
 	stateData.Name = types.StringValue(asaReadOutp.Name)
-	stateData.Ipv4 = types.StringValue(asaReadOutp.Ipv4)
+	stateData.SocketAddress = types.StringValue(asaReadOutp.Ipv4)
 	stateData.Host = types.StringValue(asaReadOutp.Host)
 	stateData.IgnoreCertifcate = types.BoolValue(asaReadOutp.IgnoreCertifcate)
 
@@ -217,7 +215,7 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 		planData.Name.ValueString(),
 		specificSdcOutp.Uid,
 		planData.SdcType.ValueString(),
-		planData.Ipv4.ValueString(),
+		planData.SocketAddress.ValueString(),
 		planData.Username.ValueString(),
 		planData.Password.ValueString(),
 		planData.IgnoreCertifcate.ValueBool(),
@@ -271,14 +269,14 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
-	updateInp := asa.UpdateInput{Uid: stateData.ID.ValueString(), Name: stateData.Name.ValueString()}
+	updateInp := asa.NewUpdateInput(stateData.ID.ValueString(), stateData.Name.ValueString(), "", "")
 
 	if isNameUpdated(planData, stateData) {
 		updateInp.Name = planData.Name.ValueString()
 	}
 
 	if isLocationUpdated(planData, stateData) {
-		updateInp.Location = planData.Ipv4.ValueString()
+		updateInp.Location = planData.SocketAddress.ValueString()
 	}
 
 	if isCredentialUpdated(planData, stateData) {
@@ -293,7 +291,7 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 		updateInp.Password = planData.Password.ValueString()
 	}
 
-	updateOutp, err := r.client.UpdateAsa(ctx, updateInp)
+	updateOutp, err := r.client.UpdateAsa(ctx, *updateInp)
 	if err != nil {
 		res.Diagnostics.AddError("failed to update ASA device", err.Error())
 		return
@@ -309,7 +307,7 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 	stateData.SdcType = types.StringValue(planData.SdcType.ValueString())
 	stateData.SdcName = getSdcName(planData)
 	stateData.Name = types.StringValue(updateOutp.Name)
-	stateData.Ipv4 = planData.Ipv4
+	stateData.SocketAddress = planData.SocketAddress
 	stateData.Host = types.StringValue(updateOutp.Host)
 	stateData.Port = types.Int64Value(port)
 
@@ -353,8 +351,8 @@ func (r *AsaDeviceResource) ModifyPlan(ctx context.Context, req resource.ModifyP
 			return
 		}
 
-		if planData != nil && stateData != nil && strings.EqualFold(planData.Ipv4.ValueString(), stateData.Ipv4.ValueString()) {
-			tflog.Debug(ctx, "There is no change in the IPv4; remove host and port diffs")
+		if planData != nil && stateData != nil && strings.EqualFold(planData.SocketAddress.ValueString(), stateData.SocketAddress.ValueString()) {
+			tflog.Debug(ctx, "There is no change in the socket address; remove host and port diffs")
 			planData.Host = stateData.Host
 			planData.Port = stateData.Port
 		}
@@ -376,7 +374,7 @@ func isNameUpdated(planData, stateData *AsaDeviceResourceModel) bool {
 }
 
 func isLocationUpdated(planData, stateData *AsaDeviceResourceModel) bool {
-	return !planData.Ipv4.Equal(stateData.Ipv4)
+	return !planData.SocketAddress.Equal(stateData.SocketAddress)
 }
 
 func parsePort(rawPort string) (int64, error) {

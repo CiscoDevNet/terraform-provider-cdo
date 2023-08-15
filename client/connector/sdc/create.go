@@ -44,7 +44,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	url := url.CreateSdc(client.BaseUrl())
 	body := createRequestBody{
 		Name:                createInp.Name,
-		OnPremLarConfigured: true, // always true because we do not support cloud sdc anymore
+		OnPremLarConfigured: true, // this is always true, because we no longer support cloud sdc
 	}
 	req := client.NewPost(ctx, url, body)
 

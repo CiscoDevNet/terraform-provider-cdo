@@ -2,6 +2,7 @@ package ios
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/stretchr/testify/assert"
 	"testing"
 
@@ -53,8 +54,8 @@ func TestIosCreate(t *testing.T) {
 				configureDeviceCreateToRespondSuccessfully(iosDevice)
 				configureSdcReadToRespondSuccessfully(sdc)
 				configureIosConfigReadToSucceedWithSubsequentCalls(iosDevice.Uid, []httpmock.Responder{
-					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: IosStatePreReadMetadata}),
-					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: IosStateDone}),
+					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: state.PRE_READ_METADATA}),
+					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: state.DONE}),
 				})
 				configureDeviceUpdateToRespondSuccessfully(iosDevice)
 			},
@@ -98,8 +99,8 @@ func TestIosCreate(t *testing.T) {
 				configureDeviceCreateToRespondWithError()
 				configureSdcReadToRespondSuccessfully(sdc)
 				configureIosConfigReadToSucceedWithSubsequentCalls(iosDevice.Uid, []httpmock.Responder{
-					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: IosStatePreReadMetadata}),
-					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: IosStateDone}),
+					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: state.PRE_READ_METADATA}),
+					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: state.DONE}),
 				})
 				configureDeviceUpdateToRespondSuccessfully(iosDevice)
 			},
@@ -126,8 +127,8 @@ func TestIosCreate(t *testing.T) {
 				configureDeviceCreateToRespondSuccessfully(iosDevice)
 				configureSdcReadToRespondWithError(sdc.Uid)
 				configureIosConfigReadToSucceedWithSubsequentCalls(iosDevice.Uid, []httpmock.Responder{
-					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: IosStatePreReadMetadata}),
-					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: IosStateDone}),
+					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: state.PRE_READ_METADATA}),
+					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: state.DONE}),
 				})
 				configureDeviceUpdateToRespondSuccessfully(iosDevice)
 			},
@@ -154,7 +155,7 @@ func TestIosCreate(t *testing.T) {
 				configureDeviceCreateToRespondSuccessfully(iosDevice)
 				configureSdcReadToRespondSuccessfully(sdc)
 				configureIosConfigReadToSucceedWithSubsequentCalls(iosDevice.Uid, []httpmock.Responder{
-					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: iosconfig.IosConfigStateError}),
+					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: state.ERROR}),
 				})
 				configureDeviceUpdateToRespondSuccessfully(iosDevice)
 			},
@@ -181,8 +182,8 @@ func TestIosCreate(t *testing.T) {
 				configureDeviceCreateToRespondSuccessfully(iosDevice)
 				configureSdcReadToRespondSuccessfully(sdc)
 				configureIosConfigReadToSucceedWithSubsequentCalls(iosDevice.Uid, []httpmock.Responder{
-					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: IosStatePreReadMetadata}),
-					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: IosStateDone}),
+					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: state.PRE_READ_METADATA}),
+					httpmock.NewJsonResponderOrPanic(200, iosconfig.ReadOutput{Uid: iosDevice.Uid, State: state.DONE}),
 				})
 				configureDeviceUpdateToRespondWithError(iosDevice.Uid)
 			},

@@ -24,9 +24,9 @@ func NewReadInput(specificUid string) *ReadInput {
 
 func NewReadRequest(ctx context.Context, client http.Client, readReq ReadInput) *http.Request {
 
-	url := url.ReadDevice(client.BaseUrl(), readReq.SpecificUid)
+	readUrl := url.ReadDevice(client.BaseUrl(), readReq.SpecificUid)
 
-	req := client.NewGet(ctx, url)
+	req := client.NewGet(ctx, readUrl)
 
 	return req
 }

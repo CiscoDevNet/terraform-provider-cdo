@@ -2,13 +2,14 @@ package asa_test
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/device/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
 )
@@ -62,7 +63,7 @@ func TestAsaUpdate(t *testing.T) {
 				updatedDevice := asaDevice
 				updatedDevice.Name = input.Name
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, updatedDevice)
-				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: asaconfig.AsaConfigStateDone})
+				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: state.DONE})
 				configureDeviceReadToRespondSuccessfully(device.ReadOutput{Uid: input.Uid, State: "DONE", Status: "IDLE", ConnectivityState: 1})
 			},
 
@@ -88,7 +89,7 @@ func TestAsaUpdate(t *testing.T) {
 				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
 				configureDeviceReadToRespondSuccessfully(asaDevice)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
-				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: asaconfig.AsaConfigStateDone})
+				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: state.DONE})
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, asaDevice)
 				configureDeviceReadToRespondSuccessfully(device.ReadOutput{Uid: input.Uid, State: "DONE", Status: "IDLE", ConnectivityState: 1})
 			},
@@ -115,7 +116,7 @@ func TestAsaUpdate(t *testing.T) {
 				configureSdcReadToRespondSuccessfully(onPremConnector)
 
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
-				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: asaconfig.AsaConfigStateDone})
+				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: state.DONE})
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, asaDeviceOnboardedByOnPremConnector)
 				configureDeviceReadToRespondSuccessfully(device.ReadOutput{Uid: input.Uid, State: "DONE", Status: "IDLE", ConnectivityState: 1})
 			},
@@ -142,7 +143,7 @@ func TestAsaUpdate(t *testing.T) {
 				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
 				configureDeviceReadToRespondSuccessfully(asaDevice)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
-				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: asaconfig.AsaConfigStateDone})
+				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: state.DONE})
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, updatedDevice)
 				configureDeviceReadToRespondSuccessfully(device.ReadOutput{Uid: input.Uid, State: "DONE", Status: "IDLE", ConnectivityState: 1})
 			},

@@ -2,12 +2,12 @@ package asa_test
 
 import (
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"net/http"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/device/asaconfig"
 	internalTesting "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/testing"
 	"github.com/jarcoal/httpmock"
 )

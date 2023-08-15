@@ -2,14 +2,15 @@ package asa_test
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/device/asaconfig"
 	"github.com/jarcoal/httpmock"
 )
 
@@ -41,7 +42,7 @@ func TestAsaCreate(t *testing.T) {
 	}
 	asaConfig := asaconfig.ReadOutput{
 		Uid:   asaSpecificDevice.SpecificUid,
-		State: asaconfig.AsaConfigStateDone,
+		State: state.DONE,
 	}
 
 	validSdc := sdc.NewSdcOutputBuilder().
@@ -77,7 +78,6 @@ func TestAsaCreate(t *testing.T) {
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				assert.Nil(t, err)
-
 				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
@@ -90,7 +90,6 @@ func TestAsaCreate(t *testing.T) {
 					SdcType:    asaDevice.LarType,
 					SdcUid:     asaDevice.LarUid,
 				}
-				assert.Equal(t, expectedCreatedOutput, *output)
 				assert.Equal(t, expectedCreatedOutput, *output)
 
 				assertDeviceCreateWasCalledOnce(t)
@@ -118,7 +117,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
 					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
@@ -128,7 +127,6 @@ func TestAsaCreate(t *testing.T) {
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				assert.Nil(t, err)
-
 				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
@@ -141,7 +139,6 @@ func TestAsaCreate(t *testing.T) {
 					SdcType:    asaDevice.LarType,
 					SdcUid:     asaDevice.LarUid,
 				}
-				assert.Equal(t, expectedCreatedOutput, *output)
 				assert.Equal(t, expectedCreatedOutput, *output)
 
 				assertDeviceCreateWasCalledOnce(t)
@@ -174,7 +171,6 @@ func TestAsaCreate(t *testing.T) {
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				assert.Nil(t, err)
-
 				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
@@ -187,7 +183,6 @@ func TestAsaCreate(t *testing.T) {
 					SdcType:    asaDeviceUsingSdc.LarType,
 					SdcUid:     asaDeviceUsingSdc.LarUid,
 				}
-				assert.Equal(t, expectedCreatedOutput, *output)
 				assert.Equal(t, expectedCreatedOutput, *output)
 
 				assertDeviceCreateWasCalledOnce(t)
@@ -217,7 +212,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
 					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
@@ -228,7 +223,6 @@ func TestAsaCreate(t *testing.T) {
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				assert.Nil(t, err)
-
 				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
@@ -271,7 +265,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
 					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
@@ -305,7 +299,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
 					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
@@ -367,7 +361,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
 					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
@@ -401,7 +395,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
 					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
@@ -434,7 +428,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
 					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})

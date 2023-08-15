@@ -175,9 +175,7 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 
 	rsaKeyBits := 512
 	rsaKey, err := rsa.GenerateKey(rand.Reader, rsaKeyBits)
-	if err != nil {
-		t.Fatal("could not generate rsa key")
-	}
+	assert.Nil(t, err, "could not generate rsa key")
 
 	testCases := []struct {
 		testName   string

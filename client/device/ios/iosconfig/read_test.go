@@ -2,6 +2,7 @@ package iosconfig
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
@@ -15,7 +16,7 @@ func TestIosConfigRead(t *testing.T) {
 
 	validIosConfig := ReadOutput{
 		Uid:   iosConfigUid,
-		State: IosConfigStateDone,
+		State: state.DONE,
 	}
 
 	testCases := []struct {

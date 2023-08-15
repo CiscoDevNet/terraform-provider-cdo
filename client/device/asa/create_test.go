@@ -2,8 +2,9 @@ package asa_test
 
 import (
 	"context"
-	asaconfig2 "github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/stretchr/testify/assert"
 	"testing"
 
@@ -39,9 +40,9 @@ func TestAsaCreate(t *testing.T) {
 		Namespace:   "devices",
 		Type:        "asa",
 	}
-	asaConfig := asaconfig2.ReadOutput{
+	asaConfig := asaconfig.ReadOutput{
 		Uid:   asaSpecificDevice.SpecificUid,
-		State: asaconfig2.AsaConfigStateDone,
+		State: state.DONE,
 	}
 
 	validSdc := sdc.NewSdcOutputBuilder().
@@ -72,12 +73,11 @@ func TestAsaCreate(t *testing.T) {
 				configureDeviceCreateToRespondSuccessfully(asaDevice)
 				configureDeviceReadSpecificToRespondSuccessfully(asaDevice.Uid, asaSpecificDevice)
 				configureAsaConfigReadToRespondSuccessfully(asaSpecificDevice.SpecificUid, asaConfig)
-				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig2.UpdateOutput{Uid: asaConfig.Uid})
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				assert.Nil(t, err)
-
 				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
@@ -90,7 +90,6 @@ func TestAsaCreate(t *testing.T) {
 					SdcType:    asaDevice.LarType,
 					SdcUid:     asaDevice.LarUid,
 				}
-				assert.Equal(t, expectedCreatedOutput, *output)
 				assert.Equal(t, expectedCreatedOutput, *output)
 
 				assertDeviceCreateWasCalledOnce(t)
@@ -116,19 +115,18 @@ func TestAsaCreate(t *testing.T) {
 				configureDeviceCreateToRespondSuccessfully(asaDevice)
 				configureDeviceReadSpecificToRespondSuccessfully(asaDevice.Uid, asaSpecificDevice)
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
-					httpmock.NewJsonResponderOrPanic(200, asaconfig2.ReadOutput{
+					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig2.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
 				configureDeviceUpdateToRespondSuccessfully(asaDevice.Uid, asaDevice)
-				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig2.UpdateOutput{Uid: asaConfig.Uid})
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				assert.Nil(t, err)
-
 				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
@@ -141,7 +139,6 @@ func TestAsaCreate(t *testing.T) {
 					SdcType:    asaDevice.LarType,
 					SdcUid:     asaDevice.LarUid,
 				}
-				assert.Equal(t, expectedCreatedOutput, *output)
 				assert.Equal(t, expectedCreatedOutput, *output)
 
 				assertDeviceCreateWasCalledOnce(t)
@@ -169,12 +166,11 @@ func TestAsaCreate(t *testing.T) {
 				configureDeviceReadSpecificToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaSpecificDevice)
 				configureAsaConfigReadToRespondSuccessfully(asaSpecificDevice.SpecificUid, asaConfig)
 				configureSdcReadToRespondSuccessfully(validSdc)
-				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig2.UpdateOutput{Uid: asaConfig.Uid})
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				assert.Nil(t, err)
-
 				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
@@ -187,7 +183,6 @@ func TestAsaCreate(t *testing.T) {
 					SdcType:    asaDeviceUsingSdc.LarType,
 					SdcUid:     asaDeviceUsingSdc.LarUid,
 				}
-				assert.Equal(t, expectedCreatedOutput, *output)
 				assert.Equal(t, expectedCreatedOutput, *output)
 
 				assertDeviceCreateWasCalledOnce(t)
@@ -215,20 +210,19 @@ func TestAsaCreate(t *testing.T) {
 				configureDeviceCreateToRespondSuccessfully(asaDeviceUsingSdc)
 				configureDeviceReadSpecificToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaSpecificDevice)
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
-					httpmock.NewJsonResponderOrPanic(200, asaconfig2.ReadOutput{
+					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig2.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
 				configureSdcReadToRespondSuccessfully(validSdc)
 				configureDeviceUpdateToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaDeviceUsingSdc)
-				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig2.UpdateOutput{Uid: asaConfig.Uid})
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				assert.Nil(t, err)
-
 				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
@@ -269,15 +263,15 @@ func TestAsaCreate(t *testing.T) {
 				configureDeviceCreateToRespondWithError()
 				configureDeviceReadSpecificToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaSpecificDevice)
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
-					httpmock.NewJsonResponderOrPanic(200, asaconfig2.ReadOutput{
+					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig2.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
 				configureSdcReadToRespondSuccessfully(validSdc)
 				configureDeviceUpdateToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaDeviceUsingSdc)
-				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig2.UpdateOutput{Uid: asaConfig.Uid})
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
@@ -303,15 +297,15 @@ func TestAsaCreate(t *testing.T) {
 				configureDeviceCreateToRespondSuccessfully(asaDeviceUsingSdc)
 				configureDeviceReadSpecificToRespondWithError(asaDeviceUsingSdc.Uid)
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
-					httpmock.NewJsonResponderOrPanic(200, asaconfig2.ReadOutput{
+					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig2.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
 				configureSdcReadToRespondSuccessfully(validSdc)
 				configureDeviceUpdateToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaDeviceUsingSdc)
-				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig2.UpdateOutput{Uid: asaConfig.Uid})
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
@@ -339,7 +333,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigReadToRespondWithError(asaConfig.Uid)
 				configureSdcReadToRespondSuccessfully(validSdc)
 				configureDeviceUpdateToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaDeviceUsingSdc)
-				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig2.UpdateOutput{Uid: asaConfig.Uid})
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
@@ -365,15 +359,15 @@ func TestAsaCreate(t *testing.T) {
 				configureDeviceCreateToRespondSuccessfully(asaDeviceUsingSdc)
 				configureDeviceReadSpecificToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaSpecificDevice)
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
-					httpmock.NewJsonResponderOrPanic(200, asaconfig2.ReadOutput{
+					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig2.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
 				configureSdcReadToRespondWithError(validSdc.Uid)
 				configureDeviceUpdateToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaDeviceUsingSdc)
-				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig2.UpdateOutput{Uid: asaConfig.Uid})
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
@@ -399,15 +393,15 @@ func TestAsaCreate(t *testing.T) {
 				configureDeviceCreateToRespondSuccessfully(asaDeviceUsingSdc)
 				configureDeviceReadSpecificToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaSpecificDevice)
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
-					httpmock.NewJsonResponderOrPanic(200, asaconfig2.ReadOutput{
+					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig2.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
 				configureSdcReadToRespondSuccessfully(validSdc)
 				configureDeviceUpdateToRespondWithError(asaDeviceUsingSdc.Uid)
-				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig2.UpdateOutput{Uid: asaConfig.Uid})
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				assert.NotNil(t, err)
@@ -432,9 +426,9 @@ func TestAsaCreate(t *testing.T) {
 				configureDeviceCreateToRespondSuccessfully(asaDeviceUsingSdc)
 				configureDeviceReadSpecificToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaSpecificDevice)
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
-					httpmock.NewJsonResponderOrPanic(200, asaconfig2.ReadOutput{
+					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig2.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})

@@ -23,7 +23,7 @@ type testIosResourceType struct {
 const testIosResourceTemplate = `
 resource "cdo_ios_device" "test" {
 	name = "{{.Name}}"
-	socket_address = "{{.Ipv4}}"
+	socket_address = "{{.SocketAddress}}"
 	connector_type = "{{.SdcType}}"
 	username = "{{.EncryptedUsername}}"
 	password = "{{.EncryptedPassword}}"

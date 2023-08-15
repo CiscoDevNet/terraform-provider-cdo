@@ -25,8 +25,8 @@ resource "cdo_ios_device" "test" {
 	name = "{{.Name}}"
 	socket_address = "{{.Ipv4}}"
 	connector_type = "{{.SdcType}}"
-	username = "{{.Username}}"
-	password = "{{.Password}}"
+	username = "{{.EncryptedUsername}}"
+	password = "{{.EncryptedPassword}}"
 	sdc_name = "{{.SdcName}}"
 	ignore_certificate = "{{.IgnoreCertificate}}"
 }`

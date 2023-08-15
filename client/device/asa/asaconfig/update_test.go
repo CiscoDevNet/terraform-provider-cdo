@@ -5,13 +5,13 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 	"github.com/stretchr/testify/assert"
-	h "net/http"
+	"net/http"
 	"testing"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
-	internalRsa "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto/rsa"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/jsonutil"
 	"github.com/jarcoal/httpmock"
 )
@@ -45,8 +45,8 @@ func TestAsaConfigUpdate(t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildUpdateAsaConfigUrl(asaConfigUid),
-					func(r *h.Request) (*h.Response, error) {
-						requestBody, err := http.ReadRequestBody[updateBody](r)
+					func(r *http.Request) (*http.Response, error) {
+						requestBody, err := internalHttp.ReadRequestBody[updateBody](r)
 						assert.Nil(t, err)
 
 						expectedBody := updateBody{
@@ -72,10 +72,10 @@ func TestAsaConfigUpdate(t *testing.T) {
 				SpecificUid: asaConfigUid,
 				Username:    username,
 				Password:    password,
-				PublicKey: &sdc.PublicKey{
+				PublicKey: &model.PublicKey{
 					KeyId:      "12341234-1234-1234-1234-123412341234",
 					Version:    2,
-					EncodedKey: internalRsa.MustBase64PublicKeyFromRsaKey(rsaKey),
+					EncodedKey: crypto.MustBase64PublicKeyFromRsaKey(rsaKey),
 				},
 			},
 
@@ -83,20 +83,20 @@ func TestAsaConfigUpdate(t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildUpdateAsaConfigUrl(asaConfigUid),
-					func(r *h.Request) (*h.Response, error) {
-						requestBody, err := http.ReadRequestBody[updateBody](r)
+					func(r *http.Request) (*http.Response, error) {
+						requestBody, err := internalHttp.ReadRequestBody[updateBody](r)
 						assert.Nil(t, err)
 						assert.Equal(t, requestBody.State, "CERT_VALIDATED", fmt.Sprintf("expected 'State' to equal 'CERT_VALIDATED', got: %s", requestBody.State))
 
-						credentials, err := jsonutil.UnmarshalStruct[credentials]([]byte(requestBody.Credentials))
+						credentials, err := jsonutil.UnmarshalStruct[model.EncryptedCredentials]([]byte(requestBody.Credentials))
 						assert.Nil(t, err)
 
-						decryptedUsername := internalRsa.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Username))
+						decryptedUsername := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.EncryptedUsername))
 						assert.Equal(t, input.Username, decryptedUsername, fmt.Sprintf(`expected decrypted username to equal '%s', got: '%s'`, input.Username, decryptedUsername))
 
-						decryptedPassword := internalRsa.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Password))
+						decryptedPassword := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.EncryptedPassword))
 						assert.Equal(t, input.Password, decryptedPassword, fmt.Sprintf(`expected decrypted password to equal '%s', got: '%s'`, input.Password, decryptedPassword))
-						assert.Equal(t, input.PublicKey.KeyId, credentials.KeyId, fmt.Sprintf("expected keyId to equal '%s', got: '%s'", input.PublicKey.KeyId, credentials.KeyId))
+						assert.Equal(t, input.PublicKey.KeyId, credentials, fmt.Sprintf("expected keyId to equal '%s', got: '%s'", input.PublicKey.KeyId, credentials.KeyId))
 
 						return httpmock.NewJsonResponse(200, UpdateOutput{Uid: asaConfigUid})
 					},
@@ -159,7 +159,7 @@ func TestAsaConfigUpdate(t *testing.T) {
 
 			testCase.setupFunc(testCase.input, t)
 
-			output, err := Update(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := Update(context.Background(), *internalHttp.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
 
 			testCase.assertFunc(output, err, t)
 		})
@@ -197,8 +197,8 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildUpdateAsaConfigUrl(asaConfigUid),
-					func(r *h.Request) (*h.Response, error) {
-						requestBody, err := http.ReadRequestBody[updateCredentialsBodyWithState](r)
+					func(r *http.Request) (*http.Response, error) {
+						requestBody, err := internalHttp.ReadRequestBody[updateCredentialsBodyWithState](r)
 						assert.Nil(t, err)
 
 						expectedBody := updateCredentialsBodyWithState{
@@ -227,10 +227,10 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 				SpecificUid: asaConfigUid,
 				Username:    username,
 				Password:    password,
-				PublicKey: &sdc.PublicKey{
+				PublicKey: &model.PublicKey{
 					KeyId:      "12341234-1234-1234-1234-123412341234",
 					Version:    2,
-					EncodedKey: internalRsa.MustBase64PublicKeyFromRsaKey(rsaKey),
+					EncodedKey: crypto.MustBase64PublicKeyFromRsaKey(rsaKey),
 				},
 			},
 
@@ -238,20 +238,20 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildUpdateAsaConfigUrl(asaConfigUid),
-					func(r *h.Request) (*h.Response, error) {
-						requestBody, err := http.ReadRequestBody[updateCredentialsBodyWithState](r)
+					func(r *http.Request) (*http.Response, error) {
+						requestBody, err := internalHttp.ReadRequestBody[updateCredentialsBodyWithState](r)
 						assert.Nil(t, err)
 
 						expectedState := "WAIT_FOR_USER_TO_UPDATE_CREDS"
 						assert.Equal(t, requestBody.State, expectedState)
 
-						credentials, err := jsonutil.UnmarshalStruct[credentials]([]byte(requestBody.SmContext.Credentials))
+						credentials, err := jsonutil.UnmarshalStruct[model.EncryptedCredentials]([]byte(requestBody.SmContext.Credentials))
 						assert.Nil(t, err)
 
-						decryptedUsername := internalRsa.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Username))
+						decryptedUsername := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.EncryptedUsername))
 						assert.Equal(t, input.Username, decryptedUsername)
 
-						decryptedPassword := internalRsa.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Password))
+						decryptedPassword := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.EncryptedPassword))
 						assert.Equal(t, input.Password, decryptedPassword)
 						assert.Equal(t, input.PublicKey.KeyId, credentials.KeyId)
 
@@ -278,8 +278,8 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildUpdateAsaConfigUrl(asaConfigUid),
-					func(r *h.Request) (*h.Response, error) {
-						requestBody, err := http.ReadRequestBody[updateCredentialsBody](r)
+					func(r *http.Request) (*http.Response, error) {
+						requestBody, err := internalHttp.ReadRequestBody[updateCredentialsBody](r)
 						assert.Nil(t, err)
 
 						expectedBody := updateCredentialsBody{
@@ -307,10 +307,10 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 				SpecificUid: asaConfigUid,
 				Username:    username,
 				Password:    password,
-				PublicKey: &sdc.PublicKey{
+				PublicKey: &model.PublicKey{
 					KeyId:      "12341234-1234-1234-1234-123412341234",
 					Version:    2,
-					EncodedKey: internalRsa.MustBase64PublicKeyFromRsaKey(rsaKey),
+					EncodedKey: crypto.MustBase64PublicKeyFromRsaKey(rsaKey),
 				},
 			},
 
@@ -318,17 +318,17 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildUpdateAsaConfigUrl(asaConfigUid),
-					func(r *h.Request) (*h.Response, error) {
-						requestBody, err := http.ReadRequestBody[updateCredentialsBody](r)
+					func(r *http.Request) (*http.Response, error) {
+						requestBody, err := internalHttp.ReadRequestBody[updateCredentialsBody](r)
 						assert.Nil(t, err)
 
-						credentials, err := jsonutil.UnmarshalStruct[credentials]([]byte(requestBody.SmContext.Credentials))
+						credentials, err := jsonutil.UnmarshalStruct[model.EncryptedCredentials]([]byte(requestBody.SmContext.Credentials))
 						assert.Nil(t, err)
 
-						decryptedUsername := internalRsa.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Username))
+						decryptedUsername := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.EncryptedUsername))
 						assert.Equal(t, input.Username, decryptedUsername)
 
-						decryptedPassword := internalRsa.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Password))
+						decryptedPassword := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.EncryptedPassword))
 						assert.Equal(t, input.Password, decryptedPassword)
 						assert.Equal(t, input.PublicKey.KeyId, credentials.KeyId)
 
@@ -394,7 +394,7 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 
 			testCase.setupFunc(testCase.input, t)
 
-			output, err := UpdateCredentials(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := UpdateCredentials(context.Background(), *internalHttp.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
 
 			testCase.assertFunc(output, err, t)
 		})
@@ -402,5 +402,5 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 }
 
 func buildUpdateAsaConfigUrl(uid string) string {
-	return fmt.Sprintf("/aegis/rest/v1/services/asa/configs/%s", asaConfigUid)
+	return fmt.Sprintf("/aegis/rest/v1/services/asa/configs/%s", uid)
 }

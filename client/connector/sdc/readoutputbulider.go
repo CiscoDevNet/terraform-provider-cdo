@@ -3,8 +3,7 @@ package sdc
 import (
 	"crypto/rand"
 	"crypto/rsa"
-
-	internalRsa "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto/rsa"
+	internalRsa "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto/internal/rsa"
 )
 
 type sdcReadOutputBuilder struct {

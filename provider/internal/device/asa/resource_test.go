@@ -25,8 +25,8 @@ resource "cdo_asa_device" "test" {
 	name = "{{.Name}}"
 	socket_address = "{{.Ipv4}}"
 	connector_type = "{{.SdcType}}"
-	username = "{{.Username}}"
-	password = "{{.Password}}"
+	username = "{{.EncryptedUsername}}"
+	password = "{{.EncryptedPassword}}"
 	ignore_certificate = "{{.IgnoreCertificate}}"
 	sdc_name = "{{.SdcName}}"
 }`
@@ -59,7 +59,7 @@ var testAsaResourceConfig_SDC_NewName = acctest.MustParseTemplate(asaResourceTem
 
 // new creds config.
 var testAsaResource_SDC_NewCreds = acctest.MustOverrideFields(testAsaResource_SDC, map[string]any{
-	"Password": "WrongPassword",
+	"EncryptedPassword": "WrongPassword",
 })
 var testAsaResourceConfig_SDC_NewCreds = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC_NewCreds)
 
@@ -91,7 +91,7 @@ var testAsaResourceConfig_CDG_NewName = acctest.MustParseTemplate(asaResourceTem
 
 // new creds config.
 var testAsaResource_CDG_NewCreds = acctest.MustOverrideFields(testAsaResource_CDG, map[string]any{
-	"Password": "WrongPassword",
+	"EncryptedPassword": "WrongPassword",
 })
 var testAsaResourceConfig_CDG_NewCreds = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_CDG_NewCreds)
 

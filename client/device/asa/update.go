@@ -3,9 +3,10 @@ package asa
 import (
 	"context"
 	"fmt"
+	asaconfig2 "github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 	"strings"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/device/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
@@ -55,7 +56,7 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 		}
 
 		if updateInp.Username != "" || updateInp.Password != "" {
-			var publicKey *sdc.PublicKey
+			var publicKey *model.PublicKey
 			if strings.EqualFold(asaReadOutp.LarType, "SDC") {
 				if asaReadOutp.LarUid == "" {
 					return nil, fmt.Errorf("sdc uid not found")
@@ -70,26 +71,26 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 				publicKey = &larReadRes.PublicKey
 			}
 
-			updateAsaConfigInp := asaconfig.NewUpdateInput(
+			updateAsaConfigInp := asaconfig2.NewUpdateInput(
 				asaReadSpecOutp.SpecificUid,
 				updateInp.Username,
 				updateInp.Password,
 				publicKey,
 				asaReadSpecOutp.State,
 			)
-			_, err = asaconfig.UpdateCredentials(ctx, client, *updateAsaConfigInp)
+			_, err = asaconfig2.UpdateCredentials(ctx, client, *updateAsaConfigInp)
 			if err != nil {
 				_ = fmt.Errorf("failed to update credentials for ASA device: %s", err.Error())
 				return nil, err
 			}
 
-			if err := retry.Do(asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), retry.DefaultOpts); err != nil {
+			if err := retry.Do(asaconfig2.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), retry.DefaultOpts); err != nil {
 				return nil, err
 			}
 		}
 
 		if updateInp.Location != "" {
-			_, err := asaconfig.UpdateLocation(ctx, client, asaconfig.UpdateLocationOptions{
+			_, err := asaconfig2.UpdateLocation(ctx, client, asaconfig2.UpdateLocationOptions{
 				SpecificUid: asaReadSpecOutp.SpecificUid,
 				Location:    updateInp.Location,
 			})
@@ -97,7 +98,7 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 				return nil, err
 			}
 
-			if err := retry.Do(asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), retry.DefaultOpts); err != nil {
+			if err := retry.Do(asaconfig2.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), retry.DefaultOpts); err != nil {
 				return nil, err
 			}
 		}

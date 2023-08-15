@@ -3,6 +3,7 @@ package ios
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"strings"
 
@@ -77,7 +78,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	}
 
 	// encrypt credentials for SDC on prem lar
-	var publicKey *sdc.PublicKey
+	var publicKey *model.PublicKey
 	if strings.EqualFold(deviceCreateOutp.LarType, "SDC") {
 
 		// on-prem lar requires encryption

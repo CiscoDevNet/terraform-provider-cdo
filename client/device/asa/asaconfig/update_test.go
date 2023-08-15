@@ -96,7 +96,7 @@ func TestAsaConfigUpdate(t *testing.T) {
 
 						decryptedPassword := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.EncryptedPassword))
 						assert.Equal(t, input.Password, decryptedPassword, fmt.Sprintf(`expected decrypted password to equal '%s', got: '%s'`, input.Password, decryptedPassword))
-						assert.Equal(t, input.PublicKey.KeyId, credentials, fmt.Sprintf("expected keyId to equal '%s', got: '%s'", input.PublicKey.KeyId, credentials.KeyId))
+						assert.Equal(t, input.PublicKey.KeyId, credentials.KeyId, fmt.Sprintf("expected keyId to equal '%s', got: '%s'", input.PublicKey.KeyId, credentials.KeyId))
 
 						return httpmock.NewJsonResponse(200, UpdateOutput{Uid: asaConfigUid})
 					},

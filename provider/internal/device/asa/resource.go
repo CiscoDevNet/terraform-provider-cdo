@@ -35,8 +35,8 @@ type AsaDeviceResource struct {
 
 type AsaDeviceResourceModel struct {
 	ID            types.String `tfsdk:"id"`
-	SdcType       types.String `tfsdk:"connector_type"`
-	SdcName       types.String `tfsdk:"sdc_name"`
+	ConnectorType types.String `tfsdk:"connector_type"`
+	ConnectorName types.String `tfsdk:"connector_name"`
 	Name          types.String `tfsdk:"name"`
 	SocketAddress types.String `tfsdk:"socket_address"`
 	Host          types.String `tfsdk:"host"`
@@ -45,7 +45,7 @@ type AsaDeviceResourceModel struct {
 	Username types.String `tfsdk:"username"`
 	Password types.String `tfsdk:"password"`
 
-	IgnoreCertifcate types.Bool `tfsdk:"ignore_certificate"`
+	IgnoreCertificate types.Bool `tfsdk:"ignore_certificate"`
 }
 
 func (r *AsaDeviceResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -69,7 +69,7 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				MarkdownDescription: "A human-readable name for the device.",
 				Required:            true,
 			},
-			"sdc_name": schema.StringAttribute{
+			"connector_name": schema.StringAttribute{
 				MarkdownDescription: "The name of the Secure Device Connector (SDC) that will be used to communicate with the device. This value is not required if the connector type selected is Cloud Connector (CDG).",
 				Optional:            true,
 				PlanModifiers: []planmodifier.String{
@@ -172,11 +172,11 @@ func (r *AsaDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 	stateData.Port = types.Int64Value(port)
 
 	stateData.ID = types.StringValue(asaReadOutp.Uid)
-	stateData.SdcType = types.StringValue(asaReadOutp.LarType)
+	stateData.ConnectorType = types.StringValue(asaReadOutp.ConnectorType)
 	stateData.Name = types.StringValue(asaReadOutp.Name)
-	stateData.SocketAddress = types.StringValue(asaReadOutp.Ipv4)
+	stateData.SocketAddress = types.StringValue(asaReadOutp.SocketAddress)
 	stateData.Host = types.StringValue(asaReadOutp.Host)
-	stateData.IgnoreCertifcate = types.BoolValue(asaReadOutp.IgnoreCertifcate)
+	stateData.IgnoreCertificate = types.BoolValue(asaReadOutp.IgnoreCertifcate)
 
 	tflog.Trace(ctx, "done read ASA device resource")
 
@@ -195,9 +195,9 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 	}
 
 	var specificSdcOutp *sdc.ReadOutput
-	if strings.EqualFold(planData.SdcType.ValueString(), "SDC") {
+	if strings.EqualFold(planData.ConnectorType.ValueString(), "SDC") {
 		readSdcByNameInp := sdc.NewReadByNameInput(
-			planData.SdcName.ValueString(),
+			planData.ConnectorName.ValueString(),
 		)
 
 		var err error
@@ -214,11 +214,11 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 	createInp := asa.NewCreateRequestInput(
 		planData.Name.ValueString(),
 		specificSdcOutp.Uid,
-		planData.SdcType.ValueString(),
+		planData.ConnectorType.ValueString(),
 		planData.SocketAddress.ValueString(),
 		planData.Username.ValueString(),
 		planData.Password.ValueString(),
-		planData.IgnoreCertifcate.ValueBool(),
+		planData.IgnoreCertificate.ValueBool(),
 	)
 
 	createOutp, createErr := r.client.CreateAsa(ctx, *createInp)
@@ -237,8 +237,8 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 	}
 
 	planData.ID = types.StringValue(createOutp.Uid)
-	planData.SdcType = types.StringValue(createOutp.SdcType)
-	planData.SdcName = getSdcName(&planData)
+	planData.ConnectorType = types.StringValue(createOutp.SdcType)
+	planData.ConnectorName = getSdcName(&planData)
 	planData.Name = types.StringValue(createOutp.Name)
 	planData.Host = types.StringValue(createOutp.Host)
 
@@ -304,14 +304,14 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 	}
 
 	stateData.ID = types.StringValue(updateOutp.Uid)
-	stateData.SdcType = types.StringValue(planData.SdcType.ValueString())
-	stateData.SdcName = getSdcName(planData)
+	stateData.ConnectorType = types.StringValue(planData.ConnectorType.ValueString())
+	stateData.ConnectorName = getSdcName(planData)
 	stateData.Name = types.StringValue(updateOutp.Name)
 	stateData.SocketAddress = planData.SocketAddress
 	stateData.Host = types.StringValue(updateOutp.Host)
 	stateData.Port = types.Int64Value(port)
 
-	stateData.IgnoreCertifcate = planData.IgnoreCertifcate
+	stateData.IgnoreCertificate = planData.IgnoreCertificate
 
 	res.Diagnostics.Append(res.State.Set(ctx, &stateData)...)
 }
@@ -383,8 +383,8 @@ func parsePort(rawPort string) (int64, error) {
 }
 
 func getSdcName(planData *AsaDeviceResourceModel) basetypes.StringValue {
-	if planData.SdcName.ValueString() != "" {
-		return types.StringValue(planData.SdcName.ValueString())
+	if planData.ConnectorName.ValueString() != "" {
+		return types.StringValue(planData.ConnectorName.ValueString())
 	} else {
 		return types.StringNull()
 	}

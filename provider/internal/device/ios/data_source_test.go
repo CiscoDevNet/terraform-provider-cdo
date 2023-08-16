@@ -9,17 +9,17 @@ import (
 
 var testIosDataSource = struct {
 	Id                string
-	SdcType           string
+	ConnectorType     string
 	Name              string
-	Ipv4              string
+	SocketAddress     string
 	Host              string
 	Port              string
 	IgnoreCertificate string
 }{
 	Id:                "cd0483d0-5ec5-4d8e-b92d-8eb389f88417",
-	SdcType:           "SDC",
+	ConnectorType:     "SDC",
 	Name:              "weilue-test-ios",
-	Ipv4:              "10.10.0.198:22",
+	SocketAddress:     "10.10.0.198:22",
 	Host:              "10.10.0.198",
 	Port:              "22",
 	IgnoreCertificate: "false",
@@ -41,9 +41,9 @@ func TestAccIosDeviceDataSource(t *testing.T) {
 				Config: acctest.ProviderConfig() + testIosDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "id", testIosDataSource.Id),
-					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "connector_type", testIosDataSource.SdcType),
+					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "connector_type", testIosDataSource.ConnectorType),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "name", testIosDataSource.Name),
-					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "socket_address", testIosDataSource.Ipv4),
+					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "socket_address", testIosDataSource.SocketAddress),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "host", testIosDataSource.Host),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "port", testIosDataSource.Port),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "ignore_certificate", testIosDataSource.IgnoreCertificate),

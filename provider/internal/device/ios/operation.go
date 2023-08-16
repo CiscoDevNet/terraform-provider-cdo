@@ -30,7 +30,7 @@ func Read(ctx context.Context, resource *IosDeviceResource, stateData *IosDevice
 	stateData.Port = types.Int64Value(port)
 	stateData.ID = types.StringValue(readOutp.Uid)
 	stateData.Name = types.StringValue(readOutp.Name)
-	stateData.Ipv4 = types.StringValue(readOutp.Ipv4)
+	stateData.Ipv4 = types.StringValue(readOutp.SocketAddress)
 	stateData.Host = types.StringValue(readOutp.Host)
 	stateData.IgnoreCertifcate = types.BoolValue(readOutp.IgnoreCertifcate)
 

@@ -50,8 +50,8 @@ func TestAsaRead(t *testing.T) {
 					LastUpdatedDate: asaDevice.LastUpdatedDate,
 					DeviceType:      asaDevice.DeviceType,
 					LarUid:          asaDevice.LarUid,
-					LarType:         asaDevice.LarType,
-					Ipv4:            asaDevice.Ipv4,
+					ConnectorType:   asaDevice.LarType,
+					SocketAddress:   asaDevice.SocketAddress,
 					Host:            asaDevice.Host,
 					Port:            asaDevice.Port,
 				}

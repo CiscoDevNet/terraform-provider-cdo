@@ -11,7 +11,7 @@ var testAsaDataSource = struct {
 	Id                string
 	SdcType           string
 	Name              string
-	Ipv4              string
+	SocketAddress     string
 	Host              string
 	Port              string
 	IgnoreCertificate string
@@ -19,7 +19,7 @@ var testAsaDataSource = struct {
 	Id:                "331ff184-9ae6-45f3-8c55-71a150a6b58f",
 	SdcType:           "CDG",
 	Name:              "asa-data-source",
-	Ipv4:              "52.53.230.145:443",
+	SocketAddress:     "52.53.230.145:443",
 	Host:              "52.53.230.145",
 	Port:              "443",
 	IgnoreCertificate: "false",
@@ -45,7 +45,7 @@ func TestAccAsaDeviceDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "id", testAsaDataSource.Id),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "connector_type", testAsaDataSource.SdcType),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "name", testAsaDataSource.Name),
-					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "socket_address", testAsaDataSource.Ipv4),
+					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "socket_address", testAsaDataSource.SocketAddress),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "host", testAsaDataSource.Host),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "port", testAsaDataSource.Port),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "ignore_certificate", testAsaDataSource.IgnoreCertificate),

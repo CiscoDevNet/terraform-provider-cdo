@@ -9,7 +9,7 @@ import (
 
 var testAsaDataSource = struct {
 	Id                string
-	SdcType           string
+	ConnectorType     string
 	Name              string
 	SocketAddress     string
 	Host              string
@@ -17,7 +17,7 @@ var testAsaDataSource = struct {
 	IgnoreCertificate string
 }{
 	Id:                "331ff184-9ae6-45f3-8c55-71a150a6b58f",
-	SdcType:           "CDG",
+	ConnectorType:     "CDG",
 	Name:              "asa-data-source",
 	SocketAddress:     "52.53.230.145:443",
 	Host:              "52.53.230.145",
@@ -43,7 +43,7 @@ func TestAccAsaDeviceDataSource(t *testing.T) {
 				Config: acctest.ProviderConfig() + testAsaDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "id", testAsaDataSource.Id),
-					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "connector_type", testAsaDataSource.SdcType),
+					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "connector_type", testAsaDataSource.ConnectorType),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "name", testAsaDataSource.Name),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "socket_address", testAsaDataSource.SocketAddress),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "host", testAsaDataSource.Host),

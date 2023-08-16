@@ -17,10 +17,10 @@ Provides an iOS device resource. This allows iOS devices to be onboarded, update
 
 ### Required
 
+- `connector_name` (String) The name of the Secure Device Connector (SDC) that will be used to communicate with the device. This value is not required if the connector type selected is Cloud Device Gateway (CDG).
 - `ignore_certificate` (Boolean) Set this attribute to true if you do not wish for CDO to validate the certificate of this device before onboarding.
 - `name` (String) A human-readable name for the device.
 - `password` (String, Sensitive) The password used to authenticate with the device.
-- `sdc_name` (String) The name of the Secure Device Connector (SDC) that will be used to communicate with the device. This value is not required if the connector type selected is Cloud Device Gateway (CDG).
 - `socket_address` (String) The address of the device to onboard, specified in the format `host:port`.
 - `username` (String) The username used to authenticate with the device.
 

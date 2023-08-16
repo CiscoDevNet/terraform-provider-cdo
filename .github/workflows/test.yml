@@ -54,7 +54,7 @@ jobs:
         with:
           go-version: '1.20'
           cache: true
-      - run: go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --provider-name cdo --rendered-provider-name "CDO Provider" --rendered-website-dir ../docs
+      - run: go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --provider-name cdo --rendered-provider-name \"CDO Provider\" --rendered-website-dir ../docs
       - name: git diff
         run: |
           git diff --compact-summary --exit-code || \

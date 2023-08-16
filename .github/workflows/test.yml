@@ -44,6 +44,7 @@ jobs:
           skip-pkg-cache: true
 
   generate:
+    name: Generate
     runs-on: ubuntu-latest
     defaults:
       run:

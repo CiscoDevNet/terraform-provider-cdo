@@ -40,7 +40,7 @@ func Read(ctx context.Context, resource *IosDeviceResource, stateData *IosDevice
 func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDeviceResourceModel) error {
 
 	readSdcByNameInp := sdc.NewReadByNameInput(
-		planData.SdcName.ValueString(),
+		planData.ConnectorName.ValueString(),
 	)
 
 	readSdcOutp, err := resource.client.ReadSdcByName(ctx, *readSdcByNameInp)
@@ -74,7 +74,7 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 	}
 
 	planData.ID = types.StringValue(createOutp.Uid)
-	planData.SdcName = types.StringValue(planData.SdcName.ValueString())
+	planData.ConnectorName = types.StringValue(planData.ConnectorName.ValueString())
 	planData.Name = types.StringValue(createOutp.Name)
 	planData.Host = types.StringValue(createOutp.Host)
 

@@ -9,7 +9,6 @@ import (
 
 var testIosDataSource = struct {
 	Id                string
-	ConnectorType     string
 	Name              string
 	SocketAddress     string
 	Host              string
@@ -17,7 +16,6 @@ var testIosDataSource = struct {
 	IgnoreCertificate string
 }{
 	Id:                "cd0483d0-5ec5-4d8e-b92d-8eb389f88417",
-	ConnectorType:     "SDC",
 	Name:              "weilue-test-ios",
 	SocketAddress:     "10.10.0.198:22",
 	Host:              "10.10.0.198",
@@ -27,7 +25,7 @@ var testIosDataSource = struct {
 
 var testIosDataSourceTemplate = `
 data "cdo_ios_device" "test" {
-	id = "{{.Id}}"
+	name = "{{.Name}}"
 }`
 var testIosDataSourceConfig = acctest.MustParseTemplate(testIosDataSourceTemplate, testIosDataSource)
 
@@ -41,7 +39,6 @@ func TestAccIosDeviceDataSource(t *testing.T) {
 				Config: acctest.ProviderConfig() + testIosDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "id", testIosDataSource.Id),
-					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "connector_type", testIosDataSource.ConnectorType),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "name", testIosDataSource.Name),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "socket_address", testIosDataSource.SocketAddress),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "host", testIosDataSource.Host),

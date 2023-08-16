@@ -27,7 +27,6 @@ var testAsaDataSource = struct {
 
 const testAsaDataSourceTemplate = `
 data "cdo_asa_device" "test" {
-	id = "{{.Id}}"
 	name = "{{.Name}}"
 }`
 

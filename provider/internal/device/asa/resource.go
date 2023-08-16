@@ -238,7 +238,7 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 
 	planData.ID = types.StringValue(createOutp.Uid)
 	planData.ConnectorType = types.StringValue(createOutp.SdcType)
-	planData.ConnectorName = getSdcName(&planData)
+	planData.ConnectorName = getConnectorName(&planData)
 	planData.Name = types.StringValue(createOutp.Name)
 	planData.Host = types.StringValue(createOutp.Host)
 
@@ -305,7 +305,7 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 
 	stateData.ID = types.StringValue(updateOutp.Uid)
 	stateData.ConnectorType = types.StringValue(planData.ConnectorType.ValueString())
-	stateData.ConnectorName = getSdcName(planData)
+	stateData.ConnectorName = getConnectorName(planData)
 	stateData.Name = types.StringValue(updateOutp.Name)
 	stateData.SocketAddress = planData.SocketAddress
 	stateData.Host = types.StringValue(updateOutp.Host)
@@ -382,7 +382,7 @@ func parsePort(rawPort string) (int64, error) {
 
 }
 
-func getSdcName(planData *AsaDeviceResourceModel) basetypes.StringValue {
+func getConnectorName(planData *AsaDeviceResourceModel) basetypes.StringValue {
 	if planData.ConnectorName.ValueString() != "" {
 		return types.StringValue(planData.ConnectorName.ValueString())
 	} else {

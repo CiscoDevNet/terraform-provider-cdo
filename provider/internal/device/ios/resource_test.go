@@ -24,7 +24,6 @@ const testIosResourceTemplate = `
 resource "cdo_ios_device" "test" {
 	name = "{{.Name}}"
 	socket_address = "{{.SocketAddress}}"
-	connector_type = "{{.ConnectorType}}"
 	username = "{{.Username}}"
 	password = "{{.Password}}"
 	connector_name = "{{.ConnectorName}}"
@@ -51,6 +50,7 @@ var testIosResource_NewName = acctest.MustOverrideFields(testIosResource, map[st
 var testIosResourceConfig_NewName = acctest.MustParseTemplate(testIosResourceTemplate, testIosResource_NewName)
 
 func TestAccIosDeviceResource_SDC(t *testing.T) {
+	t.Skip("require new ios device in ci")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 acctest.PreCheckFunc(t),
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,

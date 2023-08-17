@@ -66,6 +66,7 @@ func (r *Request) Send(output any) error {
 		r.config.Timeout,
 		r.config.Delay,
 		r.config.Retries,
+		true,
 	))
 
 	return err

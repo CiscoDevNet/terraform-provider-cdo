@@ -4,6 +4,7 @@
 package retry
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -21,6 +22,8 @@ type Options struct {
 	Retries int           // Retries is the max number of retries before terminating. Negative means no limit.
 
 	Logger *log.Logger
+
+	IgnoreError bool // IgnoreError will ignore and save error returned from Func, when max retries exceeded, errors are combined the returned together.
 }
 
 // Func is the retryable function for retrying.
@@ -29,9 +32,10 @@ type Options struct {
 type Func func() (ok bool, err error)
 
 const (
-	DefaultTimeout = 3 * time.Minute
-	DefaultDelay   = 3 * time.Second
-	DefaultRetries = -1
+	DefaultTimeout     = 3 * time.Minute
+	DefaultDelay       = 3 * time.Second
+	DefaultRetries     = -1
+	DefaultIgnoreError = false
 )
 
 var (
@@ -41,6 +45,8 @@ var (
 		Retries: DefaultRetries,
 
 		Logger: cdo.DefaultLogger,
+
+		IgnoreError: DefaultIgnoreError,
 	}
 )
 
@@ -50,16 +56,19 @@ func NewOptionsWithLogger(logger *log.Logger) *Options {
 		DefaultTimeout,
 		DefaultDelay,
 		DefaultRetries,
+		DefaultIgnoreError,
 	)
 }
 
-func NewOptions(logger *log.Logger, timeout time.Duration, delay time.Duration, retries int) *Options {
+func NewOptions(logger *log.Logger, timeout time.Duration, delay time.Duration, retries int, ignoreError bool) *Options {
 	return &Options{
 		Timeout: timeout,
 		Delay:   delay,
 		Retries: retries,
 
 		Logger: logger,
+
+		IgnoreError: ignoreError,
 	}
 }
 
@@ -73,13 +82,15 @@ func Do(retryFunc Func, opt Options) error {
 	maxRetryReached := func(retries int) bool {
 		return opt.Retries > 0 && retries >= opt.Retries
 	}
+	accumulatedErrs := make([]error, 0, 4)
 
 	// initial attempt
 	if timeout() {
 		return fmt.Errorf("timeout")
 	}
 	ok, err := retryFunc()
-	if err != nil {
+	accumulatedErrs = append(accumulatedErrs, err)
+	if err != nil && !opt.IgnoreError {
 		return fmt.Errorf("error in retry func, cause=%w", err)
 	}
 	if ok {
@@ -99,7 +110,8 @@ func Do(retryFunc Func, opt Options) error {
 		opt.Logger.Printf("[RETRY] attempt=%v\n", retries)
 
 		ok, err = retryFunc()
-		if err != nil {
+		accumulatedErrs = append(accumulatedErrs, err)
+		if err != nil && !opt.IgnoreError {
 			return fmt.Errorf("error in retry func, cause=%w", err)
 		}
 		if ok {
@@ -109,7 +121,7 @@ func Do(retryFunc Func, opt Options) error {
 		opt.Logger.Println("[RETRY] failed")
 
 		if maxRetryReached(retries) {
-			return fmt.Errorf("max retry reached")
+			return fmt.Errorf("max retry reached, accumulated error=%w", errors.Join(accumulatedErrs...))
 		}
 	}
 }

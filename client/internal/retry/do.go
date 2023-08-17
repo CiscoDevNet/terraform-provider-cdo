@@ -23,7 +23,7 @@ type Options struct {
 
 	Logger *log.Logger
 
-	IgnoreError bool // IgnoreError will ignore and save error returned from Func, when max retries exceeded, errors are combined the returned together.
+	EarlyExitOnError bool // EarlyExitOnError will cause Retry to return immediately if error is returned from Func; if false, it will only return when max retries exceeded, which errors are combined the returned together.
 }
 
 // Func is the retryable function for retrying.
@@ -32,10 +32,10 @@ type Options struct {
 type Func func() (ok bool, err error)
 
 const (
-	DefaultTimeout     = 3 * time.Minute
-	DefaultDelay       = 3 * time.Second
-	DefaultRetries     = -1
-	DefaultIgnoreError = false
+	DefaultTimeout          = 3 * time.Minute
+	DefaultDelay            = 3 * time.Second
+	DefaultRetries          = -1
+	DefaultEarlyExitOnError = true
 )
 
 var (
@@ -46,7 +46,7 @@ var (
 
 		Logger: cdo.DefaultLogger,
 
-		IgnoreError: DefaultIgnoreError,
+		EarlyExitOnError: DefaultEarlyExitOnError,
 	}
 )
 
@@ -56,7 +56,7 @@ func NewOptionsWithLogger(logger *log.Logger) *Options {
 		DefaultTimeout,
 		DefaultDelay,
 		DefaultRetries,
-		DefaultIgnoreError,
+		DefaultEarlyExitOnError,
 	)
 }
 
@@ -68,7 +68,7 @@ func NewOptions(logger *log.Logger, timeout time.Duration, delay time.Duration, 
 
 		Logger: logger,
 
-		IgnoreError: ignoreError,
+		EarlyExitOnError: ignoreError,
 	}
 }
 
@@ -90,7 +90,7 @@ func Do(retryFunc Func, opt Options) error {
 	}
 	ok, err := retryFunc()
 	accumulatedErrs = append(accumulatedErrs, err)
-	if err != nil && !opt.IgnoreError {
+	if err != nil && opt.EarlyExitOnError {
 		return fmt.Errorf("error in retry func, cause=%w", err)
 	}
 	if ok {
@@ -111,7 +111,7 @@ func Do(retryFunc Func, opt Options) error {
 
 		ok, err = retryFunc()
 		accumulatedErrs = append(accumulatedErrs, err)
-		if err != nil && !opt.IgnoreError {
+		if err != nil && opt.EarlyExitOnError {
 			return fmt.Errorf("error in retry func, cause=%w", err)
 		}
 		if ok {
@@ -121,7 +121,7 @@ func Do(retryFunc Func, opt Options) error {
 		opt.Logger.Println("[RETRY] failed")
 
 		if maxRetryReached(retries) {
-			return fmt.Errorf("max retry reached, accumulated error=%w", errors.Join(accumulatedErrs...))
+			return fmt.Errorf("max retry reached, accumulated errors=%w", errors.Join(accumulatedErrs...))
 		}
 	}
 }

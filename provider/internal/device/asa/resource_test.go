@@ -90,7 +90,7 @@ var testAsaResource_CDG_NewName = acctest.MustOverrideFields(testAsaResource_CDG
 })
 var testAsaResourceConfig_CDG_NewName = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_CDG_NewName)
 
-// new creds config.
+// bad credentials config.
 var testAsaResource_CDG_BadCreds = acctest.MustOverrideFields(testAsaResource_CDG, map[string]any{
 	"Password": "WrongPassword",
 })

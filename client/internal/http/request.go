@@ -94,7 +94,7 @@ func (r *Request) send(output any) error {
 	// check status
 	if res.StatusCode >= 400 {
 		body, err := io.ReadAll(res.Body)
-		err = fmt.Errorf("failed: code=%d, status=%s, body=%s, readBodyErr=%s", res.StatusCode, res.Status, string(body), err)
+		err = fmt.Errorf("failed: code=%d, status=%s, body=%s, readBodyErr=%s, url=%s, method=%s", res.StatusCode, res.Status, string(body), err, r.url, r.method)
 		r.Error = err
 		return err
 	}

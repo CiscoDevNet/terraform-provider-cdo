@@ -31,8 +31,8 @@ func TestAccSdcDeviceDataSource(t *testing.T) {
 			{
 				Config: acctest.ProviderConfig() + testSdcConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.cdo_sdc_connector.test", "name", testSdc.Name),
-					resource.TestCheckResourceAttr("data.cdo_sdc_connector.test", "id", testSdc.Uid),
+					resource.TestCheckResourceAttr("data.cdo_sdc.test", "name", testSdc.Name),
+					resource.TestCheckResourceAttr("data.cdo_sdc.test", "id", testSdc.Uid),
 				),
 			},
 		},

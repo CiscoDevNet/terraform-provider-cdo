@@ -47,7 +47,7 @@ func (builder *readOutputBuilder) WithName(name string) *readOutputBuilder {
 func (builder *readOutputBuilder) WithLocation(host string, port uint) *readOutputBuilder {
 	builder.readOutput.Host = host
 	builder.readOutput.Port = fmt.Sprint(port)
-	builder.readOutput.Ipv4 = fmt.Sprintf("%s:%d", host, port)
+	builder.readOutput.SocketAddress = fmt.Sprintf("%s:%d", host, port)
 
 	return builder
 }

@@ -3,20 +3,19 @@ package asa
 import (
 	"context"
 	"fmt"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
-	"strings"
-
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
+	"strings"
 )
 
 type CreateInput struct {
-	Name    string
-	SdcUid  string
-	SdcType string
-	Ipv4    string
+	Name          string
+	SdcUid        string
+	SdcType       string
+	SocketAddress string
 
 	Username string
 	Password string
@@ -25,14 +24,14 @@ type CreateInput struct {
 }
 
 type CreateOutput struct {
-	Uid        string `json:"uid"`
-	Name       string `json:"Name"`
-	DeviceType string `json:"deviceType"`
-	Host       string `json:"host"`
-	Port       string `json:"port"`
-	Ipv4       string `json:"ipv4"`
-	SdcType    string `json:"larType"`
-	SdcUid     string `json:"larUid"`
+	Uid           string `json:"uid"`
+	Name          string `json:"Name"`
+	DeviceType    string `json:"deviceType"`
+	Host          string `json:"host"`
+	Port          string `json:"port"`
+	SocketAddress string `json:"ipv4"`
+	SdcType       string `json:"larType"`
+	SdcUid        string `json:"larUid"`
 }
 
 type CreateError struct {
@@ -49,7 +48,7 @@ func NewCreateRequestInput(name, larUid, larType, ipv4, username, password strin
 		Name:             name,
 		SdcUid:           larUid,
 		SdcType:          larType,
-		Ipv4:             ipv4,
+		SocketAddress:    ipv4,
 		Username:         username,
 		Password:         password,
 		IgnoreCertifcate: ignoreCertificate,
@@ -61,7 +60,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	client.Logger.Println("creating asa device")
 
 	deviceCreateOutp, err := device.Create(ctx, client, *device.NewCreateRequestInput(
-		createInp.Name, "ASA", createInp.SdcUid, createInp.SdcType, createInp.Ipv4, false, createInp.IgnoreCertifcate,
+		createInp.Name, "ASA", createInp.SdcUid, createInp.SdcType, createInp.SocketAddress, false, createInp.IgnoreCertifcate,
 	))
 	var createdResourceId *string = nil
 	if deviceCreateOutp != nil {
@@ -176,14 +175,14 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 
 	// successful
 	createOutp := CreateOutput{
-		Uid:        deviceCreateOutp.Uid,
-		Name:       deviceCreateOutp.Name,
-		DeviceType: deviceCreateOutp.DeviceType,
-		Host:       deviceCreateOutp.Host,
-		Port:       deviceCreateOutp.Port,
-		Ipv4:       deviceCreateOutp.Ipv4,
-		SdcUid:     deviceCreateOutp.LarUid,
-		SdcType:    deviceCreateOutp.LarType,
+		Uid:           deviceCreateOutp.Uid,
+		Name:          deviceCreateOutp.Name,
+		DeviceType:    deviceCreateOutp.DeviceType,
+		Host:          deviceCreateOutp.Host,
+		Port:          deviceCreateOutp.Port,
+		SocketAddress: deviceCreateOutp.SocketAddress,
+		SdcUid:        deviceCreateOutp.LarUid,
+		SdcType:       deviceCreateOutp.LarType,
 	}
 	return &createOutp, nil
 }

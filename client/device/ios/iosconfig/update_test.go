@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
+	"time"
 
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/jsonutil"
@@ -94,13 +95,13 @@ func TestIosConfigUpdate(t *testing.T) {
 							t.Errorf("expected 'SmContext.AcceptCert' to true got: %t", requestBody.SmContext.AcceptCert)
 						}
 
-						credentials, err := jsonutil.UnmarshalStruct[model.EncryptedCredentials]([]byte(requestBody.Credentials))
+						credentials, err := jsonutil.UnmarshalStruct[model.Credentials]([]byte(requestBody.Credentials))
 						assert.Nil(t, err)
 
-						decryptedUsername := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.EncryptedUsername))
+						decryptedUsername := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Username))
 						assert.Equal(t, input.Username, decryptedUsername, `expected decrypted username to equal '%s', got: '%s'`, input.Username, decryptedUsername)
 
-						decryptedPassword := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.EncryptedPassword))
+						decryptedPassword := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Password))
 						assert.Equal(t, input.Password, decryptedPassword, `expected decrypted password to equal '%s', got: '%s'`, input.Password, decryptedPassword)
 
 						assert.Equal(t, input.PublicKey.KeyId, credentials.KeyId, "expected keyId to equal '%s', got: '%s'", input.PublicKey.KeyId, credentials.KeyId)
@@ -168,7 +169,11 @@ func TestIosConfigUpdate(t *testing.T) {
 
 			testCase.setupFunc(testCase.input, t)
 
-			output, err := Update(context.Background(), *internalHttp.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := Update(
+				context.Background(),
+				*internalHttp.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
+				testCase.input,
+			)
 
 			testCase.assertFunc(output, err, t)
 		})

@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
+	"time"
 
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/jsonutil"
@@ -88,13 +89,13 @@ func TestAsaConfigUpdate(t *testing.T) {
 						assert.Nil(t, err)
 						assert.Equal(t, requestBody.State, "CERT_VALIDATED", fmt.Sprintf("expected 'State' to equal 'CERT_VALIDATED', got: %s", requestBody.State))
 
-						credentials, err := jsonutil.UnmarshalStruct[model.EncryptedCredentials]([]byte(requestBody.Credentials))
+						credentials, err := jsonutil.UnmarshalStruct[model.Credentials]([]byte(requestBody.Credentials))
 						assert.Nil(t, err)
 
-						decryptedUsername := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.EncryptedUsername))
+						decryptedUsername := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Username))
 						assert.Equal(t, input.Username, decryptedUsername, fmt.Sprintf(`expected decrypted username to equal '%s', got: '%s'`, input.Username, decryptedUsername))
 
-						decryptedPassword := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.EncryptedPassword))
+						decryptedPassword := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Password))
 						assert.Equal(t, input.Password, decryptedPassword, fmt.Sprintf(`expected decrypted password to equal '%s', got: '%s'`, input.Password, decryptedPassword))
 						assert.Equal(t, input.PublicKey.KeyId, credentials.KeyId, fmt.Sprintf("expected keyId to equal '%s', got: '%s'", input.PublicKey.KeyId, credentials.KeyId))
 
@@ -159,7 +160,11 @@ func TestAsaConfigUpdate(t *testing.T) {
 
 			testCase.setupFunc(testCase.input, t)
 
-			output, err := Update(context.Background(), *internalHttp.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := Update(
+				context.Background(),
+				*internalHttp.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
+				testCase.input,
+			)
 
 			testCase.assertFunc(output, err, t)
 		})
@@ -243,13 +248,13 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 						expectedState := "WAIT_FOR_USER_TO_UPDATE_CREDS"
 						assert.Equal(t, requestBody.State, expectedState)
 
-						credentials, err := jsonutil.UnmarshalStruct[model.EncryptedCredentials]([]byte(requestBody.SmContext.Credentials))
+						credentials, err := jsonutil.UnmarshalStruct[model.Credentials]([]byte(requestBody.SmContext.Credentials))
 						assert.Nil(t, err)
 
-						decryptedUsername := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.EncryptedUsername))
+						decryptedUsername := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Username))
 						assert.Equal(t, input.Username, decryptedUsername)
 
-						decryptedPassword := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.EncryptedPassword))
+						decryptedPassword := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Password))
 						assert.Equal(t, input.Password, decryptedPassword)
 						assert.Equal(t, input.PublicKey.KeyId, credentials.KeyId)
 
@@ -320,13 +325,13 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 						requestBody, err := internalHttp.ReadRequestBody[updateCredentialsBody](r)
 						assert.Nil(t, err)
 
-						credentials, err := jsonutil.UnmarshalStruct[model.EncryptedCredentials]([]byte(requestBody.SmContext.Credentials))
+						credentials, err := jsonutil.UnmarshalStruct[model.Credentials]([]byte(requestBody.SmContext.Credentials))
 						assert.Nil(t, err)
 
-						decryptedUsername := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.EncryptedUsername))
+						decryptedUsername := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Username))
 						assert.Equal(t, input.Username, decryptedUsername)
 
-						decryptedPassword := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.EncryptedPassword))
+						decryptedPassword := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Password))
 						assert.Equal(t, input.Password, decryptedPassword)
 						assert.Equal(t, input.PublicKey.KeyId, credentials.KeyId)
 
@@ -392,7 +397,11 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 
 			testCase.setupFunc(testCase.input, t)
 
-			output, err := UpdateCredentials(context.Background(), *internalHttp.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := UpdateCredentials(
+				context.Background(),
+				*internalHttp.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
+				testCase.input,
+			)
 
 			testCase.assertFunc(output, err, t)
 		})

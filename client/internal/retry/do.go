@@ -75,19 +75,22 @@ func NewOptions(logger *log.Logger, timeout time.Duration, delay time.Duration, 
 // Do run retry function until response of request satisfy check function, or ends early according to configuration.
 func Do(retryFunc Func, opt Options) error {
 
-	endTime := time.Now().Add(opt.Timeout)
+	startTime := time.Now()
+	endTime := startTime.Add(opt.Timeout)
 	timeout := func() bool {
 		return time.Now().After(endTime)
 	}
-	maxRetryReached := func(retries int) bool {
-		return opt.Retries > 0 && retries >= opt.Retries
+	willTimeoutAfterDelay := func() bool {
+		return time.Now().Add(opt.Delay).After(endTime)
 	}
-	accumulatedErrs := make([]error, 0, 4)
+	accumulatedErrs := make([]error, 0, opt.Retries+1)
 
-	// initial attempt
+	// check if it is already timeout
 	if timeout() {
-		return fmt.Errorf("timeout")
+		return fmt.Errorf("retry func timeout before any attempt")
 	}
+
+	// attempt once before starting retries
 	ok, err := retryFunc()
 	accumulatedErrs = append(accumulatedErrs, err)
 	if err != nil && opt.EarlyExitOnError {
@@ -98,17 +101,17 @@ func Do(retryFunc Func, opt Options) error {
 	}
 
 	// retry starts
-	opt.Logger.Println("[RETRY] starts")
+	for retries := 1; opt.Retries < 0 || retries <= opt.Retries; retries++ {
 
-	for retries := 1; ; retries++ {
 		// if timeout now or will time out during delay between requests
-		if timeout() || time.Now().Add(opt.Delay).After(endTime) {
-			return fmt.Errorf("timeout")
+		if timeout() || willTimeoutAfterDelay() {
+			return fmt.Errorf("timeout at attempt %d/%d, after %s", retries, opt.Retries, time.Now().Sub(startTime))
 		}
 		time.Sleep(opt.Delay)
 
-		opt.Logger.Printf("[RETRY] attempt=%v\n", retries)
+		opt.Logger.Printf("[RETRY] attempt=%d/%d\n", retries, opt.Retries)
 
+		// attempt
 		ok, err = retryFunc()
 		accumulatedErrs = append(accumulatedErrs, err)
 		if err != nil && opt.EarlyExitOnError {
@@ -119,9 +122,12 @@ func Do(retryFunc Func, opt Options) error {
 			return nil
 		}
 		opt.Logger.Println("[RETRY] failed")
-
-		if maxRetryReached(retries) {
-			return fmt.Errorf("max retry reached, accumulated errors=%w", errors.Join(accumulatedErrs...))
-		}
 	}
+
+	return fmt.Errorf(
+		"max retry reached, retries=%d, time taken=%s, accumulated errors=%w",
+		opt.Retries,
+		time.Now().Sub(startTime),
+		errors.Join(accumulatedErrs...),
+	)
 }

@@ -7,20 +7,20 @@ import (
 )
 
 type ReadInput struct {
-	Uid string `json:"-"`
+	Uid string
 }
 
 type ReadOutput = device.ReadOutput
 
-func NewReadInput(uid string) *UpdateInput {
-	return &UpdateInput{
+func NewReadInput(uid string) *ReadInput {
+	return &ReadInput{
 		Uid: uid,
 	}
 }
 
 func Read(ctx context.Context, client http.Client, readInp ReadInput) (*ReadOutput, error) {
 
-	client.Logger.Println("updating generic ssh")
+	client.Logger.Println("reading generic ssh")
 
 	readOutp, err := device.Read(ctx, client, *device.NewReadInput(readInp.Uid))
 	if err != nil {

@@ -29,7 +29,7 @@ type ReadOutput struct {
 	DeviceType      string `json:"deviceType"`
 	LarUid          string `json:"larUid"`
 	LarType         string `json:"larType"`
-	Ipv4            string `json:"ipv4"`
+	SocketAddress   string `json:"ipv4"`
 	Port            string `json:"port"`
 	Host            string `json:"host"`
 

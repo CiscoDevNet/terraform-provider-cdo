@@ -112,8 +112,6 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 		KeyId:      types.StringValue(res.PublicKey.KeyId),
 	}
 
-	fmt.Printf("planData.PublicKey=%+v\n", planData.PublicKey)
-
 	// Save data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &planData)...)
 }

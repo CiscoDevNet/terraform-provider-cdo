@@ -1,4 +1,4 @@
-package rsa
+package crypto
 
 import (
 	"crypto/rand"
@@ -6,37 +6,25 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
+	internalRsa "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto/internal/rsa"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 )
 
-type RsaCiper struct {
-	pub *rsa.PublicKey
-}
-
-func NewCiper(base64EncodedPublicKey string) (*RsaCiper, error) {
-	encodedKey, err := base64.StdEncoding.DecodeString(base64EncodedPublicKey)
+func EncryptCredentials(key model.PublicKey, username, password string) (model.EncryptedCredentials, error) {
+	ciper, err := internalRsa.NewCiper(key.EncodedKey)
 	if err != nil {
-		return nil, err
+		return model.EncryptedCredentials{}, err
+	}
+	encryptedUsername, err := ciper.Encrypt(username)
+	if err != nil {
+		return model.EncryptedCredentials{}, err
+	}
+	encryptedPassword, err := ciper.Encrypt(password)
+	if err != nil {
+		return model.EncryptedCredentials{}, err
 	}
 
-	block, _ := pem.Decode([]byte(encodedKey))
-	pub, err := x509.ParsePKIXPublicKey(block.Bytes)
-	if err != nil {
-		return nil, err
-	}
-
-	return &RsaCiper{
-		pub.(*rsa.PublicKey),
-	}, nil
-}
-
-func (ciper *RsaCiper) Encrypt(msg string) (string, error) {
-	rsaEncoded, err := rsa.EncryptPKCS1v15(rand.Reader, ciper.pub, []byte(msg))
-	if err != nil {
-		return "", err
-	}
-	base64RsaEncoded := base64.StdEncoding.EncodeToString(rsaEncoded)
-
-	return base64RsaEncoded, nil
+	return model.NewEncryptedCredentials(encryptedUsername, encryptedPassword, key.KeyId), nil
 }
 
 func DecryptBase64EncodedPkcs1v15Value(privateKey *rsa.PrivateKey, cipherText []byte) (string, error) {

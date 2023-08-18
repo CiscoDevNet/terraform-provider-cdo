@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 	"strings"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
@@ -55,7 +56,7 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 		}
 
 		if updateInp.Username != "" || updateInp.Password != "" {
-			var publicKey *sdc.PublicKey
+			var publicKey *model.PublicKey
 			if strings.EqualFold(asaReadOutp.LarType, "SDC") {
 				if asaReadOutp.LarUid == "" {
 					return nil, fmt.Errorf("sdc uid not found")

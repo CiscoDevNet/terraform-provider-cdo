@@ -8,6 +8,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 	"strings"
 )
 
@@ -117,7 +118,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	}
 
 	// encrypt credentials for SDC on prem lar
-	var publicKey *sdc.PublicKey
+	var publicKey *model.PublicKey
 	if strings.EqualFold(deviceCreateOutp.LarType, "SDC") {
 
 		// on-prem lar requires encryption

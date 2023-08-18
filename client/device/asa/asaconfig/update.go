@@ -3,10 +3,10 @@ package asaconfig
 import (
 	"context"
 	"encoding/json"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 	"strings"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto/rsa"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 )
@@ -15,7 +15,7 @@ type UpdateInput struct {
 	SpecificUid string
 	Username    string
 	Password    string
-	PublicKey   *sdc.PublicKey
+	PublicKey   *model.PublicKey
 	State       string
 }
 
@@ -23,7 +23,7 @@ type UpdateOutput struct {
 	Uid string `json:"uid"`
 }
 
-func NewUpdateInput(specificUid string, username string, password string, publicKey *sdc.PublicKey, state string) *UpdateInput {
+func NewUpdateInput(specificUid string, username string, password string, publicKey *model.PublicKey, state string) *UpdateInput {
 	return &UpdateInput{
 		SpecificUid: specificUid,
 		Username:    username,
@@ -151,49 +151,19 @@ type updateCredentialsBody struct {
 	SmContext SmContext `json:"stateMachineContext"`
 }
 
-type credentials struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	KeyId    string `json:"keyId,omitempty"`
-}
-
 type SmContext struct {
 	Credentials string `json:"credentials"`
-}
-
-func encrypt(req *UpdateInput) error {
-	ciper, err := rsa.NewCiper(req.PublicKey.EncodedKey)
-	if err != nil {
-		return err
-	}
-	req.Username, err = ciper.Encrypt(req.Username)
-	if err != nil {
-		return err
-	}
-	req.Password, err = ciper.Encrypt(req.Password)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func makeCredentials(updateInp UpdateInput) ([]byte, error) {
 	if updateInp.PublicKey != nil {
 
-		if err := encrypt(&updateInp); err != nil {
+		encryptedCredentials, err := crypto.EncryptCredentials(*updateInp.PublicKey, updateInp.Username, updateInp.Password)
+		if err != nil {
 			return nil, err
 		}
-
-		return json.Marshal(credentials{
-			Username: updateInp.Username,
-			Password: updateInp.Password,
-			KeyId:    updateInp.PublicKey.KeyId,
-		})
+		return json.Marshal(encryptedCredentials)
 	}
 
-	return json.Marshal(credentials{
-		Username: updateInp.Username,
-		Password: updateInp.Password,
-	})
+	return json.Marshal(model.NewCredentials(updateInp.Username, updateInp.Password))
 }

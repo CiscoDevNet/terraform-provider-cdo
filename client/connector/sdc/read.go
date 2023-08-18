@@ -3,6 +3,7 @@ package sdc
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
@@ -17,18 +18,12 @@ type ReadByNameInput struct {
 }
 
 type ReadOutput struct {
-	Uid        string    `json:"uid"`
-	Name       string    `json:"name"`
-	DefaultSdc bool      `json:"defaultLar"`
-	Cdg        bool      `json:"cdg"`
-	TenantUid  string    `json:"tenantUid"`
-	PublicKey  PublicKey `json:"larPublicKey"`
-}
-
-type PublicKey struct {
-	EncodedKey string `json:"encodedKey"`
-	Version    int64  `json:"version"`
-	KeyId      string `json:"keyId"`
+	Uid        string          `json:"uid"`
+	Name       string          `json:"name"`
+	DefaultSdc bool            `json:"defaultLar"`
+	Cdg        bool            `json:"cdg"`
+	TenantUid  string          `json:"tenantUid"`
+	PublicKey  model.PublicKey `json:"larPublicKey"`
 }
 
 func NewReadByUidInput(sdcUid string) *ReadByUidInput {

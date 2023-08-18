@@ -3,8 +3,8 @@ package sdc
 import (
 	"crypto/rand"
 	"crypto/rsa"
-
-	internalRsa "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto/rsa"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 )
 
 type sdcReadOutputBuilder struct {
@@ -28,11 +28,7 @@ func (builder *sdcReadOutputBuilder) AsDefaultCloudConnector() *sdcReadOutputBui
 
 func (builder *sdcReadOutputBuilder) AsOnPremConnector() *sdcReadOutputBuilder {
 	builder.readOutput.Cdg = false
-	builder.readOutput.PublicKey = PublicKey{
-		EncodedKey: mustGenerateBase64PublicKey(),
-		Version:    164,
-		KeyId:      "01010101-0101-0101-0101-010101010101",
-	}
+	builder.readOutput.PublicKey = model.NewPublicKey(mustGenerateBase64PublicKey(), 164, "01010101-0101-0101-0101-010101010101")
 
 	return builder
 }
@@ -61,5 +57,5 @@ func mustGenerateBase64PublicKey() string {
 		panic(err)
 	}
 
-	return internalRsa.MustBase64PublicKeyFromRsaKey(key)
+	return crypto.MustBase64PublicKeyFromRsaKey(key)
 }

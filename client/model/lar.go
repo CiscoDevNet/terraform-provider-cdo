@@ -5,29 +5,29 @@ import (
 	"strings"
 )
 
-type LarType string
+type ConnectorType string
 
 const (
-	LarTypeCloudDeviceGateway    LarType = "CDG"
-	LarTypeSecureDeviceConnector LarType = "SDC"
+	ConnectorTypeCloudDeviceGateway    ConnectorType = "CDG"
+	ConnectorTypeSecureDeviceConnector ConnectorType = "SDC"
 )
 
-func ParseLarType(input string) (LarType, error) {
+func ParseConnectorType(input string) (ConnectorType, error) {
 	switch strings.ToUpper(input) {
-	case string(LarTypeCloudDeviceGateway):
-		return LarTypeCloudDeviceGateway, nil
+	case string(ConnectorTypeCloudDeviceGateway):
+		return ConnectorTypeCloudDeviceGateway, nil
 
-	case string(LarTypeSecureDeviceConnector):
-		return LarTypeSecureDeviceConnector, nil
+	case string(ConnectorTypeSecureDeviceConnector):
+		return ConnectorTypeSecureDeviceConnector, nil
 
 	default:
-		return "", fmt.Errorf("'%s' is not a valid lar type", input)
+		return "", fmt.Errorf("'%s' is not a valid connector type", input)
 
 	}
 }
 
-func MustParseLarType(input string) LarType {
-	larType, err := ParseLarType(input)
+func MustParseConnectorType(input string) ConnectorType {
+	larType, err := ParseConnectorType(input)
 	if err != nil {
 		panic(err)
 	}

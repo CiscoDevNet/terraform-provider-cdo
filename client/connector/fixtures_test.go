@@ -1,12 +1,14 @@
-package sdc_test
+package connector_test
 
-import "github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
+import (
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
+)
 
 const (
 	cdgUid                   = "11111111-1111-1111-1111-111111111111"
 	cdgName                  = "Cloud Connector"
-	sdcUid                   = "22222222-2222-2222-2222-222222222222"
-	sdcName                  = "My On Prem SDC"
+	connectorUid             = "22222222-2222-2222-2222-222222222222"
+	connectorName            = "My On Prem SDC"
 	tenantUid                = "99999999-9999-9999-9999-999999999999"
 	tenantName               = "test-tenant-name"
 	accessToken              = "test-access-token"
@@ -21,5 +23,5 @@ const (
 )
 
 var (
-	bootstrapData = sdc.ComputeBootstrapData(sdcName, accessToken, tenantName, baseUrl, host)
+	bootstrapData = connector.ComputeBootstrapData(connectorName, accessToken, tenantName, baseUrl, host)
 )

@@ -1,4 +1,4 @@
-package sdc
+package connector
 
 type updateOutputBuilder struct {
 	updateOutput UpdateOutput

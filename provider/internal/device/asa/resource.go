@@ -3,10 +3,10 @@ package asa
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"strconv"
 	"strings"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -194,21 +194,21 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 
-	var specificSdcOutp *sdc.ReadOutput
+	var specificSdcOutp *connector.ReadOutput
 	if strings.EqualFold(planData.ConnectorType.ValueString(), "SDC") {
-		readSdcByNameInp := sdc.NewReadByNameInput(
+		readSdcByNameInp := connector.NewReadByNameInput(
 			planData.ConnectorName.ValueString(),
 		)
 
 		var err error
-		specificSdcOutp, err = r.client.ReadSdcByName(ctx, *readSdcByNameInp)
+		specificSdcOutp, err = r.client.ReadConnectorByName(ctx, *readSdcByNameInp)
 		if err != nil {
 			res.Diagnostics.AddError("failed to read SDC by name", err.Error())
 			return
 		}
 
 	} else {
-		specificSdcOutp = &sdc.ReadOutput{}
+		specificSdcOutp = &connector.ReadOutput{}
 	}
 
 	createInp := asa.NewCreateRequestInput(
@@ -237,7 +237,7 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 	}
 
 	planData.ID = types.StringValue(createOutp.Uid)
-	planData.ConnectorType = types.StringValue(createOutp.SdcType)
+	planData.ConnectorType = types.StringValue(createOutp.ConnectorType)
 	planData.ConnectorName = getConnectorName(&planData)
 	planData.Name = types.StringValue(createOutp.Name)
 	planData.Host = types.StringValue(createOutp.Host)

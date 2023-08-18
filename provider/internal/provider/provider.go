@@ -6,9 +6,9 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/connector"
 	"os"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/internal/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/device/ios"
 
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
@@ -140,7 +140,7 @@ func (p *CdoProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 func (p *CdoProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		sdc.NewResource,
+		connector.NewResource,
 		asa.NewAsaDeviceResource,
 		ios.NewIosDeviceResource,
 	}
@@ -148,7 +148,7 @@ func (p *CdoProvider) Resources(ctx context.Context) []func() resource.Resource 
 
 func (p *CdoProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
-		sdc.NewDataSource,
+		connector.NewDataSource,
 		asa.NewAsaDataSource,
 		ios.NewIosDataSource,
 	}

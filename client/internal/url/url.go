@@ -29,7 +29,7 @@ func ReadSpecificDevice(baseUrl string, specificUid string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/device/%s/specific-device", baseUrl, specificUid)
 }
 
-func ReadAllSdcs(baseUrl string) string {
+func ReadAllConnectors(baseUrl string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/proxies", baseUrl)
 }
 
@@ -41,24 +41,24 @@ func UpdateAsaConfig(baseUrl string, specificUid string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/asa/configs/%s", baseUrl, specificUid)
 }
 
-func ReadSdcByUid(baseUrl string, larUid string) string {
-	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/proxies/%s", baseUrl, larUid)
+func ReadConnectorByUid(baseUrl string, connectorUid string) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/proxies/%s", baseUrl, connectorUid)
 }
 
-func ReadSdcByName(baseUrl string, larName string) string {
-	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/proxies?q=name:%s", baseUrl, larName)
+func ReadConnectorByName(baseUrl string, connectorName string) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/proxies?q=name:%s", baseUrl, connectorName)
 }
 
-func CreateSdc(baseUrl string) string {
+func CreateConnector(baseUrl string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/proxies", baseUrl)
 }
 
-func UpdateSdc(baseUrl string, sdcUid string) string {
-	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/proxies/%s", baseUrl, sdcUid)
+func UpdateConnector(baseUrl string, connectorUid string) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/proxies/%s", baseUrl, connectorUid)
 }
 
-func DeleteSdc(baseUrl string, sdcUid string) string {
-	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/proxies/%s", baseUrl, sdcUid)
+func DeleteConnector(baseUrl string, connectorUid string) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/proxies/%s", baseUrl, connectorUid)
 }
 
 func UserToken(baseUrl string) string {

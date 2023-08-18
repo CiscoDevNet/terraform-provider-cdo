@@ -9,11 +9,11 @@ import (
 
 type testIosResourceType struct {
 	Name              string
-	Ipv4              string
-	SdcType           string
+	SocketAddress     string
+	ConnectorType     string
 	Username          string
 	Password          string
-	SdcName           string
+	ConnectorName     string
 	IgnoreCertificate bool
 
 	Host string
@@ -24,20 +24,19 @@ const testIosResourceTemplate = `
 resource "cdo_ios_device" "test" {
 	name = "{{.Name}}"
 	socket_address = "{{.SocketAddress}}"
-	connector_type = "{{.SdcType}}"
-	username = "{{.EncryptedUsername}}"
-	password = "{{.EncryptedPassword}}"
-	sdc_name = "{{.SdcName}}"
+	username = "{{.Username}}"
+	password = "{{.Password}}"
+	connector_name = "{{.ConnectorName}}"
 	ignore_certificate = "{{.IgnoreCertificate}}"
 }`
 
 var testIosResource = testIosResourceType{
 	Name:              "test-ios-device-1",
-	Ipv4:              "10.10.0.198:22",
-	SdcType:           "SDC",
+	SocketAddress:     "10.10.0.198:22",
+	ConnectorType:     "SDC",
 	Username:          "lockhart",
 	Password:          "BlueSkittles123!!",
-	SdcName:           "CDO_terraform-provider-cdo-SDC-1",
+	ConnectorName:     "CDO_terraform-provider-cdo-SDC-1",
 	IgnoreCertificate: true,
 
 	Host: "10.10.0.198",
@@ -51,6 +50,7 @@ var testIosResource_NewName = acctest.MustOverrideFields(testIosResource, map[st
 var testIosResourceConfig_NewName = acctest.MustParseTemplate(testIosResourceTemplate, testIosResource_NewName)
 
 func TestAccIosDeviceResource_SDC(t *testing.T) {
+	t.Skip("require new ios device in ci")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 acctest.PreCheckFunc(t),
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
@@ -60,10 +60,10 @@ func TestAccIosDeviceResource_SDC(t *testing.T) {
 				Config: acctest.ProviderConfig() + testIosResourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "name", testIosResource.Name),
-					resource.TestCheckResourceAttr("cdo_ios_device.test", "socket_address", testIosResource.Ipv4),
+					resource.TestCheckResourceAttr("cdo_ios_device.test", "socket_address", testIosResource.SocketAddress),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "host", testIosResource.Host),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "port", testIosResource.Port),
-					resource.TestCheckResourceAttr("cdo_ios_device.test", "connector_type", testIosResource.SdcType),
+					resource.TestCheckResourceAttr("cdo_ios_device.test", "connector_type", testIosResource.ConnectorType),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "username", testIosResource.Username),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "password", testIosResource.Password),
 				),

@@ -157,7 +157,7 @@ func (d *AsaDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	configData.ID = types.StringValue(readOutp.Uid)
 	configData.SdcType = types.StringValue(readOutp.LarType)
 	configData.Name = types.StringValue(readOutp.Name)
-	configData.Ipv4 = types.StringValue(readOutp.Ipv4)
+	configData.Ipv4 = types.StringValue(readOutp.SocketAddress)
 	configData.Host = types.StringValue(readOutp.Host)
 	configData.IgnoreCertificate = types.BoolValue(readOutp.IgnoreCertifcate)
 

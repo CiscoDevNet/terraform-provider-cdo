@@ -21,9 +21,9 @@ IOS data source
 
 ### Read-Only
 
+- `connector_name` (String) The name of the Secure Device Connector (SDC) that is used by CDO to communicate with the device.
 - `host` (String) The host used to connect to the device.
 - `id` (String) Universally unique identifier of the device.
 - `ignore_certificate` (Boolean) This attribute indicates whether certificates were ignored when onboarding this device.
 - `port` (Number) The port used to connect to the device.
-- `sdc_name` (String) The name of the Secure Device Connector (SDC) that is used by CDO to communicate with the device.
 - `socket_address` (String) The address of the device to onboard, specified in the format `host:port`.

@@ -42,9 +42,9 @@ func TestIosCreate(t *testing.T) {
 			testName: "successfully onboards iOS when using SDC",
 			input: CreateInput{
 				Name:              iosDevice.Name,
-				SdcType:           iosDevice.LarType,
-				SdcUid:            iosDevice.LarUid,
-				Ipv4:              iosDevice.Ipv4,
+				ConnectorType:     iosDevice.LarType,
+				ConnectorUid:      iosDevice.LarUid,
+				SocketAddress:     iosDevice.SocketAddress,
 				Username:          "unittestuser",
 				Password:          "not a real password",
 				IgnoreCertificate: false,
@@ -65,14 +65,14 @@ func TestIosCreate(t *testing.T) {
 				assert.NotNil(t, output)
 
 				expectedCreatedOutput := CreateOutput{
-					Uid:        iosDevice.Uid,
-					Name:       iosDevice.Name,
-					DeviceType: iosDevice.DeviceType,
-					Host:       iosDevice.Host,
-					Port:       iosDevice.Port,
-					Ipv4:       iosDevice.Ipv4,
-					SdcType:    iosDevice.LarType,
-					SdcUid:     iosDevice.LarUid,
+					Uid:           iosDevice.Uid,
+					Name:          iosDevice.Name,
+					DeviceType:    iosDevice.DeviceType,
+					Host:          iosDevice.Host,
+					Port:          iosDevice.Port,
+					SocketAddress: iosDevice.SocketAddress,
+					SdcType:       iosDevice.LarType,
+					SdcUid:        iosDevice.LarUid,
 				}
 				assert.Equal(t, expectedCreatedOutput, *output)
 
@@ -87,9 +87,9 @@ func TestIosCreate(t *testing.T) {
 			testName: "returns error when device create call encounters error",
 			input: CreateInput{
 				Name:              iosDevice.Name,
-				SdcType:           iosDevice.LarType,
-				SdcUid:            iosDevice.LarUid,
-				Ipv4:              iosDevice.Ipv4,
+				ConnectorType:     iosDevice.LarType,
+				ConnectorUid:      iosDevice.LarUid,
+				SocketAddress:     iosDevice.SocketAddress,
 				Username:          "unittestuser",
 				Password:          "not a real password",
 				IgnoreCertificate: false,
@@ -115,9 +115,9 @@ func TestIosCreate(t *testing.T) {
 			testName: "returns error when sdc read call encounters error",
 			input: CreateInput{
 				Name:              iosDevice.Name,
-				SdcType:           iosDevice.LarType,
-				SdcUid:            iosDevice.LarUid,
-				Ipv4:              iosDevice.Ipv4,
+				ConnectorType:     iosDevice.LarType,
+				ConnectorUid:      iosDevice.LarUid,
+				SocketAddress:     iosDevice.SocketAddress,
 				Username:          "unittestuser",
 				Password:          "not a real password",
 				IgnoreCertificate: false,
@@ -143,9 +143,9 @@ func TestIosCreate(t *testing.T) {
 			testName: "returns error when iOS config read call encounters error",
 			input: CreateInput{
 				Name:              iosDevice.Name,
-				SdcType:           iosDevice.LarType,
-				SdcUid:            iosDevice.LarUid,
-				Ipv4:              iosDevice.Ipv4,
+				ConnectorType:     iosDevice.LarType,
+				ConnectorUid:      iosDevice.LarUid,
+				SocketAddress:     iosDevice.SocketAddress,
 				Username:          "unittestuser",
 				Password:          "not a real password",
 				IgnoreCertificate: false,
@@ -170,9 +170,9 @@ func TestIosCreate(t *testing.T) {
 			testName: "returns error when device update call encounters error",
 			input: CreateInput{
 				Name:              iosDevice.Name,
-				SdcType:           iosDevice.LarType,
-				SdcUid:            iosDevice.LarUid,
-				Ipv4:              iosDevice.Ipv4,
+				ConnectorType:     iosDevice.LarType,
+				ConnectorUid:      iosDevice.LarUid,
+				SocketAddress:     iosDevice.SocketAddress,
 				Username:          "unittestuser",
 				Password:          "not a real password",
 				IgnoreCertificate: false,

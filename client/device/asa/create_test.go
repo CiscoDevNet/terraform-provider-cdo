@@ -63,7 +63,7 @@ func TestAsaCreate(t *testing.T) {
 			input: asa.CreateInput{
 				Name:             asaDevice.Name,
 				SdcType:          asaDevice.LarType,
-				Ipv4:             asaDevice.Ipv4,
+				SocketAddress:    asaDevice.SocketAddress,
 				Username:         "unittestuser",
 				Password:         "not a real password",
 				IgnoreCertifcate: false,
@@ -81,14 +81,14 @@ func TestAsaCreate(t *testing.T) {
 				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
-					Uid:        asaDevice.Uid,
-					Name:       asaDevice.Name,
-					DeviceType: asaDevice.DeviceType,
-					Host:       asaDevice.Host,
-					Port:       asaDevice.Port,
-					Ipv4:       asaDevice.Ipv4,
-					SdcType:    asaDevice.LarType,
-					SdcUid:     asaDevice.LarUid,
+					Uid:           asaDevice.Uid,
+					Name:          asaDevice.Name,
+					DeviceType:    asaDevice.DeviceType,
+					Host:          asaDevice.Host,
+					Port:          asaDevice.Port,
+					SocketAddress: asaDevice.SocketAddress,
+					SdcType:       asaDevice.LarType,
+					SdcUid:        asaDevice.LarUid,
 				}
 				assert.Equal(t, expectedCreatedOutput, *output)
 
@@ -105,7 +105,7 @@ func TestAsaCreate(t *testing.T) {
 			input: asa.CreateInput{
 				Name:             asaDevice.Name,
 				SdcType:          asaDevice.LarType,
-				Ipv4:             asaDevice.Ipv4,
+				SocketAddress:    asaDevice.SocketAddress,
 				Username:         "unittestuser",
 				Password:         "not a real password",
 				IgnoreCertifcate: true,
@@ -130,14 +130,14 @@ func TestAsaCreate(t *testing.T) {
 				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
-					Uid:        asaDevice.Uid,
-					Name:       asaDevice.Name,
-					DeviceType: asaDevice.DeviceType,
-					Host:       asaDevice.Host,
-					Port:       asaDevice.Port,
-					Ipv4:       asaDevice.Ipv4,
-					SdcType:    asaDevice.LarType,
-					SdcUid:     asaDevice.LarUid,
+					Uid:           asaDevice.Uid,
+					Name:          asaDevice.Name,
+					DeviceType:    asaDevice.DeviceType,
+					Host:          asaDevice.Host,
+					Port:          asaDevice.Port,
+					SocketAddress: asaDevice.SocketAddress,
+					SdcType:       asaDevice.LarType,
+					SdcUid:        asaDevice.LarUid,
 				}
 				assert.Equal(t, expectedCreatedOutput, *output)
 
@@ -155,7 +155,7 @@ func TestAsaCreate(t *testing.T) {
 				Name:             asaDeviceUsingSdc.Name,
 				SdcType:          asaDeviceUsingSdc.LarType,
 				SdcUid:           asaDeviceUsingSdc.LarUid,
-				Ipv4:             asaDeviceUsingSdc.Ipv4,
+				SocketAddress:    asaDeviceUsingSdc.SocketAddress,
 				Username:         "unittestuser",
 				Password:         "not a real password",
 				IgnoreCertifcate: false,
@@ -174,14 +174,14 @@ func TestAsaCreate(t *testing.T) {
 				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
-					Uid:        asaDeviceUsingSdc.Uid,
-					Name:       asaDeviceUsingSdc.Name,
-					DeviceType: asaDeviceUsingSdc.DeviceType,
-					Host:       asaDeviceUsingSdc.Host,
-					Port:       asaDeviceUsingSdc.Port,
-					Ipv4:       asaDeviceUsingSdc.Ipv4,
-					SdcType:    asaDeviceUsingSdc.LarType,
-					SdcUid:     asaDeviceUsingSdc.LarUid,
+					Uid:           asaDeviceUsingSdc.Uid,
+					Name:          asaDeviceUsingSdc.Name,
+					DeviceType:    asaDeviceUsingSdc.DeviceType,
+					Host:          asaDeviceUsingSdc.Host,
+					Port:          asaDeviceUsingSdc.Port,
+					SocketAddress: asaDeviceUsingSdc.SocketAddress,
+					SdcType:       asaDeviceUsingSdc.LarType,
+					SdcUid:        asaDeviceUsingSdc.LarUid,
 				}
 				assert.Equal(t, expectedCreatedOutput, *output)
 
@@ -200,7 +200,7 @@ func TestAsaCreate(t *testing.T) {
 				Name:             asaDeviceUsingSdc.Name,
 				SdcType:          asaDeviceUsingSdc.LarType,
 				SdcUid:           asaDeviceUsingSdc.LarUid,
-				Ipv4:             asaDeviceUsingSdc.Ipv4,
+				SocketAddress:    asaDeviceUsingSdc.SocketAddress,
 				Username:         "unittestuser",
 				Password:         "not a real password",
 				IgnoreCertifcate: true,
@@ -226,14 +226,14 @@ func TestAsaCreate(t *testing.T) {
 				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
-					Uid:        asaDeviceUsingSdc.Uid,
-					Name:       asaDeviceUsingSdc.Name,
-					DeviceType: asaDeviceUsingSdc.DeviceType,
-					Host:       asaDeviceUsingSdc.Host,
-					Port:       asaDeviceUsingSdc.Port,
-					Ipv4:       asaDeviceUsingSdc.Ipv4,
-					SdcType:    asaDeviceUsingSdc.LarType,
-					SdcUid:     asaDeviceUsingSdc.LarUid,
+					Uid:           asaDeviceUsingSdc.Uid,
+					Name:          asaDeviceUsingSdc.Name,
+					DeviceType:    asaDeviceUsingSdc.DeviceType,
+					Host:          asaDeviceUsingSdc.Host,
+					Port:          asaDeviceUsingSdc.Port,
+					SocketAddress: asaDeviceUsingSdc.SocketAddress,
+					SdcType:       asaDeviceUsingSdc.LarType,
+					SdcUid:        asaDeviceUsingSdc.LarUid,
 				}
 				assert.Equal(t, expectedCreatedOutput, *output)
 
@@ -253,7 +253,7 @@ func TestAsaCreate(t *testing.T) {
 				Name:             asaDeviceUsingSdc.Name,
 				SdcType:          asaDeviceUsingSdc.LarType,
 				SdcUid:           asaDeviceUsingSdc.LarUid,
-				Ipv4:             asaDeviceUsingSdc.Ipv4,
+				SocketAddress:    asaDeviceUsingSdc.SocketAddress,
 				Username:         "unittestuser",
 				Password:         "not a real password",
 				IgnoreCertifcate: true,
@@ -287,7 +287,7 @@ func TestAsaCreate(t *testing.T) {
 				Name:             asaDeviceUsingSdc.Name,
 				SdcType:          asaDeviceUsingSdc.LarType,
 				SdcUid:           asaDeviceUsingSdc.LarUid,
-				Ipv4:             asaDeviceUsingSdc.Ipv4,
+				SocketAddress:    asaDeviceUsingSdc.SocketAddress,
 				Username:         "unittestuser",
 				Password:         "not a real password",
 				IgnoreCertifcate: true,
@@ -321,7 +321,7 @@ func TestAsaCreate(t *testing.T) {
 				Name:             asaDeviceUsingSdc.Name,
 				SdcType:          asaDeviceUsingSdc.LarType,
 				SdcUid:           asaDeviceUsingSdc.LarUid,
-				Ipv4:             asaDeviceUsingSdc.Ipv4,
+				SocketAddress:    asaDeviceUsingSdc.SocketAddress,
 				Username:         "unittestuser",
 				Password:         "not a real password",
 				IgnoreCertifcate: true,
@@ -349,7 +349,7 @@ func TestAsaCreate(t *testing.T) {
 				Name:             asaDeviceUsingSdc.Name,
 				SdcType:          asaDeviceUsingSdc.LarType,
 				SdcUid:           asaDeviceUsingSdc.LarUid,
-				Ipv4:             asaDeviceUsingSdc.Ipv4,
+				SocketAddress:    asaDeviceUsingSdc.SocketAddress,
 				Username:         "unittestuser",
 				Password:         "not a real password",
 				IgnoreCertifcate: true,
@@ -383,7 +383,7 @@ func TestAsaCreate(t *testing.T) {
 				Name:             asaDeviceUsingSdc.Name,
 				SdcType:          asaDeviceUsingSdc.LarType,
 				SdcUid:           asaDeviceUsingSdc.LarUid,
-				Ipv4:             asaDeviceUsingSdc.Ipv4,
+				SocketAddress:    asaDeviceUsingSdc.SocketAddress,
 				Username:         "unittestuser",
 				Password:         "not a real password",
 				IgnoreCertifcate: true,
@@ -416,7 +416,7 @@ func TestAsaCreate(t *testing.T) {
 				Name:             asaDeviceUsingSdc.Name,
 				SdcType:          asaDeviceUsingSdc.LarType,
 				SdcUid:           asaDeviceUsingSdc.LarUid,
-				Ipv4:             asaDeviceUsingSdc.Ipv4,
+				SocketAddress:    asaDeviceUsingSdc.SocketAddress,
 				Username:         "unittestuser",
 				Password:         "not a real password",
 				IgnoreCertifcate: true,

@@ -50,7 +50,7 @@ func TestIosRead(t *testing.T) {
 					DeviceType:      iosDevice.DeviceType,
 					LarUid:          iosDevice.LarUid,
 					LarType:         iosDevice.LarType,
-					Ipv4:            iosDevice.Ipv4,
+					SocketAddress:   iosDevice.SocketAddress,
 					Host:            iosDevice.Host,
 					Port:            iosDevice.Port,
 				}

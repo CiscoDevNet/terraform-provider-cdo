@@ -13,6 +13,7 @@ import (
 
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -52,12 +53,15 @@ func (p *CdoProvider) Schema(ctx context.Context, req provider.SchemaRequest, re
 				MarkdownDescription: "The API token used to authenticate with CDO. [See here](https://docs.defenseorchestrator.com/c_api-tokens.html#!t-generatean-api-token.html) to learn how to generate an API token.",
 				Optional:            true,
 				Sensitive:           true,
+				Validators: []validator.String{
+					validators.OneOfRoles("ROLE_SUPER_ADMIN", "ROLE_ADMIN"),
+				},
 			},
 			"base_url": schema.StringAttribute{
 				MarkdownDescription: "The base CDO URL. This is the URL you enter when logging into your CDO account.",
 				Required:            true,
 				Validators: []validator.String{
-					validators.OneOf("https://www.defenseorchestrator.com", "https://www.defenseorchestrator.eu", "https://apj.cdo.cisco.com", "https://staging.dev.lockhart.io", "https://ci.dev.lockhart.io", "https://scale.dev.lockhart.io"),
+					stringvalidator.OneOf("https://www.defenseorchestrator.com", "https://www.defenseorchestrator.eu", "https://apj.cdo.cisco.com", "https://staging.dev.lockhart.io", "https://ci.dev.lockhart.io", "https://scale.dev.lockhart.io"),
 				},
 			},
 		},

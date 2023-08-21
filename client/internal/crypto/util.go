@@ -10,18 +10,18 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 )
 
-func EncryptCredentials(key model.PublicKey, username, password string) (model.EncryptedCredentials, error) {
+func EncryptCredentials(key model.PublicKey, username, password string) (model.Credentials, error) {
 	ciper, err := internalRsa.NewCiper(key.EncodedKey)
 	if err != nil {
-		return model.EncryptedCredentials{}, err
+		return model.Credentials{}, err
 	}
 	encryptedUsername, err := ciper.Encrypt(username)
 	if err != nil {
-		return model.EncryptedCredentials{}, err
+		return model.Credentials{}, err
 	}
 	encryptedPassword, err := ciper.Encrypt(password)
 	if err != nil {
-		return model.EncryptedCredentials{}, err
+		return model.Credentials{}, err
 	}
 
 	return model.NewEncryptedCredentials(encryptedUsername, encryptedPassword, key.KeyId), nil

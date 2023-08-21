@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/jarcoal/httpmock"
 )
@@ -121,7 +122,11 @@ func TestUpdate(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := sdc.Update(context.Background(), *internalHttp.MustNewWithDefault(baseUrl, "a_valid_token"), sdc.NewUpdateInput(testCase.sdcUid, testCase.sdcName))
+			output, err := sdc.Update(
+				context.Background(),
+				*internalHttp.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
+				sdc.NewUpdateInput(testCase.sdcUid, testCase.sdcName),
+			)
 
 			testCase.assertFunc(output, err, t)
 		})

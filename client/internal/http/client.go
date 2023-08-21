@@ -31,12 +31,12 @@ func MustNewWithDefault(baseUrl, apiToken string) *Client {
 	return MustNewWithHttpClient(cdo.DefaultHttpClient, baseUrl, apiToken)
 }
 
+func MustNewWithConfig(baseUrl, apiToken string, retries int, delay, timeout time.Duration) *Client {
+	return MustNew(cdo.DefaultHttpClient, cdo.DefaultLogger, baseUrl, apiToken, retries, delay, timeout)
+}
+
 func MustNewWithHttpClient(client *http.Client, baseUrl, apiToken string) *Client {
-	internalClient, err := New(client, cdo.DefaultLogger, baseUrl, apiToken, cdo.DefaultRetries, cdo.DefaultDelay, cdo.DefaultTimeout)
-	if err != nil {
-		panic(fmt.Sprint("failed to create http client, cause=%w", err))
-	}
-	return internalClient
+	return MustNew(client, cdo.DefaultLogger, baseUrl, apiToken, cdo.DefaultRetries, cdo.DefaultDelay, cdo.DefaultTimeout)
 }
 
 func New(
@@ -61,6 +61,25 @@ func New(
 		httpClient: client,
 		Logger:     logger,
 	}, nil
+}
+
+func MustNew(
+	// objects
+	client *http.Client,
+	logger *log.Logger,
+
+	// configs
+	baseUrl string,
+	apiToken string,
+	retries int,
+	delay time.Duration,
+	timeout time.Duration,
+) *Client {
+	c, err := New(client, logger, baseUrl, apiToken, retries, delay, timeout)
+	if err != nil {
+		panic(fmt.Sprint("failed to create http client, cause=%w", err))
+	}
+	return c
 }
 
 func (c *Client) NewGet(ctx context.Context, url string) *Request {

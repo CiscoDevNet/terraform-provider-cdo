@@ -7,7 +7,10 @@ import (
 	"github.com/jarcoal/httpmock"
 )
 
-const iosConfigUid = "00000000-0000-0000-0000-000000000000"
+const (
+	iosConfigUid = "00000000-0000-0000-0000-000000000000"
+	baseUrl      = "https://unittest.cdo.cisco.com"
+)
 
 func buildIosConfigPath(specificDeviceUid string) string {
 	return fmt.Sprintf("/aegis/rest/v1/services/targets/devices/%s", specificDeviceUid)

@@ -5,6 +5,7 @@ package client
 import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/genericssh"
 	"net/http"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
@@ -102,4 +103,20 @@ func (c *Client) UpdateSdc(ctx context.Context, inp sdc.UpdateInput) (*sdc.Updat
 
 func (c *Client) DeleteSdc(ctx context.Context, inp sdc.DeleteInput) (*sdc.DeleteOutput, error) {
 	return sdc.Delete(ctx, c.client, inp)
+}
+
+func (c *Client) ReadGenericSSH(ctx context.Context, inp genericssh.ReadInput) (*genericssh.ReadOutput, error) {
+	return genericssh.Read(ctx, c.client, inp)
+}
+
+func (c *Client) CreateGenericSSH(ctx context.Context, inp genericssh.CreateInput) (*genericssh.CreateOutput, error) {
+	return genericssh.Create(ctx, c.client, inp)
+}
+
+func (c *Client) UpdateGenericSSH(ctx context.Context, inp genericssh.UpdateInput) (*genericssh.UpdateOutput, error) {
+	return genericssh.Update(ctx, c.client, inp)
+}
+
+func (c *Client) DeleteGenericSSH(ctx context.Context, inp genericssh.DeleteInput) (*genericssh.DeleteOutput, error) {
+	return genericssh.Delete(ctx, c.client, inp)
 }

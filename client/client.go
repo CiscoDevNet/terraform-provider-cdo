@@ -120,3 +120,19 @@ func (c *Client) UpdateGenericSSH(ctx context.Context, inp genericssh.UpdateInpu
 func (c *Client) DeleteGenericSSH(ctx context.Context, inp genericssh.DeleteInput) (*genericssh.DeleteOutput, error) {
 	return genericssh.Delete(ctx, c.client, inp)
 }
+
+func (c *Client) ReadGenericSSH(ctx context.Context, inp genericssh.ReadInput) (*genericssh.ReadOutput, error) {
+	return genericssh.Read(ctx, c.client, inp)
+}
+
+func (c *Client) CreateGenericSSH(ctx context.Context, inp genericssh.CreateInput) (*genericssh.CreateOutput, error) {
+	return genericssh.Create(ctx, c.client, inp)
+}
+
+func (c *Client) UpdateGenericSSH(ctx context.Context, inp genericssh.UpdateInput) (*genericssh.UpdateOutput, error) {
+	return genericssh.Update(ctx, c.client, inp)
+}
+
+func (c *Client) DeleteGenericSSH(ctx context.Context, inp genericssh.DeleteInput) (*genericssh.DeleteOutput, error) {
+	return genericssh.Delete(ctx, c.client, inp)
+}

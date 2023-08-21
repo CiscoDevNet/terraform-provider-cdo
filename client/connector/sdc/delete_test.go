@@ -7,6 +7,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 
 	"github.com/jarcoal/httpmock"
 )
@@ -66,7 +67,11 @@ func TestDelete(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := sdc.Delete(context.Background(), *http.MustNewWithDefault(baseUrl, "a_valid_token"), sdc.NewDeleteInput(testCase.sdcUid))
+			output, err := sdc.Delete(
+				context.Background(),
+				*http.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
+				sdc.NewDeleteInput(testCase.sdcUid),
+			)
 
 			testCase.assertFunc(output, err, t)
 		})

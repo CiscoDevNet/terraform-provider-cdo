@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
+	"fmt"
 )
 
 type RsaCiper struct {
@@ -19,6 +20,9 @@ func NewCiper(base64EncodedPublicKey string) (*RsaCiper, error) {
 	}
 
 	block, _ := pem.Decode(encodedKey)
+	if block == nil {
+		return nil, fmt.Errorf("PEM formatted block (i.e. public key) not found")
+	}
 	pub, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
 		return nil, err

@@ -1,28 +1,23 @@
 package model
 
-type EncryptedCredentials struct {
-	EncryptedUsername string `json:"username"`
-	EncryptedPassword string `json:"password"`
-	KeyId             string `json:"keyId,omitempty"`
-}
-
-func NewEncryptedCredentials(encryptedUsername, encryptedPassword, keyId string) EncryptedCredentials {
-	return EncryptedCredentials{
-		EncryptedUsername: encryptedUsername,
-		EncryptedPassword: encryptedPassword,
-		KeyId:             keyId,
-	}
-}
-
 type Credentials struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	KeyId    string `json:"keyId,omitempty"`
 }
 
-func NewCredentials(encryptedUsername, encryptedPassword string) Credentials {
+func NewEncryptedCredentials(encryptedUsername, encryptedPassword, keyId string) Credentials {
 	return Credentials{
 		Username: encryptedUsername,
 		Password: encryptedPassword,
+		KeyId:    keyId,
+	}
+}
+
+func NewCredentials(username, password string) Credentials {
+	return Credentials{
+		Username: username,
+		Password: password,
 	}
 }
 

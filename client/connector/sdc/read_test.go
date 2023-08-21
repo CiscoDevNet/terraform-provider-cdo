@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
@@ -113,7 +114,11 @@ func TestReadByUid(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := sdc.ReadByUid(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), sdc.ReadByUidInput{SdcUid: testCase.targetUid})
+			output, err := sdc.ReadByUid(
+				context.Background(),
+				*http.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
+				*sdc.NewReadByUidInput(testCase.targetUid),
+			)
 
 			testCase.assertFunc(output, err, t)
 		})
@@ -247,7 +252,11 @@ func TestReadByName(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := sdc.ReadByName(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), sdc.ReadByNameInput{SdcName: testCase.targetName})
+			output, err := sdc.ReadByName(
+				context.Background(),
+				*http.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
+				*sdc.NewReadByNameInput(testCase.targetName),
+			)
 
 			testCase.assertFunc(output, err, t)
 		})

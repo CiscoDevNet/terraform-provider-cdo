@@ -7,6 +7,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 
 	"github.com/jarcoal/httpmock"
 )
@@ -119,7 +120,11 @@ func TestCreate(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := sdc.Create(context.Background(), *http.MustNewWithDefault(baseUrl, "a_valid_token"), *sdc.NewCreateInput(testCase.sdcName))
+			output, err := sdc.Create(
+				context.Background(),
+				*http.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
+				*sdc.NewCreateInput(testCase.sdcName),
+			)
 
 			testCase.assertFunc(output, err, t)
 		})

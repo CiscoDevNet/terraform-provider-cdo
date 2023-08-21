@@ -13,6 +13,7 @@ import (
 
 const (
 	deviceCreatePath = "/aegis/rest/v1/services/targets/devices"
+	baseUrl          = "https://unittest.cdo.cisco.com"
 )
 
 func buildDeviceReadSpecificPath(deviceUid string) string {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
@@ -93,7 +94,11 @@ func TestReadAll(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := sdc.ReadAll(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), *sdc.NewReadAllInput())
+			output, err := sdc.ReadAll(
+				context.Background(),
+				*http.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
+				*sdc.NewReadAllInput(),
+			)
 
 			testCase.assertFunc(output, err, t)
 		})

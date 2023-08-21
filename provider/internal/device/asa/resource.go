@@ -176,7 +176,7 @@ func (r *AsaDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 	stateData.Name = types.StringValue(asaReadOutp.Name)
 	stateData.SocketAddress = types.StringValue(asaReadOutp.SocketAddress)
 	stateData.Host = types.StringValue(asaReadOutp.Host)
-	stateData.IgnoreCertificate = types.BoolValue(asaReadOutp.IgnoreCertifcate)
+	stateData.IgnoreCertificate = types.BoolValue(asaReadOutp.IgnoreCertificate)
 
 	tflog.Trace(ctx, "done read ASA device resource")
 

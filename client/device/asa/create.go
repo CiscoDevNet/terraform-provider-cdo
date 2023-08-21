@@ -21,7 +21,7 @@ type CreateInput struct {
 	Username string
 	Password string
 
-	IgnoreCertifcate bool
+	IgnoreCertificate bool
 }
 
 type CreateOutput struct {
@@ -46,13 +46,13 @@ func (r *CreateError) Error() string {
 
 func NewCreateRequestInput(name, connectorUid, connectorType, ipv4, username, password string, ignoreCertificate bool) *CreateInput {
 	return &CreateInput{
-		Name:             name,
-		ConnectorUid:     connectorUid,
-		ConnectorType:    connectorType,
-		SocketAddress:    ipv4,
-		Username:         username,
-		Password:         password,
-		IgnoreCertifcate: ignoreCertificate,
+		Name:              name,
+		ConnectorUid:      connectorUid,
+		ConnectorType:     connectorType,
+		SocketAddress:     ipv4,
+		Username:          username,
+		Password:          password,
+		IgnoreCertificate: ignoreCertificate,
 	}
 }
 
@@ -61,7 +61,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	client.Logger.Println("creating asa device")
 
 	deviceCreateOutp, err := device.Create(ctx, client, *device.NewCreateRequestInput(
-		createInp.Name, "ASA", createInp.ConnectorUid, createInp.ConnectorType, createInp.SocketAddress, false, createInp.IgnoreCertifcate,
+		createInp.Name, "ASA", createInp.ConnectorUid, createInp.ConnectorType, createInp.SocketAddress, false, createInp.IgnoreCertificate,
 	))
 	var createdResourceId *string = nil
 	if deviceCreateOutp != nil {
@@ -94,12 +94,12 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	// error during polling, but we maybe able to handle it
 	if err != nil {
 		// no idea what I am doing here, but that is what the cdo frontend ui is doing
-		if createInp.IgnoreCertifcate {
+		if createInp.IgnoreCertificate {
 			// update device with ignore certificate
 			client.Logger.Println("retrying with ignore certificate")
 			_, err := device.Update(ctx, client, device.UpdateInput{
-				Uid:              deviceCreateOutp.Uid,
-				IgnoreCertifcate: true,
+				Uid:               deviceCreateOutp.Uid,
+				IgnoreCertificate: true,
 			})
 			if err != nil {
 				return nil,

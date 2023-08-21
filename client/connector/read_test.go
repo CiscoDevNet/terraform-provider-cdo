@@ -204,7 +204,7 @@ func TestReadByName(t *testing.T) {
 				assert.Nil(t, output)
 				assert.NotNil(t, err)
 
-				expectedError := fmt.Sprintf("multiple connector found with the name: %s", cdgName)
+				expectedError := fmt.Sprintf("multiple connectors found with the name: %s", cdgName)
 				assert.Equal(t, expectedError, err.Error())
 			},
 		},

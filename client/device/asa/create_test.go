@@ -2,14 +2,16 @@ package asa_test
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/device/asaconfig"
 	"github.com/jarcoal/httpmock"
 )
 
@@ -41,12 +43,12 @@ func TestAsaCreate(t *testing.T) {
 	}
 	asaConfig := asaconfig.ReadOutput{
 		Uid:   asaSpecificDevice.SpecificUid,
-		State: asaconfig.AsaConfigStateDone,
+		State: state.DONE,
 	}
 
-	validSdc := sdc.NewSdcOutputBuilder().
+	validConnector := connector.NewConnectorOutputBuilder().
 		WithName("CloudDeviceGateway").
-		WithUid(asaDeviceUsingSdc.LarUid).
+		WithUid(asaDeviceUsingSdc.ConnectorUid).
 		WithTenantUid("44444444-4444-4444-4444-444444444444").
 		AsOnPremConnector().
 		Build()
@@ -60,12 +62,12 @@ func TestAsaCreate(t *testing.T) {
 		{
 			testName: "successfully onboards ASA when using CDG",
 			input: asa.CreateInput{
-				Name:             asaDevice.Name,
-				SdcType:          asaDevice.LarType,
-				Ipv4:             asaDevice.Ipv4,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: false,
+				Name:              asaDevice.Name,
+				ConnectorType:     asaDevice.ConnectorType,
+				SocketAddress:     asaDevice.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: false,
 			},
 
 			setupFunc: func(input asa.CreateInput) {
@@ -77,20 +79,18 @@ func TestAsaCreate(t *testing.T) {
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				assert.Nil(t, err)
-
 				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
-					Uid:        asaDevice.Uid,
-					Name:       asaDevice.Name,
-					DeviceType: asaDevice.DeviceType,
-					Host:       asaDevice.Host,
-					Port:       asaDevice.Port,
-					Ipv4:       asaDevice.Ipv4,
-					SdcType:    asaDevice.LarType,
-					SdcUid:     asaDevice.LarUid,
+					Uid:           asaDevice.Uid,
+					Name:          asaDevice.Name,
+					DeviceType:    asaDevice.DeviceType,
+					Host:          asaDevice.Host,
+					Port:          asaDevice.Port,
+					SocketAddress: asaDevice.SocketAddress,
+					ConnectorType: asaDevice.ConnectorType,
+					ConnectorUid:  asaDevice.ConnectorUid,
 				}
-				assert.Equal(t, expectedCreatedOutput, *output)
 				assert.Equal(t, expectedCreatedOutput, *output)
 
 				assertDeviceCreateWasCalledOnce(t)
@@ -104,12 +104,12 @@ func TestAsaCreate(t *testing.T) {
 			testName: "successfully onboards ASA when using CDG after recovering from certificate error",
 
 			input: asa.CreateInput{
-				Name:             asaDevice.Name,
-				SdcType:          asaDevice.LarType,
-				Ipv4:             asaDevice.Ipv4,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: true,
+				Name:              asaDevice.Name,
+				ConnectorType:     asaDevice.ConnectorType,
+				SocketAddress:     asaDevice.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: true,
 			},
 
 			setupFunc: func(input asa.CreateInput) {
@@ -118,7 +118,7 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
 					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
@@ -128,20 +128,18 @@ func TestAsaCreate(t *testing.T) {
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				assert.Nil(t, err)
-
 				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
-					Uid:        asaDevice.Uid,
-					Name:       asaDevice.Name,
-					DeviceType: asaDevice.DeviceType,
-					Host:       asaDevice.Host,
-					Port:       asaDevice.Port,
-					Ipv4:       asaDevice.Ipv4,
-					SdcType:    asaDevice.LarType,
-					SdcUid:     asaDevice.LarUid,
+					Uid:           asaDevice.Uid,
+					Name:          asaDevice.Name,
+					DeviceType:    asaDevice.DeviceType,
+					Host:          asaDevice.Host,
+					Port:          asaDevice.Port,
+					SocketAddress: asaDevice.SocketAddress,
+					ConnectorType: asaDevice.ConnectorType,
+					ConnectorUid:  asaDevice.ConnectorUid,
 				}
-				assert.Equal(t, expectedCreatedOutput, *output)
 				assert.Equal(t, expectedCreatedOutput, *output)
 
 				assertDeviceCreateWasCalledOnce(t)
@@ -153,62 +151,60 @@ func TestAsaCreate(t *testing.T) {
 		},
 
 		{
-			testName: "successfully onboards ASA when using SDC",
+			testName: "successfully onboards ASA when using connector",
 			input: asa.CreateInput{
-				Name:             asaDeviceUsingSdc.Name,
-				SdcType:          asaDeviceUsingSdc.LarType,
-				SdcUid:           asaDeviceUsingSdc.LarUid,
-				Ipv4:             asaDeviceUsingSdc.Ipv4,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: false,
+				Name:              asaDeviceUsingSdc.Name,
+				ConnectorType:     asaDeviceUsingSdc.ConnectorType,
+				ConnectorUid:      asaDeviceUsingSdc.ConnectorUid,
+				SocketAddress:     asaDeviceUsingSdc.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: false,
 			},
 
 			setupFunc: func(input asa.CreateInput) {
 				configureDeviceCreateToRespondSuccessfully(asaDeviceUsingSdc)
 				configureDeviceReadSpecificToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaSpecificDevice)
 				configureAsaConfigReadToRespondSuccessfully(asaSpecificDevice.SpecificUid, asaConfig)
-				configureSdcReadToRespondSuccessfully(validSdc)
+				configureConnectorReadToRespondSuccessfully(validConnector)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				assert.Nil(t, err)
-
 				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
-					Uid:        asaDeviceUsingSdc.Uid,
-					Name:       asaDeviceUsingSdc.Name,
-					DeviceType: asaDeviceUsingSdc.DeviceType,
-					Host:       asaDeviceUsingSdc.Host,
-					Port:       asaDeviceUsingSdc.Port,
-					Ipv4:       asaDeviceUsingSdc.Ipv4,
-					SdcType:    asaDeviceUsingSdc.LarType,
-					SdcUid:     asaDeviceUsingSdc.LarUid,
+					Uid:           asaDeviceUsingSdc.Uid,
+					Name:          asaDeviceUsingSdc.Name,
+					DeviceType:    asaDeviceUsingSdc.DeviceType,
+					Host:          asaDeviceUsingSdc.Host,
+					Port:          asaDeviceUsingSdc.Port,
+					SocketAddress: asaDeviceUsingSdc.SocketAddress,
+					ConnectorType: asaDeviceUsingSdc.ConnectorType,
+					ConnectorUid:  asaDeviceUsingSdc.ConnectorUid,
 				}
-				assert.Equal(t, expectedCreatedOutput, *output)
 				assert.Equal(t, expectedCreatedOutput, *output)
 
 				assertDeviceCreateWasCalledOnce(t)
 				assertDeviceReadSpecificWasCalledOnce(asaDeviceUsingSdc.Uid, t)
 				assertAsaConfigReadWasCalledTimes(asaConfig.Uid, 2, t)
-				assertSdcReadByUidWasCalledOnce(validSdc.Uid, t)
+				assertConnectorReadByUidWasCalledOnce(validConnector.Uid, t)
 				assertAsaConfigUpdateWasCalledOnce(asaConfig.Uid, t)
 			},
 		},
 
 		{
-			testName: "successfully onboards ASA when using SDC after recovering from certificate error",
+			testName: "successfully onboards ASA when using connector after recovering from certificate error",
 
 			input: asa.CreateInput{
-				Name:             asaDeviceUsingSdc.Name,
-				SdcType:          asaDeviceUsingSdc.LarType,
-				SdcUid:           asaDeviceUsingSdc.LarUid,
-				Ipv4:             asaDeviceUsingSdc.Ipv4,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: true,
+				Name:              asaDeviceUsingSdc.Name,
+				ConnectorType:     asaDeviceUsingSdc.ConnectorType,
+				ConnectorUid:      asaDeviceUsingSdc.ConnectorUid,
+				SocketAddress:     asaDeviceUsingSdc.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: true,
 			},
 
 			setupFunc: func(input asa.CreateInput) {
@@ -217,29 +213,28 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
 					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
-				configureSdcReadToRespondSuccessfully(validSdc)
+				configureConnectorReadToRespondSuccessfully(validConnector)
 				configureDeviceUpdateToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaDeviceUsingSdc)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
 
 			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				assert.Nil(t, err)
-
 				assert.NotNil(t, output)
 
 				expectedCreatedOutput := asa.CreateOutput{
-					Uid:        asaDeviceUsingSdc.Uid,
-					Name:       asaDeviceUsingSdc.Name,
-					DeviceType: asaDeviceUsingSdc.DeviceType,
-					Host:       asaDeviceUsingSdc.Host,
-					Port:       asaDeviceUsingSdc.Port,
-					Ipv4:       asaDeviceUsingSdc.Ipv4,
-					SdcType:    asaDeviceUsingSdc.LarType,
-					SdcUid:     asaDeviceUsingSdc.LarUid,
+					Uid:           asaDeviceUsingSdc.Uid,
+					Name:          asaDeviceUsingSdc.Name,
+					DeviceType:    asaDeviceUsingSdc.DeviceType,
+					Host:          asaDeviceUsingSdc.Host,
+					Port:          asaDeviceUsingSdc.Port,
+					SocketAddress: asaDeviceUsingSdc.SocketAddress,
+					ConnectorType: asaDeviceUsingSdc.ConnectorType,
+					ConnectorUid:  asaDeviceUsingSdc.ConnectorUid,
 				}
 				assert.Equal(t, expectedCreatedOutput, *output)
 
@@ -247,7 +242,7 @@ func TestAsaCreate(t *testing.T) {
 				assertDeviceReadSpecificWasCalledOnce(asaDeviceUsingSdc.Uid, t)
 				assertAsaConfigReadWasCalledTimes(asaConfig.Uid, 2, t)
 				assertDeviceUpdateWasCalledOnce(asaDeviceUsingSdc.Uid, t)
-				assertSdcReadByUidWasCalledOnce(validSdc.Uid, t)
+				assertConnectorReadByUidWasCalledOnce(validConnector.Uid, t)
 				assertAsaConfigUpdateWasCalledOnce(asaConfig.Uid, t)
 			},
 		},
@@ -256,13 +251,13 @@ func TestAsaCreate(t *testing.T) {
 			testName: "returns error when onboarding ASA and create device call experiences issues",
 
 			input: asa.CreateInput{
-				Name:             asaDeviceUsingSdc.Name,
-				SdcType:          asaDeviceUsingSdc.LarType,
-				SdcUid:           asaDeviceUsingSdc.LarUid,
-				Ipv4:             asaDeviceUsingSdc.Ipv4,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: true,
+				Name:              asaDeviceUsingSdc.Name,
+				ConnectorType:     asaDeviceUsingSdc.ConnectorType,
+				ConnectorUid:      asaDeviceUsingSdc.ConnectorUid,
+				SocketAddress:     asaDeviceUsingSdc.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: true,
 			},
 
 			setupFunc: func(input asa.CreateInput) {
@@ -271,11 +266,11 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
 					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
-				configureSdcReadToRespondSuccessfully(validSdc)
+				configureConnectorReadToRespondSuccessfully(validConnector)
 				configureDeviceUpdateToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaDeviceUsingSdc)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
@@ -290,13 +285,13 @@ func TestAsaCreate(t *testing.T) {
 			testName: "returns error when onboarding ASA and read specific device call experiences issues",
 
 			input: asa.CreateInput{
-				Name:             asaDeviceUsingSdc.Name,
-				SdcType:          asaDeviceUsingSdc.LarType,
-				SdcUid:           asaDeviceUsingSdc.LarUid,
-				Ipv4:             asaDeviceUsingSdc.Ipv4,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: true,
+				Name:              asaDeviceUsingSdc.Name,
+				ConnectorType:     asaDeviceUsingSdc.ConnectorType,
+				ConnectorUid:      asaDeviceUsingSdc.ConnectorUid,
+				SocketAddress:     asaDeviceUsingSdc.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: true,
 			},
 
 			setupFunc: func(input asa.CreateInput) {
@@ -305,11 +300,11 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
 					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
-				configureSdcReadToRespondSuccessfully(validSdc)
+				configureConnectorReadToRespondSuccessfully(validConnector)
 				configureDeviceUpdateToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaDeviceUsingSdc)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
@@ -324,20 +319,20 @@ func TestAsaCreate(t *testing.T) {
 			testName: "returns error when onboarding ASA and read asa config call experiences issues",
 
 			input: asa.CreateInput{
-				Name:             asaDeviceUsingSdc.Name,
-				SdcType:          asaDeviceUsingSdc.LarType,
-				SdcUid:           asaDeviceUsingSdc.LarUid,
-				Ipv4:             asaDeviceUsingSdc.Ipv4,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: true,
+				Name:              asaDeviceUsingSdc.Name,
+				ConnectorType:     asaDeviceUsingSdc.ConnectorType,
+				ConnectorUid:      asaDeviceUsingSdc.ConnectorUid,
+				SocketAddress:     asaDeviceUsingSdc.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: true,
 			},
 
 			setupFunc: func(input asa.CreateInput) {
 				configureDeviceCreateToRespondSuccessfully(asaDeviceUsingSdc)
 				configureDeviceReadSpecificToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaSpecificDevice)
 				configureAsaConfigReadToRespondWithError(asaConfig.Uid)
-				configureSdcReadToRespondSuccessfully(validSdc)
+				configureConnectorReadToRespondSuccessfully(validConnector)
 				configureDeviceUpdateToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaDeviceUsingSdc)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
@@ -349,16 +344,16 @@ func TestAsaCreate(t *testing.T) {
 		},
 
 		{
-			testName: "returns error when onboarding ASA and validSdc read call experiences issues",
+			testName: "returns error when onboarding ASA and validConnector read call experiences issues",
 
 			input: asa.CreateInput{
-				Name:             asaDeviceUsingSdc.Name,
-				SdcType:          asaDeviceUsingSdc.LarType,
-				SdcUid:           asaDeviceUsingSdc.LarUid,
-				Ipv4:             asaDeviceUsingSdc.Ipv4,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: true,
+				Name:              asaDeviceUsingSdc.Name,
+				ConnectorType:     asaDeviceUsingSdc.ConnectorType,
+				ConnectorUid:      asaDeviceUsingSdc.ConnectorUid,
+				SocketAddress:     asaDeviceUsingSdc.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: true,
 			},
 
 			setupFunc: func(input asa.CreateInput) {
@@ -367,11 +362,11 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
 					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
-				configureSdcReadToRespondWithError(validSdc.Uid)
+				configureConnectorReadToRespondWithError(validConnector.Uid)
 				configureDeviceUpdateToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaDeviceUsingSdc)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
@@ -386,13 +381,13 @@ func TestAsaCreate(t *testing.T) {
 			testName: "returns error when onboarding ASA and device update call experiences issues",
 
 			input: asa.CreateInput{
-				Name:             asaDeviceUsingSdc.Name,
-				SdcType:          asaDeviceUsingSdc.LarType,
-				SdcUid:           asaDeviceUsingSdc.LarUid,
-				Ipv4:             asaDeviceUsingSdc.Ipv4,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: true,
+				Name:              asaDeviceUsingSdc.Name,
+				ConnectorType:     asaDeviceUsingSdc.ConnectorType,
+				ConnectorUid:      asaDeviceUsingSdc.ConnectorUid,
+				SocketAddress:     asaDeviceUsingSdc.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: true,
 			},
 
 			setupFunc: func(input asa.CreateInput) {
@@ -401,11 +396,11 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
 					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
-				configureSdcReadToRespondSuccessfully(validSdc)
+				configureConnectorReadToRespondSuccessfully(validConnector)
 				configureDeviceUpdateToRespondWithError(asaDeviceUsingSdc.Uid)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
 			},
@@ -419,13 +414,13 @@ func TestAsaCreate(t *testing.T) {
 			testName: "returns error when onboarding ASA and ASA config update call experiences issues",
 
 			input: asa.CreateInput{
-				Name:             asaDeviceUsingSdc.Name,
-				SdcType:          asaDeviceUsingSdc.LarType,
-				SdcUid:           asaDeviceUsingSdc.LarUid,
-				Ipv4:             asaDeviceUsingSdc.Ipv4,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: true,
+				Name:              asaDeviceUsingSdc.Name,
+				ConnectorType:     asaDeviceUsingSdc.ConnectorType,
+				ConnectorUid:      asaDeviceUsingSdc.ConnectorUid,
+				SocketAddress:     asaDeviceUsingSdc.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: true,
 			},
 
 			setupFunc: func(input asa.CreateInput) {
@@ -434,11 +429,11 @@ func TestAsaCreate(t *testing.T) {
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
 					httpmock.NewJsonResponderOrPanic(200, asaconfig.ReadOutput{
 						Uid:   asaSpecificDevice.SpecificUid,
-						State: asaconfig.AsaConfigStateError,
+						State: state.ERROR,
 					}),
 					httpmock.NewJsonResponderOrPanic(200, asaConfig),
 				})
-				configureSdcReadToRespondSuccessfully(validSdc)
+				configureConnectorReadToRespondSuccessfully(validConnector)
 				configureDeviceUpdateToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaDeviceUsingSdc)
 				configureAsaConfigUpdateToRespondWithError(asaConfig.Uid)
 			},
@@ -456,7 +451,11 @@ func TestAsaCreate(t *testing.T) {
 
 			testCase.setupFunc(testCase.input)
 
-			output, err := asa.Create(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := asa.Create(
+				context.Background(),
+				*http.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
+				testCase.input,
+			)
 
 			testCase.assertFunc(output, err, t)
 		})

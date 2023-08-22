@@ -2,18 +2,19 @@ package asa_test
 
 import (
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"net/http"
 	"testing"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/device/asaconfig"
 	internalTesting "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/testing"
 	"github.com/jarcoal/httpmock"
 )
 
 const (
 	deviceCreatePath = "/aegis/rest/v1/services/targets/devices"
+	baseUrl          = "https://unittest.cdo.cisco.com"
 )
 
 func buildDeviceReadSpecificPath(deviceUid string) string {
@@ -28,8 +29,8 @@ func buildAsaConfigPath(specificUid string) string {
 	return fmt.Sprintf("/aegis/rest/v1/services/asa/configs/%s", specificUid)
 }
 
-func buildSdcPath(sdcUid string) string {
-	return fmt.Sprintf("/aegis/rest/v1/services/targets/proxies/%s", sdcUid)
+func buildConnectorPath(connectorUid string) string {
+	return fmt.Sprintf("/aegis/rest/v1/services/targets/proxies/%s", connectorUid)
 }
 
 func configureDeviceCreateToRespondSuccessfully(createOutput device.CreateOutput) {
@@ -158,18 +159,18 @@ func configureAsaConfigUpdateToRespondWithError(specificUid string) {
 	)
 }
 
-func configureSdcReadToRespondSuccessfully(readOutput sdc.ReadOutput) {
+func configureConnectorReadToRespondSuccessfully(readOutput connector.ReadOutput) {
 	httpmock.RegisterResponder(
 		http.MethodGet,
-		buildSdcPath(readOutput.Uid),
+		buildConnectorPath(readOutput.Uid),
 		httpmock.NewJsonResponderOrPanic(200, readOutput),
 	)
 }
 
-func configureSdcReadToRespondWithError(sdcUid string) {
+func configureConnectorReadToRespondWithError(connectorUid string) {
 	httpmock.RegisterResponder(
 		http.MethodGet,
-		buildSdcPath(sdcUid),
+		buildConnectorPath(connectorUid),
 		httpmock.NewStringResponder(500, ""),
 	)
 }
@@ -194,6 +195,6 @@ func assertAsaConfigUpdateWasCalledOnce(specificUid string, t *testing.T) {
 	internalTesting.AssertEndpointCalledTimes(http.MethodPut, buildAsaConfigPath(specificUid), 1, t)
 }
 
-func assertSdcReadByUidWasCalledOnce(sdcUid string, t *testing.T) {
-	internalTesting.AssertEndpointCalledTimes(http.MethodGet, buildSdcPath(sdcUid), 1, t)
+func assertConnectorReadByUidWasCalledOnce(connectorUid string, t *testing.T) {
+	internalTesting.AssertEndpointCalledTimes(http.MethodGet, buildConnectorPath(connectorUid), 1, t)
 }

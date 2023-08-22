@@ -40,6 +40,12 @@ cd ./provider
 ACC_TEST_CISCO_CDO_API_TOKEN=<CDO_API_TOKEN> make testacc
 ```
 
+## Linting
+Run following command in the `client` or `provider` directory.
+```bash
+golangci-lint run
+```
+
 ## Running Examples
 Examples are provided so that you can do the usual `plan`, `apply`, `destroy` etc in the folders under `provider/examples` directory.
 #### Setup

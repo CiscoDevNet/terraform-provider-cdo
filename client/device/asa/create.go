@@ -3,37 +3,36 @@ package asa
 import (
 	"context"
 	"fmt"
-	"strings"
-
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/device/asaconfig"
-
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
+	"strings"
 )
 
 type CreateInput struct {
-	Name    string
-	SdcUid  string
-	SdcType string
-	Ipv4    string
+	Name          string
+	ConnectorUid  string
+	ConnectorType string
+	SocketAddress string
 
 	Username string
 	Password string
 
-	IgnoreCertifcate bool
+	IgnoreCertificate bool
 }
 
 type CreateOutput struct {
-	Uid        string `json:"uid"`
-	Name       string `json:"Name"`
-	DeviceType string `json:"deviceType"`
-	Host       string `json:"host"`
-	Port       string `json:"port"`
-	Ipv4       string `json:"ipv4"`
-	SdcType    string `json:"larType"`
-	SdcUid     string `json:"larUid"`
+	Uid           string `json:"uid"`
+	Name          string `json:"Name"`
+	DeviceType    string `json:"deviceType"`
+	Host          string `json:"host"`
+	Port          string `json:"port"`
+	SocketAddress string `json:"ipv4"`
+	ConnectorType string `json:"larType"`
+	ConnectorUid  string `json:"larUid"`
 }
 
 type CreateError struct {
@@ -45,15 +44,15 @@ func (r *CreateError) Error() string {
 	return r.Err.Error()
 }
 
-func NewCreateRequestInput(name, larUid, larType, ipv4, username, password string, ignoreCertificate bool) *CreateInput {
+func NewCreateRequestInput(name, connectorUid, connectorType, socketAddress, username, password string, ignoreCertificate bool) *CreateInput {
 	return &CreateInput{
-		Name:             name,
-		SdcUid:           larUid,
-		SdcType:          larType,
-		Ipv4:             ipv4,
-		Username:         username,
-		Password:         password,
-		IgnoreCertifcate: ignoreCertificate,
+		Name:              name,
+		ConnectorUid:      connectorUid,
+		ConnectorType:     connectorType,
+		SocketAddress:     socketAddress,
+		Username:          username,
+		Password:          password,
+		IgnoreCertificate: ignoreCertificate,
 	}
 }
 
@@ -62,7 +61,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	client.Logger.Println("creating asa device")
 
 	deviceCreateOutp, err := device.Create(ctx, client, *device.NewCreateRequestInput(
-		createInp.Name, "ASA", createInp.SdcUid, createInp.SdcType, createInp.Ipv4, false, createInp.IgnoreCertifcate,
+		createInp.Name, "ASA", createInp.ConnectorUid, createInp.ConnectorType, createInp.SocketAddress, false, createInp.IgnoreCertificate,
 	))
 	var createdResourceId *string = nil
 	if deviceCreateOutp != nil {
@@ -95,12 +94,12 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	// error during polling, but we maybe able to handle it
 	if err != nil {
 		// no idea what I am doing here, but that is what the cdo frontend ui is doing
-		if createInp.IgnoreCertifcate {
+		if createInp.IgnoreCertificate {
 			// update device with ignore certificate
 			client.Logger.Println("retrying with ignore certificate")
 			_, err := device.Update(ctx, client, device.UpdateInput{
-				Uid:              deviceCreateOutp.Uid,
-				IgnoreCertifcate: true,
+				Uid:               deviceCreateOutp.Uid,
+				IgnoreCertificate: true,
 			})
 			if err != nil {
 				return nil,
@@ -118,24 +117,24 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		}
 	}
 
-	// encrypt credentials for SDC on prem lar
-	var publicKey *sdc.PublicKey
-	if strings.EqualFold(deviceCreateOutp.LarType, "SDC") {
+	// encrypt credentials on prem connector
+	var publicKey *model.PublicKey
+	if strings.EqualFold(deviceCreateOutp.ConnectorType, "SDC") {
 
-		// on-prem lar requires encryption
-		client.Logger.Println("decrypting public key from sdc for encrpytion")
+		// on-prem connector requires encryption
+		client.Logger.Println("decrypting public key from connector for encryption")
 
-		if deviceCreateOutp.LarUid == "" {
+		if deviceCreateOutp.ConnectorUid == "" {
 			return nil, &CreateError{
 				CreatedResourceId: createdResourceId,
-				Err:               fmt.Errorf("sdc uid not found"),
+				Err:               fmt.Errorf("connector uid not found"),
 			}
 
 		}
 
-		// read lar public key
-		larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadByUidInput{
-			SdcUid: deviceCreateOutp.LarUid,
+		// read connector public key
+		connectorReadRes, err := connector.ReadByUid(ctx, client, connector.ReadByUidInput{
+			ConnectorUid: deviceCreateOutp.ConnectorUid,
 		})
 		if err != nil {
 			return nil, &CreateError{
@@ -143,7 +142,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 				Err:               err,
 			}
 		}
-		publicKey = &larReadRes.PublicKey
+		publicKey = &connectorReadRes.PublicKey
 	}
 
 	// update asa config credentials
@@ -177,14 +176,14 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 
 	// successful
 	createOutp := CreateOutput{
-		Uid:        deviceCreateOutp.Uid,
-		Name:       deviceCreateOutp.Name,
-		DeviceType: deviceCreateOutp.DeviceType,
-		Host:       deviceCreateOutp.Host,
-		Port:       deviceCreateOutp.Port,
-		Ipv4:       deviceCreateOutp.Ipv4,
-		SdcUid:     deviceCreateOutp.LarUid,
-		SdcType:    deviceCreateOutp.LarType,
+		Uid:           deviceCreateOutp.Uid,
+		Name:          deviceCreateOutp.Name,
+		DeviceType:    deviceCreateOutp.DeviceType,
+		Host:          deviceCreateOutp.Host,
+		Port:          deviceCreateOutp.Port,
+		SocketAddress: deviceCreateOutp.SocketAddress,
+		ConnectorUid:  deviceCreateOutp.ConnectorUid,
+		ConnectorType: deviceCreateOutp.ConnectorType,
 	}
 	return &createOutp, nil
 }

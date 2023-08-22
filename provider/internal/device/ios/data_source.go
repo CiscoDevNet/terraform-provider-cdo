@@ -33,13 +33,13 @@ type IosDataSource struct {
 /////
 
 type IosDataSourceModel struct {
-	ID               types.String `tfsdk:"id"`
-	SdcName          types.String `tfsdk:"sdc_name"`
-	Name             types.String `tfsdk:"name"`
-	Ipv4             types.String `tfsdk:"socket_address"`
-	Host             types.String `tfsdk:"host"`
-	Port             types.Int64  `tfsdk:"port"`
-	IgnoreCertifcate types.Bool   `tfsdk:"ignore_certificate"`
+	ID                types.String `tfsdk:"id"`
+	Name              types.String `tfsdk:"name"`
+	ConnectorName     types.String `tfsdk:"connector_name"`
+	SocketAddress     types.String `tfsdk:"socket_address"`
+	Host              types.String `tfsdk:"host"`
+	Port              types.Int64  `tfsdk:"port"`
+	IgnoreCertificate types.Bool   `tfsdk:"ignore_certificate"`
 }
 
 // define the name for this data source.
@@ -63,7 +63,7 @@ func (d *IosDataSource) Schema(ctx context.Context, req datasource.SchemaRequest
 				MarkdownDescription: "The human-readable name of the device. This is the name that is displayed in the CDO inventory page. Device names are unique across a CDO tenant.",
 				Required:            true,
 			},
-			"sdc_name": schema.StringAttribute{
+			"connector_name": schema.StringAttribute{
 				MarkdownDescription: "The name of the Secure Device Connector (SDC) that is used by CDO to communicate with the device.",
 				Computed:            true,
 			},
@@ -146,9 +146,9 @@ func (d *IosDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 
 	configData.ID = types.StringValue(readOutp.Uid)
 	configData.Name = types.StringValue(readOutp.Name)
-	configData.Ipv4 = types.StringValue(readOutp.Ipv4)
+	configData.SocketAddress = types.StringValue(readOutp.SocketAddress)
 	configData.Host = types.StringValue(readOutp.Host)
-	configData.IgnoreCertifcate = types.BoolValue(readOutp.IgnoreCertifcate)
+	configData.IgnoreCertificate = types.BoolValue(readOutp.IgnoreCertificate)
 
 	tflog.Trace(ctx, "done read IOS device data source")
 

@@ -49,7 +49,7 @@ func NewRequest(config cdo.Config, httpClient *http.Client, logger *log.Logger, 
 	}
 }
 
-// Send() wrap send() with retry & delay & timeout... stuff
+// Send wrap send() with retry & delay & timeout... stuff
 // TODO: cancel retry when context done
 // output: if given, will unmarshal response body into this object, should be a pointer for it to be useful
 func (r *Request) Send(output any) error {
@@ -66,6 +66,7 @@ func (r *Request) Send(output any) error {
 		r.config.Timeout,
 		r.config.Delay,
 		r.config.Retries,
+		false,
 	))
 
 	return err
@@ -94,7 +95,7 @@ func (r *Request) send(output any) error {
 	// check status
 	if res.StatusCode >= 400 {
 		body, err := io.ReadAll(res.Body)
-		err = fmt.Errorf("failed: code=%d, status=%s, body=%s, readBodyErr=%s", res.StatusCode, res.Status, string(body), err)
+		err = fmt.Errorf("failed: code=%d, status=%s, body=%s, readBodyErr=%s, url=%s, method=%s", res.StatusCode, res.Status, string(body), err, r.url, r.method)
 		r.Error = err
 		return err
 	}

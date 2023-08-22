@@ -5,12 +5,13 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
+	"time"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
-	internalRsa "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto/rsa"
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/jsonutil"
 	"github.com/jarcoal/httpmock"
@@ -75,10 +76,10 @@ func TestIosConfigUpdate(t *testing.T) {
 				SpecificUid: iosConfigUid,
 				Username:    username,
 				Password:    password,
-				PublicKey: &sdc.PublicKey{
+				PublicKey: &model.PublicKey{
 					KeyId:      "12341234-1234-1234-1234-123412341234",
 					Version:    2,
-					EncodedKey: internalRsa.MustBase64PublicKeyFromRsaKey(rsaKey),
+					EncodedKey: crypto.MustBase64PublicKeyFromRsaKey(rsaKey),
 				},
 			},
 
@@ -94,13 +95,13 @@ func TestIosConfigUpdate(t *testing.T) {
 							t.Errorf("expected 'SmContext.AcceptCert' to true got: %t", requestBody.SmContext.AcceptCert)
 						}
 
-						credentials, err := jsonutil.UnmarshalStruct[credentials]([]byte(requestBody.Credentials))
+						credentials, err := jsonutil.UnmarshalStruct[model.Credentials]([]byte(requestBody.Credentials))
 						assert.Nil(t, err)
 
-						decryptedUsername := internalRsa.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Username))
+						decryptedUsername := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Username))
 						assert.Equal(t, input.Username, decryptedUsername, `expected decrypted username to equal '%s', got: '%s'`, input.Username, decryptedUsername)
 
-						decryptedPassword := internalRsa.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Password))
+						decryptedPassword := crypto.MustDecryptBase64EncodedPkcs1v15Value(rsaKey, []byte(credentials.Password))
 						assert.Equal(t, input.Password, decryptedPassword, `expected decrypted password to equal '%s', got: '%s'`, input.Password, decryptedPassword)
 
 						assert.Equal(t, input.PublicKey.KeyId, credentials.KeyId, "expected keyId to equal '%s', got: '%s'", input.PublicKey.KeyId, credentials.KeyId)
@@ -168,7 +169,11 @@ func TestIosConfigUpdate(t *testing.T) {
 
 			testCase.setupFunc(testCase.input, t)
 
-			output, err := Update(context.Background(), *internalHttp.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := Update(
+				context.Background(),
+				*internalHttp.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
+				testCase.input,
+			)
 
 			testCase.assertFunc(output, err, t)
 		})

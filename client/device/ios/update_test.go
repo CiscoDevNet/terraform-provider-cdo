@@ -2,10 +2,11 @@ package ios
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
@@ -15,7 +16,7 @@ func TestIosUpdate(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	onPremConnector := sdc.NewSdcOutputBuilder().
+	onPremConnector := connector.NewConnectorOutputBuilder().
 		AsOnPremConnector().
 		WithUid("00000000-0000-0000-0000-000000000000").
 		WithName("MyOnPremConnector").
@@ -83,7 +84,11 @@ func TestIosUpdate(t *testing.T) {
 
 			testCase.setupFunc(testCase.input)
 
-			output, err := Update(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := Update(
+				context.Background(),
+				*http.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
+				testCase.input,
+			)
 
 			testCase.assertFunc(testCase.input, output, err, t)
 		})

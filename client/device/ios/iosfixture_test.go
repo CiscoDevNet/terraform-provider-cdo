@@ -2,10 +2,10 @@ package ios
 
 import (
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"net/http"
 	"testing"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	internalTesting "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/testing"
 	"github.com/jarcoal/httpmock"
@@ -13,6 +13,7 @@ import (
 
 const (
 	deviceCreatePath = "/aegis/rest/v1/services/targets/devices"
+	baseUrl          = "https://unittest.cdo.cisco.com"
 )
 
 func buildDeviceReadSpecificPath(deviceUid string) string {
@@ -121,7 +122,7 @@ func configureIosConfigReadToSucceedWithSubsequentCalls(specificUid string, resp
 	)
 }
 
-func configureSdcReadToRespondSuccessfully(readOutput sdc.ReadOutput) {
+func configureSdcReadToRespondSuccessfully(readOutput connector.ReadOutput) {
 	httpmock.RegisterResponder(
 		http.MethodGet,
 		buildSdcPath(readOutput.Uid),

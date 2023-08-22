@@ -2,7 +2,9 @@ package iosconfig
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"testing"
+	"time"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
@@ -15,7 +17,7 @@ func TestIosConfigRead(t *testing.T) {
 
 	validIosConfig := ReadOutput{
 		Uid:   iosConfigUid,
-		State: IosConfigStateDone,
+		State: state.DONE,
 	}
 
 	testCases := []struct {
@@ -84,7 +86,11 @@ func TestIosConfigRead(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := Read(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), *NewReadInput(iosConfigUid))
+			output, err := Read(
+				context.Background(),
+				*http.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
+				*NewReadInput(iosConfigUid),
+			)
 
 			testCase.assertFunc(output, err, t)
 		})

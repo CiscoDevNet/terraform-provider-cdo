@@ -47,7 +47,7 @@ func (builder *readOutputBuilder) WithName(name string) *readOutputBuilder {
 func (builder *readOutputBuilder) WithLocation(host string, port uint) *readOutputBuilder {
 	builder.readOutput.Host = host
 	builder.readOutput.Port = fmt.Sprint(port)
-	builder.readOutput.Ipv4 = fmt.Sprintf("%s:%d", host, port)
+	builder.readOutput.SocketAddress = fmt.Sprintf("%s:%d", host, port)
 
 	return builder
 }
@@ -64,16 +64,16 @@ func (builder *readOutputBuilder) WithLastUpdatedDate(date time.Time) *readOutpu
 	return builder
 }
 
-func (builder *readOutputBuilder) OnboardedUsingOnPremConnector(sdcUid string) *readOutputBuilder {
-	builder.readOutput.LarType = "SDC"
-	builder.readOutput.LarUid = sdcUid
+func (builder *readOutputBuilder) OnboardedUsingOnPremConnector(connectorUid string) *readOutputBuilder {
+	builder.readOutput.ConnectorType = "SDC"
+	builder.readOutput.ConnectorUid = connectorUid
 
 	return builder
 }
 
 func (builder *readOutputBuilder) OnboardedUsingCloudConnector(cdgUid string) *readOutputBuilder {
-	builder.readOutput.LarType = "CDG"
-	builder.readOutput.LarUid = cdgUid
+	builder.readOutput.ConnectorType = "CDG"
+	builder.readOutput.ConnectorUid = cdgUid
 
 	return builder
 }

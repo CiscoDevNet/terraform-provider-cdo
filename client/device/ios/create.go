@@ -3,9 +3,11 @@ package ios
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"strings"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios/iosconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
@@ -13,10 +15,10 @@ import (
 )
 
 type CreateInput struct {
-	Name    string
-	SdcUid  string
-	SdcType string
-	Ipv4    string
+	Name          string
+	ConnectorUid  string
+	ConnectorType string
+	SocketAddress string
 
 	Username string
 	Password string
@@ -25,14 +27,14 @@ type CreateInput struct {
 }
 
 type CreateOutput struct {
-	Uid        string `json:"uid"`
-	Name       string `json:"Name"`
-	DeviceType string `json:"deviceType"`
-	Host       string `json:"host"`
-	Port       string `json:"port"`
-	Ipv4       string `json:"ipv4"`
-	SdcType    string `json:"larType"`
-	SdcUid     string `json:"larUid"`
+	Uid           string `json:"uid"`
+	Name          string `json:"Name"`
+	DeviceType    string `json:"deviceType"`
+	Host          string `json:"host"`
+	Port          string `json:"port"`
+	SocketAddress string `json:"ipv4"`
+	ConnectorType string `json:"larType"`
+	ConnectorUid  string `json:"larUid"`
 }
 
 type CreateError struct {
@@ -44,17 +46,12 @@ func (r *CreateError) Error() string {
 	return r.Err.Error()
 }
 
-const (
-	IosStatePreReadMetadata = "$PRE_READ_METADATA"
-	IosStateDone            = "DONE"
-)
-
-func NewCreateRequestInput(name, sdcUid, sdcType, ipv4, username, password string, ignoreCertificate bool) *CreateInput {
+func NewCreateRequestInput(name, connectorUid, connectorType, socketAddress, username, password string, ignoreCertificate bool) *CreateInput {
 	return &CreateInput{
 		Name:              name,
-		SdcUid:            sdcUid,
-		SdcType:           sdcType,
-		Ipv4:              ipv4,
+		ConnectorUid:      connectorUid,
+		ConnectorType:     connectorType,
+		SocketAddress:     socketAddress,
 		Username:          username,
 		Password:          password,
 		IgnoreCertificate: ignoreCertificate,
@@ -66,7 +63,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	client.Logger.Println("creating ios device")
 
 	deviceCreateOutp, err := device.Create(ctx, client, *device.NewCreateRequestInput(
-		createInp.Name, "IOS", createInp.SdcUid, createInp.SdcType, createInp.Ipv4, false, createInp.IgnoreCertificate,
+		createInp.Name, "IOS", createInp.ConnectorUid, createInp.ConnectorType, createInp.SocketAddress, false, createInp.IgnoreCertificate,
 	))
 	var createdResourceId *string = nil
 	if deviceCreateOutp != nil {
@@ -80,35 +77,33 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		}
 	}
 
-	// encrypt credentials for SDC on prem lar
-	var publicKey *sdc.PublicKey
-	if strings.EqualFold(deviceCreateOutp.LarType, "SDC") {
+	// encrypt credentials on prem connector
+	var publicKey *model.PublicKey
+	if strings.EqualFold(deviceCreateOutp.ConnectorType, "SDC") {
 
-		// on-prem lar requires encryption
-		client.Logger.Println("decrypting public key from sdc for encrpytion")
+		// on-prem connector requires encryption
+		client.Logger.Println("decrypting public key from connector for encryption")
 
-		if deviceCreateOutp.LarUid == "" {
+		if deviceCreateOutp.ConnectorUid == "" {
 			return nil, &CreateError{
-				Err:               fmt.Errorf("sdc uid not found"),
+				Err:               fmt.Errorf("connector uid not found"),
 				CreatedResourceId: createdResourceId,
 			}
 
 		}
 
-		// read lar public key
-		larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadByUidInput{
-			SdcUid: deviceCreateOutp.LarUid,
-		})
+		// read connector public key
+		connectorReadRes, err := connector.ReadByUid(ctx, client, *connector.NewReadByUidInput(deviceCreateOutp.ConnectorUid))
 		if err != nil {
 			return nil, &CreateError{
 				Err:               err,
 				CreatedResourceId: createdResourceId,
 			}
 		}
-		publicKey = &larReadRes.PublicKey
+		publicKey = &connectorReadRes.PublicKey
 	}
 
-	err = retry.Do(iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, IosStatePreReadMetadata), *retry.NewOptionsWithLogger(client.Logger))
+	err = retry.Do(iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, state.PRE_READ_METADATA), *retry.NewOptionsWithLogger(client.Logger))
 	if err != nil {
 		return nil, &CreateError{
 			Err:               err,
@@ -136,7 +131,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	// poll until ios config state done
 	client.Logger.Println("waiting for device to reach state done")
 
-	err = retry.Do(iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, IosStateDone), *retry.NewOptionsWithLogger(client.Logger))
+	err = retry.Do(iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, state.DONE), *retry.NewOptionsWithLogger(client.Logger))
 	if err != nil {
 		return nil, &CreateError{
 			Err:               err,
@@ -146,14 +141,14 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 
 	// done!
 	createOutp := CreateOutput{
-		Uid:        deviceCreateOutp.Uid,
-		Name:       deviceCreateOutp.Name,
-		DeviceType: deviceCreateOutp.DeviceType,
-		Host:       deviceCreateOutp.Host,
-		Port:       deviceCreateOutp.Port,
-		Ipv4:       deviceCreateOutp.Ipv4,
-		SdcUid:     deviceCreateOutp.LarUid,
-		SdcType:    deviceCreateOutp.LarType,
+		Uid:           deviceCreateOutp.Uid,
+		Name:          deviceCreateOutp.Name,
+		DeviceType:    deviceCreateOutp.DeviceType,
+		Host:          deviceCreateOutp.Host,
+		Port:          deviceCreateOutp.Port,
+		SocketAddress: deviceCreateOutp.SocketAddress,
+		ConnectorUid:  deviceCreateOutp.ConnectorUid,
+		ConnectorType: deviceCreateOutp.ConnectorType,
 	}
 	return &createOutp, nil
 }

@@ -4,14 +4,15 @@ package client
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/genericssh"
 	"net/http"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/device/asaconfig"
 	internalhttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 )
 
@@ -36,16 +37,16 @@ func NewWithHttpClient(httpClient *http.Client, hostname, apiToken string) (*Cli
 	}, nil
 }
 
-func (c *Client) ReadAllSdcs(ctx context.Context, inp sdc.ReadAllInput) (*sdc.ReadAllOutput, error) {
-	return sdc.ReadAll(ctx, c.client, inp)
+func (c *Client) ReadAllConnectors(ctx context.Context, inp connector.ReadAllInput) (*connector.ReadAllOutput, error) {
+	return connector.ReadAll(ctx, c.client, inp)
 }
 
-func (c *Client) ReadSdcByName(ctx context.Context, inp sdc.ReadByNameInput) (*sdc.ReadOutput, error) {
-	return sdc.ReadByName(ctx, c.client, inp)
+func (c *Client) ReadConnectorByName(ctx context.Context, inp connector.ReadByNameInput) (*connector.ReadOutput, error) {
+	return connector.ReadByName(ctx, c.client, inp)
 }
 
-func (c *Client) ReadSdcByUid(ctx context.Context, inp sdc.ReadByUidInput) (*sdc.ReadOutput, error) {
-	return sdc.ReadByUid(ctx, c.client, inp)
+func (c *Client) ReadConnectorByUid(ctx context.Context, inp connector.ReadByUidInput) (*connector.ReadOutput, error) {
+	return connector.ReadByUid(ctx, c.client, inp)
 }
 
 func (c *Client) ReadAsa(ctx context.Context, inp asa.ReadInput) (*asa.ReadOutput, error) {
@@ -92,14 +93,30 @@ func (c *Client) ReadSpecificAsa(ctx context.Context, inp asa.ReadSpecificInput)
 	return asa.ReadSpecific(ctx, c.client, inp)
 }
 
-func (c *Client) CreateSdc(ctx context.Context, inp sdc.CreateInput) (*sdc.CreateOutput, error) {
-	return sdc.Create(ctx, c.client, inp)
+func (c *Client) CreateConnector(ctx context.Context, inp connector.CreateInput) (*connector.CreateOutput, error) {
+	return connector.Create(ctx, c.client, inp)
 }
 
-func (c *Client) UpdateSdc(ctx context.Context, inp sdc.UpdateInput) (*sdc.UpdateOutput, error) {
-	return sdc.Update(ctx, c.client, inp)
+func (c *Client) UpdateConnector(ctx context.Context, inp connector.UpdateInput) (*connector.UpdateOutput, error) {
+	return connector.Update(ctx, c.client, inp)
 }
 
-func (c *Client) DeleteSdc(ctx context.Context, inp sdc.DeleteInput) (*sdc.DeleteOutput, error) {
-	return sdc.Delete(ctx, c.client, inp)
+func (c *Client) DeleteConnector(ctx context.Context, inp connector.DeleteInput) (*connector.DeleteOutput, error) {
+	return connector.Delete(ctx, c.client, inp)
+}
+
+func (c *Client) ReadGenericSSH(ctx context.Context, inp genericssh.ReadInput) (*genericssh.ReadOutput, error) {
+	return genericssh.Read(ctx, c.client, inp)
+}
+
+func (c *Client) CreateGenericSSH(ctx context.Context, inp genericssh.CreateInput) (*genericssh.CreateOutput, error) {
+	return genericssh.Create(ctx, c.client, inp)
+}
+
+func (c *Client) UpdateGenericSSH(ctx context.Context, inp genericssh.UpdateInput) (*genericssh.UpdateOutput, error) {
+	return genericssh.Update(ctx, c.client, inp)
+}
+
+func (c *Client) DeleteGenericSSH(ctx context.Context, inp genericssh.DeleteInput) (*genericssh.DeleteOutput, error) {
+	return genericssh.Delete(ctx, c.client, inp)
 }

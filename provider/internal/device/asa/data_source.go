@@ -36,7 +36,7 @@ type AsaDataSource struct {
 
 type AsaDataSourceModel struct {
 	ID                types.String `tfsdk:"id"`
-	SdcType           types.String `tfsdk:"connector_type"`
+	ConnectorType     types.String `tfsdk:"connector_type"`
 	SdcName           types.String `tfsdk:"sdc_name"`
 	Name              types.String `tfsdk:"name"`
 	Ipv4              types.String `tfsdk:"socket_address"`
@@ -155,11 +155,11 @@ func (d *AsaDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	configData.Port = types.Int64Value(port)
 
 	configData.ID = types.StringValue(readOutp.Uid)
-	configData.SdcType = types.StringValue(readOutp.LarType)
+	configData.ConnectorType = types.StringValue(readOutp.ConnectorType)
 	configData.Name = types.StringValue(readOutp.Name)
-	configData.Ipv4 = types.StringValue(readOutp.Ipv4)
+	configData.Ipv4 = types.StringValue(readOutp.SocketAddress)
 	configData.Host = types.StringValue(readOutp.Host)
-	configData.IgnoreCertificate = types.BoolValue(readOutp.IgnoreCertifcate)
+	configData.IgnoreCertificate = types.BoolValue(readOutp.IgnoreCertificate)
 
 	tflog.Trace(ctx, "done read ASA device data source")
 

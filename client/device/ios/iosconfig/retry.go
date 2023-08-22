@@ -7,15 +7,10 @@ import (
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 )
 
-const (
-	IosConfigStateDone           = "DONE"
-	IosConfigStateError          = "ERROR"
-	IosConfigStateBadCredentials = "BAD_CREDENTIALS"
-)
-
-func UntilState(ctx context.Context, client http.Client, specificUid string, state string) retry.Func {
+func UntilState(ctx context.Context, client http.Client, specificUid string, expectedState string) retry.Func {
 
 	// create ios config read request
 	readReq := NewReadRequest(ctx, client, *NewReadInput(
@@ -30,14 +25,14 @@ func UntilState(ctx context.Context, client http.Client, specificUid string, sta
 			return false, err
 		}
 
-		client.Logger.Printf("ios config state=%s\n", readOutp.State)
-		if strings.EqualFold(readOutp.State, state) {
+		client.Logger.Printf("ios config expectedState=%s\n", readOutp.State)
+		if strings.EqualFold(readOutp.State, expectedState) {
 			return true, nil
 		}
-		if strings.EqualFold(readOutp.State, IosConfigStateError) {
-			return false, fmt.Errorf("workflow ended in %s", IosConfigStateError)
+		if strings.EqualFold(readOutp.State, state.ERROR) {
+			return false, fmt.Errorf("workflow ended in %s", state.ERROR)
 		}
-		if strings.EqualFold(readOutp.State, IosConfigStateBadCredentials) {
+		if strings.EqualFold(readOutp.State, state.BAD_CREDENTIALS) {
 			return false, fmt.Errorf("bad credentials")
 		}
 		return false, nil

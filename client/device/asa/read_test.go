@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
@@ -49,9 +50,9 @@ func TestAsaRead(t *testing.T) {
 					CreatedDate:     asaDevice.CreatedDate,
 					LastUpdatedDate: asaDevice.LastUpdatedDate,
 					DeviceType:      asaDevice.DeviceType,
-					LarUid:          asaDevice.LarUid,
-					LarType:         asaDevice.LarType,
-					Ipv4:            asaDevice.Ipv4,
+					ConnectorUid:    asaDevice.ConnectorUid,
+					ConnectorType:   asaDevice.ConnectorType,
+					SocketAddress:   asaDevice.SocketAddress,
 					Host:            asaDevice.Host,
 					Port:            asaDevice.Port,
 				}
@@ -82,7 +83,11 @@ func TestAsaRead(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := asa.Read(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.input)
+			output, err := asa.Read(
+				context.Background(),
+				*http.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
+				testCase.input,
+			)
 
 			testCase.assertFunc(output, err, t)
 		})

@@ -30,17 +30,17 @@ type IosDeviceResource struct {
 }
 
 type IosDeviceResourceModel struct {
-	ID      types.String `tfsdk:"id"`
-	SdcName types.String `tfsdk:"sdc_name"`
-	Name    types.String `tfsdk:"name"`
-	Ipv4    types.String `tfsdk:"socket_address"`
-	Host    types.String `tfsdk:"host"`
-	Port    types.Int64  `tfsdk:"port"`
+	ID            types.String `tfsdk:"id"`
+	ConnectorName types.String `tfsdk:"connector_name"`
+	Name          types.String `tfsdk:"name"`
+	Ipv4          types.String `tfsdk:"socket_address"`
+	Host          types.String `tfsdk:"host"`
+	Port          types.Int64  `tfsdk:"port"`
 
 	Username types.String `tfsdk:"username"`
 	Password types.String `tfsdk:"password"`
 
-	IgnoreCertifcate types.Bool `tfsdk:"ignore_certificate"`
+	IgnoreCertificate types.Bool `tfsdk:"ignore_certificate"`
 }
 
 func (r *IosDeviceResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -64,7 +64,7 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				MarkdownDescription: "A human-readable name for the device.",
 				Required:            true,
 			},
-			"sdc_name": schema.StringAttribute{
+			"connector_name": schema.StringAttribute{
 				MarkdownDescription: "The name of the Secure Device Connector (SDC) that will be used to communicate with the device. This value is not required if the connector type selected is Cloud Device Gateway (CDG).",
 				Required:            true,
 				PlanModifiers: []planmodifier.String{

@@ -3,17 +3,16 @@ package iosconfig
 import (
 	"context"
 	"encoding/json"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
-
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto/rsa"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 )
 
 type UpdateInput struct {
 	SpecificUid string
-	PublicKey   *sdc.PublicKey
+	PublicKey   *model.PublicKey
 
 	Username string
 	Password string
@@ -23,7 +22,7 @@ type UpdateOutput struct {
 	Uid string `json:"uid"`
 }
 
-func NewUpdateInput(specificUid string, username string, password string, publicKey *sdc.PublicKey) *UpdateInput {
+func NewUpdateInput(specificUid string, username string, password string, publicKey *model.PublicKey) *UpdateInput {
 	return &UpdateInput{
 		SpecificUid: specificUid,
 		Username:    username,
@@ -68,51 +67,19 @@ type UpdateBody struct {
 	SmContext   SmContext `json:"stateMachineContext"`
 }
 
-type credentials struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	KeyId    string `json:"keyId,omitempty"`
-}
-
 type SmContext struct {
 	AcceptCert bool `json:"acceptCert"`
 }
 
-func encrypt(req *UpdateInput) error {
-	ciper, err := rsa.NewCiper(req.PublicKey.EncodedKey)
-	if err != nil {
-		return err
-	}
-	req.Username, err = ciper.Encrypt(req.Username)
-	if err != nil {
-		return err
-	}
-	req.Password, err = ciper.Encrypt(req.Password)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func makeCredentials(updateInp UpdateInput) ([]byte, error) {
-	var creds []byte
-	var err error
 	if updateInp.PublicKey != nil {
-		err = encrypt(&updateInp)
+
+		encryptedCredentials, err := crypto.EncryptCredentials(*updateInp.PublicKey, updateInp.Username, updateInp.Password)
 		if err != nil {
 			return nil, err
 		}
-		creds, err = json.Marshal(credentials{
-			Username: updateInp.Username,
-			Password: updateInp.Password,
-			KeyId:    updateInp.PublicKey.KeyId,
-		})
-	} else {
-		creds, err = json.Marshal(credentials{
-			Username: updateInp.Username,
-			Password: updateInp.Password,
-		})
+		return json.Marshal(encryptedCredentials)
 	}
-	return creds, err
+
+	return json.Marshal(model.NewCredentials(updateInp.Username, updateInp.Password))
 }

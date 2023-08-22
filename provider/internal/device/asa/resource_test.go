@@ -1,6 +1,7 @@
 package asa_test
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/acctest"
@@ -9,12 +10,12 @@ import (
 
 type testAsaResourceType struct {
 	Name              string
-	Ipv4              string
-	SdcType           string
+	SocketAddress     string
+	ConnectorName     string
+	ConnectorType     string
 	Username          string
 	Password          string
 	IgnoreCertificate bool
-	SdcName           string
 
 	Host string
 	Port string
@@ -23,12 +24,12 @@ type testAsaResourceType struct {
 const asaResourceTemplate = `
 resource "cdo_asa_device" "test" {
 	name = "{{.Name}}"
-	socket_address = "{{.Ipv4}}"
-	connector_type = "{{.SdcType}}"
+	socket_address = "{{.SocketAddress}}"
+	connector_name = "{{.ConnectorName}}"
+	connector_type = "{{.ConnectorType}}"
 	username = "{{.Username}}"
 	password = "{{.Password}}"
 	ignore_certificate = "{{.IgnoreCertificate}}"
-	sdc_name = "{{.SdcName}}"
 }`
 
 // SDC configs.
@@ -36,12 +37,12 @@ resource "cdo_asa_device" "test" {
 // default config.
 var testAsaResource_SDC = testAsaResourceType{
 	Name:              "test-asa-device-1",
-	Ipv4:              "vasa-gb-ravpn-03-mgmt.dev.lockhart.io:443",
-	SdcType:           "SDC",
+	SocketAddress:     "vasa-gb-ravpn-03-mgmt.dev.lockhart.io:443",
+	ConnectorName:     "CDO_terraform-provider-cdo-SDC-1",
+	ConnectorType:     "SDC",
 	Username:          "lockhart",
 	Password:          "BlueSkittles123!!",
 	IgnoreCertificate: true,
-	SdcName:           "CDO_terraform-provider-cdo-SDC-1",
 
 	Host: "vasa-gb-ravpn-03-mgmt.dev.lockhart.io",
 	Port: "443",
@@ -58,12 +59,12 @@ var testAsaResource_SDC_NewName = acctest.MustOverrideFields(testAsaResource_SDC
 var testAsaResourceConfig_SDC_NewName = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC_NewName)
 
 // new creds config.
-var testAsaResource_SDC_NewCreds = acctest.MustOverrideFields(testAsaResource_SDC, map[string]any{
+var testAsaResource_SDC_BadCreds = acctest.MustOverrideFields(testAsaResource_SDC, map[string]any{
 	"Password": "WrongPassword",
 })
-var testAsaResourceConfig_SDC_NewCreds = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC_NewCreds)
+var testAsaResourceConfig_SDC_NewCreds = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC_BadCreds)
 
-var testAsaResource_SDC_NewLocation = acctest.MustOverrideFields(testAsaResource_SDC, map[string]any{"Ipv4": alternativeDeviceLocation})
+var testAsaResource_SDC_NewLocation = acctest.MustOverrideFields(testAsaResource_SDC, map[string]any{"SocketAddress": alternativeDeviceLocation})
 var testAsaResourceConfig_SDC_NewLocation = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC_NewLocation)
 
 // CDG configs
@@ -71,12 +72,12 @@ var testAsaResourceConfig_SDC_NewLocation = acctest.MustParseTemplate(asaResourc
 // default config.
 var testAsaResource_CDG = testAsaResourceType{
 	Name:              "test-asa-device-1",
-	Ipv4:              "vasa-gb-ravpn-03-mgmt.dev.lockhart.io:443",
-	SdcType:           "CDG",
+	SocketAddress:     "vasa-gb-ravpn-03-mgmt.dev.lockhart.io:443",
+	ConnectorName:     "CDO_terraform-provider-cdo-SDC-1",
+	ConnectorType:     "CDG",
 	Username:          "lockhart",
 	Password:          "BlueSkittles123!!",
 	IgnoreCertificate: false,
-	SdcName:           "CDO_terraform-provider-cdo-SDC-1",
 
 	Host: "vasa-gb-ravpn-03-mgmt.dev.lockhart.io",
 	Port: "443",
@@ -89,13 +90,13 @@ var testAsaResource_CDG_NewName = acctest.MustOverrideFields(testAsaResource_CDG
 })
 var testAsaResourceConfig_CDG_NewName = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_CDG_NewName)
 
-// new creds config.
-var testAsaResource_CDG_NewCreds = acctest.MustOverrideFields(testAsaResource_CDG, map[string]any{
+// bad credentials config.
+var testAsaResource_CDG_BadCreds = acctest.MustOverrideFields(testAsaResource_CDG, map[string]any{
 	"Password": "WrongPassword",
 })
-var testAsaResourceConfig_CDG_NewCreds = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_CDG_NewCreds)
+var testAsaResourceConfig_CDG_NewCreds = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_CDG_BadCreds)
 
-var testAsaResource_CDG_NewLocation = acctest.MustOverrideFields(testAsaResource_CDG, map[string]any{"Ipv4": alternativeDeviceLocation})
+var testAsaResource_CDG_NewLocation = acctest.MustOverrideFields(testAsaResource_CDG, map[string]any{"SocketAddress": alternativeDeviceLocation})
 var testAsaResourceConfig_CDG_NewLocation = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_CDG_NewLocation)
 
 func TestAccAsaDeviceResource_SDC(t *testing.T) {
@@ -108,10 +109,10 @@ func TestAccAsaDeviceResource_SDC(t *testing.T) {
 				Config: acctest.ProviderConfig() + testAsaResourceConfig_SDC,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_SDC.Name),
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "socket_address", testAsaResource_SDC.Ipv4),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "socket_address", testAsaResource_SDC.SocketAddress),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "host", testAsaResource_SDC.Host),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "port", testAsaResource_SDC.Port),
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "connector_type", testAsaResource_SDC.SdcType),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "connector_type", testAsaResource_SDC.ConnectorType),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "username", testAsaResource_SDC.Username),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_SDC.Password),
 				),
@@ -123,13 +124,16 @@ func TestAccAsaDeviceResource_SDC(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_SDC_NewName.Name),
 				),
 			},
+			// bad credential tests
 			{
 				Config: acctest.ProviderConfig() + testAsaResourceConfig_SDC_NewCreds,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_SDC_NewCreds.Name),
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_SDC_NewCreds.Password),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_SDC_BadCreds.Name),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_SDC_BadCreds.Password),
 				),
+				ExpectError: regexp.MustCompile(`.*bad credentials.*`),
 			},
+			// fix correct credentials test
 			{
 				Config: acctest.ProviderConfig() + testAsaResourceConfig_SDC,
 				Check: resource.ComposeAggregateTestCheckFunc(
@@ -137,10 +141,11 @@ func TestAccAsaDeviceResource_SDC(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_SDC.Password),
 				),
 			},
+			// change location test
 			{
 				Config: acctest.ProviderConfig() + testAsaResourceConfig_SDC_NewLocation,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "ipv4", testAsaResource_SDC_NewLocation.Ipv4),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "socket_address", testAsaResource_SDC_NewLocation.SocketAddress),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
@@ -158,10 +163,10 @@ func TestAccAsaDeviceResource_CDG(t *testing.T) {
 				Config: acctest.ProviderConfig() + testAsaResourceConfig_CDG,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_CDG.Name),
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "socket_address", testAsaResource_CDG.Ipv4),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "socket_address", testAsaResource_CDG.SocketAddress),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "host", testAsaResource_CDG.Host),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "port", testAsaResource_CDG.Port),
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "connector_type", testAsaResource_CDG.SdcType),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "connector_type", testAsaResource_CDG.ConnectorType),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "username", testAsaResource_CDG.Username),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_CDG.Password),
 				),
@@ -173,13 +178,16 @@ func TestAccAsaDeviceResource_CDG(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_CDG_NewName.Name),
 				),
 			},
+			// bad credentials tests
 			{
 				Config: acctest.ProviderConfig() + testAsaResourceConfig_CDG_NewCreds,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_CDG_NewCreds.Name),
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_CDG_NewCreds.Password),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_CDG_BadCreds.Name),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_CDG_BadCreds.Password),
 				),
+				ExpectError: regexp.MustCompile(".*bad credentials.*"),
 			},
+			// fix bad credentials test
 			{
 				Config: acctest.ProviderConfig() + testAsaResourceConfig_CDG,
 				Check: resource.ComposeAggregateTestCheckFunc(
@@ -187,10 +195,11 @@ func TestAccAsaDeviceResource_CDG(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_CDG.Password),
 				),
 			},
+			// change location test
 			{
 				Config: acctest.ProviderConfig() + testAsaResourceConfig_CDG_NewLocation,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "ipv4", testAsaResource_CDG_NewLocation.Ipv4),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "socket_address", testAsaResource_CDG_NewLocation.SocketAddress),
 				),
 			},
 			// Delete testing automatically occurs in TestCase

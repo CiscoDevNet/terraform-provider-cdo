@@ -159,7 +159,7 @@ func (d *AsaDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	configData.Name = types.StringValue(readOutp.Name)
 	configData.Ipv4 = types.StringValue(readOutp.SocketAddress)
 	configData.Host = types.StringValue(readOutp.Host)
-	configData.IgnoreCertificate = types.BoolValue(readOutp.IgnoreCertifcate)
+	configData.IgnoreCertificate = types.BoolValue(readOutp.IgnoreCertificate)
 
 	tflog.Trace(ctx, "done read ASA device data source")
 

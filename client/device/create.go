@@ -15,20 +15,20 @@ type CreateInput struct {
 	SocketAddress string `json:"ipv4"`
 	Model         bool   `json:"model"`
 
-	IgnoreCertifcate bool `json:"ignoreCertificate"`
+	IgnoreCertificate bool `json:"ignoreCertificate"`
 }
 
 type CreateOutput = ReadOutput
 
 func NewCreateRequestInput(name, deviceType, connectorUid, connectorType, socketAddress string, model bool, ignoreCertificate bool) *CreateInput {
 	return &CreateInput{
-		Name:             name,
-		DeviceType:       deviceType,
-		ConnectorUid:     connectorUid,
-		ConnectorType:    connectorType,
-		SocketAddress:    socketAddress,
-		Model:            model,
-		IgnoreCertifcate: ignoreCertificate,
+		Name:              name,
+		DeviceType:        deviceType,
+		ConnectorUid:      connectorUid,
+		ConnectorType:     connectorType,
+		SocketAddress:     socketAddress,
+		Model:             model,
+		IgnoreCertificate: ignoreCertificate,
 	}
 }
 

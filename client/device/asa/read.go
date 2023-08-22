@@ -21,7 +21,7 @@ type ReadOutput struct {
 	Port            string `json:"port"`
 	Host            string `json:"host"`
 
-	IgnoreCertifcate  bool   `json:"ignoreCertificate"`
+	IgnoreCertificate bool   `json:"ignoreCertificate"`
 	ConnectivityState int    `json:"connectivityState,omitempty"`
 	ConnectivityError string `json:"connectivityError,omitempty"`
 	State             string `json:"state"`

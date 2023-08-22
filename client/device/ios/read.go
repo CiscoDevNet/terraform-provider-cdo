@@ -7,7 +7,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 )
 
-type ReadInput = device.ReadInput
+type ReadInput = device.ReadByUidInput
 type ReadOutput struct {
 	Uid             string `json:"uid"`
 	Name            string `json:"name"`
@@ -24,7 +24,7 @@ type ReadOutput struct {
 }
 
 func NewReadInput(uid string) *ReadInput {
-	return device.NewReadInput(uid)
+	return device.NewReadByUidInput(uid)
 }
 
 func NewReadRequest(ctx context.Context, client http.Client, readInp ReadInput) *http.Request {

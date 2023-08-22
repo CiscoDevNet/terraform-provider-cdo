@@ -127,7 +127,7 @@ func (d *IosDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	}
 
 	// read ios
-	readInp := device.ReadByNameAndDeviceTypeInput{
+	readInp := device.ReadByNameAndTypeInput{
 		Name:       configData.Name.ValueString(),
 		DeviceType: "IOS",
 	}

@@ -44,12 +44,12 @@ func (r *CreateError) Error() string {
 	return r.Err.Error()
 }
 
-func NewCreateRequestInput(name, connectorUid, connectorType, ipv4, username, password string, ignoreCertificate bool) *CreateInput {
+func NewCreateRequestInput(name, connectorUid, connectorType, socketAddress, username, password string, ignoreCertificate bool) *CreateInput {
 	return &CreateInput{
 		Name:              name,
 		ConnectorUid:      connectorUid,
 		ConnectorType:     connectorType,
-		SocketAddress:     ipv4,
+		SocketAddress:     socketAddress,
 		Username:          username,
 		Password:          password,
 		IgnoreCertificate: ignoreCertificate,

@@ -90,6 +90,7 @@ jobs:
       run:
         working-directory: provider
     timeout-minutes: 15
+    concurrency: "ci"  # fixed group so that it never parallel, even in different PR
     strategy:
       fail-fast: false
       max-parallel: 1  # acceptance tests create real infra, so no parallel run is enabled

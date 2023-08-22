@@ -10,12 +10,17 @@ import (
 )
 
 type ReadInput struct {
-	Uid string `json:"uid"`
+}
+
+func NewReadInput() ReadInput {
+	return ReadInput{}
 }
 
 type ReadOutput = device.ReadOutput
 
 func Read(ctx context.Context, client http.Client, readInp ReadInput) (*ReadOutput, error) {
+
+	client.Logger.Println("reading cdFMC")
 
 	cdfmcDevices, err := device.ReadAllByType(ctx, client, device.NewReadAllByTypeInput("FMCE"))
 	if err != nil {

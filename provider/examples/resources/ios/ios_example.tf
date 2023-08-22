@@ -8,14 +8,14 @@ terraform {
 
 provider "cdo" {
   base_url  = "https://staging.dev.lockhart.io"
-  api_token = "<FILL_ME>"
+  api_token = "<replace-with-api-token-generated-from-cdo>"
 }
 
 resource "cdo_ios_device" "my_ios" {
-  name               = "<FILL_ME>"
-  connector_name     = "<FILL_ME>"
-  socket_address     = "<FILL_ME>"
-  username           = "<FILL_ME>"
-  password           = "<FILL_ME>"
+  name               = "<name-of-device>"
+  connector_name     = "<name-of-sdc-connector>"
+  socket_address     = "<host>:<port>"
+  username           = "<username>"
+  password           = "<password>"
   ignore_certificate = true
 }

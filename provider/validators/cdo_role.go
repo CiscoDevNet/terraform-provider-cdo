@@ -31,7 +31,7 @@ func (v oneOfRolesValidator) Description(ctx context.Context) string {
 }
 
 func (v oneOfRolesValidator) MarkdownDescription(_ context.Context) string {
-	return fmt.Sprintf("must contains one of CDO roles: %q", v.expectedRoles)
+	return fmt.Sprintf("The user must be assigned one of the following CDO roles: %q", v.expectedRoles)
 }
 
 func (v oneOfRolesValidator) ValidateString(ctx context.Context, request validator.StringRequest, response *validator.StringResponse) {
@@ -61,6 +61,10 @@ func (v oneOfRolesValidator) ValidateString(ctx context.Context, request validat
 }
 
 func extractRoleFromToken(tokenString string) (string, error) {
+	if tokenString == "" {
+		return "", fmt.Errorf("tokenString is nil or empty")
+	}
+
 	parts := strings.Split(tokenString, ".")
 	if len(parts) != 3 {
 		return "", fmt.Errorf(ErrInvalidTokenFormat)
@@ -76,10 +80,12 @@ func extractRoleFromToken(tokenString string) (string, error) {
 		return "", fmt.Errorf("failed to decode token payload: %v", err)
 	}
 
-	if rolesClaim, exists := claims["roles"]; exists {
-		if roles, ok := rolesClaim.([]interface{}); ok && len(roles) > 0 {
-			if role, ok := roles[0].(string); ok {
-				return role, nil
+	if rolesClaim, exists := claims["roles"]; exists { // check if "roles" claim exists
+		if roles, ok := rolesClaim.([]interface{}); ok { // convert to a slice of interfaces
+			if len(roles) > 0 {
+				if role, ok := roles[0].(string); ok {
+					return role, nil
+				}
 			}
 		}
 	}

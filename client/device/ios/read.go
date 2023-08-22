@@ -28,7 +28,7 @@ func NewReadInput(uid string) *ReadInput {
 }
 
 func NewReadRequest(ctx context.Context, client http.Client, readInp ReadInput) *http.Request {
-	return device.NewReadRequest(ctx, client, readInp)
+	return device.NewReadByUidRequest(ctx, client, readInp)
 }
 
 func Read(ctx context.Context, client http.Client, readInp ReadInput) (*ReadOutput, error) {

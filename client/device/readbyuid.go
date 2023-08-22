@@ -35,13 +35,19 @@ func NewReadByUidInput(uid string) *ReadByUidInput {
 	}
 }
 
+func NewReadByUidRequest(ctx context.Context, client http.Client, readInp ReadByUidInput) *http.Request {
+	readUrl := url.ReadDevice(client.BaseUrl(), readInp.Uid)
+
+	req := client.NewGet(ctx, readUrl)
+
+	return req
+}
+
 func ReadByUid(ctx context.Context, client http.Client, readInp ReadByUidInput) (*ReadOutput, error) {
 
 	client.Logger.Println("reading device")
 
-	readUrl := url.ReadDevice(client.BaseUrl(), readInp.Uid)
-
-	req := client.NewGet(ctx, readUrl)
+	req := NewReadByUidRequest(ctx, client, readInp)
 
 	var outp ReadOutput
 	if err := req.Send(&outp); err != nil {

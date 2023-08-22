@@ -3,13 +3,12 @@ package asa
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 	"strings"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
-
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
@@ -57,18 +56,18 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 
 		if updateInp.Username != "" || updateInp.Password != "" {
 			var publicKey *model.PublicKey
-			if strings.EqualFold(asaReadOutp.LarType, "SDC") {
-				if asaReadOutp.LarUid == "" {
-					return nil, fmt.Errorf("sdc uid not found")
+			if strings.EqualFold(asaReadOutp.ConnectorType, "SDC") {
+				if asaReadOutp.ConnectorUid == "" {
+					return nil, fmt.Errorf("connector uid not found")
 				}
 
-				larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadByUidInput{
-					SdcUid: asaReadOutp.LarUid,
+				connectorReadRes, err := connector.ReadByUid(ctx, client, connector.ReadByUidInput{
+					ConnectorUid: asaReadOutp.ConnectorUid,
 				})
 				if err != nil {
 					return nil, err
 				}
-				publicKey = &larReadRes.PublicKey
+				publicKey = &connectorReadRes.PublicKey
 			}
 
 			updateAsaConfigInp := asaconfig.NewUpdateInput(

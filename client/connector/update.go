@@ -1,4 +1,4 @@
-package sdc
+package connector
 
 import (
 	"context"
@@ -35,7 +35,7 @@ type UpdateRequestOutput struct {
 
 func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*UpdateOutput, error) {
 
-	url := url.UpdateSdc(client.BaseUrl(), updateInp.Uid)
+	url := url.UpdateConnector(client.BaseUrl(), updateInp.Uid)
 
 	req := client.NewPut(ctx, url, updateInp)
 

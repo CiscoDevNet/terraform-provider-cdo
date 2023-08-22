@@ -1,12 +1,12 @@
-package sdc_test
+package connector_test
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
 )
@@ -15,24 +15,24 @@ func TestReadAll(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	validCdg := sdc.NewSdcOutputBuilder().
+	validCdg := connector.NewConnectorOutputBuilder().
 		AsDefaultCloudConnector().
 		WithUid(cdgUid).
 		WithName(cdgName).
 		WithTenantUid(tenantUid).
 		Build()
 
-	validSdc := sdc.NewSdcOutputBuilder().
+	validConnector := connector.NewConnectorOutputBuilder().
 		AsOnPremConnector().
-		WithUid(sdcUid).
-		WithName(sdcName).
+		WithUid(connectorUid).
+		WithName(connectorName).
 		WithTenantUid(tenantUid).
 		Build()
 
 	testCases := []struct {
 		testName   string
 		setupFunc  func()
-		assertFunc func(output *sdc.ReadAllOutput, err error, t *testing.T)
+		assertFunc func(output *connector.ReadAllOutput, err error, t *testing.T)
 	}{
 		{
 			testName: "successfully fetches secure connectors",
@@ -41,15 +41,15 @@ func TestReadAll(t *testing.T) {
 				httpmock.RegisterResponder(
 					"GET",
 					"/aegis/rest/v1/services/targets/proxies",
-					httpmock.NewJsonResponderOrPanic(200, sdc.ReadAllOutput{validCdg, validSdc}),
+					httpmock.NewJsonResponderOrPanic(200, connector.ReadAllOutput{validCdg, validConnector}),
 				)
 			},
 
-			assertFunc: func(output *sdc.ReadAllOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.ReadAllOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
 
-				expectedResponse := sdc.ReadAllOutput{validCdg, validSdc}
+				expectedResponse := connector.ReadAllOutput{validCdg, validConnector}
 				assert.Equal(t, expectedResponse, *output)
 			},
 		},
@@ -60,11 +60,11 @@ func TestReadAll(t *testing.T) {
 				httpmock.RegisterResponder(
 					"GET",
 					"/aegis/rest/v1/services/targets/proxies",
-					httpmock.NewJsonResponderOrPanic(200, sdc.ReadAllOutput{}),
+					httpmock.NewJsonResponderOrPanic(200, connector.ReadAllOutput{}),
 				)
 			},
 
-			assertFunc: func(output *sdc.ReadAllOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.ReadAllOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
 				assert.Len(t, *output, 0)
@@ -81,7 +81,7 @@ func TestReadAll(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *sdc.ReadAllOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.ReadAllOutput, err error, t *testing.T) {
 				assert.Nil(t, output)
 				assert.NotNil(t, err)
 			},
@@ -94,10 +94,10 @@ func TestReadAll(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := sdc.ReadAll(
+			output, err := connector.ReadAll(
 				context.Background(),
 				*http.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
-				*sdc.NewReadAllInput(),
+				*connector.NewReadAllInput(),
 			)
 
 			testCase.assertFunc(output, err, t)

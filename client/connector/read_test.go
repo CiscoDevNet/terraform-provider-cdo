@@ -1,12 +1,12 @@
-package sdc_test
+package connector_test
 
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"testing"
 	"time"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
@@ -16,17 +16,17 @@ func TestReadByUid(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	validCdg := sdc.NewSdcOutputBuilder().
+	validCdg := connector.NewConnectorOutputBuilder().
 		AsDefaultCloudConnector().
 		WithUid(cdgUid).
 		WithName(cdgName).
 		WithTenantUid(tenantUid).
 		Build()
 
-	validSdc := sdc.NewSdcOutputBuilder().
+	validConnector := connector.NewConnectorOutputBuilder().
 		AsOnPremConnector().
-		WithUid(sdcUid).
-		WithName(sdcName).
+		WithUid(connectorUid).
+		WithName(connectorName).
 		WithTenantUid(tenantUid).
 		Build()
 
@@ -34,7 +34,7 @@ func TestReadByUid(t *testing.T) {
 		testName   string
 		targetUid  string
 		setupFunc  func()
-		assertFunc func(output *sdc.ReadOutput, err error, t *testing.T)
+		assertFunc func(output *connector.ReadOutput, err error, t *testing.T)
 	}{
 		{
 			testName:  "successfully fetch CDG by uid",
@@ -48,28 +48,28 @@ func TestReadByUid(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.ReadOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
 				assert.Equal(t, validCdg, *output)
 			},
 		},
 		{
-			testName:  "successfully fetch SDC by uid",
-			targetUid: sdcUid,
+			testName:  "successfully fetch connector by uid",
+			targetUid: connectorUid,
 
 			setupFunc: func() {
 				httpmock.RegisterResponder(
 					"GET",
-					fmt.Sprintf("/aegis/rest/v1/services/targets/proxies/%s", sdcUid),
-					httpmock.NewJsonResponderOrPanic(200, validSdc),
+					fmt.Sprintf("/aegis/rest/v1/services/targets/proxies/%s", connectorUid),
+					httpmock.NewJsonResponderOrPanic(200, validConnector),
 				)
 			},
 
-			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.ReadOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
-				assert.Equal(t, validSdc, *output)
+				assert.Equal(t, validConnector, *output)
 			},
 		},
 		{
@@ -84,7 +84,7 @@ func TestReadByUid(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.ReadOutput, err error, t *testing.T) {
 				assert.Nil(t, output)
 				assert.NotNil(t, err)
 			},
@@ -101,7 +101,7 @@ func TestReadByUid(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.ReadOutput, err error, t *testing.T) {
 				assert.Nil(t, output)
 				assert.NotNil(t, err)
 			},
@@ -114,10 +114,10 @@ func TestReadByUid(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := sdc.ReadByUid(
+			output, err := connector.ReadByUid(
 				context.Background(),
 				*http.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
-				*sdc.NewReadByUidInput(testCase.targetUid),
+				*connector.NewReadByUidInput(testCase.targetUid),
 			)
 
 			testCase.assertFunc(output, err, t)
@@ -129,17 +129,17 @@ func TestReadByName(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	validCdg := sdc.NewSdcOutputBuilder().
+	validCdg := connector.NewConnectorOutputBuilder().
 		AsDefaultCloudConnector().
 		WithUid(cdgUid).
 		WithName(cdgName).
 		WithTenantUid(tenantUid).
 		Build()
 
-	validSdc := sdc.NewSdcOutputBuilder().
+	validConnector := connector.NewConnectorOutputBuilder().
 		AsOnPremConnector().
-		WithUid(sdcUid).
-		WithName(sdcName).
+		WithUid(connectorUid).
+		WithName(connectorName).
 		WithTenantUid(tenantUid).
 		Build()
 
@@ -147,7 +147,7 @@ func TestReadByName(t *testing.T) {
 		testName   string
 		targetName string
 		setupFunc  func()
-		assertFunc func(output *sdc.ReadOutput, err error, t *testing.T)
+		assertFunc func(output *connector.ReadOutput, err error, t *testing.T)
 	}{
 		{
 			testName:   "successfully fetch CDG by name",
@@ -158,33 +158,33 @@ func TestReadByName(t *testing.T) {
 					"GET",
 					"/aegis/rest/v1/services/targets/proxies",
 					fmt.Sprintf("q=name:%s", cdgName),
-					httpmock.NewJsonResponderOrPanic(200, []sdc.ReadOutput{validCdg}),
+					httpmock.NewJsonResponderOrPanic(200, []connector.ReadOutput{validCdg}),
 				)
 			},
 
-			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.ReadOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
 				assert.Equal(t, validCdg, *output)
 			},
 		},
 		{
-			testName:   "successfully fetch SDC by name",
-			targetName: sdcName,
+			testName:   "successfully fetch connector by name",
+			targetName: connectorName,
 
 			setupFunc: func() {
 				httpmock.RegisterResponderWithQuery(
 					"GET",
 					"/aegis/rest/v1/services/targets/proxies",
-					fmt.Sprintf("q=name:%s", sdcName),
-					httpmock.NewJsonResponderOrPanic(200, []sdc.ReadOutput{validSdc}),
+					fmt.Sprintf("q=name:%s", connectorName),
+					httpmock.NewJsonResponderOrPanic(200, []connector.ReadOutput{validConnector}),
 				)
 			},
 
-			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.ReadOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
-				assert.Equal(t, validSdc, *output)
+				assert.Equal(t, validConnector, *output)
 			},
 		},
 		{
@@ -196,15 +196,15 @@ func TestReadByName(t *testing.T) {
 					"GET",
 					"/aegis/rest/v1/services/targets/proxies",
 					fmt.Sprintf("q=name:%s", cdgName),
-					httpmock.NewJsonResponderOrPanic(200, []sdc.ReadOutput{validCdg, validCdg}),
+					httpmock.NewJsonResponderOrPanic(200, []connector.ReadOutput{validCdg, validCdg}),
 				)
 			},
 
-			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.ReadOutput, err error, t *testing.T) {
 				assert.Nil(t, output)
 				assert.NotNil(t, err)
 
-				expectedError := fmt.Sprintf("multiple SDCs found with the name: %s", cdgName)
+				expectedError := fmt.Sprintf("multiple connectors found with the name: %s", cdgName)
 				assert.Equal(t, expectedError, err.Error())
 			},
 		},
@@ -217,11 +217,11 @@ func TestReadByName(t *testing.T) {
 					"GET",
 					"/aegis/rest/v1/services/targets/proxies",
 					fmt.Sprintf("q=name:%s", cdgName),
-					httpmock.NewJsonResponderOrPanic(200, []sdc.ReadOutput{}),
+					httpmock.NewJsonResponderOrPanic(200, []connector.ReadOutput{}),
 				)
 			},
 
-			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.ReadOutput, err error, t *testing.T) {
 				assert.Nil(t, output)
 				assert.NotNil(t, err)
 			},
@@ -239,7 +239,7 @@ func TestReadByName(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *sdc.ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.ReadOutput, err error, t *testing.T) {
 				assert.Nil(t, output)
 				assert.NotNil(t, err)
 			},
@@ -252,10 +252,10 @@ func TestReadByName(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := sdc.ReadByName(
+			output, err := connector.ReadByName(
 				context.Background(),
 				*http.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
-				*sdc.NewReadByNameInput(testCase.targetName),
+				*connector.NewReadByNameInput(testCase.targetName),
 			)
 
 			testCase.assertFunc(output, err, t)

@@ -1,4 +1,4 @@
-package sdc
+package connector
 
 type createOutputBuilder struct {
 	createOutput CreateOutput

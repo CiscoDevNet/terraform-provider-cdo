@@ -64,16 +64,16 @@ func (builder *readOutputBuilder) WithLastUpdatedDate(date time.Time) *readOutpu
 	return builder
 }
 
-func (builder *readOutputBuilder) OnboardedUsingOnPremConnector(sdcUid string) *readOutputBuilder {
-	builder.readOutput.LarType = "SDC"
-	builder.readOutput.LarUid = sdcUid
+func (builder *readOutputBuilder) OnboardedUsingOnPremConnector(connectorUid string) *readOutputBuilder {
+	builder.readOutput.ConnectorType = "SDC"
+	builder.readOutput.ConnectorUid = connectorUid
 
 	return builder
 }
 
 func (builder *readOutputBuilder) OnboardedUsingCloudConnector(cdgUid string) *readOutputBuilder {
-	builder.readOutput.LarType = "CDG"
-	builder.readOutput.LarUid = cdgUid
+	builder.readOutput.ConnectorType = "CDG"
+	builder.readOutput.ConnectorUid = cdgUid
 
 	return builder
 }

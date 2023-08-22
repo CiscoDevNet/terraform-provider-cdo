@@ -3,11 +3,11 @@ package ios
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"strings"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios/iosconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
@@ -33,8 +33,8 @@ type CreateOutput struct {
 	Host          string `json:"host"`
 	Port          string `json:"port"`
 	SocketAddress string `json:"ipv4"`
-	SdcType       string `json:"larType"`
-	SdcUid        string `json:"larUid"`
+	ConnectorType string `json:"larType"`
+	ConnectorUid  string `json:"larUid"`
 }
 
 type CreateError struct {
@@ -46,12 +46,12 @@ func (r *CreateError) Error() string {
 	return r.Err.Error()
 }
 
-func NewCreateRequestInput(name, sdcUid, sdcType, ipv4, username, password string, ignoreCertificate bool) *CreateInput {
+func NewCreateRequestInput(name, connectorUid, connectorType, socketAddress, username, password string, ignoreCertificate bool) *CreateInput {
 	return &CreateInput{
 		Name:              name,
-		ConnectorUid:      sdcUid,
-		ConnectorType:     sdcType,
-		SocketAddress:     ipv4,
+		ConnectorUid:      connectorUid,
+		ConnectorType:     connectorType,
+		SocketAddress:     socketAddress,
 		Username:          username,
 		Password:          password,
 		IgnoreCertificate: ignoreCertificate,
@@ -77,32 +77,30 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		}
 	}
 
-	// encrypt credentials for SDC on prem lar
+	// encrypt credentials on prem connector
 	var publicKey *model.PublicKey
-	if strings.EqualFold(deviceCreateOutp.LarType, "SDC") {
+	if strings.EqualFold(deviceCreateOutp.ConnectorType, "SDC") {
 
-		// on-prem lar requires encryption
-		client.Logger.Println("decrypting public key from sdc for encrpytion")
+		// on-prem connector requires encryption
+		client.Logger.Println("decrypting public key from connector for encryption")
 
-		if deviceCreateOutp.LarUid == "" {
+		if deviceCreateOutp.ConnectorUid == "" {
 			return nil, &CreateError{
-				Err:               fmt.Errorf("sdc uid not found"),
+				Err:               fmt.Errorf("connector uid not found"),
 				CreatedResourceId: createdResourceId,
 			}
 
 		}
 
-		// read lar public key
-		larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadByUidInput{
-			SdcUid: deviceCreateOutp.LarUid,
-		})
+		// read connector public key
+		connectorReadRes, err := connector.ReadByUid(ctx, client, *connector.NewReadByUidInput(deviceCreateOutp.ConnectorUid))
 		if err != nil {
 			return nil, &CreateError{
 				Err:               err,
 				CreatedResourceId: createdResourceId,
 			}
 		}
-		publicKey = &larReadRes.PublicKey
+		publicKey = &connectorReadRes.PublicKey
 	}
 
 	err = retry.Do(iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, state.PRE_READ_METADATA), *retry.NewOptionsWithLogger(client.Logger))
@@ -149,8 +147,8 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		Host:          deviceCreateOutp.Host,
 		Port:          deviceCreateOutp.Port,
 		SocketAddress: deviceCreateOutp.SocketAddress,
-		SdcUid:        deviceCreateOutp.LarUid,
-		SdcType:       deviceCreateOutp.LarType,
+		ConnectorUid:  deviceCreateOutp.ConnectorUid,
+		ConnectorType: deviceCreateOutp.ConnectorType,
 	}
 	return &createOutp, nil
 }

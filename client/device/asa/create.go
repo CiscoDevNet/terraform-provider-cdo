@@ -3,7 +3,7 @@ package asa
 import (
 	"context"
 	"fmt"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
@@ -14,8 +14,8 @@ import (
 
 type CreateInput struct {
 	Name          string
-	SdcUid        string
-	SdcType       string
+	ConnectorUid  string
+	ConnectorType string
 	SocketAddress string
 
 	Username string
@@ -31,8 +31,8 @@ type CreateOutput struct {
 	Host          string `json:"host"`
 	Port          string `json:"port"`
 	SocketAddress string `json:"ipv4"`
-	SdcType       string `json:"larType"`
-	SdcUid        string `json:"larUid"`
+	ConnectorType string `json:"larType"`
+	ConnectorUid  string `json:"larUid"`
 }
 
 type CreateError struct {
@@ -44,11 +44,11 @@ func (r *CreateError) Error() string {
 	return r.Err.Error()
 }
 
-func NewCreateRequestInput(name, larUid, larType, ipv4, username, password string, ignoreCertificate bool) *CreateInput {
+func NewCreateRequestInput(name, connectorUid, connectorType, ipv4, username, password string, ignoreCertificate bool) *CreateInput {
 	return &CreateInput{
 		Name:             name,
-		SdcUid:           larUid,
-		SdcType:          larType,
+		ConnectorUid:     connectorUid,
+		ConnectorType:    connectorType,
 		SocketAddress:    ipv4,
 		Username:         username,
 		Password:         password,
@@ -61,7 +61,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	client.Logger.Println("creating asa device")
 
 	deviceCreateOutp, err := device.Create(ctx, client, *device.NewCreateRequestInput(
-		createInp.Name, "ASA", createInp.SdcUid, createInp.SdcType, createInp.SocketAddress, false, createInp.IgnoreCertifcate,
+		createInp.Name, "ASA", createInp.ConnectorUid, createInp.ConnectorType, createInp.SocketAddress, false, createInp.IgnoreCertifcate,
 	))
 	var createdResourceId *string = nil
 	if deviceCreateOutp != nil {
@@ -117,24 +117,24 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		}
 	}
 
-	// encrypt credentials for SDC on prem lar
+	// encrypt credentials on prem connector
 	var publicKey *model.PublicKey
-	if strings.EqualFold(deviceCreateOutp.LarType, "SDC") {
+	if strings.EqualFold(deviceCreateOutp.ConnectorType, "SDC") {
 
-		// on-prem lar requires encryption
-		client.Logger.Println("decrypting public key from sdc for encrpytion")
+		// on-prem connector requires encryption
+		client.Logger.Println("decrypting public key from connector for encryption")
 
-		if deviceCreateOutp.LarUid == "" {
+		if deviceCreateOutp.ConnectorUid == "" {
 			return nil, &CreateError{
 				CreatedResourceId: createdResourceId,
-				Err:               fmt.Errorf("sdc uid not found"),
+				Err:               fmt.Errorf("connector uid not found"),
 			}
 
 		}
 
-		// read lar public key
-		larReadRes, err := sdc.ReadByUid(ctx, client, sdc.ReadByUidInput{
-			SdcUid: deviceCreateOutp.LarUid,
+		// read connector public key
+		connectorReadRes, err := connector.ReadByUid(ctx, client, connector.ReadByUidInput{
+			ConnectorUid: deviceCreateOutp.ConnectorUid,
 		})
 		if err != nil {
 			return nil, &CreateError{
@@ -142,7 +142,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 				Err:               err,
 			}
 		}
-		publicKey = &larReadRes.PublicKey
+		publicKey = &connectorReadRes.PublicKey
 	}
 
 	// update asa config credentials
@@ -182,8 +182,8 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		Host:          deviceCreateOutp.Host,
 		Port:          deviceCreateOutp.Port,
 		SocketAddress: deviceCreateOutp.SocketAddress,
-		SdcUid:        deviceCreateOutp.LarUid,
-		SdcType:       deviceCreateOutp.LarType,
+		ConnectorUid:  deviceCreateOutp.ConnectorUid,
+		ConnectorType: deviceCreateOutp.ConnectorType,
 	}
 	return &createOutp, nil
 }

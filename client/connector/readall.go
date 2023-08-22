@@ -1,4 +1,4 @@
-package sdc
+package connector
 
 import (
 	"context"
@@ -17,7 +17,7 @@ func NewReadAllInput() *ReadAllInput {
 
 func NewReadAllRequest(ctx context.Context, client http.Client, readAllInp ReadAllInput) *http.Request {
 
-	url := url.ReadAllSdcs(client.BaseUrl())
+	url := url.ReadAllConnectors(client.BaseUrl())
 
 	req := client.NewGet(ctx, url)
 
@@ -27,7 +27,7 @@ func NewReadAllRequest(ctx context.Context, client http.Client, readAllInp ReadA
 // TODO: Change the return type to return value type over pointer (*ReadAllOutput -> ReadAllOutput). Slices are references in golang.
 func ReadAll(ctx context.Context, client http.Client, readAllInp ReadAllInput) (*ReadAllOutput, error) {
 
-	client.Logger.Println("reading all sdcs")
+	client.Logger.Println("reading all connectors")
 
 	req := NewReadAllRequest(ctx, client, readAllInp)
 

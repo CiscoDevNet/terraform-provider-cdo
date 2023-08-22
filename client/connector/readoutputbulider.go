@@ -1,4 +1,4 @@
-package sdc
+package connector
 
 import (
 	"crypto/rand"
@@ -11,7 +11,7 @@ type sdcReadOutputBuilder struct {
 	readOutput ReadOutput
 }
 
-func NewSdcOutputBuilder() *sdcReadOutputBuilder {
+func NewConnectorOutputBuilder() *sdcReadOutputBuilder {
 	return &sdcReadOutputBuilder{}
 }
 
@@ -20,7 +20,7 @@ func (builder *sdcReadOutputBuilder) Build() ReadOutput {
 }
 
 func (builder *sdcReadOutputBuilder) AsDefaultCloudConnector() *sdcReadOutputBuilder {
-	builder.readOutput.DefaultSdc = true
+	builder.readOutput.DefaultConnector = true
 	builder.readOutput.Cdg = true
 
 	return builder

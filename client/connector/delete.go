@@ -1,4 +1,4 @@
-package sdc
+package connector
 
 import (
 	"context"
@@ -22,7 +22,7 @@ type DeleteOutput struct {
 
 func Delete(ctx context.Context, client http.Client, inp DeleteInput) (*DeleteOutput, error) {
 
-	url := url.DeleteSdc(client.BaseUrl(), inp.Uid)
+	url := url.DeleteConnector(client.BaseUrl(), inp.Uid)
 
 	req := client.NewDelete(ctx, url)
 

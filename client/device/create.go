@@ -8,25 +8,25 @@ import (
 )
 
 type CreateInput struct {
-	Name       string `json:"name"`
-	DeviceType string `json:"deviceType"`
-	LarUid     string `json:"larUid,omitempty"`
-	LarType    string `json:"larType"`
-	Ipv4       string `json:"ipv4"`
-	Model      bool   `json:"model"`
+	Name          string `json:"name"`
+	DeviceType    string `json:"deviceType"`
+	ConnectorUid  string `json:"larUid,omitempty"`
+	ConnectorType string `json:"larType"`
+	SocketAddress string `json:"ipv4"`
+	Model         bool   `json:"model"`
 
 	IgnoreCertifcate bool `json:"ignoreCertificate"`
 }
 
 type CreateOutput = ReadOutput
 
-func NewCreateRequestInput(name, deviceType, larUid, larType, ipv4 string, model bool, ignoreCertificate bool) *CreateInput {
+func NewCreateRequestInput(name, deviceType, connectorUid, connectorType, socketAddress string, model bool, ignoreCertificate bool) *CreateInput {
 	return &CreateInput{
 		Name:             name,
 		DeviceType:       deviceType,
-		LarUid:           larUid,
-		LarType:          larType,
-		Ipv4:             ipv4,
+		ConnectorUid:     connectorUid,
+		ConnectorType:    connectorType,
+		SocketAddress:    socketAddress,
 		Model:            model,
 		IgnoreCertifcate: ignoreCertificate,
 	}

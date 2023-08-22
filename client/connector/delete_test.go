@@ -1,9 +1,9 @@
-package sdc_test
+package connector_test
 
 import (
 	"context"
 	"fmt"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -16,27 +16,27 @@ func TestDelete(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	validDeleteOutput := sdc.DeleteOutput{}
+	validDeleteOutput := connector.DeleteOutput{}
 
 	testCases := []struct {
 		testName   string
 		sdcUid     string
 		setupFunc  func()
-		assertFunc func(output *sdc.DeleteOutput, err error, t *testing.T)
+		assertFunc func(output *connector.DeleteOutput, err error, t *testing.T)
 	}{
 		{
 			testName: "successfully delete SDC",
-			sdcUid:   sdcUid,
+			sdcUid:   connectorUid,
 
 			setupFunc: func() {
 				httpmock.RegisterResponder(
 					"DELETE",
-					fmt.Sprintf("/aegis/rest/v1/services/targets/proxies/%s", sdcUid),
+					fmt.Sprintf("/aegis/rest/v1/services/targets/proxies/%s", connectorUid),
 					httpmock.NewJsonResponderOrPanic(200, validDeleteOutput),
 				)
 			},
 
-			assertFunc: func(output *sdc.DeleteOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.DeleteOutput, err error, t *testing.T) {
 				assert.Nil(t, err, "error should be nil")
 				assert.NotNil(t, output, "output should not be nil")
 				assert.Equal(t, validDeleteOutput, *output, "output should be valid")
@@ -44,19 +44,19 @@ func TestDelete(t *testing.T) {
 		},
 		{
 			testName: "should error if failed to delete",
-			sdcUid:   sdcUid,
+			sdcUid:   connectorUid,
 
 			setupFunc: func() {
 				httpmock.RegisterResponder(
 					"DELETE",
-					fmt.Sprintf("/aegis/rest/v1/services/targets/proxies/%s", sdcUid),
+					fmt.Sprintf("/aegis/rest/v1/services/targets/proxies/%s", connectorUid),
 					httpmock.NewJsonResponderOrPanic(500, nil),
 				)
 			},
 
-			assertFunc: func(output *sdc.DeleteOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.DeleteOutput, err error, t *testing.T) {
 				assert.NotNil(t, err, "error should be nil")
-				assert.Equal(t, &sdc.DeleteOutput{}, output, "output should be zero value")
+				assert.Equal(t, &connector.DeleteOutput{}, output, "output should be zero value")
 			},
 		},
 	}
@@ -67,10 +67,10 @@ func TestDelete(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := sdc.Delete(
+			output, err := connector.Delete(
 				context.Background(),
 				*http.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
-				sdc.NewDeleteInput(testCase.sdcUid),
+				connector.NewDeleteInput(testCase.sdcUid),
 			)
 
 			testCase.assertFunc(output, err, t)

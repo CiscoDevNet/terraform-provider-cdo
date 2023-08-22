@@ -1,4 +1,4 @@
-package sdc
+package connector
 
 import (
 	"context"
@@ -41,7 +41,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	client.Logger.Println("create SDC")
 
 	// 1. create sdc device
-	url := url.CreateSdc(client.BaseUrl())
+	url := url.CreateConnector(client.BaseUrl())
 	body := createRequestBody{
 		Name:                createInp.Name,
 		OnPremLarConfigured: true, // this is always true, because we no longer support cloud sdc

@@ -3,9 +3,9 @@ package ios
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"strconv"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -39,11 +39,11 @@ func Read(ctx context.Context, resource *IosDeviceResource, stateData *IosDevice
 
 func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDeviceResourceModel) error {
 
-	readSdcByNameInp := sdc.NewReadByNameInput(
+	readSdcByNameInp := connector.NewReadByNameInput(
 		planData.ConnectorName.ValueString(),
 	)
 
-	readSdcOutp, err := resource.client.ReadSdcByName(ctx, *readSdcByNameInp)
+	readSdcOutp, err := resource.client.ReadConnectorByName(ctx, *readSdcByNameInp)
 	if err != nil {
 		return err
 	}

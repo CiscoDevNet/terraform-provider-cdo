@@ -1,13 +1,13 @@
 // Copyright (c) HashiCorp, Inc.
 // SPDX-License-Identifier: MPL-2.0
 
-package sdc
+package connector
 
 import (
 	"context"
 	"fmt"
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -96,7 +96,7 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 		return
 	}
 
-	res, err := d.client.ReadSdcByName(ctx, *sdc.NewReadByNameInput(planData.Name.ValueString()))
+	res, err := d.client.ReadConnectorByName(ctx, *connector.NewReadByNameInput(planData.Name.ValueString()))
 	if err != nil {
 		resp.Diagnostics.AddError("Failed to read sdc devices", err.Error())
 		return

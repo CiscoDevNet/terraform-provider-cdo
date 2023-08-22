@@ -1,16 +1,16 @@
-package sdc
+package connector
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) error {
 
 	// do read
-	readSdcOutp, err := resource.client.ReadSdcByUid(ctx, *sdc.NewReadByUidInput(stateData.ID.ValueString()))
+	readSdcOutp, err := resource.client.ReadConnectorByUid(ctx, *connector.NewReadByUidInput(stateData.ID.ValueString()))
 	if err != nil {
 		return err
 	}
@@ -25,7 +25,7 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 func Create(ctx context.Context, resource *Resource, planData *ResourceModel) error {
 
 	// do create
-	createSdcOutp, err := resource.client.CreateSdc(ctx, *sdc.NewCreateInput(planData.Name.ValueString()))
+	createSdcOutp, err := resource.client.CreateConnector(ctx, *connector.NewCreateInput(planData.Name.ValueString()))
 	if err != nil {
 		return err
 	}
@@ -41,7 +41,7 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 func Update(ctx context.Context, resource *Resource, planData *ResourceModel, stateData *ResourceModel) error {
 
 	// do update
-	updateSdcOutp, err := resource.client.UpdateSdc(ctx, sdc.NewUpdateInput(planData.ID.ValueString(), planData.Name.ValueString()))
+	updateSdcOutp, err := resource.client.UpdateConnector(ctx, connector.NewUpdateInput(planData.ID.ValueString(), planData.Name.ValueString()))
 	if err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func Update(ctx context.Context, resource *Resource, planData *ResourceModel, st
 func Delete(ctx context.Context, resource *Resource, stateData *ResourceModel) error {
 
 	// do delete
-	_, err := resource.client.DeleteSdc(ctx, sdc.NewDeleteInput(stateData.ID.ValueString()))
+	_, err := resource.client.DeleteConnector(ctx, connector.NewDeleteInput(stateData.ID.ValueString()))
 	if err != nil {
 		return err
 	}

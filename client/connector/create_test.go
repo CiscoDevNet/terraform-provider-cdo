@@ -1,8 +1,8 @@
-package sdc_test
+package connector_test
 
 import (
 	"context"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
 	"github.com/stretchr/testify/assert"
@@ -16,16 +16,16 @@ func TestCreate(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	validCreateRequestOutput := sdc.NewCreateResponseBuilder().
-		Uid(sdcUid).
+	validCreateRequestOutput := connector.NewCreateResponseBuilder().
+		Uid(connectorUid).
 		TenantUid(tenantUid).
-		Name(sdcName).
+		Name(connectorName).
 		ServiceConnectivityState(serviceConnectivityState).
 		State(state).
 		Status(status).
 		Build()
 
-	validCreateOutput := sdc.NewCreateOutputBuilder().
+	validCreateOutput := connector.NewCreateOutputBuilder().
 		CreateRequestOutput(validCreateRequestOutput).
 		BootstrapData(bootstrapData).
 		Build()
@@ -43,11 +43,11 @@ func TestCreate(t *testing.T) {
 		testName   string
 		sdcName    string
 		setupFunc  func()
-		assertFunc func(output *sdc.CreateOutput, err error, t *testing.T)
+		assertFunc func(output *connector.CreateOutput, err error, t *testing.T)
 	}{
 		{
 			testName: "successfully create SDC",
-			sdcName:  sdcName,
+			sdcName:  connectorName,
 
 			setupFunc: func() {
 				httpmock.RegisterResponder(
@@ -62,7 +62,7 @@ func TestCreate(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *sdc.CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.CreateOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
 				assert.Equal(t, validCreateOutput, *output)
@@ -70,7 +70,7 @@ func TestCreate(t *testing.T) {
 		},
 		{
 			testName: "should error if failed to create proxy",
-			sdcName:  sdcName,
+			sdcName:  connectorName,
 
 			setupFunc: func() {
 				httpmock.RegisterResponder(
@@ -85,14 +85,14 @@ func TestCreate(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *sdc.CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.CreateOutput, err error, t *testing.T) {
 				assert.NotNil(t, err, "error should not be nil")
-				assert.Equal(t, output, &sdc.CreateOutput{}, "output should be zero value")
+				assert.Equal(t, output, &connector.CreateOutput{}, "output should be zero value")
 			},
 		},
 		{
 			testName: "should error if failed to retrieve user token",
-			sdcName:  sdcName,
+			sdcName:  connectorName,
 
 			setupFunc: func() {
 				httpmock.RegisterResponder(
@@ -107,9 +107,9 @@ func TestCreate(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *sdc.CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.CreateOutput, err error, t *testing.T) {
 				assert.NotNil(t, err, "error should not be nil")
-				assert.Equal(t, output, &sdc.CreateOutput{}, "output should be zero value")
+				assert.Equal(t, output, &connector.CreateOutput{}, "output should be zero value")
 			},
 		},
 	}
@@ -120,10 +120,10 @@ func TestCreate(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := sdc.Create(
+			output, err := connector.Create(
 				context.Background(),
 				*http.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
-				*sdc.NewCreateInput(testCase.sdcName),
+				*connector.NewCreateInput(testCase.sdcName),
 			)
 
 			testCase.assertFunc(output, err, t)

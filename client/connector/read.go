@@ -1,4 +1,4 @@
-package sdc
+package connector
 
 import (
 	"context"
@@ -10,37 +10,37 @@ import (
 )
 
 type ReadByUidInput struct {
-	SdcUid string
+	ConnectorUid string
 }
 
 type ReadByNameInput struct {
-	SdcName string
+	ConnectorName string
 }
 
 type ReadOutput struct {
-	Uid        string          `json:"uid"`
-	Name       string          `json:"name"`
-	DefaultSdc bool            `json:"defaultLar"`
-	Cdg        bool            `json:"cdg"`
-	TenantUid  string          `json:"tenantUid"`
-	PublicKey  model.PublicKey `json:"larPublicKey"`
+	Uid              string          `json:"uid"`
+	Name             string          `json:"name"`
+	DefaultConnector bool            `json:"defaultLar"`
+	Cdg              bool            `json:"cdg"`
+	TenantUid        string          `json:"tenantUid"`
+	PublicKey        model.PublicKey `json:"larPublicKey"`
 }
 
-func NewReadByUidInput(sdcUid string) *ReadByUidInput {
+func NewReadByUidInput(connectorUid string) *ReadByUidInput {
 	return &ReadByUidInput{
-		SdcUid: sdcUid,
+		ConnectorUid: connectorUid,
 	}
 }
 
-func NewReadByNameInput(sdcName string) *ReadByNameInput {
+func NewReadByNameInput(ConnectorName string) *ReadByNameInput {
 	return &ReadByNameInput{
-		SdcName: sdcName,
+		ConnectorName: ConnectorName,
 	}
 }
 
 func newReadByUidRequest(ctx context.Context, client http.Client, readInp ReadByUidInput) *http.Request {
 
-	url := url.ReadSdcByUid(client.BaseUrl(), readInp.SdcUid)
+	url := url.ReadConnectorByUid(client.BaseUrl(), readInp.ConnectorUid)
 
 	req := client.NewGet(ctx, url)
 
@@ -49,7 +49,7 @@ func newReadByUidRequest(ctx context.Context, client http.Client, readInp ReadBy
 
 func newReadByNameRequest(ctx context.Context, client http.Client, readInp ReadByNameInput) *http.Request {
 
-	url := url.ReadSdcByName(client.BaseUrl(), readInp.SdcName)
+	url := url.ReadConnectorByName(client.BaseUrl(), readInp.ConnectorName)
 
 	req := client.NewGet(ctx, url)
 
@@ -58,7 +58,7 @@ func newReadByNameRequest(ctx context.Context, client http.Client, readInp ReadB
 
 func ReadByUid(ctx context.Context, client http.Client, readInp ReadByUidInput) (*ReadOutput, error) {
 
-	client.Logger.Println("reading sdc")
+	client.Logger.Println("reading connector by uid")
 
 	req := newReadByUidRequest(ctx, client, readInp)
 
@@ -72,7 +72,7 @@ func ReadByUid(ctx context.Context, client http.Client, readInp ReadByUidInput) 
 
 func ReadByName(ctx context.Context, client http.Client, readInp ReadByNameInput) (*ReadOutput, error) {
 
-	client.Logger.Println("reading sdc by name")
+	client.Logger.Println("reading connector by name")
 
 	req := newReadByNameRequest(ctx, client, readInp)
 
@@ -82,11 +82,11 @@ func ReadByName(ctx context.Context, client http.Client, readInp ReadByNameInput
 	}
 
 	if len(arrayOutp) == 0 {
-		return nil, fmt.Errorf("no SDC found")
+		return nil, fmt.Errorf("no connector found")
 	}
 
 	if len(arrayOutp) > 1 {
-		return nil, fmt.Errorf("multiple SDCs found with the name: %s", readInp.SdcName)
+		return nil, fmt.Errorf("multiple connectors found with the name: %s", readInp.ConnectorName)
 	}
 
 	outp := arrayOutp[0]

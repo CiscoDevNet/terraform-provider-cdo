@@ -2,13 +2,13 @@ package asa_test
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
@@ -19,7 +19,7 @@ func TestAsaUpdate(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	onPremConnector := sdc.NewSdcOutputBuilder().
+	onPremConnector := connector.NewConnectorOutputBuilder().
 		AsOnPremConnector().
 		WithUid("00000000-0000-0000-0000-000000000000").
 		WithName("MyCloudConnector").
@@ -114,7 +114,7 @@ func TestAsaUpdate(t *testing.T) {
 				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
 				configureDeviceReadToRespondSuccessfully(asaDeviceOnboardedByOnPremConnector)
 
-				configureSdcReadToRespondSuccessfully(onPremConnector)
+				configureConnectorReadToRespondSuccessfully(onPremConnector)
 
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
 				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: state.DONE})
@@ -172,7 +172,7 @@ func TestAsaUpdate(t *testing.T) {
 				configureDeviceReadSpecificToRespondWithError(input.Uid)
 				configureDeviceReadToRespondSuccessfully(asaDeviceOnboardedByOnPremConnector)
 
-				configureSdcReadToRespondSuccessfully(onPremConnector)
+				configureConnectorReadToRespondSuccessfully(onPremConnector)
 
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, asaDeviceOnboardedByOnPremConnector)
@@ -196,7 +196,7 @@ func TestAsaUpdate(t *testing.T) {
 				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
 				configureDeviceReadToRespondWithError(asaDeviceOnboardedByOnPremConnector.Uid)
 
-				configureSdcReadToRespondSuccessfully(onPremConnector)
+				configureConnectorReadToRespondSuccessfully(onPremConnector)
 
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, asaDeviceOnboardedByOnPremConnector)
@@ -220,7 +220,7 @@ func TestAsaUpdate(t *testing.T) {
 				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
 				configureDeviceReadToRespondSuccessfully(asaDeviceOnboardedByOnPremConnector)
 
-				configureSdcReadToRespondWithError(onPremConnector.Uid)
+				configureConnectorReadToRespondWithError(onPremConnector.Uid)
 
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, asaDeviceOnboardedByOnPremConnector)
@@ -244,7 +244,7 @@ func TestAsaUpdate(t *testing.T) {
 				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
 				configureDeviceReadToRespondSuccessfully(asaDeviceOnboardedByOnPremConnector)
 
-				configureSdcReadToRespondSuccessfully(onPremConnector)
+				configureConnectorReadToRespondSuccessfully(onPremConnector)
 
 				configureAsaConfigUpdateToRespondWithError(asaConfig.SpecificUid)
 				configureDeviceUpdateToRespondSuccessfully(input.Uid, asaDeviceOnboardedByOnPremConnector)
@@ -268,7 +268,7 @@ func TestAsaUpdate(t *testing.T) {
 				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
 				configureDeviceReadToRespondSuccessfully(asaDeviceOnboardedByOnPremConnector)
 
-				configureSdcReadToRespondSuccessfully(onPremConnector)
+				configureConnectorReadToRespondSuccessfully(onPremConnector)
 
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
 				configureDeviceUpdateToRespondWithError(asaDeviceOnboardedByOnPremConnector.Uid)

@@ -14,8 +14,8 @@ type ReadOutput struct {
 	CreatedDate     int64  `json:"createdDate"`
 	LastUpdatedDate int64  `json:"lastUpdatedDate"`
 	DeviceType      string `json:"deviceType"`
-	LarUid          string `json:"larUid"`
-	LarType         string `json:"larType"`
+	ConnectorUid    string `json:"larUid"`
+	ConnectorType   string `json:"larType"`
 	SocketAddress   string `json:"ipv4"`
 	Port            string `json:"port"`
 	Host            string `json:"host"`

@@ -1,9 +1,9 @@
-package sdc_test
+package connector_test
 
 import (
 	"context"
 	"fmt"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
 	"github.com/stretchr/testify/assert"
@@ -18,12 +18,12 @@ func TestUpdate(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	validUpdateRequestOutput := sdc.NewUpdateResponseBuilder().
-		Uid(sdcUid).
-		Name(sdcName).
+	validUpdateRequestOutput := connector.NewUpdateResponseBuilder().
+		Uid(connectorUid).
+		Name(connectorName).
 		Build()
 
-	validUpdateOutput := sdc.NewUpdateOutputBuilder().
+	validUpdateOutput := connector.NewUpdateOutputBuilder().
 		UpdateRequestOutput(validUpdateRequestOutput).
 		BootstrapData(bootstrapData).
 		Build()
@@ -42,17 +42,17 @@ func TestUpdate(t *testing.T) {
 		sdcUid     string
 		sdcName    string
 		setupFunc  func()
-		assertFunc func(output *sdc.UpdateOutput, err error, t *testing.T)
+		assertFunc func(output *connector.UpdateOutput, err error, t *testing.T)
 	}{
 		{
 			testName: "successfully update SDC",
-			sdcUid:   sdcUid,
-			sdcName:  sdcName,
+			sdcUid:   connectorUid,
+			sdcName:  connectorName,
 
 			setupFunc: func() {
 				httpmock.RegisterResponder(
 					http.MethodPut,
-					fmt.Sprintf("/aegis/rest/v1/services/targets/proxies/%s", sdcUid),
+					fmt.Sprintf("/aegis/rest/v1/services/targets/proxies/%s", connectorUid),
 					httpmock.NewJsonResponderOrPanic(200, validUpdateOutput),
 				)
 				httpmock.RegisterResponder(
@@ -62,7 +62,7 @@ func TestUpdate(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *sdc.UpdateOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.UpdateOutput, err error, t *testing.T) {
 				assert.Nil(t, err, "error should be nil")
 				assert.NotNil(t, output, "output should not be nil")
 				assert.Equal(t, validUpdateOutput, *output, "output should be same as valid output")
@@ -70,13 +70,13 @@ func TestUpdate(t *testing.T) {
 		},
 		{
 			testName: "should error if failed to update sdc",
-			sdcUid:   sdcUid,
-			sdcName:  sdcName,
+			sdcUid:   connectorUid,
+			sdcName:  connectorName,
 
 			setupFunc: func() {
 				httpmock.RegisterResponder(
 					http.MethodPut,
-					fmt.Sprintf("/aegis/rest/v1/services/targets/proxies/%s", sdcUid),
+					fmt.Sprintf("/aegis/rest/v1/services/targets/proxies/%s", connectorUid),
 					httpmock.NewJsonResponderOrPanic(500, "test error"),
 				)
 				httpmock.RegisterResponder(
@@ -86,20 +86,20 @@ func TestUpdate(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *sdc.UpdateOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.UpdateOutput, err error, t *testing.T) {
 				assert.NotNil(t, err, "error should not be nil")
-				assert.Equal(t, output, &sdc.UpdateOutput{}, "output should be zero value")
+				assert.Equal(t, output, &connector.UpdateOutput{}, "output should be zero value")
 			},
 		},
 		{
 			testName: "should error if failed to generate bootstrap data",
-			sdcUid:   sdcUid,
-			sdcName:  sdcName,
+			sdcUid:   connectorUid,
+			sdcName:  connectorName,
 
 			setupFunc: func() {
 				httpmock.RegisterResponder(
 					http.MethodPut,
-					fmt.Sprintf("/aegis/rest/v1/services/targets/proxies/%s", sdcUid),
+					fmt.Sprintf("/aegis/rest/v1/services/targets/proxies/%s", connectorUid),
 					httpmock.NewJsonResponderOrPanic(200, validUpdateOutput),
 				)
 				httpmock.RegisterResponder(
@@ -109,9 +109,9 @@ func TestUpdate(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *sdc.UpdateOutput, err error, t *testing.T) {
+			assertFunc: func(output *connector.UpdateOutput, err error, t *testing.T) {
 				assert.NotNil(t, err, "error should not be nil")
-				assert.Equal(t, output, &sdc.UpdateOutput{}, "output should be zero value")
+				assert.Equal(t, output, &connector.UpdateOutput{}, "output should be zero value")
 			},
 		},
 	}
@@ -122,10 +122,10 @@ func TestUpdate(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := sdc.Update(
+			output, err := connector.Update(
 				context.Background(),
 				*internalHttp.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
-				sdc.NewUpdateInput(testCase.sdcUid, testCase.sdcName),
+				connector.NewUpdateInput(testCase.sdcUid, testCase.sdcName),
 			)
 
 			testCase.assertFunc(output, err, t)

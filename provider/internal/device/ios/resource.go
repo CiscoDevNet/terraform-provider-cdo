@@ -40,7 +40,7 @@ type IosDeviceResourceModel struct {
 	Username types.String `tfsdk:"username"`
 	Password types.String `tfsdk:"password"`
 
-	IgnoreCertifcate types.Bool `tfsdk:"ignore_certificate"`
+	IgnoreCertificate types.Bool `tfsdk:"ignore_certificate"`
 }
 
 func (r *IosDeviceResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {

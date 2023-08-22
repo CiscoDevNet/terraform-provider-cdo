@@ -62,12 +62,12 @@ func TestAsaCreate(t *testing.T) {
 		{
 			testName: "successfully onboards ASA when using CDG",
 			input: asa.CreateInput{
-				Name:             asaDevice.Name,
-				ConnectorType:    asaDevice.ConnectorType,
-				SocketAddress:    asaDevice.SocketAddress,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: false,
+				Name:              asaDevice.Name,
+				ConnectorType:     asaDevice.ConnectorType,
+				SocketAddress:     asaDevice.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: false,
 			},
 
 			setupFunc: func(input asa.CreateInput) {
@@ -104,12 +104,12 @@ func TestAsaCreate(t *testing.T) {
 			testName: "successfully onboards ASA when using CDG after recovering from certificate error",
 
 			input: asa.CreateInput{
-				Name:             asaDevice.Name,
-				ConnectorType:    asaDevice.ConnectorType,
-				SocketAddress:    asaDevice.SocketAddress,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: true,
+				Name:              asaDevice.Name,
+				ConnectorType:     asaDevice.ConnectorType,
+				SocketAddress:     asaDevice.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: true,
 			},
 
 			setupFunc: func(input asa.CreateInput) {
@@ -153,13 +153,13 @@ func TestAsaCreate(t *testing.T) {
 		{
 			testName: "successfully onboards ASA when using connector",
 			input: asa.CreateInput{
-				Name:             asaDeviceUsingSdc.Name,
-				ConnectorType:    asaDeviceUsingSdc.ConnectorType,
-				ConnectorUid:     asaDeviceUsingSdc.ConnectorUid,
-				SocketAddress:    asaDeviceUsingSdc.SocketAddress,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: false,
+				Name:              asaDeviceUsingSdc.Name,
+				ConnectorType:     asaDeviceUsingSdc.ConnectorType,
+				ConnectorUid:      asaDeviceUsingSdc.ConnectorUid,
+				SocketAddress:     asaDeviceUsingSdc.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: false,
 			},
 
 			setupFunc: func(input asa.CreateInput) {
@@ -198,13 +198,13 @@ func TestAsaCreate(t *testing.T) {
 			testName: "successfully onboards ASA when using connector after recovering from certificate error",
 
 			input: asa.CreateInput{
-				Name:             asaDeviceUsingSdc.Name,
-				ConnectorType:    asaDeviceUsingSdc.ConnectorType,
-				ConnectorUid:     asaDeviceUsingSdc.ConnectorUid,
-				SocketAddress:    asaDeviceUsingSdc.SocketAddress,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: true,
+				Name:              asaDeviceUsingSdc.Name,
+				ConnectorType:     asaDeviceUsingSdc.ConnectorType,
+				ConnectorUid:      asaDeviceUsingSdc.ConnectorUid,
+				SocketAddress:     asaDeviceUsingSdc.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: true,
 			},
 
 			setupFunc: func(input asa.CreateInput) {
@@ -251,13 +251,13 @@ func TestAsaCreate(t *testing.T) {
 			testName: "returns error when onboarding ASA and create device call experiences issues",
 
 			input: asa.CreateInput{
-				Name:             asaDeviceUsingSdc.Name,
-				ConnectorType:    asaDeviceUsingSdc.ConnectorType,
-				ConnectorUid:     asaDeviceUsingSdc.ConnectorUid,
-				SocketAddress:    asaDeviceUsingSdc.SocketAddress,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: true,
+				Name:              asaDeviceUsingSdc.Name,
+				ConnectorType:     asaDeviceUsingSdc.ConnectorType,
+				ConnectorUid:      asaDeviceUsingSdc.ConnectorUid,
+				SocketAddress:     asaDeviceUsingSdc.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: true,
 			},
 
 			setupFunc: func(input asa.CreateInput) {
@@ -285,13 +285,13 @@ func TestAsaCreate(t *testing.T) {
 			testName: "returns error when onboarding ASA and read specific device call experiences issues",
 
 			input: asa.CreateInput{
-				Name:             asaDeviceUsingSdc.Name,
-				ConnectorType:    asaDeviceUsingSdc.ConnectorType,
-				ConnectorUid:     asaDeviceUsingSdc.ConnectorUid,
-				SocketAddress:    asaDeviceUsingSdc.SocketAddress,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: true,
+				Name:              asaDeviceUsingSdc.Name,
+				ConnectorType:     asaDeviceUsingSdc.ConnectorType,
+				ConnectorUid:      asaDeviceUsingSdc.ConnectorUid,
+				SocketAddress:     asaDeviceUsingSdc.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: true,
 			},
 
 			setupFunc: func(input asa.CreateInput) {
@@ -319,13 +319,13 @@ func TestAsaCreate(t *testing.T) {
 			testName: "returns error when onboarding ASA and read asa config call experiences issues",
 
 			input: asa.CreateInput{
-				Name:             asaDeviceUsingSdc.Name,
-				ConnectorType:    asaDeviceUsingSdc.ConnectorType,
-				ConnectorUid:     asaDeviceUsingSdc.ConnectorUid,
-				SocketAddress:    asaDeviceUsingSdc.SocketAddress,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: true,
+				Name:              asaDeviceUsingSdc.Name,
+				ConnectorType:     asaDeviceUsingSdc.ConnectorType,
+				ConnectorUid:      asaDeviceUsingSdc.ConnectorUid,
+				SocketAddress:     asaDeviceUsingSdc.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: true,
 			},
 
 			setupFunc: func(input asa.CreateInput) {
@@ -347,13 +347,13 @@ func TestAsaCreate(t *testing.T) {
 			testName: "returns error when onboarding ASA and validConnector read call experiences issues",
 
 			input: asa.CreateInput{
-				Name:             asaDeviceUsingSdc.Name,
-				ConnectorType:    asaDeviceUsingSdc.ConnectorType,
-				ConnectorUid:     asaDeviceUsingSdc.ConnectorUid,
-				SocketAddress:    asaDeviceUsingSdc.SocketAddress,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: true,
+				Name:              asaDeviceUsingSdc.Name,
+				ConnectorType:     asaDeviceUsingSdc.ConnectorType,
+				ConnectorUid:      asaDeviceUsingSdc.ConnectorUid,
+				SocketAddress:     asaDeviceUsingSdc.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: true,
 			},
 
 			setupFunc: func(input asa.CreateInput) {
@@ -381,13 +381,13 @@ func TestAsaCreate(t *testing.T) {
 			testName: "returns error when onboarding ASA and device update call experiences issues",
 
 			input: asa.CreateInput{
-				Name:             asaDeviceUsingSdc.Name,
-				ConnectorType:    asaDeviceUsingSdc.ConnectorType,
-				ConnectorUid:     asaDeviceUsingSdc.ConnectorUid,
-				SocketAddress:    asaDeviceUsingSdc.SocketAddress,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: true,
+				Name:              asaDeviceUsingSdc.Name,
+				ConnectorType:     asaDeviceUsingSdc.ConnectorType,
+				ConnectorUid:      asaDeviceUsingSdc.ConnectorUid,
+				SocketAddress:     asaDeviceUsingSdc.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: true,
 			},
 
 			setupFunc: func(input asa.CreateInput) {
@@ -414,13 +414,13 @@ func TestAsaCreate(t *testing.T) {
 			testName: "returns error when onboarding ASA and ASA config update call experiences issues",
 
 			input: asa.CreateInput{
-				Name:             asaDeviceUsingSdc.Name,
-				ConnectorType:    asaDeviceUsingSdc.ConnectorType,
-				ConnectorUid:     asaDeviceUsingSdc.ConnectorUid,
-				SocketAddress:    asaDeviceUsingSdc.SocketAddress,
-				Username:         "unittestuser",
-				Password:         "not a real password",
-				IgnoreCertifcate: true,
+				Name:              asaDeviceUsingSdc.Name,
+				ConnectorType:     asaDeviceUsingSdc.ConnectorType,
+				ConnectorUid:      asaDeviceUsingSdc.ConnectorUid,
+				SocketAddress:     asaDeviceUsingSdc.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: true,
 			},
 
 			setupFunc: func(input asa.CreateInput) {

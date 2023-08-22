@@ -32,7 +32,7 @@ func Read(ctx context.Context, resource *IosDeviceResource, stateData *IosDevice
 	stateData.Name = types.StringValue(readOutp.Name)
 	stateData.Ipv4 = types.StringValue(readOutp.SocketAddress)
 	stateData.Host = types.StringValue(readOutp.Host)
-	stateData.IgnoreCertifcate = types.BoolValue(readOutp.IgnoreCertifcate)
+	stateData.IgnoreCertificate = types.BoolValue(readOutp.IgnoreCertificate)
 
 	return nil
 }
@@ -55,7 +55,7 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 		planData.Ipv4.ValueString(),
 		planData.Username.ValueString(),
 		planData.Password.ValueString(),
-		planData.IgnoreCertifcate.ValueBool(),
+		planData.IgnoreCertificate.ValueBool(),
 	)
 
 	createOutp, createErr := resource.client.CreateIos(ctx, *createInp)

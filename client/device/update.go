@@ -10,17 +10,17 @@ import (
 type UpdateInput struct {
 	Uid string `json:"-"`
 
-	Name             string `json:"name,omitempty"`
-	IgnoreCertifcate bool   `json:"ignoreCertificate,omitempty"`
+	Name              string `json:"name,omitempty"`
+	IgnoreCertificate bool   `json:"ignoreCertificate,omitempty"`
 }
 
 type UpdateOutput = ReadOutput
 
 func NewUpdateInput(uid string, name string, ignoreCertificate bool) *UpdateInput {
 	return &UpdateInput{
-		Uid:              uid,
-		Name:             name,
-		IgnoreCertifcate: ignoreCertificate,
+		Uid:               uid,
+		Name:              name,
+		IgnoreCertificate: ignoreCertificate,
 	}
 }
 

@@ -6,8 +6,22 @@ type AccessPolicies struct {
 	Paging Paging `json:"paging"`
 }
 
+func New(items Items, links Links, paging Paging) AccessPolicies {
+	return AccessPolicies{
+		Items:  items,
+		Links:  links,
+		Paging: paging,
+	}
+}
+
 type Items struct {
 	Items []Item `json:"items"`
+}
+
+func NewItems(items ...Item) Items {
+	return Items{
+		Items: items,
+	}
 }
 
 type Item struct {
@@ -17,12 +31,13 @@ type Item struct {
 	Type  string `json:"type"`
 }
 
-type Metadata struct {
-	AuthStatus        string `json:"authStatus"`
-	EvalExpiresInDays int    `json:"evalExpiresInDays"`
-	EvalUsed          bool   `json:"evalUsed"`
-	ExportControl     bool   `json:"exportControl"`
-	VirtualAccount    string `json:"virtualAccount"`
+func NewItem(id, name, type_ string, links Links) Item {
+	return Item{
+		Id:    id,
+		Name:  name,
+		Type:  type_,
+		Links: links,
+	}
 }
 
 type Paging struct {
@@ -32,6 +47,21 @@ type Paging struct {
 	Pages  int `json:"pages"`
 }
 
+func NewPaging(count, offset, limit, pages int) Paging {
+	return Paging{
+		Count:  count,
+		Offset: offset,
+		Limit:  limit,
+		Pages:  pages,
+	}
+}
+
 type Links struct {
 	Self string `json:"self"`
+}
+
+func NewLinks(self string) Links {
+	return Links{
+		Self: self,
+	}
 }

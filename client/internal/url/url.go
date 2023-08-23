@@ -68,3 +68,7 @@ func UserToken(baseUrl string) string {
 func ReadAccessPolicies(baseUrl string, domainUid string, limit int) string {
 	return fmt.Sprintf("%s/fmc/api/fmc_config/v1/domain/%s/policy/accesspolicies?limit=%d", baseUrl, domainUid, limit)
 }
+
+func ReadSmartLicense(baseUrl string) string {
+	return fmt.Sprintf("%s/fmc/api/fmc_platform/v1/license/smartlicenses", baseUrl)
+}

@@ -1,20 +1,21 @@
-// Copyright (c) HashiCorp, Inc.
-// SPDX-License-Identifier: MPL-2.0
-
 package validators_test
 
 import (
 	"context"
 	"testing"
 
+	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 )
 
-func TestOneOfValidator(t *testing.T) {
+func TestOneOfRolesValidator(t *testing.T) {
 	t.Parallel()
+
+	SuperAdminRoleToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WyJST0xFX1NVUEVSX0FETUlOIl19.FBEPzCpXPiYX6esud26WMrJvU3reLDVFdLociGrilVw"
+	AdminRoleToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl19.Xlk9JQJV9butj8ERu7mZFvRczY66KvmnTklQVnHwoy0"
+	BlaRoleToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WyJST0xFX0JMQSJdfQ.nx10m1Cb8ZkUbxWKyfyJzsD1Y8rdTtkRbGEC2A4yV2M"
+	NoRolesToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6W119.0Dd6yUeJ4UbCr8WyXOiK3BhqVVwJFk5c53ipJBWenmc"
 
 	type testCase struct {
 		in        types.String
@@ -23,50 +24,33 @@ func TestOneOfValidator(t *testing.T) {
 	}
 
 	testCases := map[string]testCase{
-		"simple-match": {
-			in: types.StringValue("foo"),
-			validator: stringvalidator.OneOf(
-				"foo",
-				"bar",
-				"baz",
+		"super-admin-role-match": {
+			in: types.StringValue(SuperAdminRoleToken),
+			validator: validators.OneOfRoles(
+				"ROLE_SUPER_ADMIN", "ROLE_ADMIN",
 			),
 			expErrors: 0,
 		},
-		"simple-mismatch-case-insensitive": {
-			in: types.StringValue("foo"),
-			validator: stringvalidator.OneOf(
-				"FOO",
-				"bar",
-				"baz",
+		"admin-role-match": {
+			in: types.StringValue(AdminRoleToken),
+			validator: validators.OneOfRoles(
+				"ROLE_SUPER_ADMIN", "ROLE_ADMIN",
 			),
-			expErrors: 1,
+			expErrors: 0,
 		},
 		"simple-mismatch": {
-			in: types.StringValue("foz"),
-			validator: stringvalidator.OneOf(
-				"foo",
-				"bar",
-				"baz",
+			in: types.StringValue(BlaRoleToken),
+			validator: validators.OneOfRoles(
+				"ROLE_SUPER_ADMIN", "ROLE_ADMIN",
 			),
 			expErrors: 1,
 		},
-		"skip-validation-on-null": {
-			in: types.StringNull(),
-			validator: stringvalidator.OneOf(
-				"foo",
-				"bar",
-				"baz",
+		"no-roles": {
+			in: types.StringValue(NoRolesToken),
+			validator: validators.OneOfRoles(
+				"ROLE_SUPER_ADMIN", "ROLE_ADMIN",
 			),
-			expErrors: 0,
-		},
-		"skip-validation-on-unknown": {
-			in: types.StringUnknown(),
-			validator: stringvalidator.OneOf(
-				"foo",
-				"bar",
-				"baz",
-			),
-			expErrors: 0,
+			expErrors: 1,
 		},
 	}
 

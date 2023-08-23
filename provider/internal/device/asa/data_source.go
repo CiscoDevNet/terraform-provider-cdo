@@ -10,7 +10,7 @@ import (
 
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
-	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -74,7 +74,7 @@ func (d *AsaDataSource) Schema(ctx context.Context, req datasource.SchemaRequest
 				MarkdownDescription: "The type of the connector that is used to communicate with the device. CDO can communicate with your device using either a Cloud Connector (CDG) or a Secure Device Connector (SDC); see [the CDO documentation](https://docs.defenseorchestrator.com/c-connect-cisco-defense-orchestratortor-the-secure-device-connector.html) to learn mor (Valid values: [CDG, SDC]).",
 				Computed:            true,
 				Validators: []validator.String{
-					validators.OneOf("CDG", "SDC"),
+					stringvalidator.OneOf("CDG", "SDC"),
 				},
 			},
 			"socket_address": schema.StringAttribute{

@@ -4,21 +4,22 @@ import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 )
 
 type ReadAllByTypeInput struct {
-	DeviceType string `json:"deviceType"`
+	DeviceType devicetype.Type `json:"deviceType"`
 }
 
-type ReadAllOutput = []ReadOutput
+type ReadAllByTypeOutput = []ReadOutput
 
-func NewReadAllByTypeInput(deviceType string) ReadAllByTypeInput {
+func NewReadAllByTypeInput(deviceType devicetype.Type) ReadAllByTypeInput {
 	return ReadAllByTypeInput{
 		DeviceType: deviceType,
 	}
 }
 
-func ReadAllByType(ctx context.Context, client http.Client, readInp ReadAllByTypeInput) (*ReadAllOutput, error) {
+func ReadAllByType(ctx context.Context, client http.Client, readInp ReadAllByTypeInput) (*ReadAllByTypeOutput, error) {
 
 	client.Logger.Println("reading all Devices by device type")
 

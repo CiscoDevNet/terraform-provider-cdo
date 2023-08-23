@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/cdo"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 )
@@ -22,7 +23,7 @@ func Read(ctx context.Context, client http.Client, readInp ReadInput) (*ReadOutp
 
 	client.Logger.Println("reading cdFMC")
 
-	cdfmcDevices, err := device.ReadAllByType(ctx, client, device.NewReadAllByTypeInput("FMCE"))
+	cdfmcDevices, err := device.ReadAllByType(ctx, client, device.NewReadAllByTypeInput(devicetype.Cdfmc))
 	if err != nil {
 		return nil, err
 	}

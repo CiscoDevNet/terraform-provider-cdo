@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
@@ -80,7 +81,7 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				MarkdownDescription: "The type of the connector that will be used to communicate with the device. CDO can communicate with your device using either a Cloud Connector (CDG) or a Secure Device Connector (SDC); see [the CDO documentation](https://docs.defenseorchestrator.com/c-connect-cisco-defense-orchestratortor-the-secure-device-connector.html) to learn mor (Valid values: [CDG, SDC]).",
 				Required:            true,
 				Validators: []validator.String{
-					validators.OneOf("CDG", "SDC"),
+					stringvalidator.OneOf("CDG", "SDC"),
 				},
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),

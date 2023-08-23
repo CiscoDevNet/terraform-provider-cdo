@@ -2,6 +2,7 @@ package asa
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
@@ -10,16 +11,16 @@ import (
 type ReadInput = device.ReadByUidInput
 
 type ReadOutput struct {
-	Uid             string `json:"uid"`
-	Name            string `json:"name"`
-	CreatedDate     int64  `json:"createdDate"`
-	LastUpdatedDate int64  `json:"lastUpdatedDate"`
-	DeviceType      string `json:"deviceType"`
-	ConnectorUid    string `json:"larUid"`
-	ConnectorType   string `json:"larType"`
-	SocketAddress   string `json:"ipv4"`
-	Port            string `json:"port"`
-	Host            string `json:"host"`
+	Uid             string          `json:"uid"`
+	Name            string          `json:"name"`
+	CreatedDate     int64           `json:"createdDate"`
+	LastUpdatedDate int64           `json:"lastUpdatedDate"`
+	DeviceType      devicetype.Type `json:"deviceType"`
+	ConnectorUid    string          `json:"larUid"`
+	ConnectorType   string          `json:"larType"`
+	SocketAddress   string          `json:"ipv4"`
+	Port            string          `json:"port"`
+	Host            string          `json:"host"`
 
 	IgnoreCertificate bool   `json:"ignoreCertificate"`
 	ConnectivityState int    `json:"connectivityState,omitempty"`

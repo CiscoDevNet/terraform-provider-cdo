@@ -64,3 +64,7 @@ func DeleteConnector(baseUrl string, connectorUid string) string {
 func UserToken(baseUrl string) string {
 	return fmt.Sprintf("%s/anubis/rest/v1/oauth/token", baseUrl)
 }
+
+func ReadAccessPolicies(baseUrl string, domainUid string, limit int) string {
+	return fmt.Sprintf("%s/fmc/api/fmc_config/v1/domain/%s/policy/accesspolicies?limit=%d", baseUrl, domainUid, limit)
+}

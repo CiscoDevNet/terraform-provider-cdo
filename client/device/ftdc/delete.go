@@ -19,7 +19,8 @@ func NewDeleteInput(uid string) DeleteInput {
 type DeleteOutput = ReadByUidOutput
 
 func Delete(ctx context.Context, client http.Client, deleteInp DeleteInput) (*DeleteOutput, error) {
-
+	
+	// TODO: is this all it takes to delete a ftdc? What about the underlying virtual ftd?
 	deleteUrl := url.DeleteDevice(client.BaseUrl(), deleteInp.Uid)
 	req := client.NewDelete(ctx, deleteUrl)
 	var deleteOutp DeleteOutput

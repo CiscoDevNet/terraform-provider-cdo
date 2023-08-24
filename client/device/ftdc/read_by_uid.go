@@ -20,6 +20,7 @@ func NewReadByUidInput(uid string) ReadByUidInput {
 
 type ReadByUidOutput struct {
 	Uid      string   `json:"uid"`
+	Name     string   `json:"name"`
 	Metadata Metadata `json:"metadata,omitempty"`
 }
 

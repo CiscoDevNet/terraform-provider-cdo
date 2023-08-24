@@ -3,11 +3,13 @@ package ftd
 import (
 	"context"
 	"fmt"
-
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -26,9 +28,15 @@ type Resource struct {
 }
 
 type ResourceModel struct {
-	ID   types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
-	// TODO: fill me
+	ID               types.String `tfsdk:"id"`
+	Name             types.String `tfsdk:"name"`
+	AccessPolicyName types.String `tfsdk:"access_policy_name"`
+	PerformanceTier  types.String `tfsdk:"performance_tier"`
+	Virtual          types.Bool   `tfsdk:"virtual"`
+	Licenses         types.List   `tfsdk:"licenses"`
+
+	AccessPolicyUid  types.String `tfsdk:"access_policy_id"`
+	GeneratedCommand types.String `tfsdk:"generated_command"`
 }
 
 func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -51,7 +59,50 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				MarkdownDescription: "A human-readable name for the Secure Device Connector (SDC). This should be unique among SDCs",
 				Required:            true,
 			},
-			// TODO: fill me
+			"access_policy_name": schema.StringAttribute{
+				MarkdownDescription: "The name of the cdFMC access policy that will be used by the FTD",
+				Required:            true,
+				// TODO: make this optional, and use default access policy when not given
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(), // TODO: can we change access policy after it is created?
+				},
+			},
+			"performance_tier": schema.StringAttribute{
+				MarkdownDescription: "The performance tier of the virtual FTD, if virtual is set to false, this field is ignored.",
+				Required:            false,
+				// TODO: validator for performance tier, check valid performance tier is given
+				// TODO: ignore changes in this field when virtual is false
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(), // TODO: can we change performance tier after it is created?
+				},
+			},
+			"virtual": schema.BoolAttribute{
+				MarkdownDescription: "Whether this FTD is virtual. If false, performance_tier is ignored",
+				Required:            false,
+				Default:             booldefault.StaticBool(false),
+				PlanModifiers: []planmodifier.Bool{
+					boolplanmodifier.RequiresReplace(),
+				},
+			},
+			"licenses": schema.ListAttribute{
+				ElementType:         types.StringType,
+				MarkdownDescription: "Comma separated list of licenses of this FTD, it must at least contains the \"BASE\" license.",
+				Required:            true,
+				// TODO: make this not required, when not given, use BASE license
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.RequiresReplace(), // TODO: can we modify license after FTD is created?
+					// TODO: always sort the licenses so that it is the same order, so that it does not change when order of licenses changes
+				},
+				// TODO: validate the licenses are valid input.
+			},
+			"generated_command": schema.StringAttribute{
+				MarkdownDescription: "The command to run in the FTD to register itself with cdFMC.",
+				Computed:            true,
+			},
+			"access_policy_id": schema.StringAttribute{
+				MarkdownDescription: "The id of the access policy used by this FTD.",
+				Computed:            true,
+			},
 		},
 	}
 }

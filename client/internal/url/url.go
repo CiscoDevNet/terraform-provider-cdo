@@ -10,7 +10,7 @@ func ReadDevice(baseUrl string, uid string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/devices/%s", baseUrl, uid)
 }
 
-func ReadDeviceByNameAndDeviceType(baseUrl string, deviceName string, deviceType string) string {
+func ReadDeviceByNameAndType(baseUrl string, deviceName string, deviceType devicetype.Type) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/devices?q=name:%s+AND+deviceType:%s", baseUrl, deviceName, deviceType)
 }
 func ReadAllDevicesByType(baseUrl string, deviceType devicetype.Type) string {
@@ -75,4 +75,8 @@ func ReadAccessPolicies(baseUrl string, domainUid string, limit int) string {
 
 func ReadSmartLicense(baseUrl string) string {
 	return fmt.Sprintf("%s/fmc/api/fmc_platform/v1/license/smartlicenses", baseUrl)
+}
+
+func UpdateSpecificFtdc(baseUrl string, ftdSpecificUid string) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/firepower/ftds/%s", baseUrl, ftdSpecificUid)
 }

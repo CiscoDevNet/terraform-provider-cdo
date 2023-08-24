@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/accesspolicies"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cdfmc/accesspolicies"
 )
 
 type ReadAccessPoliciesInput struct {

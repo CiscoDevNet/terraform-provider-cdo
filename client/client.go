@@ -6,6 +6,7 @@ import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ftdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/genericssh"
 	"net/http"
 
@@ -119,4 +120,24 @@ func (c *Client) UpdateGenericSSH(ctx context.Context, inp genericssh.UpdateInpu
 
 func (c *Client) DeleteGenericSSH(ctx context.Context, inp genericssh.DeleteInput) (*genericssh.DeleteOutput, error) {
 	return genericssh.Delete(ctx, c.client, inp)
+}
+
+func (c *Client) ReadFtdcByUid(ctx context.Context, inp ftdc.ReadByUidInput) (*ftdc.ReadByUidOutput, error) {
+	return ftdc.ReadByUid(ctx, c.client, inp)
+}
+
+func (c *Client) ReadFtdcByName(ctx context.Context, inp ftdc.ReadByNameInput) (*ftdc.ReadByNameOutput, error) {
+	return ftdc.ReadByName(ctx, c.client, inp)
+}
+
+func (c *Client) CreateFtdc(ctx context.Context, inp ftdc.CreateInput) (*ftdc.CreateOutput, error) {
+	return ftdc.Create(ctx, c.client, inp)
+}
+
+func (c *Client) UpdateFtdc(ctx context.Context, inp ftdc.UpdateInput) (*ftdc.UpdateOutput, error) {
+	return ftdc.Update(ctx, c.client, inp)
+}
+
+func (c *Client) DeleteFtdc(ctx context.Context, inp ftdc.DeleteInput) (*ftdc.DeleteOutput, error) {
+	return ftdc.Delete(ctx, c.client, inp)
 }

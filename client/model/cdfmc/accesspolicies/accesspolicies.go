@@ -1,12 +1,12 @@
 package accesspolicies
 
 type AccessPolicies struct {
-	Items  Items  `json:"items"`
+	Items  []Item `json:"items"`
 	Links  Links  `json:"links"`
 	Paging Paging `json:"paging"`
 }
 
-func New(items Items, links Links, paging Paging) AccessPolicies {
+func New(items []Item, links Links, paging Paging) AccessPolicies {
 	return AccessPolicies{
 		Items:  items,
 		Links:  links,
@@ -14,14 +14,14 @@ func New(items Items, links Links, paging Paging) AccessPolicies {
 	}
 }
 
-type Items struct {
-	Items []Item `json:"items"`
-}
-
-func NewItems(items ...Item) Items {
-	return Items{
-		Items: items,
+// Find return the access policy item with the given name, second return value ok indicate whether the item is found.
+func (policies *AccessPolicies) Find(name string) (item Item, ok bool) {
+	for _, policy := range policies.Items {
+		if policy.Name == name {
+			return policy, true
+		}
 	}
+	return Item{}, false
 }
 
 type Item struct {

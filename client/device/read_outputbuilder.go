@@ -2,6 +2,7 @@ package device
 
 import (
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 	"time"
 )
 
@@ -23,12 +24,17 @@ func (builder *readOutputBuilder) Build() ReadOutput {
 }
 
 func (builder *readOutputBuilder) AsAsa() *readOutputBuilder {
-	builder.readOutput.DeviceType = "ASA"
+	builder.readOutput.DeviceType = devicetype.Asa
 	return builder
 }
 
 func (builder *readOutputBuilder) AsIos() *readOutputBuilder {
 	builder.readOutput.DeviceType = "IOS"
+	return builder
+}
+
+func (builder *readOutputBuilder) AsCdfmc() *readOutputBuilder {
+	builder.readOutput.DeviceType = "FMCE"
 	return builder
 }
 

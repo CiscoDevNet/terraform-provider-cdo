@@ -22,7 +22,7 @@ func Read(ctx context.Context, client http.Client, readInp ReadInput) (*ReadOutp
 
 	client.Logger.Println("reading generic ssh")
 
-	readOutp, err := device.Read(ctx, client, *device.NewReadInput(readInp.Uid))
+	readOutp, err := device.ReadByUid(ctx, client, *device.NewReadByUidInput(readInp.Uid))
 	if err != nil {
 		return nil, err
 	}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"strings"
 
@@ -27,14 +28,14 @@ type CreateInput struct {
 }
 
 type CreateOutput struct {
-	Uid           string `json:"uid"`
-	Name          string `json:"Name"`
-	DeviceType    string `json:"deviceType"`
-	Host          string `json:"host"`
-	Port          string `json:"port"`
-	SocketAddress string `json:"ipv4"`
-	ConnectorType string `json:"larType"`
-	ConnectorUid  string `json:"larUid"`
+	Uid           string          `json:"uid"`
+	Name          string          `json:"Name"`
+	DeviceType    devicetype.Type `json:"deviceType"`
+	Host          string          `json:"host"`
+	Port          string          `json:"port"`
+	SocketAddress string          `json:"ipv4"`
+	ConnectorType string          `json:"larType"`
+	ConnectorUid  string          `json:"larUid"`
 }
 
 type CreateError struct {

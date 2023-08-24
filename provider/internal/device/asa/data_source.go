@@ -137,7 +137,7 @@ func (d *AsaDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	}
 
 	// read asa
-	readInp := device.ReadByNameAndDeviceTypeInput{
+	readInp := device.ReadByNameAndTypeInput{
 		Name:       configData.Name.ValueString(),
 		DeviceType: "ASA",
 	}

@@ -47,7 +47,7 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 			return nil, err
 		}
 
-		asaReadOutp, err := device.Read(ctx, client, *device.NewReadInput(
+		asaReadOutp, err := device.ReadByUid(ctx, client, *device.NewReadByUidInput(
 			updateInp.Uid,
 		))
 		if err != nil {

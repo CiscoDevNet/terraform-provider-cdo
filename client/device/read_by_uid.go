@@ -1,14 +1,15 @@
-package asa
+package device
 
 import (
 	"context"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
-
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 )
 
-type ReadInput = device.ReadByUidInput
+type ReadByUidInput struct {
+	Uid string `json:"uid"`
+}
 
 type ReadOutput struct {
 	Uid             string          `json:"uid"`
@@ -29,19 +30,25 @@ type ReadOutput struct {
 	Status            string `json:"status"`
 }
 
-func NewReadInput(uid string) *ReadInput {
-	return device.NewReadByUidInput(uid)
+func NewReadByUidInput(uid string) *ReadByUidInput {
+	return &ReadByUidInput{
+		Uid: uid,
+	}
 }
 
-func NewReadRequest(ctx context.Context, client http.Client, readInp ReadInput) *http.Request {
-	return device.NewReadByUidRequest(ctx, client, readInp)
+func NewReadByUidRequest(ctx context.Context, client http.Client, readInp ReadByUidInput) *http.Request {
+	readUrl := url.ReadDevice(client.BaseUrl(), readInp.Uid)
+
+	req := client.NewGet(ctx, readUrl)
+
+	return req
 }
 
-func Read(ctx context.Context, client http.Client, readInp ReadInput) (*ReadOutput, error) {
+func ReadByUid(ctx context.Context, client http.Client, readInp ReadByUidInput) (*ReadOutput, error) {
 
-	client.Logger.Println("reading asa device")
+	client.Logger.Println("reading device")
 
-	req := NewReadRequest(ctx, client, readInp)
+	req := NewReadByUidRequest(ctx, client, readInp)
 
 	var outp ReadOutput
 	if err := req.Send(&outp); err != nil {

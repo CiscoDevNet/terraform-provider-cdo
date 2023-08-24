@@ -3,6 +3,7 @@ package url
 
 import (
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 )
 
 func ReadDevice(baseUrl string, uid string) string {
@@ -11,6 +12,9 @@ func ReadDevice(baseUrl string, uid string) string {
 
 func ReadDeviceByNameAndDeviceType(baseUrl string, deviceName string, deviceType string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/devices?q=name:%s+AND+deviceType:%s", baseUrl, deviceName, deviceType)
+}
+func ReadAllDevicesByType(baseUrl string, deviceType devicetype.Type) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/devices?q=deviceType:%s", baseUrl, deviceType)
 }
 
 func CreateDevice(baseUrl string) string {

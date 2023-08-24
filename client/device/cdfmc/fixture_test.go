@@ -1,7 +1,20 @@
 package cdfmc_test
 
 const (
-	baseUrl   = "https://unit-test.net"
+	smartLicenseEvalExpiresInDays = 123456
+	smartLicenseEvalUsed          = false
+	smartLicenseExportControl     = false
+	smartLicenseVirtualAccount    = "unit-test-virtual-account"
+	smartLicenseAuthStatus        = "unit-test-auth-status"
+	smartLicenseRegStatus         = "unit-test-reg-status"
+	smartLicenseType              = "unit-test-type"
+	smartLicenseSelfLink          = "unit-test-self-link"
+	smartLicenseCount             = 123456
+	smartLicenseOffset            = 123456
+	smartLicenseLimit             = 123456
+	smartLicensePages             = 123456
+
+  baseUrl   = "https://unit-test.net"
 	domainUid = "unit-test-domain-uid"
 	limit     = 123456
 

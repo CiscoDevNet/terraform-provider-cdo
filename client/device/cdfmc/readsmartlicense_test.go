@@ -5,7 +5,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cdfmc"
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cdfmc/smartlicense"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/smartlicense"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"net/http"

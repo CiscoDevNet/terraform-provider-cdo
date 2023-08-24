@@ -5,8 +5,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cdfmc"
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/accesspolicies"
-	accesspolicies2 "github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cdfmc/accesspolicies"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cdfmc/accesspolicies"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -18,23 +17,23 @@ func TestAccessPoliciesRead(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	validAccessPolicesItems := accesspolicies.NewItems(
-		accesspolicies2.NewItem(
+	validAccessPolicesItems := []accesspolicies.Item{
+		accesspolicies.NewItem(
 			accessPolicyId,
 			accessPolicyName,
 			accessPolicyType,
-			accesspolicies2.NewLinks(accessPolicySelfLink),
+			accesspolicies.NewLinks(accessPolicySelfLink),
 		),
-	)
-	validAccessPoliciesPaging := accesspolicies2.NewPaging(
+	}
+	validAccessPoliciesPaging := accesspolicies.NewPaging(
 		accessPolicyCount,
 		accessPolicyOffset,
 		accessPolicyLimit,
 		accessPolicyPages,
 	)
-	validAccessPoliciesLink := accesspolicies2.NewLinks(accessPolicySelfLink)
+	validAccessPoliciesLink := accesspolicies.NewLinks(accessPolicySelfLink)
 
-	validAccessPolicies := accesspolicies2.New(
+	validAccessPolicies := accesspolicies.New(
 		validAccessPolicesItems,
 		validAccessPoliciesLink,
 		validAccessPoliciesPaging,

@@ -77,10 +77,6 @@ func ReadAccessPolicies(baseUrl string, domainUid string, limit int) string {
 	return fmt.Sprintf("%s/fmc/api/fmc_config/v1/domain/%s/policy/accesspolicies?limit=%d", baseUrl, domainUid, limit)
 }
 
-func ReadSmartLicense(baseUrl string) string {
-	return fmt.Sprintf("%s/fmc/api/fmc_platform/v1/license/smartlicenses", baseUrl)
-}
-
 func UpdateSpecificFtdc(baseUrl string, ftdSpecificUid string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/firepower/ftds/%s", baseUrl, ftdSpecificUid)
 }

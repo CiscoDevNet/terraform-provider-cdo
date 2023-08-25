@@ -11,10 +11,10 @@ type ReadSpecificInput struct {
 }
 
 type ReadSpecificOutput struct {
-	Uid       string `json:"uid"`
-	DomainUid string `json:"domainUid"`
-	State     string `json:"state"`
-	Status    string `json:"status"`
+	SpecificUid string `json:"uid"`
+	DomainUid   string `json:"domainUid"`
+	State       string `json:"state"`
+	Status      string `json:"status"`
 }
 
 func NewReadSpecificInput(fmcId string) ReadSpecificInput {

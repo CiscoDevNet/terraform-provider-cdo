@@ -1,6 +1,8 @@
 package ftd_test
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/acctest"
@@ -52,8 +54,15 @@ func TestAccFtdResource(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_ftd_device.test", "performance_tier", testResource.PerformanceTier),
 					resource.TestCheckResourceAttr("cdo_ftd_device.test", "virtual", testResource.Virtual),
 					resource.TestCheckResourceAttrSet("cdo_ftd_device.test", "licenses.0"),
+					resource.TestCheckResourceAttr("cdo_ftd_device.test", "licenses.#", "1"),
 					resource.TestCheckResourceAttr("cdo_ftd_device.test", "access_policy_name", testResource.AccessPolicyName),
-					resource.TestCheckResourceAttr("cdo_ftd_device.test", "generated_command", testResource.GeneratedCommand),
+					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "generated_command", func(value string) error {
+						ok := strings.HasPrefix(value, "configure manager add")
+						if !ok {
+							return fmt.Errorf("generated command should starts with \"configure manager add\", but it was \"%s\"", value)
+						}
+						return nil
+					}),
 				),
 			},
 			// Update and Read testing

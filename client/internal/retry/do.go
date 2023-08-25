@@ -23,7 +23,7 @@ type Options struct {
 
 	Logger *log.Logger
 
-	EarlyExitOnError bool // EarlyExitOnError will cause Retry to return immediately if error is returned from Func; if false, it will only return when max retries exceeded, which errors are combined the returned together.
+	EarlyExitOnError bool // EarlyExitOnError will cause Retry to return immediately if error is returned from Func; if false, it will only return when max retries exceeded, which errors are combined and returned together.
 }
 
 // Func is the retryable function for retrying.

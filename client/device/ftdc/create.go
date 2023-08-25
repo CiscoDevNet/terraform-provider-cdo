@@ -80,7 +80,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		return nil, err
 	}
 	// 2. get cdFMC domain id by looking up FMC's specific device
-	//fmcSpecificRes, err := cdfmc.ReadSpecific(ctx, client, cdfmc.NewReadSpecificInput(fmcRes.Uid))
+	//fmcSpecificRes, err := cdfmc.ReadSpecific(ctx, client, cdfmc.NewReadSpecificInput(fmcRes.SpecificUid))
 	//if err != nil {
 	//	return nil, err
 	//}
@@ -151,7 +151,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 
 	// 7. get generate command
 	err = retry.Do(UntilGeneratedCommandAvailable(ctx, client, createOup.Uid), *retry.NewOptionsWithLoggerAndRetries(client.Logger, 3))
-	//readOutp, err := ReadByUid(ctx, client, NewReadByUidInput(createOup.Uid))
+	//readOutp, err := ReadByUid(ctx, client, NewReadByUidInput(createOup.SpecificUid))
 	if err != nil {
 		return nil, err
 	}

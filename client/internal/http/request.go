@@ -11,6 +11,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	netUrl "net/url"
 	"strings"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/cdo"
@@ -29,7 +30,9 @@ type Request struct {
 	url    string
 	body   any
 
-	Header   http.Header
+	Header      http.Header
+	QueryParams netUrl.Values
+
 	Response *Response
 	Error    error
 }
@@ -45,7 +48,9 @@ func NewRequest(config cdo.Config, httpClient *http.Client, logger *log.Logger, 
 		method: method,
 		url:    url,
 		body:   body,
-		Header: make(http.Header),
+
+		Header:      make(http.Header),
+		QueryParams: make(netUrl.Values),
 	}
 }
 
@@ -102,7 +107,7 @@ func (r *Request) send(output any) error {
 
 	// request is all good, now parse body
 	resBody, err := io.ReadAll(res.Body)
-	fmt.Printf("\n\nsuccess: url=%s, code=%d, status=%s, body=%s, readBodyErr=%s, method=%s, header=%s\n", r.url, res.StatusCode, res.Status, string(resBody), err, r.method, r.Header)
+	fmt.Printf("\n\nsuccess: url=%s, code=%d, status=%s, body=%s, readBodyErr=%s, method=%s, header=%s, queryParams=%s\n", r.url, res.StatusCode, res.Status, string(resBody), err, r.method, r.Header, r.QueryParams)
 	if err != nil {
 		r.Error = err
 		return err
@@ -132,19 +137,20 @@ func (r *Request) build() (*http.Request, error) {
 		return nil, err
 	}
 
-	if r.method != "GET" && r.method != "DELETE" {
-		bodyReader2, err := toReader(r.body)
-		if err != nil {
-			return nil, err
-		}
-		bs, err := io.ReadAll(bodyReader2)
-		if err != nil {
-			return nil, err
-		}
-		fmt.Println("request_check")
-		fmt.Printf("Request: %+v\n", r)
-		fmt.Printf("Request: %s, %s, %s\n", r.url, r.method, string(bs))
-	}
+	// TODO: remove these debug lines
+	//if r.method != "GET" && r.method != "DELETE" {
+	//	bodyReader2, err := toReader(r.body)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	bs, err := io.ReadAll(bodyReader2)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	fmt.Println("request_check")
+	//	fmt.Printf("Request: %+v\n", r)
+	//	fmt.Printf("Request: %s, %s, %s\n", r.url, r.method, string(bs))
+	//}
 
 	req, err := http.NewRequest(r.method, r.url, bodyReader)
 	if err != nil {
@@ -155,7 +161,27 @@ func (r *Request) build() (*http.Request, error) {
 	}
 
 	r.addHeaders(req)
+	r.addQueryParams(req)
 	return req, nil
+}
+
+func (r *Request) addQueryParams(req *http.Request) {
+	q := req.URL.Query()
+	for k, vs := range r.QueryParams {
+		for _, v := range vs {
+			q.Add(k, v)
+		}
+	}
+	s := q.Encode()
+	if s != "" {
+		fmt.Printf("\n\nencoded_query=%s\n\n", s)
+	}
+	req.URL.RawQuery = s
+}
+
+func (r *Request) addHeaders(req *http.Request) {
+	r.addAuthHeader(req)
+	r.addOtherHeader(req)
 }
 
 func (r *Request) addAuthHeader(req *http.Request) {
@@ -163,8 +189,7 @@ func (r *Request) addAuthHeader(req *http.Request) {
 	req.Header.Add("Content-Type", "application/json")
 }
 
-func (r *Request) addHeaders(req *http.Request) {
-	r.addAuthHeader(req)
+func (r *Request) addOtherHeader(req *http.Request) {
 	for k, vs := range r.Header {
 		for _, v := range vs {
 			req.Header.Add(k, v)
@@ -172,7 +197,7 @@ func (r *Request) addHeaders(req *http.Request) {
 	}
 }
 
-// toReader try to convert anything to io.Reader.
+// toReader tries to convert anything to io.Reader.
 // Can return nil, which means empty, i.e. empty request body
 func toReader(v any) (io.Reader, error) {
 	var reader io.Reader

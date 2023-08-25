@@ -2,7 +2,6 @@ package ftd
 
 import (
 	"context"
-	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ftdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
@@ -60,7 +59,7 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 		licenses,
 	)
 	res, err := resource.client.CreateFtdc(ctx, createInp)
-	fmt.Printf("\ncreate FTDc res: %+v\n", res)
+	//fmt.Printf("\ncreate FTDc res: %+v\n", res)
 	if err != nil {
 		return err
 	}

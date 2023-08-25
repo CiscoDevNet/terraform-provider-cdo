@@ -27,8 +27,8 @@ type Options struct {
 }
 
 // Func is the retryable function for retrying.
-// ok: whether to to stop
-// err: if not nil, stop retrying
+// ok: whether ok to stop
+// err: if not nil, stop retrying and return that error
 type Func func() (ok bool, err error)
 
 const (
@@ -56,6 +56,16 @@ func NewOptionsWithLogger(logger *log.Logger) *Options {
 		DefaultTimeout,
 		DefaultDelay,
 		DefaultRetries,
+		DefaultEarlyExitOnError,
+	)
+}
+
+func NewOptionsWithLoggerAndRetries(logger *log.Logger, retries int) *Options {
+	return NewOptions(
+		logger,
+		DefaultTimeout,
+		DefaultDelay,
+		retries,
 		DefaultEarlyExitOnError,
 	)
 }

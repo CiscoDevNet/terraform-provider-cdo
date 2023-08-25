@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/connector"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/device/ftd"
 	"os"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/device/ios"
@@ -147,6 +148,7 @@ func (p *CdoProvider) Resources(ctx context.Context) []func() resource.Resource 
 		connector.NewResource,
 		asa.NewAsaDeviceResource,
 		ios.NewIosDeviceResource,
+		ftd.NewResource,
 	}
 }
 

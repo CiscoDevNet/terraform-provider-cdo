@@ -29,11 +29,10 @@ type Request struct {
 	url    string
 	body   any
 
+	Header   http.Header
 	Response *Response
 	Error    error
 }
-
-const ()
 
 func NewRequest(config cdo.Config, httpClient *http.Client, logger *log.Logger, ctx context.Context, method string, url string, body any) *Request {
 	return &Request{
@@ -46,6 +45,7 @@ func NewRequest(config cdo.Config, httpClient *http.Client, logger *log.Logger, 
 		method: method,
 		url:    url,
 		body:   body,
+		Header: make(http.Header),
 	}
 }
 
@@ -95,13 +95,14 @@ func (r *Request) send(output any) error {
 	// check status
 	if res.StatusCode >= 400 {
 		body, err := io.ReadAll(res.Body)
-		err = fmt.Errorf("failed: code=%d, status=%s, body=%s, readBodyErr=%s, url=%s, method=%s", res.StatusCode, res.Status, string(body), err, r.url, r.method)
+		err = fmt.Errorf("failed: url=%s, code=%d, status=%s, body=%s, readBodyErr=%s, method=%s, header=%s", r.url, res.StatusCode, res.Status, string(body), err, r.method, r.Header)
 		r.Error = err
 		return err
 	}
 
 	// request is all good, now parse body
 	resBody, err := io.ReadAll(res.Body)
+	fmt.Printf("\n\nsuccess: url=%s, code=%d, status=%s, body=%s, readBodyErr=%s, method=%s, header=%s\n", r.url, res.StatusCode, res.Status, string(resBody), err, r.method, r.Header)
 	if err != nil {
 		r.Error = err
 		return err
@@ -131,6 +132,20 @@ func (r *Request) build() (*http.Request, error) {
 		return nil, err
 	}
 
+	if r.method != "GET" && r.method != "DELETE" {
+		bodyReader2, err := toReader(r.body)
+		if err != nil {
+			return nil, err
+		}
+		bs, err := io.ReadAll(bodyReader2)
+		if err != nil {
+			return nil, err
+		}
+		fmt.Println("request_check")
+		fmt.Printf("Request: %+v\n", r)
+		fmt.Printf("Request: %s, %s, %s\n", r.url, r.method, string(bs))
+	}
+
 	req, err := http.NewRequest(r.method, r.url, bodyReader)
 	if err != nil {
 		return nil, err
@@ -138,13 +153,23 @@ func (r *Request) build() (*http.Request, error) {
 	if r.ctx != nil {
 		req = req.WithContext(r.ctx)
 	}
-	r.addAuthHeader(req)
+
+	r.addHeaders(req)
 	return req, nil
 }
 
 func (r *Request) addAuthHeader(req *http.Request) {
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.config.ApiToken))
 	req.Header.Add("Content-Type", "application/json")
+}
+
+func (r *Request) addHeaders(req *http.Request) {
+	r.addAuthHeader(req)
+	for k, vs := range r.Header {
+		for _, v := range vs {
+			req.Header.Add(k, v)
+		}
+	}
 }
 
 // toReader try to convert anything to io.Reader.

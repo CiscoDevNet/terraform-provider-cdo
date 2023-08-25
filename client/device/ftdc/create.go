@@ -7,6 +7,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cdfmc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/cdo"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/sliceutil"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
@@ -24,9 +25,9 @@ type CreateInput struct {
 }
 
 type CreateOutput struct {
-	Uid      string
-	Name     string
-	Metadata Metadata
+	Uid      string   `json:"uid"`
+	Name     string   `json:"name"`
+	Metadata Metadata `json:"metadata"`
 }
 
 func NewCreateInput(
@@ -52,6 +53,7 @@ type createRequestBody struct {
 	Name       string          `json:"name"`
 	State      string          `json:"state"` // TODO: use queueTriggerState?
 	Type       string          `json:"type"`
+	Model      bool            `json:"model"`
 }
 
 type metadata struct {
@@ -60,6 +62,13 @@ type metadata struct {
 	LicenseCaps      string     `json:"license_caps"`
 	PerformanceTier  *tier.Type `json:"performanceTier"`
 }
+
+// TODO: use this to fetch
+//
+//	curl --request GET \
+//	 --url https://<FMC_HOST>/api/fmc_platform/v1/info/domain \
+//	 --header 'Authorization: Bearer <CDO TOKEN>'
+const FmcDomainUid = "e276abec-e0f2-11e3-8169-6d9ed49b625f"
 
 func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, error) {
 
@@ -71,16 +80,16 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		return nil, err
 	}
 	// 2. get cdFMC domain id by looking up FMC's specific device
-	fmcSpecificRes, err := cdfmc.ReadSpecific(ctx, client, cdfmc.NewReadSpecificInput(fmcRes.Uid))
-	if err != nil {
-		return nil, err
-	}
+	//fmcSpecificRes, err := cdfmc.ReadSpecific(ctx, client, cdfmc.NewReadSpecificInput(fmcRes.Uid))
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	// 3. read access policies using cdFMC domain id
 	accessPoliciesRes, err := cdfmc.ReadAccessPolicies(
 		ctx,
 		client,
-		cdfmc.NewReadAccessPoliciesInput(fmcSpecificRes.DomainUid, 1000), // 1000 is what CDO UI uses
+		cdfmc.NewReadAccessPoliciesInput(fmcRes.Host, FmcDomainUid, 1000), // 1000 is what CDO UI uses
 	)
 	if err != nil {
 		return nil, err
@@ -118,6 +127,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		},
 		State: "NEW",
 		Type:  "devices",
+		Model: false,
 	}
 	createReq := client.NewPost(ctx, createUrl, createBody)
 	var createOup CreateOutput
@@ -140,6 +150,11 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	)
 
 	// 7. get generate command
+	err = retry.Do(UntilGeneratedCommandAvailable(ctx, client, createOup.Uid), *retry.NewOptionsWithLoggerAndRetries(client.Logger, 3))
+	//readOutp, err := ReadByUid(ctx, client, NewReadByUidInput(createOup.Uid))
+	if err != nil {
+		return nil, err
+	}
 	readOutp, err := ReadByUid(ctx, client, NewReadByUidInput(createOup.Uid))
 	if err != nil {
 		return nil, err

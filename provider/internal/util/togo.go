@@ -2,10 +2,10 @@ package util
 
 import "github.com/hashicorp/terraform-plugin-framework/types"
 
-func TFStringListToGoStringList(l types.List) []string {
-	res := make([]string, len(l.Elements()))
-	for i, v := range l.Elements() {
-		res[i] = v.String()
+func TFStringListToGoStringList(l []types.String) []string {
+	res := make([]string, len(l))
+	for i, v := range l {
+		res[i] = v.ValueString()
 	}
 	return res
 }

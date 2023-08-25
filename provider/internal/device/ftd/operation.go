@@ -2,6 +2,7 @@ package ftd
 
 import (
 	"context"
+	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ftdc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
@@ -19,7 +20,7 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 		return err
 	}
 
-	// map return struct to sdc model
+	// map return struct to model
 	stateData.ID = types.StringValue(res.Uid)
 	stateData.Name = types.StringValue(res.Name)
 	stateData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
@@ -46,19 +47,25 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 		}
 	}
 
+	licensesGoList := util.TFStringListToGoStringList(planData.Licenses)
+	licenses, err := sliceutil.MapWithError(licensesGoList, func(s string) (license.Type, error) { return license.Parse(s) })
+	if err != nil {
+		return err
+	}
 	createInp := ftdc.NewCreateInput(
 		planData.Name.ValueString(),
 		planData.AccessPolicyName.ValueString(),
 		performanceTier,
 		planData.Virtual.ValueBool(),
-		sliceutil.Map(util.TFStringListToGoStringList(planData.Licenses), func(s string) license.Type { return license.MustParse(s) }),
+		licenses,
 	)
 	res, err := resource.client.CreateFtdc(ctx, createInp)
+	fmt.Printf("\ncreate FTDc res: %+v\n", res)
 	if err != nil {
 		return err
 	}
 
-	// map return struct to sdc model
+	// map return struct to model
 	planData.ID = types.StringValue(res.Uid)
 	planData.Name = types.StringValue(res.Name)
 	planData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
@@ -74,11 +81,25 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 }
 
 func Update(ctx context.Context, resource *Resource, planData *ResourceModel, stateData *ResourceModel) error {
-	// TODO: fill me
 
 	// do update
+	inp := ftdc.NewUpdateInput(stateData.ID.ValueString(), stateData.Name.ValueString())
+	res, err := resource.client.UpdateFtdc(ctx, inp)
+	if err != nil {
+		return err
+	}
 
-	// map return struct to sdc model
+	// map return struct to model
+	planData.ID = types.StringValue(res.Uid)
+	planData.Name = types.StringValue(res.Name)
+	planData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
+	planData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUuid)
+	planData.Virtual = types.BoolValue(res.Metadata.PerformanceTier != nil)
+	planData.Licenses = util.GoStringSliceToTFStringList(sliceutil.Map(res.Metadata.LicenseCaps, func(l license.Type) string { return string(l) }))
+	if res.Metadata.PerformanceTier != nil { // nil means physical ftd
+		planData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))
+	}
+	planData.GeneratedCommand = types.StringValue(res.Metadata.GeneratedCommand)
 
 	return nil
 }
@@ -87,6 +108,8 @@ func Delete(ctx context.Context, resource *Resource, stateData *ResourceModel) e
 	// TODO: fill me
 
 	// do delete
+	inp := ftdc.NewDeleteInput(stateData.ID.ValueString())
+	_, err := resource.client.DeleteFtdc(ctx, inp)
 
-	return nil
+	return err
 }

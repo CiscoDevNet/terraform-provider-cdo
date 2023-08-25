@@ -8,14 +8,16 @@ import (
 )
 
 type ReadAccessPoliciesInput struct {
-	DomainUid string
-	Limit     int
+	FmcHostname string
+	DomainUid   string
+	Limit       int
 }
 
-func NewReadAccessPoliciesInput(domainUid string, limit int) ReadAccessPoliciesInput {
+func NewReadAccessPoliciesInput(fmcHostname, domainUid string, limit int) ReadAccessPoliciesInput {
 	return ReadAccessPoliciesInput{
-		DomainUid: domainUid,
-		Limit:     limit,
+		FmcHostname: fmcHostname,
+		DomainUid:   domainUid,
+		Limit:       limit,
 	}
 }
 
@@ -26,6 +28,7 @@ func ReadAccessPolicies(ctx context.Context, client http.Client, inp ReadAccessP
 	readUrl := url.ReadAccessPolicies(client.BaseUrl(), inp.DomainUid, inp.Limit)
 
 	req := client.NewGet(ctx, readUrl)
+	req.Header.Add("Fmc-Hostname", inp.FmcHostname) // required, otherwise 500 internal server error
 
 	var outp ReadAccessPoliciesOutput
 	if err := req.Send(&outp); err != nil {

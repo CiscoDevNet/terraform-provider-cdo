@@ -7,7 +7,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -28,19 +27,19 @@ type Resource struct {
 }
 
 type ResourceModel struct {
-	ID               types.String `tfsdk:"id"`
-	Name             types.String `tfsdk:"name"`
-	AccessPolicyName types.String `tfsdk:"access_policy_name"`
-	PerformanceTier  types.String `tfsdk:"performance_tier"`
-	Virtual          types.Bool   `tfsdk:"virtual"`
-	Licenses         types.List   `tfsdk:"licenses"`
+	ID               types.String   `tfsdk:"id"`
+	Name             types.String   `tfsdk:"name"`
+	AccessPolicyName types.String   `tfsdk:"access_policy_name"`
+	PerformanceTier  types.String   `tfsdk:"performance_tier"`
+	Virtual          types.Bool     `tfsdk:"virtual"`
+	Licenses         []types.String `tfsdk:"licenses"`
 
 	AccessPolicyUid  types.String `tfsdk:"access_policy_id"`
 	GeneratedCommand types.String `tfsdk:"generated_command"`
 }
 
 func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_ftd"
+	resp.TypeName = req.ProviderTypeName + "_ftd_device"
 }
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
@@ -56,7 +55,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "A human-readable name for the Secure Device Connector (SDC). This should be unique among SDCs",
+				MarkdownDescription: "A human-readable name for the Firewall Threat Defense (FTD). This should be unique among FTDs",
 				Required:            true,
 			},
 			"access_policy_name": schema.StringAttribute{
@@ -69,7 +68,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			},
 			"performance_tier": schema.StringAttribute{
 				MarkdownDescription: "The performance tier of the virtual FTD, if virtual is set to false, this field is ignored.",
-				Required:            false,
+				Optional:            true,
 				// TODO: validator for performance tier, check valid performance tier is given
 				// TODO: ignore changes in this field when virtual is false
 				PlanModifiers: []planmodifier.String{
@@ -78,8 +77,9 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			},
 			"virtual": schema.BoolAttribute{
 				MarkdownDescription: "Whether this FTD is virtual. If false, performance_tier is ignored",
-				Required:            false,
-				Default:             booldefault.StaticBool(false),
+				Required:            true,
+				// TODO: can we change this after created?
+				// TODO: default value false
 				PlanModifiers: []planmodifier.Bool{
 					boolplanmodifier.RequiresReplace(),
 				},
@@ -159,7 +159,7 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, res *
 
 	// 2. create resource & fill model data
 	if err := Create(ctx, r, &planData); err != nil {
-		res.Diagnostics.AddError("failed to create SDC resource", err.Error())
+		res.Diagnostics.AddError("failed to create FTD resource", err.Error())
 		return
 	}
 
@@ -206,7 +206,7 @@ func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, res *
 
 	// 2. delete the resource
 	if err := Delete(ctx, r, &stateData); err != nil {
-		res.Diagnostics.AddError("failed to delete SDC resource", err.Error())
+		res.Diagnostics.AddError("failed to delete FTD resource", err.Error())
 	}
 }
 

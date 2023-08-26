@@ -88,3 +88,7 @@ func UpdateFmcAppliance(baseUrl string, fmcSpecificUid string) string {
 func ReadStateMachineInstance(baseUrl string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/state-machines/instances", baseUrl)
 }
+
+func ReadFmcDomainInfo(fmcHost string) string {
+	return fmt.Sprintf("https://%s/api/fmc_platform/v1/info/domain", fmcHost)
+}

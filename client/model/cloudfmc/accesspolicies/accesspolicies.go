@@ -1,12 +1,14 @@
 package accesspolicies
 
+import "github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc"
+
 type AccessPolicies struct {
-	Items  []Item `json:"items"`
-	Links  Links  `json:"links"`
-	Paging Paging `json:"paging"`
+	Items  []Item          `json:"items"`
+	Links  cloudfmc.Links  `json:"links"`
+	Paging cloudfmc.Paging `json:"paging"`
 }
 
-func New(items []Item, links Links, paging Paging) AccessPolicies {
+func New(items []Item, links cloudfmc.Links, paging cloudfmc.Paging) AccessPolicies {
 	return AccessPolicies{
 		Items:  items,
 		Links:  links,
@@ -25,43 +27,17 @@ func (policies *AccessPolicies) Find(name string) (item Item, ok bool) {
 }
 
 type Item struct {
-	Links Links  `json:"links"`
-	Id    string `json:"id"`
-	Name  string `json:"name"`
-	Type  string `json:"type"`
+	Links cloudfmc.Links `json:"links"`
+	Id    string         `json:"id"`
+	Name  string         `json:"name"`
+	Type  string         `json:"type"`
 }
 
-func NewItem(id, name, type_ string, links Links) Item {
+func NewItem(id, name, type_ string, links cloudfmc.Links) Item {
 	return Item{
 		Id:    id,
 		Name:  name,
 		Type:  type_,
 		Links: links,
-	}
-}
-
-type Paging struct {
-	Count  int `json:"count"`
-	Offset int `json:"offset"`
-	Limit  int `json:"limit"`
-	Pages  int `json:"pages"`
-}
-
-func NewPaging(count, offset, limit, pages int) Paging {
-	return Paging{
-		Count:  count,
-		Offset: offset,
-		Limit:  limit,
-		Pages:  pages,
-	}
-}
-
-type Links struct {
-	Self string `json:"self"`
-}
-
-func NewLinks(self string) Links {
-	return Links{
-		Self: self,
 	}
 }

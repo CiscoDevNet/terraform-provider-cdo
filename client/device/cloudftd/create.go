@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc/fmcplatform"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/cdo"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
@@ -63,12 +64,7 @@ type metadata struct {
 	PerformanceTier  *tier.Type `json:"performanceTier"`
 }
 
-// TODO: use this to fetch
-//
-//	curl --request GET \
-//	 --url https://<FMC_HOST>/api/fmc_platform/v1/info/domain \
-//	 --header 'Authorization: Bearer <CDO TOKEN>'
-const FmcDomainUid = "e276abec-e0f2-11e3-8169-6d9ed49b625f"
+//const FmcDomainUid = "e276abec-e0f2-11e3-8169-6d9ed49b625f"
 
 func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, error) {
 
@@ -79,13 +75,21 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	if err != nil {
 		return nil, err
 	}
-	// 2. get Cloud FMC domain id by looking up FMC's specific device
+
+	// 2. get FMC domain uid by reading Cloud FMC domain info
+	readFmcDomainRes, err := fmcplatform.ReadFmcDomainInfo(ctx, client, fmcplatform.NewReadDomainInfo(fmcRes.Host))
+	if err != nil {
+		return nil, err
+	}
+	if len(readFmcDomainRes.Items) == 0 {
+		return nil, fmt.Errorf("fmc domain info not found")
+	}
 
 	// 3. read access policies using Cloud FMC domain id
 	accessPoliciesRes, err := cloudfmc.ReadAccessPolicies(
 		ctx,
 		client,
-		cloudfmc.NewReadAccessPoliciesInput(fmcRes.Host, FmcDomainUid, 1000), // 1000 is what CDO UI uses
+		cloudfmc.NewReadAccessPoliciesInput(fmcRes.Host, readFmcDomainRes.Items[0].Uuid, 1000), // 1000 is what CDO UI uses
 	)
 	if err != nil {
 		return nil, err
@@ -109,7 +113,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		performanceTier = createInp.PerformanceTier
 	}
 
-	// 4. create the cloudftd device
+	// 4. create the cloud ftd device
 	createUrl := url.CreateDevice(client.BaseUrl())
 	createBody := createRequestBody{
 		Name:       createInp.Name,

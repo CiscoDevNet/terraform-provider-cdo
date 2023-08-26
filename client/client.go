@@ -6,7 +6,7 @@ import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ftdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/genericssh"
 	"net/http"
 
@@ -122,22 +122,22 @@ func (c *Client) DeleteGenericSSH(ctx context.Context, inp genericssh.DeleteInpu
 	return genericssh.Delete(ctx, c.client, inp)
 }
 
-func (c *Client) ReadFtdcByUid(ctx context.Context, inp ftdc.ReadByUidInput) (*ftdc.ReadByUidOutput, error) {
-	return ftdc.ReadByUid(ctx, c.client, inp)
+func (c *Client) ReadCloudFtdByUid(ctx context.Context, inp cloudftd.ReadByUidInput) (*cloudftd.ReadByUidOutput, error) {
+	return cloudftd.ReadByUid(ctx, c.client, inp)
 }
 
-func (c *Client) ReadFtdcByName(ctx context.Context, inp ftdc.ReadByNameInput) (*ftdc.ReadByNameOutput, error) {
-	return ftdc.ReadByName(ctx, c.client, inp)
+func (c *Client) ReadCloudFtdByName(ctx context.Context, inp cloudftd.ReadByNameInput) (*cloudftd.ReadByNameOutput, error) {
+	return cloudftd.ReadByName(ctx, c.client, inp)
 }
 
-func (c *Client) CreateFtdc(ctx context.Context, inp ftdc.CreateInput) (*ftdc.CreateOutput, error) {
-	return ftdc.Create(ctx, c.client, inp)
+func (c *Client) CreateCloudFtd(ctx context.Context, inp cloudftd.CreateInput) (*cloudftd.CreateOutput, error) {
+	return cloudftd.Create(ctx, c.client, inp)
 }
 
-func (c *Client) UpdateFtdc(ctx context.Context, inp ftdc.UpdateInput) (*ftdc.UpdateOutput, error) {
-	return ftdc.Update(ctx, c.client, inp)
+func (c *Client) UpdateCloudFtd(ctx context.Context, inp cloudftd.UpdateInput) (*cloudftd.UpdateOutput, error) {
+	return cloudftd.Update(ctx, c.client, inp)
 }
 
-func (c *Client) DeleteFtdc(ctx context.Context, inp ftdc.DeleteInput) (*ftdc.DeleteOutput, error) {
-	return ftdc.Delete(ctx, c.client, inp)
+func (c *Client) DeleteCloudFtd(ctx context.Context, inp cloudftd.DeleteInput) (*cloudftd.DeleteOutput, error) {
+	return cloudftd.Delete(ctx, c.client, inp)
 }

@@ -73,11 +73,11 @@ func ReadSmartLicense(baseUrl string) string {
 	return fmt.Sprintf("%s/fmc/api/fmc_platform/v1/license/smartlicenses", baseUrl)
 }
 
-func ReadAccessPolicies(baseUrl string, domainUid string, limit int) string {
-	return fmt.Sprintf("%s/fmc/api/fmc_config/v1/domain/%s/policy/accesspolicies?limit=%d", baseUrl, domainUid, limit)
+func ReadAccessPolicies(baseUrl string, domainUid string) string {
+	return fmt.Sprintf("%s/fmc/api/fmc_config/v1/domain/%s/policy/accesspolicies?", baseUrl, domainUid)
 }
 
-func UpdateSpecificFtdc(baseUrl string, ftdSpecificUid string) string {
+func UpdateSpecificCloudFtd(baseUrl string, ftdSpecificUid string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/firepower/ftds/%s", baseUrl, ftdSpecificUid)
 }
 
@@ -85,7 +85,6 @@ func UpdateFmcAppliance(baseUrl string, fmcSpecificUid string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/fmc/appliance/%s", baseUrl, fmcSpecificUid)
 }
 
-// example: ${baseUrl}/aegis/rest/v1/services/state-machines/instances?limit=1&q=objectReference.uid:11111111-1111-1111-1111-111111111111&sort=lastActiveDate:desc
 func ReadStateMachineInstance(baseUrl string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/state-machines/instances", baseUrl)
 }

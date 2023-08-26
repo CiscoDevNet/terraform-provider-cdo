@@ -1,8 +1,8 @@
-package cdfmc_test
+package cloudfmc_test
 
 import (
 	"context"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cdfmc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/smartlicense"
@@ -47,7 +47,7 @@ func TestSmartLicenseRead(t *testing.T) {
 	testCases := []struct {
 		testName   string
 		setupFunc  func()
-		assertFunc func(output *cdfmc.ReadSmartLicenseOutput, err error, t *testing.T)
+		assertFunc func(output *cloudfmc.ReadSmartLicenseOutput, err error, t *testing.T)
 	}{
 		{
 			testName: "successfully read Smart License",
@@ -58,7 +58,7 @@ func TestSmartLicenseRead(t *testing.T) {
 					httpmock.NewJsonResponderOrPanic(http.StatusOK, validSmartLicense),
 				)
 			},
-			assertFunc: func(output *cdfmc.ReadSmartLicenseOutput, err error, t *testing.T) {
+			assertFunc: func(output *cloudfmc.ReadSmartLicenseOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
 				assert.Equal(t, validSmartLicense, *output)
@@ -73,7 +73,7 @@ func TestSmartLicenseRead(t *testing.T) {
 					httpmock.NewStringResponder(http.StatusInternalServerError, "internal server error"),
 				)
 			},
-			assertFunc: func(output *cdfmc.ReadSmartLicenseOutput, err error, t *testing.T) {
+			assertFunc: func(output *cloudfmc.ReadSmartLicenseOutput, err error, t *testing.T) {
 				assert.Nil(t, output)
 				assert.NotNil(t, err)
 			},
@@ -86,10 +86,10 @@ func TestSmartLicenseRead(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := cdfmc.ReadSmartLicense(
+			output, err := cloudfmc.ReadSmartLicense(
 				context.Background(),
 				*internalHttp.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
-				cdfmc.NewReadSmartLicenseInput(),
+				cloudfmc.NewReadSmartLicenseInput(),
 			)
 
 			testCase.assertFunc(output, err, t)

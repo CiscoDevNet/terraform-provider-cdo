@@ -1,4 +1,4 @@
-package ftdc
+package cloudftd
 
 import (
 	"context"
@@ -27,7 +27,7 @@ type ReadByNameOutput struct {
 
 func ReadByName(ctx context.Context, client http.Client, readInp ReadByNameInput) (*ReadByNameOutput, error) {
 
-	readUrl := url.ReadDeviceByNameAndType(client.BaseUrl(), readInp.Name, devicetype.Ftdc)
+	readUrl := url.ReadDeviceByNameAndType(client.BaseUrl(), readInp.Name, devicetype.CloudFtd)
 	req := client.NewGet(ctx, readUrl)
 
 	var readOutp []ReadByNameOutput
@@ -36,7 +36,7 @@ func ReadByName(ctx context.Context, client http.Client, readInp ReadByNameInput
 	}
 
 	if len(readOutp) == 0 {
-		return nil, fmt.Errorf("ftd with name: \"%s\" not found", readInp.Name)
+		return nil, fmt.Errorf("cloudftd with name: \"%s\" not found", readInp.Name)
 	}
 
 	if len(readOutp) > 1 {

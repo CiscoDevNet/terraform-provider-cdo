@@ -30,7 +30,7 @@ resource "cdo_ftd_device" "test" {
 }`
 
 var testResource = ResourceType{
-	Name:             "ci-test-ftd-9",
+	Name:             "ci-test-cloudftd-10",
 	AccessPolicyName: "Default Access Control Policy",
 	PerformanceTier:  "FTDv5",
 	Virtual:          "false",
@@ -38,6 +38,12 @@ var testResource = ResourceType{
 	GeneratedCommand: "configure manager add terraform-provider-cdo.app.staging.cdo.cisco.com LvWGkKjYNrqZlYbz2JGZqbD0ibDuxlSp h2zTtFTvwxgDIbI9pGshHNWrJGDT0jzC terraform-provider-cdo.app.staging.cdo.cisco.com",
 }
 var testResourceConfig = acctest.MustParseTemplate(ResourceTemplate, testResource)
+
+var testResource_NewName = acctest.MustOverrideFields(testResource, map[string]any{
+	"Name": "ci-test-cloudftd-new-name",
+})
+
+var testResourceConfig_NewName = acctest.MustParseTemplate(ResourceTemplate, testResource_NewName)
 
 func TestAccFtdResource(t *testing.T) {
 
@@ -66,12 +72,12 @@ func TestAccFtdResource(t *testing.T) {
 				),
 			},
 			// Update and Read testing
-			//{
-			//	Config: acctest.ProviderConfig() + testResourceConfig,
-			//	Check: resource.ComposeAggregateTestCheckFunc(
-			//		resource.TestCheckResourceAttr("cdo_ios_device.test", "name", testResource.Name),
-			//	),
-			//},
+			{
+				Config: acctest.ProviderConfig() + testResourceConfig_NewName,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("cdo_ftd_device.test", "name", testResource_NewName.Name),
+				),
+			},
 			// Delete testing automatically occurs in TestCase
 		},
 	})

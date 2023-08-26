@@ -39,7 +39,7 @@ type ResourceModel struct {
 }
 
 func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_ftd_device"
+	resp.TypeName = req.ProviderTypeName + "_ftd_device" // TODO: _cloud_ftd_device ?
 }
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
@@ -59,7 +59,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Required:            true,
 			},
 			"access_policy_name": schema.StringAttribute{
-				MarkdownDescription: "The name of the cdFMC access policy that will be used by the FTD",
+				MarkdownDescription: "The name of the Cloud FMC access policy that will be used by the FTD",
 				Required:            true,
 				// TODO: make this optional, and use default access policy when not given
 				PlanModifiers: []planmodifier.String{
@@ -96,7 +96,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				// TODO: validate the licenses are valid input.
 			},
 			"generated_command": schema.StringAttribute{
-				MarkdownDescription: "The command to run in the FTD to register itself with cdFMC.",
+				MarkdownDescription: "The command to run in the FTD to register itself with Cloud FMC.",
 				Computed:            true,
 			},
 			"access_policy_id": schema.StringAttribute{

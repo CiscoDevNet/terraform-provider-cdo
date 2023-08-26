@@ -1,4 +1,4 @@
-package cdfmc_test
+package cloudfmc_test
 
 const (
 	smartLicenseEvalExpiresInDays = 123456

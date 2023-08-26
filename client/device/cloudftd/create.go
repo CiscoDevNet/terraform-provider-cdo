@@ -1,10 +1,10 @@
-package ftdc
+package cloudftd
 
 import (
 	"context"
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cdfmc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/cdo"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
@@ -72,24 +72,20 @@ const FmcDomainUid = "e276abec-e0f2-11e3-8169-6d9ed49b625f"
 
 func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, error) {
 
-	client.Logger.Println("creating ftdc")
+	client.Logger.Println("creating cloudftd")
 
-	// 1. find cdFMC
-	fmcRes, err := cdfmc.Read(ctx, client, cdfmc.NewReadInput())
+	// 1. find Cloud FMC
+	fmcRes, err := cloudfmc.Read(ctx, client, cloudfmc.NewReadInput())
 	if err != nil {
 		return nil, err
 	}
-	// 2. get cdFMC domain id by looking up FMC's specific device
-	//fmcSpecificRes, err := cdfmc.ReadSpecific(ctx, client, cdfmc.NewReadSpecificInput(fmcRes.SpecificUid))
-	//if err != nil {
-	//	return nil, err
-	//}
+	// 2. get Cloud FMC domain id by looking up FMC's specific device
 
-	// 3. read access policies using cdFMC domain id
-	accessPoliciesRes, err := cdfmc.ReadAccessPolicies(
+	// 3. read access policies using Cloud FMC domain id
+	accessPoliciesRes, err := cloudfmc.ReadAccessPolicies(
 		ctx,
 		client,
-		cdfmc.NewReadAccessPoliciesInput(fmcRes.Host, FmcDomainUid, 1000), // 1000 is what CDO UI uses
+		cloudfmc.NewReadAccessPoliciesInput(fmcRes.Host, FmcDomainUid, 1000), // 1000 is what CDO UI uses
 	)
 	if err != nil {
 		return nil, err
@@ -113,12 +109,12 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		performanceTier = createInp.PerformanceTier
 	}
 
-	// 4. create the ftdc device
+	// 4. create the cloudftd device
 	createUrl := url.CreateDevice(client.BaseUrl())
 	createBody := createRequestBody{
 		Name:       createInp.Name,
 		FmcId:      fmcRes.Uid,
-		DeviceType: devicetype.Ftdc,
+		DeviceType: devicetype.CloudFtd,
 		Metadata: metadata{
 			AccessPolicyName: selectedPolicy.Name,
 			AccessPolicyId:   selectedPolicy.Id,
@@ -135,13 +131,13 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		return nil, err
 	}
 
-	// 5. read created ftdc's specific device's uid
+	// 5. read created cloudftd's specific device's uid
 	readSpecRes, err := device.ReadSpecific(ctx, client, *device.NewReadSpecificInput(createOup.Uid))
 	if err != nil {
 		return nil, err
 	}
 
-	// 6. initiate ftdc onboarding by triggering a weird endpoint using created ftdc's specific uid
+	// 6. initiate cloudftd onboarding by triggering a weird endpoint using created cloudftd's specific uid
 	_, err = UpdateSpecific(ctx, client,
 		NewUpdateSpecificFtdInput(
 			readSpecRes.SpecificUid,

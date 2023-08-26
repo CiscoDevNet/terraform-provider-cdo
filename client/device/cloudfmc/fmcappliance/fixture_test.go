@@ -2,7 +2,7 @@ package fmcappliance_test
 
 const (
 	baseUrl           = "https://unit-test.net"
-	FmcSpecificUid    = "unit-test-fmc-specific-uid"
+	FmcSpecificUid    = "unit-test-cloudfmc-specific-uid"
 	queueTriggerState = "unit-test-queue-trigger-state"
 	uid               = "unit-test-uid"
 	state             = "unit-test-state"

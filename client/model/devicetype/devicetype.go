@@ -3,8 +3,8 @@ package devicetype
 type Type string
 
 const (
-	Asa   Type = "ASA"
-	Ios   Type = "IOS"
-	Cdfmc Type = "FMCE"
-	Ftdc  Type = "FTDC"
+	Asa      Type = "ASA"
+	Ios      Type = "IOS"
+	CloudFmc Type = "FMCE"
+	CloudFtd Type = "FTDC"
 )

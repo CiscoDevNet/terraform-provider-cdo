@@ -2,7 +2,7 @@ package ftd
 
 import (
 	"context"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ftdc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
@@ -13,8 +13,8 @@ import (
 func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) error {
 
 	// do read
-	inp := ftdc.NewReadByNameInput(stateData.Name.ValueString())
-	res, err := resource.client.ReadFtdcByName(ctx, inp)
+	inp := cloudftd.NewReadByNameInput(stateData.Name.ValueString())
+	res, err := resource.client.ReadCloudFtdByName(ctx, inp)
 	if err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 	stateData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUuid)
 	stateData.Virtual = types.BoolValue(res.Metadata.PerformanceTier != nil)
 	stateData.Licenses = util.GoStringSliceToTFStringList(sliceutil.Map(res.Metadata.LicenseCaps, func(l license.Type) string { return string(l) }))
-	if res.Metadata.PerformanceTier != nil { // nil means physical ftd
+	if res.Metadata.PerformanceTier != nil { // nil means physical cloudftd
 		stateData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))
 	}
 	stateData.GeneratedCommand = types.StringValue(res.Metadata.GeneratedCommand)
@@ -51,15 +51,14 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 	if err != nil {
 		return err
 	}
-	createInp := ftdc.NewCreateInput(
+	createInp := cloudftd.NewCreateInput(
 		planData.Name.ValueString(),
 		planData.AccessPolicyName.ValueString(),
 		performanceTier,
 		planData.Virtual.ValueBool(),
 		licenses,
 	)
-	res, err := resource.client.CreateFtdc(ctx, createInp)
-	//fmt.Printf("\ncreate FTDc res: %+v\n", res)
+	res, err := resource.client.CreateCloudFtd(ctx, createInp)
 	if err != nil {
 		return err
 	}
@@ -71,7 +70,7 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 	planData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUuid)
 	planData.Virtual = types.BoolValue(res.Metadata.PerformanceTier != nil)
 	planData.Licenses = util.GoStringSliceToTFStringList(sliceutil.Map(res.Metadata.LicenseCaps, func(l license.Type) string { return string(l) }))
-	if res.Metadata.PerformanceTier != nil { // nil means physical ftd
+	if res.Metadata.PerformanceTier != nil { // nil means physical cloud ftd
 		planData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))
 	}
 	planData.GeneratedCommand = types.StringValue(res.Metadata.GeneratedCommand)
@@ -82,33 +81,23 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 func Update(ctx context.Context, resource *Resource, planData *ResourceModel, stateData *ResourceModel) error {
 
 	// do update
-	inp := ftdc.NewUpdateInput(stateData.ID.ValueString(), stateData.Name.ValueString())
-	res, err := resource.client.UpdateFtdc(ctx, inp)
+	inp := cloudftd.NewUpdateInput(planData.ID.ValueString(), planData.Name.ValueString())
+	res, err := resource.client.UpdateCloudFtd(ctx, inp)
 	if err != nil {
 		return err
 	}
 
 	// map return struct to model
-	planData.ID = types.StringValue(res.Uid)
-	planData.Name = types.StringValue(res.Name)
-	planData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
-	planData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUuid)
-	planData.Virtual = types.BoolValue(res.Metadata.PerformanceTier != nil)
-	planData.Licenses = util.GoStringSliceToTFStringList(sliceutil.Map(res.Metadata.LicenseCaps, func(l license.Type) string { return string(l) }))
-	if res.Metadata.PerformanceTier != nil { // nil means physical ftd
-		planData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))
-	}
-	planData.GeneratedCommand = types.StringValue(res.Metadata.GeneratedCommand)
+	stateData.Name = types.StringValue(res.Name)
 
 	return nil
 }
 
 func Delete(ctx context.Context, resource *Resource, stateData *ResourceModel) error {
-	// TODO: fill me
 
 	// do delete
-	inp := ftdc.NewDeleteInput(stateData.ID.ValueString())
-	_, err := resource.client.DeleteFtdc(ctx, inp)
+	inp := cloudftd.NewDeleteInput(stateData.ID.ValueString())
+	_, err := resource.client.DeleteCloudFtd(ctx, inp)
 
 	return err
 }

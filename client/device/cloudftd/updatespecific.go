@@ -1,4 +1,4 @@
-package ftdc
+package cloudftd
 
 import (
 	"context"
@@ -28,7 +28,7 @@ type updateSpecificRequestBody struct {
 
 func UpdateSpecific(ctx context.Context, client http.Client, updateInp UpdateSpecificFtdInput) (*UpdateSpecificFtdOutput, error) {
 
-	updateUrl := url.UpdateSpecificFtdc(client.BaseUrl(), updateInp.SpecificUid)
+	updateUrl := url.UpdateSpecificCloudFtd(client.BaseUrl(), updateInp.SpecificUid)
 
 	updateBody := updateSpecificRequestBody{
 		QueueTriggerState: updateInp.QueueTriggerState,

@@ -2,7 +2,7 @@ package fmcappliance_test
 
 import (
 	"context"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cdfmc/fmcappliance"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc/fmcappliance"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 	"github.com/stretchr/testify/assert"
 	"net/http"

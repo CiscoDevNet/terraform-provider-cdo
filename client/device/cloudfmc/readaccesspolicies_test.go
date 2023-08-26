@@ -1,11 +1,11 @@
-package cdfmc_test
+package cloudfmc_test
 
 import (
 	"context"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cdfmc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cdfmc/accesspolicies"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/accesspolicies"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -44,7 +44,7 @@ func TestAccessPoliciesRead(t *testing.T) {
 		domainUid  string
 		limit      int
 		setupFunc  func()
-		assertFunc func(output *cdfmc.ReadAccessPoliciesOutput, err error, t *testing.T)
+		assertFunc func(output *cloudfmc.ReadAccessPoliciesOutput, err error, t *testing.T)
 	}{
 		{
 			testName:  "successfully read Access Policies",
@@ -57,7 +57,7 @@ func TestAccessPoliciesRead(t *testing.T) {
 					httpmock.NewJsonResponderOrPanic(http.StatusOK, validAccessPolicies),
 				)
 			},
-			assertFunc: func(output *cdfmc.ReadAccessPoliciesOutput, err error, t *testing.T) {
+			assertFunc: func(output *cloudfmc.ReadAccessPoliciesOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
 				assert.Equal(t, validAccessPolicies, *output)
@@ -74,7 +74,7 @@ func TestAccessPoliciesRead(t *testing.T) {
 					httpmock.NewStringResponder(http.StatusInternalServerError, "internal server error"),
 				)
 			},
-			assertFunc: func(output *cdfmc.ReadAccessPoliciesOutput, err error, t *testing.T) {
+			assertFunc: func(output *cloudfmc.ReadAccessPoliciesOutput, err error, t *testing.T) {
 				assert.Nil(t, output)
 				assert.NotNil(t, err)
 			},
@@ -87,10 +87,10 @@ func TestAccessPoliciesRead(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := cdfmc.ReadAccessPolicies(
+			output, err := cloudfmc.ReadAccessPolicies(
 				context.Background(),
 				*internalHttp.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
-				cdfmc.NewReadAccessPoliciesInput(fmcHostname, domainUid, limit),
+				cloudfmc.NewReadAccessPoliciesInput(fmcHostname, domainUid, limit),
 			)
 
 			testCase.assertFunc(output, err, t)

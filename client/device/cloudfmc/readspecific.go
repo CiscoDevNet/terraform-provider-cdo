@@ -1,4 +1,4 @@
-package cdfmc
+package cloudfmc
 
 import (
 	"context"

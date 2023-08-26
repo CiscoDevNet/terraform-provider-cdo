@@ -1,4 +1,4 @@
-package ftdc
+package cloudftd
 
 import (
 	"context"

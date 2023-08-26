@@ -172,11 +172,7 @@ func (r *Request) addQueryParams(req *http.Request) {
 			q.Add(k, v)
 		}
 	}
-	s := q.Encode()
-	if s != "" {
-		fmt.Printf("\n\nencoded_query=%s\n\n", s)
-	}
-	req.URL.RawQuery = s
+	req.URL.RawQuery = q.Encode()
 }
 
 func (r *Request) addHeaders(req *http.Request) {

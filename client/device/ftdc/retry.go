@@ -19,7 +19,6 @@ func UntilGeneratedCommandAvailable(ctx context.Context, client http.Client, uid
 
 		if readOutp.Metadata.GeneratedCommand != "" {
 			return true, nil
-
 		} else {
 			return false, fmt.Errorf("generated command not found in metadata: %+v", readOutp.Metadata)
 		}

@@ -1,16 +1,16 @@
 package accesspolicies
 
 import (
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/common"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/fmccommon"
 )
 
 type AccessPolicies struct {
-	Items  []Item        `json:"items"`
-	Links  common.Links  `json:"links"`
-	Paging common.Paging `json:"paging"`
+	Items  []Item           `json:"items"`
+	Links  fmccommon.Links  `json:"links"`
+	Paging fmccommon.Paging `json:"paging"`
 }
 
-func New(items []Item, links common.Links, paging common.Paging) AccessPolicies {
+func New(items []Item, links fmccommon.Links, paging fmccommon.Paging) AccessPolicies {
 	return AccessPolicies{
 		Items:  items,
 		Links:  links,
@@ -29,13 +29,13 @@ func (policies *AccessPolicies) Find(name string) (item Item, ok bool) {
 }
 
 type Item struct {
-	Links common.Links `json:"links"`
-	Id    string       `json:"id"`
-	Name  string       `json:"name"`
-	Type  string       `json:"type"`
+	Links fmccommon.Links `json:"links"`
+	Id    string          `json:"id"`
+	Name  string          `json:"name"`
+	Type  string          `json:"type"`
 }
 
-func NewItem(id, name, type_ string, links common.Links) Item {
+func NewItem(id, name, type_ string, links fmccommon.Links) Item {
 	return Item{
 		Id:    id,
 		Name:  name,

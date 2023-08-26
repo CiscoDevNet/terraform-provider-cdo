@@ -1,16 +1,16 @@
 package smartlicense
 
 import (
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/common"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/fmccommon"
 )
 
 type SmartLicense struct {
-	Items  []Item        `json:"items"`
-	Links  common.Links  `json:"links"`
-	Paging common.Paging `json:"paging"`
+	Items  []Item           `json:"items"`
+	Links  fmccommon.Links  `json:"links"`
+	Paging fmccommon.Paging `json:"paging"`
 }
 
-func NewSmartLicense(items []Item, links common.Links, paging common.Paging) SmartLicense {
+func NewSmartLicense(items []Item, links fmccommon.Links, paging fmccommon.Paging) SmartLicense {
 	return SmartLicense{
 		Items:  items,
 		Links:  links,

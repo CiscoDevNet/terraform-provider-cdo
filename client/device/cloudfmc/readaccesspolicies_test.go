@@ -6,7 +6,7 @@ import (
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/accesspolicies"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/common"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/fmccommon"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -23,16 +23,16 @@ func TestAccessPoliciesRead(t *testing.T) {
 			accessPolicyId,
 			accessPolicyName,
 			accessPolicyType,
-			common.NewLinks(accessPolicySelfLink),
+			fmccommon.NewLinks(accessPolicySelfLink),
 		),
 	}
-	validAccessPoliciesPaging := common.NewPaging(
+	validAccessPoliciesPaging := fmccommon.NewPaging(
 		accessPolicyCount,
 		accessPolicyOffset,
 		accessPolicyLimit,
 		accessPolicyPages,
 	)
-	validAccessPoliciesLink := common.NewLinks(accessPolicySelfLink)
+	validAccessPoliciesLink := fmccommon.NewLinks(accessPolicySelfLink)
 
 	validAccessPolicies := accesspolicies.New(
 		validAccessPolicesItems,

@@ -13,8 +13,8 @@ func ReadDevice(baseUrl string, uid string) string {
 func ReadDeviceByNameAndType(baseUrl string, deviceName string, deviceType devicetype.Type) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/devices?q=name:%s+AND+deviceType:%s", baseUrl, deviceName, deviceType)
 }
-func ReadAllDevicesByType(baseUrl string, deviceType devicetype.Type) string {
-	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/devices?q=deviceType:%s", baseUrl, deviceType)
+func ReadAllDevicesByType(baseUrl string) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/devices", baseUrl)
 }
 
 func CreateDevice(baseUrl string) string {

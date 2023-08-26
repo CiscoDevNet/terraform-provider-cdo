@@ -142,7 +142,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	}
 
 	// 6. initiate ftdc onboarding by triggering a weird endpoint using created ftdc's specific uid
-	_, err = UpdateSpecificFtd(ctx, client,
+	_, err = UpdateSpecific(ctx, client,
 		NewUpdateSpecificFtdInput(
 			readSpecRes.SpecificUid,
 			"INITIATE_FTDC_ONBOARDING",

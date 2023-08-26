@@ -90,7 +90,7 @@ func TestAccessPoliciesRead(t *testing.T) {
 			output, err := cdfmc.ReadAccessPolicies(
 				context.Background(),
 				*internalHttp.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
-				cdfmc.NewReadAccessPoliciesInput(domainUid, limit),
+				cdfmc.NewReadAccessPoliciesInput(fmcHostname, domainUid, limit),
 			)
 
 			testCase.assertFunc(output, err, t)

@@ -15,7 +15,7 @@ func UntilGeneratedCommandAvailable(ctx context.Context, client http.Client, uid
 			return false, err
 		}
 
-		client.Logger.Printf("device metadata=%s\n", readOutp.Metadata)
+		client.Logger.Printf("device metadata=%v\n", readOutp.Metadata)
 
 		if readOutp.Metadata.GeneratedCommand != "" {
 			return true, nil

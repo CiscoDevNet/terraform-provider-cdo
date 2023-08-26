@@ -26,7 +26,7 @@ type updateSpecificRequestBody struct {
 	QueueTriggerState string `json:"queueTriggerState"`
 }
 
-func UpdateSpecificFtd(ctx context.Context, client http.Client, updateInp UpdateSpecificFtdInput) (*UpdateSpecificFtdOutput, error) {
+func UpdateSpecific(ctx context.Context, client http.Client, updateInp UpdateSpecificFtdInput) (*UpdateSpecificFtdOutput, error) {
 
 	updateUrl := url.UpdateSpecificFtdc(client.BaseUrl(), updateInp.SpecificUid)
 

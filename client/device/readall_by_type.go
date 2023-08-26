@@ -2,13 +2,14 @@ package device
 
 import (
 	"context"
+	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 )
 
 type ReadAllByTypeInput struct {
-	DeviceType devicetype.Type `json:"deviceType"`
+	DeviceType devicetype.Type
 }
 
 type ReadAllByTypeOutput = []ReadOutput
@@ -20,9 +21,11 @@ func NewReadAllByTypeInput(deviceType devicetype.Type) ReadAllByTypeInput {
 }
 
 func ReadAllByTypeRequest(ctx context.Context, client http.Client, readInp ReadAllByTypeInput) *http.Request {
-	readAllUrl := url.ReadAllDevicesByType(client.BaseUrl(), readInp.DeviceType)
+	readAllUrl := url.ReadAllDevicesByType(client.BaseUrl())
 
 	req := client.NewGet(ctx, readAllUrl)
+
+	req.QueryParams.Add("q", fmt.Sprintf("deviceType:%s", readInp.DeviceType))
 
 	return req
 }

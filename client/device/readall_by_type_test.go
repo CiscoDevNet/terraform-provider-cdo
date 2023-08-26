@@ -48,7 +48,7 @@ func TestDeviceReadAllByType(t *testing.T) {
 			setupFunc: func() {
 				httpmock.RegisterResponder(
 					http.MethodGet,
-					url.ReadAllDevicesByType(baseUrl, devicetype.Cdfmc),
+					url.ReadAllDevicesByType(baseUrl),
 					httpmock.NewJsonResponderOrPanic(http.StatusOK, validReadAllOutput),
 				)
 			},

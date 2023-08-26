@@ -39,7 +39,7 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 	}
 	req := client.NewPut(ctx, updateUrl, updateBody)
 	var updateOup UpdateOutput
-	if err := req.Send(updateOup); err != nil {
+	if err := req.Send(&updateOup); err != nil {
 		return nil, err
 	}
 

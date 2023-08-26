@@ -6,6 +6,7 @@ import (
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/accesspolicies"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/common"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -22,16 +23,16 @@ func TestAccessPoliciesRead(t *testing.T) {
 			accessPolicyId,
 			accessPolicyName,
 			accessPolicyType,
-			accesspolicies.NewLinks(accessPolicySelfLink),
+			common.NewLinks(accessPolicySelfLink),
 		),
 	}
-	validAccessPoliciesPaging := accesspolicies.NewPaging(
+	validAccessPoliciesPaging := common.NewPaging(
 		accessPolicyCount,
 		accessPolicyOffset,
 		accessPolicyLimit,
 		accessPolicyPages,
 	)
-	validAccessPoliciesLink := accesspolicies.NewLinks(accessPolicySelfLink)
+	validAccessPoliciesLink := common.NewLinks(accessPolicySelfLink)
 
 	validAccessPolicies := accesspolicies.New(
 		validAccessPolicesItems,
@@ -53,7 +54,7 @@ func TestAccessPoliciesRead(t *testing.T) {
 			setupFunc: func() {
 				httpmock.RegisterResponder(
 					http.MethodGet,
-					url.ReadAccessPolicies(baseUrl, domainUid, limit),
+					url.ReadAccessPolicies(baseUrl, domainUid),
 					httpmock.NewJsonResponderOrPanic(http.StatusOK, validAccessPolicies),
 				)
 			},
@@ -70,7 +71,7 @@ func TestAccessPoliciesRead(t *testing.T) {
 			setupFunc: func() {
 				httpmock.RegisterResponder(
 					http.MethodGet,
-					url.ReadAccessPolicies(baseUrl, domainUid, limit),
+					url.ReadAccessPolicies(baseUrl, domainUid),
 					httpmock.NewStringResponder(http.StatusInternalServerError, "internal server error"),
 				)
 			},

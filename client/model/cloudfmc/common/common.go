@@ -1,4 +1,4 @@
-package cloudfmc
+package common
 
 type Paging struct {
 	Count  int `json:"count"`

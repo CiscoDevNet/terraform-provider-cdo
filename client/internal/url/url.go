@@ -74,7 +74,7 @@ func ReadSmartLicense(baseUrl string) string {
 }
 
 func ReadAccessPolicies(baseUrl string, domainUid string) string {
-	return fmt.Sprintf("%s/fmc/api/fmc_config/v1/domain/%s/policy/accesspolicies?", baseUrl, domainUid)
+	return fmt.Sprintf("%s/fmc/api/fmc_config/v1/domain/%s/policy/accesspolicies", baseUrl, domainUid)
 }
 
 func UpdateSpecificCloudFtd(baseUrl string, ftdSpecificUid string) string {

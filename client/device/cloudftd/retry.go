@@ -7,7 +7,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 )
 
-func UntilGeneratedCommandAvailable(ctx context.Context, client http.Client, uid string) retry.Func {
+func UntilGeneratedCommandAvailable(ctx context.Context, client http.Client, uid string, metadata *Metadata) retry.Func {
 
 	return func() (bool, error) {
 		readOutp, err := ReadByUid(ctx, client, NewReadByUidInput(uid))
@@ -18,6 +18,7 @@ func UntilGeneratedCommandAvailable(ctx context.Context, client http.Client, uid
 		client.Logger.Printf("device metadata=%v\n", readOutp.Metadata)
 
 		if readOutp.Metadata.GeneratedCommand != "" {
+			*metadata = readOutp.Metadata
 			return true, nil
 		} else {
 			return false, fmt.Errorf("generated command not found in metadata: %+v", readOutp.Metadata)

@@ -36,13 +36,15 @@ type Metadata struct {
 	RegKey             string         `json:"regKey,omitempty"`
 }
 
+// custom unmarshal json for metadata, because we need to handle license caps differently,
+// it is a string containing command separated values, instead of a json list where it can be parsed directly.
 func (metadata *Metadata) UnmarshalJSON(data []byte) error {
 	var t struct {
 		AccessPolicyName   string     `json:"accessPolicyName,omitempty"`
 		AccessPolicyUuid   string     `json:"accessPolicyUuid,omitempty"`
 		CloudManagerDomain string     `json:"cloudManagerDomain,omitempty"`
 		GeneratedCommand   string     `json:"generatedCommand,omitempty"`
-		LicenseCaps        string     `json:"license_caps,omitempty"`
+		LicenseCaps        string     `json:"license_caps,omitempty"` // first, unmarshal it into string
 		NatID              string     `json:"natID,omitempty"`
 		PerformanceTier    *tier.Type `json:"performanceTier,omitempty"`
 		RegKey             string     `json:"regKey,omitempty"`
@@ -52,7 +54,7 @@ func (metadata *Metadata) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	licenseCaps, err := license.ParseAll(t.LicenseCaps)
+	licenseCaps, err := license.ParseAll(t.LicenseCaps) // now parse it into golang type
 	if err != nil {
 		return err
 	}
@@ -65,7 +67,7 @@ func (metadata *Metadata) UnmarshalJSON(data []byte) error {
 	(*metadata).PerformanceTier = t.PerformanceTier
 	(*metadata).RegKey = t.RegKey
 
-	(*metadata).LicenseCaps = licenseCaps
+	(*metadata).LicenseCaps = licenseCaps // set it as usual
 
 	return nil
 }

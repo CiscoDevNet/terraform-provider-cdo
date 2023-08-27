@@ -64,13 +64,11 @@ type metadata struct {
 	PerformanceTier  *tier.Type `json:"performanceTier"`
 }
 
-//const FmcDomainUid = "e276abec-e0f2-11e3-8169-6d9ed49b625f"
-
 func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, error) {
 
 	client.Logger.Println("creating cloudftd")
 
-	// 1. find Cloud FMC
+	// 1. read Cloud FMC
 	fmcRes, err := cloudfmc.Read(ctx, client, cloudfmc.NewReadInput())
 	if err != nil {
 		return nil, err
@@ -85,7 +83,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		return nil, fmt.Errorf("fmc domain info not found")
 	}
 
-	// 3. read access policies using Cloud FMC domain id
+	// 3. get access policies using Cloud FMC domain uid
 	accessPoliciesRes, err := cloudfmc.ReadAccessPolicies(
 		ctx,
 		client,
@@ -105,7 +103,13 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	}
 
 	// handle selected license caps
-	licenseCaps := sliceutil.Map(createInp.Licenses, func(l license.Type) string { return string(l) })
+	licenseCaps := strings.Join( // join strings by comma
+		sliceutil.Map( // map license.Type to string
+			createInp.Licenses,
+			func(l license.Type) string { return string(l) },
+		),
+		",",
+	)
 
 	// handle performance tier
 	var performanceTier *tier.Type = nil // physical is nil
@@ -122,7 +126,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		Metadata: metadata{
 			AccessPolicyName: selectedPolicy.Name,
 			AccessPolicyId:   selectedPolicy.Id,
-			LicenseCaps:      strings.Join(licenseCaps, ","),
+			LicenseCaps:      licenseCaps,
 			PerformanceTier:  performanceTier,
 		},
 		State: "NEW",
@@ -135,13 +139,13 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		return nil, err
 	}
 
-	// 5. read created cloudftd's specific device's uid
+	// 5. read created cloud ftd's specific device's uid
 	readSpecRes, err := device.ReadSpecific(ctx, client, *device.NewReadSpecificInput(createOup.Uid))
 	if err != nil {
 		return nil, err
 	}
 
-	// 6. initiate cloudftd onboarding by triggering a weird endpoint using created cloudftd's specific uid
+	// 6. initiate cloud ftd onboarding by triggering an endpoint at the specific device
 	_, err = UpdateSpecific(ctx, client,
 		NewUpdateSpecificFtdInput(
 			readSpecRes.SpecificUid,
@@ -149,13 +153,9 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		),
 	)
 
-	// 7. get generate command
-	err = retry.Do(UntilGeneratedCommandAvailable(ctx, client, createOup.Uid), *retry.NewOptionsWithLoggerAndRetries(client.Logger, 3))
-	//readOutp, err := ReadByUid(ctx, client, NewReadByUidInput(createOup.SpecificUid))
-	if err != nil {
-		return nil, err
-	}
-	readOutp, err := ReadByUid(ctx, client, NewReadByUidInput(createOup.Uid))
+	// 8. wait for generate command available
+	var metadata Metadata
+	err = retry.Do(UntilGeneratedCommandAvailable(ctx, client, createOup.Uid, &metadata), *retry.NewOptionsWithLoggerAndRetries(client.Logger, 3))
 	if err != nil {
 		return nil, err
 	}
@@ -164,6 +164,6 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	return &CreateOutput{
 		Uid:      createOup.Uid,
 		Name:     createOup.Name,
-		Metadata: readOutp.Metadata,
+		Metadata: metadata,
 	}, nil
 }

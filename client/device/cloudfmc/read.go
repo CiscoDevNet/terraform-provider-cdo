@@ -17,10 +17,7 @@ func NewReadInput() ReadInput {
 	return ReadInput{}
 }
 
-type ReadOutput struct {
-	device.ReadOutput
-	Host string `json:"host"`
-}
+type ReadOutput = device.ReadOutput
 
 func Read(ctx context.Context, client http.Client, readInp ReadInput) (*ReadOutput, error) {
 

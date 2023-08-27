@@ -1,5 +1,7 @@
 package cloudfmc_test
 
+import "time"
+
 const (
 	smartLicenseEvalExpiresInDays = 123456
 	smartLicenseEvalUsed          = false
@@ -14,10 +16,21 @@ const (
 	smartLicenseLimit             = 123456
 	smartLicensePages             = 123456
 
-	baseUrl     = "https://unit-test.net"
+	baseUrl = "https://unit-test.net"
+
 	fmcHostname = "https://fmc-hostname.unit-test.net"
+	fmcUid      = "unit-test-fmc-uid"
 	domainUid   = "unit-test-domain-uid"
 	limit       = 123456
+
+	deviceName              = "unit-test-device-name"
+	deviceUid               = "unit-test-uid"
+	deviceHost              = "https://unit-test.com"
+	devicePort              = 1234
+	deviceCloudConnectorUId = "unit-tets-uid"
+
+	specificDeviceUid = "unit-test-specific-device-uid"
+	status            = "unit-test-status"
 
 	accessPolicySelfLink = "https://unit-test.cdo.cisco.com/api/fmc_config/v1/domain/unit-test-domain-uid/policy/accesspolicies/unit-test-uid"
 	accessPolicyName     = "Unit Test Access Control Policy"
@@ -27,4 +40,9 @@ const (
 	accessPolicyOffset   = 123456
 	accessPolicyLimit    = 123456
 	accessPolicyPages    = 123456
+)
+
+var (
+	deviceCreatedDate     = time.Date(1999, 1, 1, 0, 0, 0, 0, time.Local)
+	deviceLastUpdatedDate = time.Date(1999, 1, 1, 0, 0, 0, 0, time.Local)
 )

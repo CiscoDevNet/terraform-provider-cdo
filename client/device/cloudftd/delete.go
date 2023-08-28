@@ -37,13 +37,15 @@ func Delete(ctx context.Context, client http.Client, deleteInp DeleteInput) (*De
 	}
 
 	// 3. schedule a state machine for cloudfmc to delete the cloud FTD
-	_, err = fmcappliance.Update(ctx, client, fmcappliance.NewUpdateInput(
-		cloudFmcReadSpecificRes.SpecificUid,
-		"PENDING_DELETE_FTDC",
-		map[string]string{
-			"ftdCDeviceIDs": deleteInp.Uid,
-		},
-	))
+	_, err = fmcappliance.Update(
+		ctx,
+		client,
+		fmcappliance.NewUpdateInputBuilder().
+			FmcSpecificUid(cloudFmcReadSpecificRes.SpecificUid).
+			QueueTriggerState("PENDING_DELETE_FTDC").
+			StateMachineContext(map[string]string{"ftdCDeviceIDs": deleteInp.Uid}).
+			Build(),
+	)
 	if err != nil {
 		return nil, err
 	}

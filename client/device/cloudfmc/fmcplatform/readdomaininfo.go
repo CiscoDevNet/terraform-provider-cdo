@@ -7,12 +7,6 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/fmcdomain"
 )
 
-// TODO: use this to fetch
-//
-//	curl --request GET \
-//	 --url https://<FMC_HOST>/api/fmc_platform/v1/info/domain \
-//	 --header 'Authorization: Bearer <CDO TOKEN>'
-
 type ReadDomainInfoInput struct {
 	FmcHost string
 }

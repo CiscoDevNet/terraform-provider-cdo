@@ -22,15 +22,15 @@ const (
 	fmcUid      = "unit-test-fmc-uid"
 	domainUid   = "unit-test-domain-uid"
 	limit       = 123456
+	status      = "unit-test-status"
 
 	deviceName              = "unit-test-device-name"
 	deviceUid               = "unit-test-uid"
 	deviceHost              = "https://unit-test.com"
 	devicePort              = 1234
-	deviceCloudConnectorUId = "unit-tets-uid"
+	deviceCloudConnectorUId = "unit-test-uid"
 
 	specificDeviceUid = "unit-test-specific-device-uid"
-	status            = "unit-test-status"
 
 	accessPolicySelfLink = "https://unit-test.cdo.cisco.com/api/fmc_config/v1/domain/unit-test-domain-uid/policy/accesspolicies/unit-test-uid"
 	accessPolicyName     = "Unit Test Access Control Policy"

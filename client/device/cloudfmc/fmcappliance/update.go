@@ -33,10 +33,10 @@ type updateRequestBody struct {
 
 func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*UpdateOutput, error) {
 	updateUrl := url.UpdateFmcAppliance(client.BaseUrl(), updateInp.FmcSpecificUid)
-	updateBody := updateRequestBody{
-		QueueTriggerState:   updateInp.QueueTriggerState,
-		StateMachineContext: updateInp.StateMachineContext,
-	}
+	updateBody := newUpdateRequestBodyBuilder().
+		QueueTriggerState(updateInp.QueueTriggerState).
+		StateMachineContext(updateInp.StateMachineContext).
+		Build()
 	req := client.NewPut(ctx, updateUrl, updateBody)
 	var updateOup UpdateOutput
 	if err := req.Send(&updateOup); err != nil {

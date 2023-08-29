@@ -18,7 +18,7 @@ func NewReadByNameInput(name string) ReadByNameInput {
 		Name: name,
 	}
 }
-
+g
 func ReadByName(ctx context.Context, client http.Client, readInp ReadByNameInput) (*ReadOutput, error) {
 
 	readUrl := url.ReadDeviceByNameAndType(client.BaseUrl(), readInp.Name, devicetype.CloudFtd)

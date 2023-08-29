@@ -1,7 +1,6 @@
 package statemachine
 
 type Details struct {
-	//stateMachineDetails
 	CurrentDataRequirements       *string `json:"currentDataRequirements,omitempty"`
 	Identifier                    string  `json:"identifier"`
 	LastActiveDate                int     `json:"lastActiveDate"`

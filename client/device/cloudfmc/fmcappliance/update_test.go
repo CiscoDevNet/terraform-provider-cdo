@@ -17,11 +17,11 @@ func TestUpdate(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	validUpdateOutput := fmcappliance.UpdateOutput{
-		Uid:       uid,
-		State:     state,
-		DomainUid: domainUid,
-	}
+	validUpdateOutput := fmcappliance.NewUpdateOutputBuilder().
+		Uid(uid).
+		State(state).
+		DomainUid(domainUid).
+		Build()
 
 	testCases := []struct {
 		testName   string

@@ -20,6 +20,8 @@ func NewReadInstanceByDeviceUidInput(deviceUid string) ReadInstanceByDeviceUidIn
 
 type ReadInstanceByDeviceUidOutput = statemachine.Instance
 
+var NewReadInstanceByDeviceUidOutputBuilder = statemachine.NewInstanceBuilder
+
 func ReadInstanceByDeviceUid(ctx context.Context, client http.Client, readInp ReadInstanceByDeviceUidInput) (*ReadInstanceByDeviceUidOutput, error) {
 
 	readUrl := url.ReadStateMachineInstance(client.BaseUrl())

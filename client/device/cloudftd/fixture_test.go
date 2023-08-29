@@ -2,11 +2,15 @@ package cloudftd_test
 
 import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc/fmcappliance"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/statemachine"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/accesspolicies"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/fmcdomain"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 )
 
 const (
@@ -34,6 +38,10 @@ const (
 	fmcAccessPolicyItemName = "unit-test-access-policy-item-name"
 	fmcAccessPolicyItemType = "unit-test-access-policy-item-type"
 	fmcAccessPolicyItemUid  = "unit-test-access-policy-item-uid"
+
+	fmcSpecificUid    = "unit-test-fmc-specific-uid"
+	fmcSpecificStatus = "unit-test-fmc-specific-status"
+	fmcSpecificState  = "unit-test-fmc-specific-state"
 
 	ftdName    = "unit-test-ftdName"
 	ftdUid     = "unit-test-ftdUid"
@@ -129,4 +137,23 @@ var (
 							RegKey(ftdRegKey).
 							Build()).
 						Build()
+
+	validReadSpecificOutput = cloudfmc.ReadSpecificOutput{
+		SpecificUid: fmcSpecificUid,
+		DomainUid:   fmcDomainUid,
+		State:       state.DONE,
+		Status:      fmcSpecificStatus,
+	}
+
+	validUpdateFmcSpecificOutput = fmcappliance.NewUpdateOutputBuilder().
+					Uid(fmcSpecificUid).
+					State(fmcSpecificState).
+					DomainUid(fmcDomainUid).
+					Build()
+
+	validReadStateMachineOutput = statemachine.NewReadInstanceByDeviceUidOutputBuilder().
+					StateMachineIdentifier("fmceDeleteFtdcStateMachine").
+					Build()
+
+	validDeleteOutput = cloudftd.DeleteOutput{}
 )

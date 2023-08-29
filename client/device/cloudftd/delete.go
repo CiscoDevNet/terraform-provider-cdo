@@ -25,23 +25,23 @@ type DeleteOutput struct {
 func Delete(ctx context.Context, client http.Client, deleteInp DeleteInput) (*DeleteOutput, error) {
 
 	// 1. read FMC that manages this cloud FTD
-	cloudFmcReadRes, err := cloudfmc.Read(ctx, client, cloudfmc.NewReadInput())
+	fmcReadRes, err := cloudfmc.Read(ctx, client, cloudfmc.NewReadInput())
 	if err != nil {
 		return nil, err
 	}
 
 	// 2. read FMC specific device, i.e. the actual FMC
-	cloudFmcReadSpecificRes, err := cloudfmc.ReadSpecific(ctx, client, cloudfmc.NewReadSpecificInput(cloudFmcReadRes.Uid))
+	fmcReadSpecificRes, err := cloudfmc.ReadSpecific(ctx, client, cloudfmc.NewReadSpecificInput(fmcReadRes.Uid))
 	if err != nil {
 		return nil, err
 	}
 
-	// 3. schedule a state machine for cloudfmc to delete the cloud FTD
+	// 3. schedule a state machine for cloud fmc to delete the cloud FTD
 	_, err = fmcappliance.Update(
 		ctx,
 		client,
 		fmcappliance.NewUpdateInputBuilder().
-			FmcSpecificUid(cloudFmcReadSpecificRes.SpecificUid).
+			FmcSpecificUid(fmcReadSpecificRes.SpecificUid).
 			QueueTriggerState("PENDING_DELETE_FTDC").
 			StateMachineContext(map[string]string{"ftdCDeviceIDs": deleteInp.Uid}).
 			Build(),
@@ -51,7 +51,7 @@ func Delete(ctx context.Context, client http.Client, deleteInp DeleteInput) (*De
 	}
 
 	// 4. wait until the delete cloud FTD state machine has started
-	err = retry.Do(statemachine.UntilStarted(ctx, client, cloudFmcReadSpecificRes.SpecificUid, "fmceDeleteFtdcStateMachine"), retry.DefaultOpts)
+	err = retry.Do(statemachine.UntilStarted(ctx, client, fmcReadSpecificRes.SpecificUid, "fmceDeleteFtdcStateMachine"), retry.DefaultOpts)
 	if err != nil {
 		return nil, err
 	}

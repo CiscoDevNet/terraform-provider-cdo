@@ -11,18 +11,11 @@ provider "cdo" {
   api_token = "<replace-with-api-token-generated-from-cdo>"
 }
 
-resource "cdo_sdc" "example" {
-  name = "tf-sdc-1"
-}
-
-output "sdc_name" {
-  value = cdo_sdc.example.name
-}
-
-output "sdc_uid" {
-  value = cdo_sdc.example.id
-}
-
-output "sdc_bootstrap_data" {
-  value = cdo_sdc.example.bootstrap_data
+resource "cdo_asa_device" "my_asa" {
+  name               = "burak-crush-lavda"
+  connector_type     = "CDG"
+  socket_address     = "3.8.235.174:443"
+  username           = "lockhart"
+  password           = "BlueSkittles123!!"
+  ignore_certificate = false
 }

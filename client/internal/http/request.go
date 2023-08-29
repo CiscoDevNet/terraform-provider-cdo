@@ -129,7 +129,6 @@ func (r *Request) send(output any, contentType string) error {
 
 	// unmarshal if needed
 	if output != nil && len(resBody) > 0 {
-		println("output: " + string(resBody[:]))
 		err = json.Unmarshal(resBody, &output)
 		if err != nil {
 			r.Error = err

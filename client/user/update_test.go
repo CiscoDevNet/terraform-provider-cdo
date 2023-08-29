@@ -2,7 +2,6 @@ package user_test
 
 import (
 	"context"
-	"fmt"
 	netHttp "net/http"
 	"testing"
 	"time"
@@ -13,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreate(t *testing.T) {
+func TestUpdate(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
@@ -25,18 +24,17 @@ func TestCreate(t *testing.T) {
 			Type:      "users",
 		},
 	}
-
-	t.Run("successfully create user", func(t *testing.T) {
+	t.Run("Successfully update an existing user", func(t *testing.T) {
 		httpmock.Reset()
 		expected := user.UserDetails{
-			Name:        "george@example.com",
+			Name:        "jfk@example.com",
 			ApiOnlyUser: false,
 			UserRoles:   []string{"ROLE_SUPER_ADMIN"},
 		}
 
 		httpmock.RegisterResponder(
-			netHttp.MethodPost,
-			fmt.Sprintf("/anubis/rest/v1/users/%s", expected.Name),
+			netHttp.MethodPut,
+			"/anubis/rest/v1/users/"+validUserTenantAssociation.Source.Uid,
 			httpmock.NewJsonResponderOrPanic(200, validUserTenantAssociation),
 		)
 		httpmock.RegisterResponder(
@@ -45,35 +43,32 @@ func TestCreate(t *testing.T) {
 			httpmock.NewJsonResponderOrPanic(200, expected),
 		)
 
-		actual, err := user.Create(context.Background(), *http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute), *user.NewCreateUserInput(expected.Name, expected.UserRoles[0], expected.ApiOnlyUser))
+		actual, err := user.Update(context.Background(), *http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute), *user.NewUpdateByUidInput(validUserTenantAssociation.Source.Uid, []string{"ROLE_SUPER_ADMIN"}))
 
 		assert.NotNil(t, actual, "User details returned must not be nil")
 		assert.Equal(t, expected, *actual, "Actual user details do not match expected")
 		assert.Nil(t, err, "error should be nil")
 	})
 
-	t.Run("should error if failed to create user", func(t *testing.T) {
-		username := "bill@example.com"
-		apiOnlyUser := false
-		userRoles := []string{"ROLE_READ_ONLY"}
+	t.Run("should error if failed to update user", func(t *testing.T) {
+		httpmock.Reset()
+
 		httpmock.RegisterResponder(
-			netHttp.MethodPost,
-			fmt.Sprintf("/anubis/rest/v1/users/%s", username),
+			netHttp.MethodPut,
+			"/anubis/rest/v1/users/"+validUserTenantAssociation.Source.Uid,
 			httpmock.NewJsonResponderOrPanic(500, nil),
 		)
 
-		actual, err := user.Create(context.Background(), *http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute), *user.NewCreateUserInput(username, userRoles[0], apiOnlyUser))
-		assert.Nil(t, actual, "Expected actual user not to be created")
+		actual, err := user.Update(context.Background(), *http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute), *user.NewUpdateByUidInput(validUserTenantAssociation.Source.Uid, []string{"ROLE_SUPER_ADMIN"}))
+
+		assert.Nil(t, actual, "Expected actual user not to be updated")
 		assert.NotNil(t, err, "Expected error")
 	})
 
-	t.Run("should error if failed to read user details after creation", func(t *testing.T) {
-		username := "bill@example.com"
-		apiOnlyUser := false
-		userRoles := []string{"ROLE_READ_ONLY"}
+	t.Run("should error if failed to read user details after update", func(t *testing.T) {
 		httpmock.RegisterResponder(
-			netHttp.MethodPost,
-			fmt.Sprintf("/anubis/rest/v1/users/%s", username),
+			netHttp.MethodPut,
+			"/anubis/rest/v1/users/"+validUserTenantAssociation.Source.Uid,
 			httpmock.NewJsonResponderOrPanic(200, validUserTenantAssociation),
 		)
 		httpmock.RegisterResponder(
@@ -82,8 +77,8 @@ func TestCreate(t *testing.T) {
 			httpmock.NewJsonResponderOrPanic(500, nil),
 		)
 
-		actual, err := user.Create(context.Background(), *http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute), *user.NewCreateUserInput(username, userRoles[0], apiOnlyUser))
-		assert.Nil(t, actual, "Expected actual user not to be created")
+		actual, err := user.Update(context.Background(), *http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute), *user.NewUpdateByUidInput(validUserTenantAssociation.Source.Uid, []string{"ROLE_SUPER_ADMIN"}))
+		assert.Nil(t, actual, "Expected actual user not to be updated")
 		assert.NotNil(t, err, "Expected error")
 	})
 }

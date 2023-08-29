@@ -2,6 +2,7 @@ package user_test
 
 import (
 	"context"
+	netHttp "net/http"
 	"testing"
 	"time"
 
@@ -19,7 +20,7 @@ func TestDelete(t *testing.T) {
 		httpmock.Reset()
 		uid := "sample-user-uid"
 		httpmock.RegisterResponder(
-			"DELETE",
+			netHttp.MethodDelete,
 			"/anubis/rest/v1/users/"+uid,
 			httpmock.NewJsonResponderOrPanic(200, nil),
 		)
@@ -34,7 +35,7 @@ func TestDelete(t *testing.T) {
 		httpmock.Reset()
 		uid := "sample-user-uid"
 		httpmock.RegisterResponder(
-			"DELETE",
+			netHttp.MethodDelete,
 			"/anubis/rest/v1/users/"+uid,
 			httpmock.NewJsonResponderOrPanic(500, nil),
 		)

@@ -2,6 +2,7 @@ package user_test
 
 import (
 	"context"
+	netHttp "net/http"
 	"testing"
 	"time"
 
@@ -24,7 +25,7 @@ func TestReadByUid(t *testing.T) {
 			UserRoles:   []string{"ROLE_SUPER_ADMIN"},
 		}
 		httpmock.RegisterResponder(
-			"GET",
+			netHttp.MethodGet,
 			"/anubis/rest/v1/users/"+uid,
 			httpmock.NewJsonResponderOrPanic(200, expected),
 		)
@@ -40,7 +41,7 @@ func TestReadByUid(t *testing.T) {
 		httpmock.Reset()
 		uid := "sample-user-uid"
 		httpmock.RegisterResponder(
-			"GET",
+			netHttp.MethodGet,
 			"/anubis/rest/v1/users/"+uid,
 			httpmock.NewJsonResponderOrPanic(500, nil),
 		)

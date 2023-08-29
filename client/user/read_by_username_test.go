@@ -2,6 +2,7 @@ package user_test
 
 import (
 	"context"
+	netHttp "net/http"
 	"testing"
 	"time"
 
@@ -23,7 +24,7 @@ func TestReadByUsername(t *testing.T) {
 			UserRoles:   []string{"ROLE_ADMIN"},
 		}
 		httpmock.RegisterResponder(
-			"GET",
+			netHttp.MethodGet,
 			"/anubis/rest/v1/users?q=name:"+expected.Name,
 			httpmock.NewJsonResponderOrPanic(200, []user.UserDetails{expected}),
 		)
@@ -39,7 +40,7 @@ func TestReadByUsername(t *testing.T) {
 		httpmock.Reset()
 		name := "donald@example.com"
 		httpmock.RegisterResponder(
-			"GET",
+			netHttp.MethodGet,
 			"/anubis/rest/v1/users?q=name:"+name,
 			httpmock.NewJsonResponderOrPanic(500, nil),
 		)

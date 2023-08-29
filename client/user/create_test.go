@@ -3,6 +3,7 @@ package user_test
 import (
 	"context"
 	"fmt"
+	netHttp "net/http"
 	"testing"
 	"time"
 
@@ -34,12 +35,12 @@ func TestCreate(t *testing.T) {
 		}
 
 		httpmock.RegisterResponder(
-			"POST",
+			netHttp.MethodPost,
 			fmt.Sprintf("/anubis/rest/v1/users/%s", expected.Name),
 			httpmock.NewJsonResponderOrPanic(200, validUserTenantAssociation),
 		)
 		httpmock.RegisterResponder(
-			"GET",
+			netHttp.MethodGet,
 			"/anubis/rest/v1/users/"+validUserTenantAssociation.Source.Uid,
 			httpmock.NewJsonResponderOrPanic(200, expected),
 		)
@@ -55,7 +56,7 @@ func TestCreate(t *testing.T) {
 		apiOnlyUser := false
 		userRoles := []string{"ROLE_READ_ONLY"}
 		httpmock.RegisterResponder(
-			"POST",
+			netHttp.MethodPost,
 			fmt.Sprintf("/anubis/rest/v1/users/%s", username),
 			httpmock.NewJsonResponderOrPanic(500, nil),
 		)
@@ -70,12 +71,12 @@ func TestCreate(t *testing.T) {
 		apiOnlyUser := false
 		userRoles := []string{"ROLE_READ_ONLY"}
 		httpmock.RegisterResponder(
-			"POST",
+			netHttp.MethodPost,
 			fmt.Sprintf("/anubis/rest/v1/users/%s", username),
 			httpmock.NewJsonResponderOrPanic(200, validUserTenantAssociation),
 		)
 		httpmock.RegisterResponder(
-			"GET",
+			netHttp.MethodGet,
 			"/anubis/rest/v1/users/"+validUserTenantAssociation.Source.Uid,
 			httpmock.NewJsonResponderOrPanic(500, nil),
 		)

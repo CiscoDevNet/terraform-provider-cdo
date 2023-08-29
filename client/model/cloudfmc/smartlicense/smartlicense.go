@@ -1,16 +1,14 @@
 package smartlicense
 
-import (
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/internal"
-)
+import "github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/internal"
 
 type SmartLicense struct {
-	Items  []Item          `json:"items"`
-	Links  internal.Links  `json:"links"`
-	Paging internal.Paging `json:"paging"`
+	Items  []Item `json:"items"`
+	Links  Links  `json:"links"`
+	Paging Paging `json:"paging"`
 }
 
-func NewSmartLicense(items []Item, links internal.Links, paging internal.Paging) SmartLicense {
+func NewSmartLicense(items []Item, links Links, paging Paging) SmartLicense {
 	return SmartLicense{
 		Items:  items,
 		Links:  links,
@@ -55,3 +53,9 @@ func NewMetadata(
 		VirtualAccount:    virtualAccount,
 	}
 }
+
+type Links = internal.Links
+type Paging = internal.Paging
+
+var NewLinks = internal.NewLinks
+var NewPaging = internal.NewPaging

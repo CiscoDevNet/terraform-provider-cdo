@@ -28,6 +28,8 @@ type updateSpecificRequestBody struct {
 
 func UpdateSpecific(ctx context.Context, client http.Client, updateInp UpdateSpecificFtdInput) (*UpdateSpecificFtdOutput, error) {
 
+	client.Logger.Println("updating FTD specific device")
+
 	updateUrl := url.UpdateSpecificCloudFtd(client.BaseUrl(), updateInp.SpecificUid)
 
 	updateBody := updateSpecificRequestBody{

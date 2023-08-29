@@ -24,6 +24,7 @@ func TestCreateCloudFtd(t *testing.T) {
 	}{
 		{
 			testName: "successfully create Cloud FTD",
+			input:    cloudftd.NewCreateInput(ftdName, ftdAccessPolicyName, &ftdPerformanceTier, ftdVirtual, ftdLicenseCaps),
 			setupFunc: func() {
 				readFmcIsSuccessful(true)
 				readFmcDomainInfoIsSuccessful(true)
@@ -36,7 +37,7 @@ func TestCreateCloudFtd(t *testing.T) {
 			assertFunc: func(output *cloudftd.CreateOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
-				assert.Equal(t, validFtdCreateOutput, *output)
+				assert.Equal(t, validReadFtdGeneratedCommandOutput, *output)
 			},
 		},
 	}
@@ -142,13 +143,13 @@ func triggerFtdOnboardingIsSuccessful(success bool) {
 	if success {
 		httpmock.RegisterResponder(
 			http.MethodPut,
-			url.UpdateSpecificCloudFtd(baseUrl, createSpecificFtdUid),
+			url.UpdateSpecificCloudFtd(baseUrl, ftdSpecificUid),
 			httpmock.NewJsonResponderOrPanic(http.StatusOK, validUpdateSpecificFtdOutput),
 		)
 	} else {
 		httpmock.RegisterResponder(
 			http.MethodPut,
-			url.UpdateSpecificCloudFtd(baseUrl, createSpecificFtdUid),
+			url.UpdateSpecificCloudFtd(baseUrl, ftdSpecificUid),
 			httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, "internal server error"),
 		)
 	}
@@ -158,13 +159,13 @@ func generateFtdConfigureManagerCommandIsSuccessful(success bool) {
 	if success {
 		httpmock.RegisterResponder(
 			http.MethodGet,
-			url.ReadDevice(baseUrl, createdFtdUid),
+			url.ReadDevice(baseUrl, ftdUid),
 			httpmock.NewJsonResponderOrPanic(http.StatusOK, validReadFtdGeneratedCommandOutput),
 		)
 	} else {
 		httpmock.RegisterResponder(
 			http.MethodGet,
-			url.ReadDevice(baseUrl, createdFtdUid),
+			url.ReadDevice(baseUrl, ftdUid),
 			httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, "internal server error"),
 		)
 	}

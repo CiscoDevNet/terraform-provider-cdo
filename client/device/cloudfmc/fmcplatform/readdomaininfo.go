@@ -21,6 +21,8 @@ type ReadDomainInfoOutput = fmcdomain.Info
 
 func ReadFmcDomainInfo(ctx context.Context, client http.Client, readInp ReadDomainInfoInput) (*ReadDomainInfoOutput, error) {
 
+	client.Logger.Println("reading FMC domain info")
+
 	readUrl := url.ReadFmcDomainInfo(readInp.FmcHost)
 
 	req := client.NewGet(ctx, readUrl)

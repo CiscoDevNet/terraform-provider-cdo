@@ -5,7 +5,6 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc/fmcplatform"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/fmcdomain"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/internal"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
@@ -20,8 +19,8 @@ func TestReadDomainInfo(t *testing.T) {
 	defer httpmock.DeactivateAndReset()
 
 	validOutput := &fmcplatform.ReadDomainInfoOutput{
-		Links:  internal.NewLinks(links),
-		Paging: internal.NewPaging(count, offset, limit, pages),
+		Links:  fmcdomain.NewLinks(links),
+		Paging: fmcdomain.NewPaging(count, offset, limit, pages),
 		Items: []fmcdomain.Item{
 			fmcdomain.NewItem(uuid, name, type_),
 		},

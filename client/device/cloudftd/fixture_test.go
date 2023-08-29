@@ -12,14 +12,11 @@ import (
 const (
 	baseUrl = "https://unit-test.net"
 
-	deviceName              = "unit-test-device-name"
-	deviceUid               = "unit-test-uid"
-	deviceHost              = "https://unit-test.com"
-	devicePort              = 1234
-	deviceCloudConnectorUId = "unit-test-device-connector-uid"
-
+	fmcName      = "unit-test-device-name"
+	fmcUid       = "unit-test-uid"
 	fmcDomainUid = "unit-test-domain-uid"
 	fmcHost      = "unit-test-fmc-host.com"
+	fmcPort      = 1234
 	fmcLink      = "unit-test-fmc-link"
 
 	fmcDomainPages    = 123
@@ -28,7 +25,7 @@ const (
 	fmcDomainLimit    = 123
 	fmcDomainItemName = "unit-test-fmcDomainItemName"
 	fmcDomainItemType = "unit-test-fmcDomainItemType"
-	fmcDomainItemUid  = "unit-test-fmcDomainItemUid"
+	fmcDomainItemUid  = fmcDomainUid
 
 	fmcAccessPolicyPages    = 123
 	fmcAccessPolicyCount    = 123
@@ -38,14 +35,20 @@ const (
 	fmcAccessPolicyItemType = "unit-test-access-policy-item-type"
 	fmcAccessPolicyItemUid  = "unit-test-access-policy-item-uid"
 
-	ftdName = "unit-test-ftdName"
-	ftdUid  = "unit-test-ftdUid"
+	ftdName    = "unit-test-ftdName"
+	ftdUid     = "unit-test-ftdUid"
+	ftdVirtual = true
 
 	ftdGeneratedCommand   = "unit-test-ftdGeneratedCommand"
-	ftdAccessPolicyName   = "unit-test-ftdAccessPolicyName"
+	ftdAccessPolicyName   = fmcAccessPolicyItemName
 	ftdNatID              = "unit-test-ftdNatID"
-	ftdCloudManagerDomain = "unit-test-ftdCloudManagerDomain"
+	ftdCloudManagerDomain = "unit-test-ftdCloudManagerDomain.com"
 	ftdRegKey             = "unit-test-ftdRegKey"
+
+	ftdSpecificUid       = "unit-test-ftd-specific-uid"
+	ftdSpecificType      = "unit-test-ftd-specific-type"
+	ftdSpecificState     = "unit-test-ftd-specific-state"
+	ftdSpecificNamespace = "unit-test-ftd-specific-namespace"
 )
 
 var (
@@ -54,13 +57,14 @@ var (
 )
 
 var (
-	validReadFmcOutput = device.NewReadOutputBuilder().
-				AsCloudFmc().
-				WithName(deviceName).
-				WithUid(deviceUid).
-				WithLocation(deviceHost, devicePort).
-				OnboardedUsingCloudConnector(deviceCloudConnectorUId).
-				Build()
+	validReadFmcOutput = []device.ReadOutput{
+		device.NewReadOutputBuilder().
+			AsCloudFmc().
+			WithName(fmcName).
+			WithUid(fmcUid).
+			WithLocation(fmcHost, fmcPort).
+			Build(),
+	}
 
 	validReadFmcDomainInfoOutput = fmcdomain.NewInfoBuilder().
 					Links(fmcdomain.NewLinks(fmcLink)).
@@ -95,16 +99,34 @@ var (
 				Uid(ftdUid).
 				Metadata(cloudftd.NewMetadataBuilder().
 					LicenseCaps(ftdLicenseCaps).
-					GeneratedCommand(ftdGeneratedCommand).
 					AccessPolicyName(ftdAccessPolicyName).
 					PerformanceTier(&ftdPerformanceTier).
-					NatID(ftdNatID).
 					CloudManagerDomain(ftdCloudManagerDomain).
-					RegKey(ftdRegKey).
 					Build()).
 				Build()
 
 	validUpdateSpecificFtdOutput = cloudftd.NewUpdateSpecificFtdOutputBuilder().
 					SpecificUid(ftdSpecificUid).
 					Build()
+
+	validReadFtdSpecificDeviceOutput = cloudftd.NewReadSpecificOutputBuilder().
+						SpecificUid(ftdSpecificUid).
+						Type(ftdSpecificType).
+						State(ftdSpecificState).
+						Namespace(ftdSpecificNamespace).
+						Build()
+
+	validReadFtdGeneratedCommandOutput = cloudftd.NewCreateOutputBuilder().
+						Name(ftdName).
+						Uid(ftdUid).
+						Metadata(cloudftd.NewMetadataBuilder().
+							LicenseCaps(ftdLicenseCaps).
+							GeneratedCommand(ftdGeneratedCommand).
+							AccessPolicyName(ftdAccessPolicyName).
+							PerformanceTier(&ftdPerformanceTier).
+							NatID(ftdNatID).
+							CloudManagerDomain(ftdCloudManagerDomain).
+							RegKey(ftdRegKey).
+							Build()).
+						Build()
 )

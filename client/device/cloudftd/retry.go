@@ -10,6 +10,8 @@ import (
 func UntilGeneratedCommandAvailable(ctx context.Context, client http.Client, uid string, metadata *Metadata) retry.Func {
 
 	return func() (bool, error) {
+		client.Logger.Println("checking if FTD generated command is available")
+
 		readOutp, err := ReadByUid(ctx, client, NewReadByUidInput(uid))
 		if err != nil {
 			return false, err

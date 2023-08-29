@@ -21,7 +21,7 @@ func (b *MetadataBuilder) AccessPolicyName(accessPolicyName string) *MetadataBui
 }
 
 func (b *MetadataBuilder) AccessPolicyUuid(accessPolicyUuid string) *MetadataBuilder {
-	b.metadata.AccessPolicyUuid = accessPolicyUuid
+	b.metadata.AccessPolicyUid = accessPolicyUuid
 	return b
 }
 

@@ -21,7 +21,7 @@ func (b *CreateOutputBuilder) Name(name string) *CreateOutputBuilder {
 }
 
 func (b *CreateOutputBuilder) Metadata(metadata Metadata) *CreateOutputBuilder {
-	b.createOutput.Metadata = metadata
+	b.createOutput.Metadata = &metadata
 	return b
 }
 

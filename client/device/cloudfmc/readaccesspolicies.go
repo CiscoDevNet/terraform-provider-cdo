@@ -26,6 +26,8 @@ type ReadAccessPoliciesOutput = accesspolicies.AccessPolicies
 
 func ReadAccessPolicies(ctx context.Context, client http.Client, inp ReadAccessPoliciesInput) (*ReadAccessPoliciesOutput, error) {
 
+	client.Logger.Println("reading FMC Access Policies")
+
 	readUrl := url.ReadAccessPolicies(client.BaseUrl(), inp.DomainUid)
 
 	req := client.NewGet(ctx, readUrl)

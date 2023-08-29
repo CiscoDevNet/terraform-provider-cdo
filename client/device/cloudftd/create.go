@@ -9,12 +9,10 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/cdo"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/sliceutil"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
-	"strings"
 )
 
 type CreateInput struct {
@@ -26,9 +24,9 @@ type CreateInput struct {
 }
 
 type CreateOutput struct {
-	Uid      string   `json:"uid"`
-	Name     string   `json:"name"`
-	Metadata Metadata `json:"metadata"`
+	Uid      string    `json:"uid"`
+	Name     string    `json:"name"`
+	Metadata *Metadata `json:"metadata"`
 }
 
 func NewCreateInput(
@@ -50,23 +48,16 @@ func NewCreateInput(
 type createRequestBody struct {
 	FmcId      string          `json:"associatedDeviceUid"`
 	DeviceType devicetype.Type `json:"deviceType"`
-	Metadata   metadata        `json:"metadata"`
+	Metadata   *Metadata       `json:"metadata"`
 	Name       string          `json:"name"`
 	State      string          `json:"state"` // TODO: use queueTriggerState?
 	Type       string          `json:"type"`
 	Model      bool            `json:"model"`
 }
 
-type metadata struct {
-	AccessPolicyName string     `json:"accessPolicyName"`
-	AccessPolicyId   string     `json:"accessPolicyUuid"`
-	LicenseCaps      string     `json:"license_caps"`
-	PerformanceTier  *tier.Type `json:"performanceTier"`
-}
-
 func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, error) {
 
-	client.Logger.Println("creating cloudftd")
+	client.Logger.Println("creating cloud ftd")
 
 	// 1. read Cloud FMC
 	fmcRes, err := cloudfmc.Read(ctx, client, cloudfmc.NewReadInput())
@@ -102,20 +93,13 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		)
 	}
 
-	// handle selected license caps
-	licenseCaps := strings.Join( // join strings by comma
-		sliceutil.Map( // map license.Type to string
-			createInp.Licenses,
-			func(l license.Type) string { return string(l) },
-		),
-		",",
-	)
-
 	// handle performance tier
 	var performanceTier *tier.Type = nil // physical is nil
 	if createInp.Virtual {
 		performanceTier = createInp.PerformanceTier
 	}
+
+	client.Logger.Println("posting FTD device")
 
 	// 4. create the cloud ftd device
 	createUrl := url.CreateDevice(client.BaseUrl())
@@ -123,10 +107,10 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		Name:       createInp.Name,
 		FmcId:      fmcRes.Uid,
 		DeviceType: devicetype.CloudFtd,
-		Metadata: metadata{
+		Metadata: &Metadata{
 			AccessPolicyName: selectedPolicy.Name,
-			AccessPolicyId:   selectedPolicy.Id,
-			LicenseCaps:      licenseCaps,
+			AccessPolicyUid:  selectedPolicy.Id,
+			LicenseCaps:      createInp.Licenses,
 			PerformanceTier:  performanceTier,
 		},
 		State: "NEW",
@@ -138,6 +122,8 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	if err := createReq.Send(&createOup); err != nil {
 		return nil, err
 	}
+
+	client.Logger.Println("reading FTD specific device")
 
 	// 5. read created cloud ftd's specific device's uid
 	readSpecRes, err := device.ReadSpecific(ctx, client, *device.NewReadSpecificInput(createOup.Uid))
@@ -164,6 +150,6 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	return &CreateOutput{
 		Uid:      createOup.Uid,
 		Name:     createOup.Name,
-		Metadata: metadata,
+		Metadata: &metadata,
 	}, nil
 }

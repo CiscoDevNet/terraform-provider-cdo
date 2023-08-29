@@ -39,7 +39,7 @@ func TestAccUserDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr("data.cdo_user.test", "name", testUser.Name),
 					resource.TestCheckResourceAttr("data.cdo_user.test", "id", testUser.Uid),
 					resource.TestCheckResourceAttr("data.cdo_user.test", "is_api_only_user", strconv.FormatBool(testUser.ApiOnlyUser)),
-					resource.TestCheckResourceAttr("data.cdo_user.role", "role", testUser.UserRole),
+					resource.TestCheckResourceAttr("data.cdo_user.test", "role", testUser.UserRole),
 				),
 			},
 		},

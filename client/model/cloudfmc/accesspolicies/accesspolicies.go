@@ -1,16 +1,14 @@
 package accesspolicies
 
-import (
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/fmccommon"
-)
+import "github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/internal"
 
 type AccessPolicies struct {
-	Items  []Item           `json:"items"`
-	Links  fmccommon.Links  `json:"links"`
-	Paging fmccommon.Paging `json:"paging"`
+	Items  []Item `json:"items"`
+	Links  Links  `json:"links"`
+	Paging Paging `json:"paging"`
 }
 
-func New(items []Item, links fmccommon.Links, paging fmccommon.Paging) AccessPolicies {
+func New(items []Item, links Links, paging Paging) AccessPolicies {
 	return AccessPolicies{
 		Items:  items,
 		Links:  links,
@@ -29,13 +27,13 @@ func (policies *AccessPolicies) Find(name string) (item Item, ok bool) {
 }
 
 type Item struct {
-	Links fmccommon.Links `json:"links"`
-	Id    string          `json:"id"`
-	Name  string          `json:"name"`
-	Type  string          `json:"type"`
+	Links Links  `json:"links"`
+	Id    string `json:"id"`
+	Name  string `json:"name"`
+	Type  string `json:"type"`
 }
 
-func NewItem(id, name, type_ string, links fmccommon.Links) Item {
+func NewItem(id, name, type_ string, links Links) Item {
 	return Item{
 		Id:    id,
 		Name:  name,
@@ -43,3 +41,9 @@ func NewItem(id, name, type_ string, links fmccommon.Links) Item {
 		Links: links,
 	}
 }
+
+type Links = internal.Links
+type Paging = internal.Paging
+
+var NewLinks = internal.NewLinks
+var NewPaging = internal.NewPaging

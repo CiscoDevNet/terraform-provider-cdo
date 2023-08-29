@@ -1,4 +1,4 @@
-package fmccommon
+package internal
 
 type Paging struct {
 	Count  int `json:"count"`

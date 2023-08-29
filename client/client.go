@@ -122,11 +122,11 @@ func (c *Client) DeleteGenericSSH(ctx context.Context, inp genericssh.DeleteInpu
 	return genericssh.Delete(ctx, c.client, inp)
 }
 
-func (c *Client) ReadCloudFtdByUid(ctx context.Context, inp cloudftd.ReadByUidInput) (*cloudftd.ReadByUidOutput, error) {
+func (c *Client) ReadCloudFtdByUid(ctx context.Context, inp cloudftd.ReadByUidInput) (*cloudftd.ReadOutput, error) {
 	return cloudftd.ReadByUid(ctx, c.client, inp)
 }
 
-func (c *Client) ReadCloudFtdByName(ctx context.Context, inp cloudftd.ReadByNameInput) (*cloudftd.ReadByNameOutput, error) {
+func (c *Client) ReadCloudFtdByName(ctx context.Context, inp cloudftd.ReadByNameInput) (*cloudftd.ReadOutput, error) {
 	return cloudftd.ReadByName(ctx, c.client, inp)
 }
 

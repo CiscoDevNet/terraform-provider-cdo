@@ -19,7 +19,7 @@ func NewReadByUidInput(uid string) ReadByUidInput {
 	}
 }
 
-type ReadByUidOutput struct {
+type ReadOutput struct {
 	Uid      string   `json:"uid"`
 	Name     string   `json:"name"`
 	Metadata Metadata `json:"metadata,omitempty"`
@@ -72,12 +72,12 @@ func (metadata *Metadata) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func ReadByUid(ctx context.Context, client http.Client, readInp ReadByUidInput) (*ReadByUidOutput, error) {
+func ReadByUid(ctx context.Context, client http.Client, readInp ReadByUidInput) (*ReadOutput, error) {
 
 	readUrl := url.ReadDevice(client.BaseUrl(), readInp.Uid)
 	req := client.NewGet(ctx, readUrl)
 
-	var readOutp ReadByUidOutput
+	var readOutp ReadOutput
 	if err := req.Send(&readOutp); err != nil {
 		return nil, err
 	}

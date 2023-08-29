@@ -19,18 +19,12 @@ func NewReadByNameInput(name string) ReadByNameInput {
 	}
 }
 
-type ReadByNameOutput struct {
-	Uid      string   `json:"uid"`
-	Name     string   `json:"name"`
-	Metadata Metadata `json:"metadata,omitempty"`
-}
-
-func ReadByName(ctx context.Context, client http.Client, readInp ReadByNameInput) (*ReadByNameOutput, error) {
+func ReadByName(ctx context.Context, client http.Client, readInp ReadByNameInput) (*ReadOutput, error) {
 
 	readUrl := url.ReadDeviceByNameAndType(client.BaseUrl(), readInp.Name, devicetype.CloudFtd)
 	req := client.NewGet(ctx, readUrl)
 
-	var readOutp []ReadByNameOutput
+	var readOutp []ReadOutput
 	if err := req.Send(&readOutp); err != nil {
 		return nil, err
 	}

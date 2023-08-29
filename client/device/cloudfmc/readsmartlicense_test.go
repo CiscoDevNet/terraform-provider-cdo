@@ -5,7 +5,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/fmccommon"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/internal"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/smartlicense"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
@@ -32,8 +32,8 @@ func TestSmartLicenseRead(t *testing.T) {
 			smartLicenseType,
 		),
 	)
-	validSmartLicenseLinks := fmccommon.NewLinks(smartLicenseSelfLink)
-	validSmartLicensePaging := fmccommon.NewPaging(
+	validSmartLicenseLinks := internal.NewLinks(smartLicenseSelfLink)
+	validSmartLicensePaging := internal.NewPaging(
 		smartLicenseCount,
 		smartLicenseOffset,
 		smartLicenseLimit,

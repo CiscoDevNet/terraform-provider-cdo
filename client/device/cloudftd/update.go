@@ -22,7 +22,7 @@ type updateRequestBody struct {
 	Name string `json:"name"`
 }
 
-type UpdateOutput = ReadByUidOutput
+type UpdateOutput = ReadOutput
 
 func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*UpdateOutput, error) {
 

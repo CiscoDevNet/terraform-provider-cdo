@@ -94,13 +94,13 @@ func readFmcAccessPoliciesIsSuccessful(success bool) {
 	if success {
 		httpmock.RegisterResponder(
 			http.MethodGet,
-			url.ReadAccessPolicies(baseUrl, domainUid),
+			url.ReadAccessPolicies(baseUrl, fmcDomainUid),
 			httpmock.NewJsonResponderOrPanic(http.StatusOK, validReadAccessPoliciesOutput),
 		)
 	} else {
 		httpmock.RegisterResponder(
 			http.MethodGet,
-			url.ReadAccessPolicies(baseUrl, domainUid),
+			url.ReadAccessPolicies(baseUrl, fmcDomainUid),
 			httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, "internal server error"),
 		)
 	}
@@ -126,13 +126,13 @@ func readFtdSpecificDeviceIsSuccessful(success bool) {
 	if success {
 		httpmock.RegisterResponder(
 			http.MethodGet,
-			url.ReadSpecificDevice(baseUrl, createdFtdUid),
+			url.ReadSpecificDevice(baseUrl, ftdUid),
 			httpmock.NewJsonResponderOrPanic(http.StatusOK, validReadFtdSpecificDeviceOutput),
 		)
 	} else {
 		httpmock.RegisterResponder(
 			http.MethodGet,
-			url.ReadSpecificDevice(baseUrl, createdFtdUid),
+			url.ReadSpecificDevice(baseUrl, ftdUid),
 			httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, "internal server error"),
 		)
 	}

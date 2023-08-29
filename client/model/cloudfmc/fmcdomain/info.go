@@ -1,16 +1,16 @@
 package fmcdomain
 
 import (
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/fmccommon"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/internal"
 )
 
 type Info struct {
-	Links  fmccommon.Links  `json:"links"`
-	Paging fmccommon.Paging `json:"paging"`
-	Items  []Item           `json:"items"`
+	Links  Links  `json:"links"`
+	Paging Paging `json:"paging"`
+	Items  []Item `json:"items"`
 }
 
-func NewInfo(links fmccommon.Links, paging fmccommon.Paging, items []Item) Info {
+func NewInfo(links Links, paging Paging, items []Item) Info {
 	return Info{
 		Links:  links,
 		Paging: paging,
@@ -31,3 +31,9 @@ func NewItem(uuid, name, type_ string) Item {
 		Type: type_,
 	}
 }
+
+type Links = internal.Links
+type Paging = internal.Paging
+
+var NewLinks = internal.NewLinks
+var NewPaging = internal.NewPaging

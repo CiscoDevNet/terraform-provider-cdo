@@ -89,3 +89,7 @@ func ReadUserByUsername(baseUrl string, username string) string {
 func UserByUid(baseUrl string, uid string) string {
 	return fmt.Sprintf("%s/anubis/rest/v1/users/%s", baseUrl, uid)
 }
+
+func GenerateApiToken(baseUrl string, username string) string {
+	return fmt.Sprintf("%s/anubis/rest/v1/oauth/token/%s", baseUrl, username)
+}

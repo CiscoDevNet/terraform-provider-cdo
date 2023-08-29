@@ -142,3 +142,7 @@ func (c *Client) DeleteUser(ctx context.Context, inp user.DeleteUserInput) (*use
 func (c *Client) UpdateUser(ctx context.Context, inp user.UpdateUserInput) (*user.UserDetails, error) {
 	return user.Update(ctx, c.client, inp)
 }
+
+func (c *Client) GenerateApiToken(ctx context.Context, inp user.GenerateApiTokenInput) (*user.ApiTokenResponse, error) {
+	return user.GenerateApiToken(ctx, c.client, inp)
+}

@@ -41,8 +41,16 @@ type ReadByUsernameInput struct {
 	Name string `json:"name"`
 }
 
+type GenerateApiTokenInput struct {
+	Name string `json:"name"`
+}
+
 type ReadByUidInput struct {
 	Uid string `json:"uid"`
+}
+
+type ApiTokenResponse struct {
+	ApiToken string `json:"access_token"`
 }
 
 func NewCreateUserInput(username string, userRoles string, apiOnlyUser bool) *CreateUserInput {
@@ -55,6 +63,12 @@ func NewCreateUserInput(username string, userRoles string, apiOnlyUser bool) *Cr
 
 func NewReadByUsernameInput(name string) *ReadByUsernameInput {
 	return &ReadByUsernameInput{
+		Name: name,
+	}
+}
+
+func NewGenerateApiTokenInput(name string) *GenerateApiTokenInput {
+	return &GenerateApiTokenInput{
 		Name: name,
 	}
 }

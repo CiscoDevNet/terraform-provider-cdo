@@ -18,6 +18,12 @@ func NewCreateRequest(ctx context.Context, client http.Client, createInp CreateU
 	return client.NewPost(ctx, url, body)
 }
 
+func NewGenerateApiTokenRequest(ctx context.Context, client http.Client, generateApiTokenInp GenerateApiTokenInput) *http.Request {
+	url := url.GenerateApiToken(client.BaseUrl(), generateApiTokenInp.Name)
+	var body = struct{}{}
+	return client.NewPost(ctx, url, body)
+}
+
 func NewReadByUidRequest(ctx context.Context, client http.Client, uid string) *http.Request {
 	url := url.UserByUid(client.BaseUrl(), uid)
 	return client.NewGet(ctx, url)

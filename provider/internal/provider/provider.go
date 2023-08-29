@@ -10,6 +10,7 @@ import (
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/user"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/user_api_token"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/device/ios"
 
@@ -150,6 +151,7 @@ func (p *CdoProvider) Resources(ctx context.Context) []func() resource.Resource 
 		asa.NewAsaDeviceResource,
 		ios.NewIosDeviceResource,
 		user.NewResource,
+		user_api_token.NewResource,
 	}
 }
 

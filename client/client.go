@@ -146,3 +146,7 @@ func (c *Client) UpdateUser(ctx context.Context, inp user.UpdateUserInput) (*use
 func (c *Client) GenerateApiToken(ctx context.Context, inp user.GenerateApiTokenInput) (*user.ApiTokenResponse, error) {
 	return user.GenerateApiToken(ctx, c.client, inp)
 }
+
+func (c *Client) RevokeApiToken(ctx context.Context, inp user.RevokeApiTokenInput) (*user.RevokeApiTokenOutput, error) {
+	return user.RevokeApiToken(ctx, c.client, inp)
+}

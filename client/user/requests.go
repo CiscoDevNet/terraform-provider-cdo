@@ -24,6 +24,12 @@ func NewGenerateApiTokenRequest(ctx context.Context, client http.Client, generat
 	return client.NewPost(ctx, url, body)
 }
 
+func NewRevokeOauthTokenRequest(ctx context.Context, client http.Client, revokeApiTokenInp RevokeOAuthTokenInput) *http.Request {
+	url := url.RevokeApiToken(client.BaseUrl(), revokeApiTokenInp.ApiTokenId)
+	var body = struct{}{}
+	return client.NewPost(ctx, url, body)
+}
+
 func NewReadByUidRequest(ctx context.Context, client http.Client, uid string) *http.Request {
 	url := url.UserByUid(client.BaseUrl(), uid)
 	return client.NewGet(ctx, url)

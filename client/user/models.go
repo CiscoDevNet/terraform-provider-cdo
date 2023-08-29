@@ -17,6 +17,8 @@ type DeleteUserInput struct {
 
 type DeleteUserOutput struct{}
 
+type RevokeApiTokenOutput struct{}
+
 // CreateUser endpoint returns a user-tenant association for whatever reason
 type UserTenantAssociation struct {
 	Uid    string      `json:"uid"`
@@ -29,6 +31,7 @@ type UserDetails struct {
 	UserRoles           []string `json:"roles"`
 	ApiOnlyUser         bool     `json:"isApiOnlyUser"`
 	LastSuccessfulLogin int64    `json:"lastSuccessfulLogin"`
+	ApiTokenId          string   `json:"apiTokenId"`
 }
 
 type Association struct {
@@ -43,6 +46,14 @@ type ReadByUsernameInput struct {
 
 type GenerateApiTokenInput struct {
 	Name string `json:"name"`
+}
+
+type RevokeApiTokenInput struct {
+	Name string `json:"name"`
+}
+
+type RevokeOAuthTokenInput struct {
+	ApiTokenId string `json:"apiTokenId"`
 }
 
 type ReadByUidInput struct {
@@ -70,6 +81,18 @@ func NewReadByUsernameInput(name string) *ReadByUsernameInput {
 func NewGenerateApiTokenInput(name string) *GenerateApiTokenInput {
 	return &GenerateApiTokenInput{
 		Name: name,
+	}
+}
+
+func NewRevokeApiTokenInput(name string) *RevokeApiTokenInput {
+	return &RevokeApiTokenInput{
+		Name: name,
+	}
+}
+
+func NewRevokeOAuthTokenInput(apiTokenId string) *RevokeOAuthTokenInput {
+	return &RevokeOAuthTokenInput{
+		ApiTokenId: apiTokenId,
 	}
 }
 

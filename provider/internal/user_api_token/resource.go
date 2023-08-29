@@ -69,6 +69,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"api_token": schema.StringAttribute{
 				MarkdownDescription: "The API token for the user. This API token has no expiry; to re-generate it, delete the resource and recreate it.",
 				Computed:            true,
+				Sensitive:           true,
 			},
 		},
 	}
@@ -105,21 +106,21 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, res *
 func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, res *resource.DeleteResponse) {
 	tflog.Trace(ctx, "TODO")
 
-	// // 1. read state data from terraform state
-	// var stateData UserResourceModel
-	// res.Diagnostics.Append(req.State.Get(ctx, &stateData)...)
-	// if res.Diagnostics.HasError() {
-	// 	return
-	// }
+	// 1. read state data from terraform state
+	var stateData ApiTokenResourceModel
+	res.Diagnostics.Append(req.State.Get(ctx, &stateData)...)
+	if res.Diagnostics.HasError() {
+		return
+	}
 
-	// // 2. delete the resource
-	// deleteUserInput := user.DeleteUserInput{
-	// 	Uid: stateData.ID.ValueString(),
-	// }
-	// _, err := r.client.DeleteUser(ctx, deleteUserInput)
-	// if err != nil {
-	// 	res.Diagnostics.AddError("failed to delete User resource", err.Error())
-	// }
+	// 2. delete the resource
+	deleteUserInput := user.RevokeApiTokenInput{
+		Name: stateData.Username.ValueString(),
+	}
+	_, err := r.client.RevokeApiToken(ctx, deleteUserInput)
+	if err != nil {
+		res.Diagnostics.AddError("failed to delete User resource", err.Error())
+	}
 }
 
 func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequest, res *resource.ImportStateResponse) {

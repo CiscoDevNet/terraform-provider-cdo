@@ -40,6 +40,119 @@ func TestCreateCloudFtd(t *testing.T) {
 				assert.Equal(t, validReadFtdGeneratedCommandOutput, *output)
 			},
 		},
+		{
+			testName: "error when failed to read FMC",
+			input:    cloudftd.NewCreateInput(ftdName, ftdAccessPolicyName, &ftdPerformanceTier, ftdVirtual, ftdLicenseCaps),
+			setupFunc: func() {
+				readFmcIsSuccessful(false)
+			},
+			assertFunc: func(output *cloudftd.CreateOutput, err error, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+			},
+		},
+		{
+			testName: "error when failed to read FMC domain info",
+			input:    cloudftd.NewCreateInput(ftdName, ftdAccessPolicyName, &ftdPerformanceTier, ftdVirtual, ftdLicenseCaps),
+			setupFunc: func() {
+				readFmcIsSuccessful(true)
+				readFmcDomainInfoIsSuccessful(false)
+				readFmcAccessPoliciesIsSuccessful(true)
+				createFtdIsSuccessful(true)
+				readFtdSpecificDeviceIsSuccessful(true)
+				triggerFtdOnboardingIsSuccessful(true)
+				generateFtdConfigureManagerCommandIsSuccessful(true)
+			},
+			assertFunc: func(output *cloudftd.CreateOutput, err error, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+			},
+		},
+		{
+			testName: "error when failed to read FMC Access Policy",
+			input:    cloudftd.NewCreateInput(ftdName, ftdAccessPolicyName, &ftdPerformanceTier, ftdVirtual, ftdLicenseCaps),
+			setupFunc: func() {
+				readFmcIsSuccessful(true)
+				readFmcDomainInfoIsSuccessful(true)
+				readFmcAccessPoliciesIsSuccessful(false)
+				createFtdIsSuccessful(true)
+				readFtdSpecificDeviceIsSuccessful(true)
+				triggerFtdOnboardingIsSuccessful(true)
+				generateFtdConfigureManagerCommandIsSuccessful(true)
+			},
+			assertFunc: func(output *cloudftd.CreateOutput, err error, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+			},
+		},
+		{
+			testName: "error when failed to create FTD",
+			input:    cloudftd.NewCreateInput(ftdName, ftdAccessPolicyName, &ftdPerformanceTier, ftdVirtual, ftdLicenseCaps),
+			setupFunc: func() {
+				readFmcIsSuccessful(true)
+				readFmcDomainInfoIsSuccessful(true)
+				readFmcAccessPoliciesIsSuccessful(true)
+				createFtdIsSuccessful(false)
+				readFtdSpecificDeviceIsSuccessful(true)
+				triggerFtdOnboardingIsSuccessful(true)
+				generateFtdConfigureManagerCommandIsSuccessful(true)
+			},
+			assertFunc: func(output *cloudftd.CreateOutput, err error, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+			},
+		},
+		{
+			testName: "error when failed to read FTD specific device",
+			input:    cloudftd.NewCreateInput(ftdName, ftdAccessPolicyName, &ftdPerformanceTier, ftdVirtual, ftdLicenseCaps),
+			setupFunc: func() {
+				readFmcIsSuccessful(true)
+				readFmcDomainInfoIsSuccessful(true)
+				readFmcAccessPoliciesIsSuccessful(true)
+				createFtdIsSuccessful(true)
+				readFtdSpecificDeviceIsSuccessful(false)
+				triggerFtdOnboardingIsSuccessful(true)
+				generateFtdConfigureManagerCommandIsSuccessful(true)
+			},
+			assertFunc: func(output *cloudftd.CreateOutput, err error, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+			},
+		},
+		{
+			testName: "error when failed to read trigger FTD onboarding",
+			input:    cloudftd.NewCreateInput(ftdName, ftdAccessPolicyName, &ftdPerformanceTier, ftdVirtual, ftdLicenseCaps),
+			setupFunc: func() {
+				readFmcIsSuccessful(true)
+				readFmcDomainInfoIsSuccessful(true)
+				readFmcAccessPoliciesIsSuccessful(true)
+				createFtdIsSuccessful(true)
+				readFtdSpecificDeviceIsSuccessful(true)
+				triggerFtdOnboardingIsSuccessful(false)
+				generateFtdConfigureManagerCommandIsSuccessful(true)
+			},
+			assertFunc: func(output *cloudftd.CreateOutput, err error, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+			},
+		},
+		{
+			testName: "error when failed to read retrieve FTD configure manager command",
+			input:    cloudftd.NewCreateInput(ftdName, ftdAccessPolicyName, &ftdPerformanceTier, ftdVirtual, ftdLicenseCaps),
+			setupFunc: func() {
+				readFmcIsSuccessful(true)
+				readFmcDomainInfoIsSuccessful(true)
+				readFmcAccessPoliciesIsSuccessful(true)
+				createFtdIsSuccessful(true)
+				readFtdSpecificDeviceIsSuccessful(true)
+				triggerFtdOnboardingIsSuccessful(true)
+				generateFtdConfigureManagerCommandIsSuccessful(false)
+			},
+			assertFunc: func(output *cloudftd.CreateOutput, err error, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+			},
+		},
 	}
 
 	for _, testCase := range testCases {

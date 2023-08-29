@@ -138,6 +138,9 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 			"INITIATE_FTDC_ONBOARDING",
 		),
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	// 8. wait for generate command available
 	var metadata Metadata

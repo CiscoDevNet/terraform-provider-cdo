@@ -4,10 +4,12 @@ package client
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/genericssh"
-	"net/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios"
@@ -119,4 +121,24 @@ func (c *Client) UpdateGenericSSH(ctx context.Context, inp genericssh.UpdateInpu
 
 func (c *Client) DeleteGenericSSH(ctx context.Context, inp genericssh.DeleteInput) (*genericssh.DeleteOutput, error) {
 	return genericssh.Delete(ctx, c.client, inp)
+}
+
+func (c *Client) ReadUserByUsername(ctx context.Context, inp user.ReadByUsernameInput) (*user.UserDetails, error) {
+	return user.ReadByUsername(ctx, c.client, inp)
+}
+
+func (c *Client) ReadUserByUid(ctx context.Context, inp user.ReadByUidInput) (*user.UserDetails, error) {
+	return user.ReadByUid(ctx, c.client, inp)
+}
+
+func (c *Client) CreateUser(ctx context.Context, inp user.CreateUserInput) (*user.UserDetails, error) {
+	return user.Create(ctx, c.client, inp)
+}
+
+func (c *Client) DeleteUser(ctx context.Context, inp user.DeleteUserInput) (*user.DeleteUserOutput, error) {
+	return user.Delete(ctx, c.client, inp)
+}
+
+func (c *Client) UpdateUser(ctx context.Context, inp user.UpdateUserInput) (*user.UserDetails, error) {
+	return user.Update(ctx, c.client, inp)
 }

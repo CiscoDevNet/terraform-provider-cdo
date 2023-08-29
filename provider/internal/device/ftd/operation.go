@@ -23,7 +23,7 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 	stateData.ID = types.StringValue(res.Uid)
 	stateData.Name = types.StringValue(res.Name)
 	stateData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
-	stateData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUuid)
+	stateData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUid)
 	stateData.Virtual = types.BoolValue(res.Metadata.PerformanceTier != nil)
 	stateData.Licenses = util.GoStringSliceToTFStringList(sliceutil.Map(res.Metadata.LicenseCaps, func(l license.Type) string { return string(l) }))
 	if res.Metadata.PerformanceTier != nil { // nil means physical cloudftd
@@ -47,7 +47,7 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 	}
 
 	licensesGoList := util.TFStringListToGoStringList(planData.Licenses)
-	licenses, err := sliceutil.MapWithError(licensesGoList, func(s string) (license.Type, error) { return license.Parse(s) })
+	licenses, err := sliceutil.MapWithError(licensesGoList, func(s string) (license.Type, error) { return license.Deserialize(s) })
 	if err != nil {
 		return err
 	}
@@ -67,7 +67,7 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 	planData.ID = types.StringValue(res.Uid)
 	planData.Name = types.StringValue(res.Name)
 	planData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
-	planData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUuid)
+	planData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUid)
 	planData.Virtual = types.BoolValue(res.Metadata.PerformanceTier != nil)
 	planData.Licenses = util.GoStringSliceToTFStringList(sliceutil.Map(res.Metadata.LicenseCaps, func(l license.Type) string { return string(l) }))
 	if res.Metadata.PerformanceTier != nil { // nil means physical cloud ftd

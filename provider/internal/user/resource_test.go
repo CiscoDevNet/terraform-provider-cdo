@@ -31,7 +31,7 @@ var testResource_NewName = acctest.MustOverrideFields(testUserResource, map[stri
 })
 var testResourceConfig_NewName = acctest.MustParseTemplate(testResourceTemplate, testResource_NewName)
 
-func TestAccSdcResource(t *testing.T) {
+func TestAccUserResource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 acctest.PreCheckFunc(t),
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,

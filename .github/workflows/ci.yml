@@ -83,7 +83,7 @@ jobs:
   # Run acceptance tests in a matrix with Terraform CLI versions on merge to master
   acceptance-test:
     name: Terraform Provider Acceptance Tests
-    needs: build
+    needs: unit-test
     runs-on: ubuntu-latest
     if: ${{ (github.ref == 'refs/heads/main') || github.ref_type == 'tag' }}
     defaults:

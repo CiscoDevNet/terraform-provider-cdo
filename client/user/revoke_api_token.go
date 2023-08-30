@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 )
 
 func RevokeApiToken(ctx context.Context, client http.Client, revokeInp RevokeApiTokenInput) (*RevokeApiTokenOutput, error) {
@@ -13,7 +14,7 @@ func RevokeApiToken(ctx context.Context, client http.Client, revokeInp RevokeApi
 
 	// 1. Find the user
 	readReq := NewReadByUsernameRequest(ctx, client, revokeInp.Name)
-	var userDetails []UserDetails
+	var userDetails []model.UserDetails
 	if readErr := readReq.Send(&userDetails); readErr != nil {
 		return nil, readErr
 	}

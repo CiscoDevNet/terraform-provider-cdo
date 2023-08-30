@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
@@ -19,7 +20,7 @@ func TestReadByUid(t *testing.T) {
 	t.Run("Should read a user by UID", func(t *testing.T) {
 		httpmock.Reset()
 		uid := "sample-uid"
-		expected := user.UserDetails{
+		expected := model.UserDetails{
 			Name:        "dubya@example.com",
 			ApiOnlyUser: false,
 			UserRoles:   []string{"ROLE_SUPER_ADMIN"},

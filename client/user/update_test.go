@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
@@ -26,7 +27,7 @@ func TestUpdate(t *testing.T) {
 	}
 	t.Run("Successfully update an existing user", func(t *testing.T) {
 		httpmock.Reset()
-		expected := user.UserDetails{
+		expected := model.UserDetails{
 			Name:        "jfk@example.com",
 			ApiOnlyUser: false,
 			UserRoles:   []string{"ROLE_SUPER_ADMIN"},

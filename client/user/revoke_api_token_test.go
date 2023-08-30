@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +16,7 @@ import (
 func TestRevokeApiToken(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
-	userDetails := user.UserDetails{
+	userDetails := model.UserDetails{
 		Name:        "barack@example.com",
 		ApiOnlyUser: false,
 		UserRoles:   []string{"ROLE_ADMIN"},
@@ -27,7 +28,7 @@ func TestRevokeApiToken(t *testing.T) {
 		httpmock.RegisterResponder(
 			netHttp.MethodGet,
 			"/anubis/rest/v1/users?q=name:"+userDetails.Name,
-			httpmock.NewJsonResponderOrPanic(200, []user.UserDetails{userDetails}),
+			httpmock.NewJsonResponderOrPanic(200, []model.UserDetails{userDetails}),
 		)
 
 		httpmock.RegisterResponder(
@@ -46,7 +47,7 @@ func TestRevokeApiToken(t *testing.T) {
 		httpmock.RegisterResponder(
 			netHttp.MethodGet,
 			"/anubis/rest/v1/users?q=name:"+userDetails.Name,
-			httpmock.NewJsonResponderOrPanic(200, []user.UserDetails{userDetails}),
+			httpmock.NewJsonResponderOrPanic(200, []model.UserDetails{userDetails}),
 		)
 
 		httpmock.RegisterResponder(

@@ -1,5 +1,9 @@
 package user
 
+import (
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
+)
+
 type CreateUserInput struct {
 	Username    string
 	UserRoles   string
@@ -25,20 +29,11 @@ type UserTenantAssociation struct {
 	Source Association `json:"source"`
 }
 
-type UserDetails struct {
-	Uid                 string   `json:"uid"`
-	Name                string   `json:"name"`
-	UserRoles           []string `json:"roles"`
-	ApiOnlyUser         bool     `json:"isApiOnlyUser"`
-	LastSuccessfulLogin int64    `json:"lastSuccessfulLogin"`
-	ApiTokenId          string   `json:"apiTokenId"`
-}
+type CreateUserOutput = model.UserDetails
 
-type CreateUserOutput = UserDetails
+type UpdateUserOutput = model.UserDetails
 
-type UpdateUserOutput = UserDetails
-
-type ReadUserOutput = UserDetails
+type ReadUserOutput = model.UserDetails
 
 type Association struct {
 	Namespace string `json:"namespace"`

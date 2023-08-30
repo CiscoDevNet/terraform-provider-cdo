@@ -12,7 +12,7 @@ provider "cdo" {
 }
 
 resource "cdo_user" "new_user" {
-  name             = "jonny.bairstow@ecb.example.com"
-  is_api_only_user = false
-  role             = "ROLE_ADMIN"
+  name             = "<replace-with-email-address-if-non-api-only-user-or-with-username-if-api-only-user>"
+  is_api_only_user = "<replace-with-boolean-without-quotes-true-or-false>"
+  role             = "<ROLE_READ_ONLY|ROLE_ADMIN|ROLE_SUPER_ADMIN|ROLE_DEPLOY_ONLY|ROLE_EDIT_ONLY|ROLE_VPN_SESSIONS_MANAGER>"
 }

@@ -31,7 +31,7 @@ func NewRevokeOauthTokenRequest(ctx context.Context, client http.Client, revokeA
 }
 
 func NewReadByUidRequest(ctx context.Context, client http.Client, uid string) *http.Request {
-	url := url.UserByUid(client.BaseUrl(), uid)
+	url := url.ReadOrUpdateUserByUid(client.BaseUrl(), uid)
 	return client.NewGet(ctx, url)
 }
 
@@ -41,7 +41,7 @@ func NewReadByUsernameRequest(ctx context.Context, client http.Client, username 
 }
 
 func NewUpdateRequest(ctx context.Context, client http.Client, updateInp UpdateUserInput) *http.Request {
-	url := url.UserByUid(client.BaseUrl(), updateInp.Uid)
+	url := url.ReadOrUpdateUserByUid(client.BaseUrl(), updateInp.Uid)
 	body := updateRequestBody{
 		UserRoles: updateInp.UserRoles,
 	}

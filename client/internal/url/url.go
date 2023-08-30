@@ -86,7 +86,7 @@ func ReadUserByUsername(baseUrl string, username string) string {
 	return fmt.Sprintf("%s/anubis/rest/v1/users?q=name:%s", baseUrl, username)
 }
 
-func UserByUid(baseUrl string, uid string) string {
+func ReadOrUpdateUserByUid(baseUrl string, uid string) string {
 	return fmt.Sprintf("%s/anubis/rest/v1/users/%s", baseUrl, uid)
 }
 

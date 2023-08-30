@@ -9,7 +9,7 @@ import (
 
 func Delete(ctx context.Context, client http.Client, deleteInp DeleteUserInput) (*DeleteUserOutput, error) {
 
-	url := url.UserByUid(client.BaseUrl(), deleteInp.Uid)
+	url := url.ReadOrUpdateUserByUid(client.BaseUrl(), deleteInp.Uid)
 
 	req := client.NewDelete(ctx, url)
 

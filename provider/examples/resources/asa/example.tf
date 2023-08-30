@@ -12,10 +12,10 @@ provider "cdo" {
 }
 
 resource "cdo_asa_device" "my_asa" {
-  name               = "burak-crush-lavda"
-  connector_type     = "CDG"
-  socket_address     = "3.8.235.174:443"
-  username           = "lockhart"
-  password           = "BlueSkittles123!!"
-  ignore_certificate = false
+  name               = "<replace-with-name-of-asa>"
+  connector_type     = "<CDG|SDC>"
+  socket_address     = "<host:port>"
+  username           = "<replace-with-username>"
+  password           = "<replace-with-password>"
+  ignore_certificate = "<replace-with-boolean-without-quotes-true-or-false>"
 }

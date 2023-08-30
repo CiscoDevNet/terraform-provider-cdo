@@ -98,8 +98,8 @@ func CreateUser(baseUrl string, username string) string {
 	return fmt.Sprintf("%s/anubis/rest/v1/users/%s", baseUrl, username)
 }
 
-func ReadUserByUsername(baseUrl string, username string) string {
-	return fmt.Sprintf("%s/anubis/rest/v1/users?q=name:%s", baseUrl, username)
+func ReadUserByUsername(baseUrl string) string {
+	return fmt.Sprintf("%s/anubis/rest/v1/users", baseUrl)
 }
 
 func ReadOrUpdateUserByUid(baseUrl string, uid string) string {

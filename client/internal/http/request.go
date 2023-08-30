@@ -127,7 +127,6 @@ func (r *Request) send(output any, contentType string) error {
 
 	// request is all good, now parse body
 	resBody, err := io.ReadAll(res.Body)
-	fmt.Printf("\n\nsuccess: url=%s, code=%d, status=%s, body=%s, readBodyErr=%s, method=%s, header=%s, queryParams=%s\n", r.url, res.StatusCode, res.Status, string(resBody), err, r.method, r.Header, r.QueryParams)
 	if err != nil {
 		r.Error = err
 		return err

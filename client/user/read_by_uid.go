@@ -6,7 +6,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 )
 
-func ReadByUid(ctx context.Context, client http.Client, readInp ReadByUidInput) (*UserDetails, error) {
+func ReadByUid(ctx context.Context, client http.Client, readInp ReadByUidInput) (*ReadUserOutput, error) {
 
 	readReq := NewReadByUidRequest(ctx, client, readInp.Uid)
 	var userDetails UserDetails

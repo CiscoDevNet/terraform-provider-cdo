@@ -7,7 +7,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 )
 
-func Create(ctx context.Context, client http.Client, createInp CreateUserInput) (*UserDetails, error) {
+func Create(ctx context.Context, client http.Client, createInp CreateUserInput) (*CreateUserOutput, error) {
 	client.Logger.Println(fmt.Sprintf("Creating user %s", createInp.Username))
 	req := NewCreateRequest(ctx, client, createInp)
 

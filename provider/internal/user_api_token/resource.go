@@ -104,7 +104,7 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, res *
 }
 
 func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, res *resource.DeleteResponse) {
-	tflog.Trace(ctx, "TODO")
+	tflog.Trace(ctx, "Revoke user API token")
 
 	// 1. read state data from terraform state
 	var stateData ApiTokenResourceModel

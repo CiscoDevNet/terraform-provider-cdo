@@ -34,6 +34,12 @@ type UserDetails struct {
 	ApiTokenId          string   `json:"apiTokenId"`
 }
 
+type CreateUserOutput = UserDetails
+
+type UpdateUserOutput = UserDetails
+
+type ReadUserOutput = UserDetails
+
 type Association struct {
 	Namespace string `json:"namespace"`
 	Type      string `json:"type"`

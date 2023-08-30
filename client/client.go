@@ -123,15 +123,15 @@ func (c *Client) DeleteGenericSSH(ctx context.Context, inp genericssh.DeleteInpu
 	return genericssh.Delete(ctx, c.client, inp)
 }
 
-func (c *Client) ReadUserByUsername(ctx context.Context, inp user.ReadByUsernameInput) (*user.UserDetails, error) {
+func (c *Client) ReadUserByUsername(ctx context.Context, inp user.ReadByUsernameInput) (*user.ReadUserOutput, error) {
 	return user.ReadByUsername(ctx, c.client, inp)
 }
 
-func (c *Client) ReadUserByUid(ctx context.Context, inp user.ReadByUidInput) (*user.UserDetails, error) {
+func (c *Client) ReadUserByUid(ctx context.Context, inp user.ReadByUidInput) (*user.ReadUserOutput, error) {
 	return user.ReadByUid(ctx, c.client, inp)
 }
 
-func (c *Client) CreateUser(ctx context.Context, inp user.CreateUserInput) (*user.UserDetails, error) {
+func (c *Client) CreateUser(ctx context.Context, inp user.CreateUserInput) (*user.CreateUserOutput, error) {
 	return user.Create(ctx, c.client, inp)
 }
 
@@ -139,7 +139,7 @@ func (c *Client) DeleteUser(ctx context.Context, inp user.DeleteUserInput) (*use
 	return user.Delete(ctx, c.client, inp)
 }
 
-func (c *Client) UpdateUser(ctx context.Context, inp user.UpdateUserInput) (*user.UserDetails, error) {
+func (c *Client) UpdateUser(ctx context.Context, inp user.UpdateUserInput) (*user.UpdateUserOutput, error) {
 	return user.Update(ctx, c.client, inp)
 }
 

@@ -7,7 +7,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 )
 
-func ReadByUsername(ctx context.Context, client http.Client, readInp ReadByUsernameInput) (*UserDetails, error) {
+func ReadByUsername(ctx context.Context, client http.Client, readInp ReadByUsernameInput) (*ReadUserOutput, error) {
 
 	readReq := NewReadByUsernameRequest(ctx, client, readInp.Name)
 	var userDetails []UserDetails

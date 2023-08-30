@@ -5,12 +5,13 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
+	"github.com/stretchr/testify/assert"
 
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/jsonutil"
@@ -205,7 +206,7 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 						assert.Nil(t, err)
 
 						expectedBody := updateCredentialsBodyWithState{
-							State: "WAIT_FOR_USER_TO_UPDATE_CREDS",
+							QueueTriggerState: "WAIT_FOR_USER_TO_UPDATE_CREDS",
 							SmContext: SmContext{
 								Credentials: fmt.Sprintf(`{"username":"%s","password":"%s"}`, input.Username, input.Password),
 							},
@@ -246,7 +247,7 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 						assert.Nil(t, err)
 
 						expectedState := "WAIT_FOR_USER_TO_UPDATE_CREDS"
-						assert.Equal(t, requestBody.State, expectedState)
+						assert.Equal(t, requestBody.QueueTriggerState, expectedState)
 
 						credentials, err := jsonutil.UnmarshalStruct[model.Credentials]([]byte(requestBody.SmContext.Credentials))
 						assert.Nil(t, err)

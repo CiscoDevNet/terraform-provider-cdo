@@ -11,18 +11,11 @@ provider "cdo" {
   api_token = "<replace-with-api-token-generated-from-cdo>"
 }
 
-resource "cdo_sdc" "example" {
-  name = "tf-sdc-1"
-}
-
-output "sdc_name" {
-  value = cdo_sdc.example.name
-}
-
-output "sdc_uid" {
-  value = cdo_sdc.example.id
-}
-
-output "sdc_bootstrap_data" {
-  value = cdo_sdc.example.bootstrap_data
+resource "cdo_ios_device" "my_ios" {
+  name               = "<name-of-device>"
+  sdc_name           = "<name-of-sdc;not-required-if-connector-type-cdg>"
+  socket_address     = "<host>:<port>"
+  username           = "<username>"
+  password           = "<password>"
+  ignore_certificate = "<true|false>"
 }

@@ -11,18 +11,18 @@ provider "cdo" {
   api_token = "<replace-with-api-token-generated-from-cdo>"
 }
 
-resource "cdo_sdc" "example" {
-  name = "tf-sdc-1"
+data "cdo_user" "example_user" {
+  name = "example-user@cisco.com"
 }
 
-output "sdc_name" {
-  value = cdo_sdc.example.name
+output "example_user_uid" {
+  value = data.cdo_user.example_user.id
 }
 
-output "sdc_uid" {
-  value = cdo_sdc.example.id
+output "example_user_is_api_only_user" {
+  value = data.cdo_user.example_user.is_api_only_user
 }
 
-output "sdc_bootstrap_data" {
-  value = cdo_sdc.example.bootstrap_data
+output "example_user_role" {
+  value = data.cdo_user.example_user.role
 }

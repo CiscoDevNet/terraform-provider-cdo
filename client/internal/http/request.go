@@ -60,7 +60,7 @@ func NewRequest(config cdo.Config, httpClient *http.Client, logger *log.Logger, 
 func (r *Request) Send(output any) error {
 	err := retry.Do(func() (bool, error) {
 
-		err := r.send(output)
+		err := r.send(output, "application/json")
 		if err != nil {
 			return false, err
 		}
@@ -77,13 +77,33 @@ func (r *Request) Send(output any) error {
 	return err
 }
 
-func (r *Request) send(output any) error {
+func (r *Request) SendFormUrlEncoded(output any) error {
+	err := retry.Do(func() (bool, error) {
+
+		err := r.send(output, "application/x-www-form-urlencoded")
+		if err != nil {
+			return false, err
+		}
+		return true, nil
+
+	}, *retry.NewOptions(
+		r.logger,
+		r.config.Timeout,
+		r.config.Delay,
+		r.config.Retries,
+		false,
+	))
+
+	return err
+}
+
+func (r *Request) send(output any, contentType string) error {
 	// clear prev response
 	r.Response = nil
 	r.Error = nil
 
 	// build net/http.Request
-	req, err := r.build()
+	req, err := r.build(contentType)
 	if err != nil {
 		r.Error = err
 		return err
@@ -130,7 +150,7 @@ func (r *Request) send(output any) error {
 }
 
 // build the net/http.Request
-func (r *Request) build() (*http.Request, error) {
+func (r *Request) build(contentType string) (*http.Request, error) {
 
 	bodyReader, err := toReader(r.body)
 	if err != nil {
@@ -147,6 +167,7 @@ func (r *Request) build() (*http.Request, error) {
 
 	r.addHeaders(req)
 	r.addQueryParams(req)
+	r.addContentTypeHeader(req, contentType)
 	return req, nil
 }
 
@@ -167,7 +188,10 @@ func (r *Request) addHeaders(req *http.Request) {
 
 func (r *Request) addAuthHeader(req *http.Request) {
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.config.ApiToken))
-	req.Header.Add("Content-Type", "application/json")
+}
+
+func (r *Request) addContentTypeHeader(req *http.Request, contentType string) {
+	req.Header.Add("Content-Type", contentType)
 }
 
 func (r *Request) addOtherHeader(req *http.Request) {

@@ -82,8 +82,8 @@ func UpdateSpecificCloudFtd(baseUrl string, ftdSpecificUid string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/firepower/ftds/%s", baseUrl, ftdSpecificUid)
 }
 
-func UpdateFmcAppliance(baseUrl string, fmcSpecificUid string) string {
-	return fmt.Sprintf("%s/aegis/rest/v1/services/fmc/appliance/%s", baseUrl, fmcSpecificUid)
+func UpdateFmcAppliance(baseUrl string, fmcApplianceUid string) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/fmc/appliance/%s", baseUrl, fmcApplianceUid)
 }
 
 func ReadStateMachineInstance(baseUrl string) string {

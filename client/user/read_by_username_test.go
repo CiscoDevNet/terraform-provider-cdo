@@ -26,7 +26,7 @@ func TestReadByUsername(t *testing.T) {
 		}
 		httpmock.RegisterResponder(
 			netHttp.MethodGet,
-			"/anubis/rest/v1/users?q=name:"+expected.Name,
+			"/anubis/rest/v1/users",
 			httpmock.NewJsonResponderOrPanic(200, []model.UserDetails{expected}),
 		)
 		actual, err := user.ReadByUsername(context.Background(), *http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute), user.ReadByUsernameInput{
@@ -42,7 +42,7 @@ func TestReadByUsername(t *testing.T) {
 		name := "donald@example.com"
 		httpmock.RegisterResponder(
 			netHttp.MethodGet,
-			"/anubis/rest/v1/users?q=name:"+name,
+			"/anubis/rest/v1/users",
 			httpmock.NewJsonResponderOrPanic(500, nil),
 		)
 

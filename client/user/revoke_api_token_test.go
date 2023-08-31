@@ -27,7 +27,7 @@ func TestRevokeApiToken(t *testing.T) {
 		httpmock.Reset()
 		httpmock.RegisterResponder(
 			netHttp.MethodGet,
-			"/anubis/rest/v1/users?q=name:"+userDetails.Name,
+			"/anubis/rest/v1/users",
 			httpmock.NewJsonResponderOrPanic(200, []model.UserDetails{userDetails}),
 		)
 
@@ -46,7 +46,7 @@ func TestRevokeApiToken(t *testing.T) {
 		httpmock.Reset()
 		httpmock.RegisterResponder(
 			netHttp.MethodGet,
-			"/anubis/rest/v1/users?q=name:"+userDetails.Name,
+			"/anubis/rest/v1/users",
 			httpmock.NewJsonResponderOrPanic(200, []model.UserDetails{userDetails}),
 		)
 
@@ -65,7 +65,7 @@ func TestRevokeApiToken(t *testing.T) {
 		httpmock.Reset()
 		httpmock.RegisterResponder(
 			netHttp.MethodGet,
-			"/anubis/rest/v1/users?q=name:"+userDetails.Name,
+			"/anubis/rest/v1/users",
 			httpmock.NewJsonResponderOrPanic(500, nil),
 		)
 

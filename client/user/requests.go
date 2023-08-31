@@ -15,7 +15,9 @@ type updateRequestBody struct {
 func NewCreateRequest(ctx context.Context, client http.Client, createInp CreateUserInput) *http.Request {
 	url := url.CreateUser(client.BaseUrl(), createInp.Username)
 	body := fmt.Sprintf("roles=%s&isApiOnlyUser=%t", createInp.UserRoles, createInp.ApiOnlyUser)
-	return client.NewPost(ctx, url, body)
+	req := client.NewPost(ctx, url, body)
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	return req
 }
 
 func NewGenerateApiTokenRequest(ctx context.Context, client http.Client, generateApiTokenInp GenerateApiTokenInput) *http.Request {

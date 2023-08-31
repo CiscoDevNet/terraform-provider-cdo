@@ -13,7 +13,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateUserInput) 
 	req := NewCreateRequest(ctx, client, createInp)
 
 	var outp UserTenantAssociation
-	if err := req.SendFormUrlEncoded(&outp); err != nil {
+	if err := req.Send(&outp); err != nil {
 		return nil, err
 	}
 

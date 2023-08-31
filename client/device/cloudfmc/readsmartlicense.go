@@ -1,10 +1,10 @@
-package cdfmc
+package cloudfmc
 
 import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/smartlicense"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/smartlicense"
 )
 
 type ReadSmartLicenseInput struct{}

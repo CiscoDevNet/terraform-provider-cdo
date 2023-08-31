@@ -19,14 +19,14 @@ func TestDeviceReadAllByType(t *testing.T) {
 
 	validDevice1 := device.
 		NewReadOutputBuilder().
-		AsCdfmc().
+		AsCloudFmc().
 		WithUid(deviceUid1).
 		WithName(deviceName1).
 		Build()
 
 	validDevice2 := device.
 		NewReadOutputBuilder().
-		AsCdfmc().
+		AsCloudFmc().
 		WithUid(deviceUid2).
 		WithName(deviceName2).
 		Build()
@@ -44,11 +44,11 @@ func TestDeviceReadAllByType(t *testing.T) {
 	}{
 		{
 			testName:   "successfully read devices by type",
-			targetType: devicetype.Cdfmc,
+			targetType: devicetype.CloudFmc,
 			setupFunc: func() {
 				httpmock.RegisterResponder(
 					http.MethodGet,
-					url.ReadAllDevicesByType(baseUrl, devicetype.Cdfmc),
+					url.ReadAllDevicesByType(baseUrl),
 					httpmock.NewJsonResponderOrPanic(http.StatusOK, validReadAllOutput),
 				)
 			},
@@ -60,7 +60,7 @@ func TestDeviceReadAllByType(t *testing.T) {
 		},
 		{
 			testName:   "return error when read devices by type error",
-			targetType: devicetype.Cdfmc,
+			targetType: devicetype.CloudFmc,
 			setupFunc: func() {
 				httpmock.RegisterResponder(
 					http.MethodGet,

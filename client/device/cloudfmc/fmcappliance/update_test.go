@@ -31,12 +31,12 @@ func TestUpdate(t *testing.T) {
 	}{
 		{
 			testName: "successfully updates FMC Appliance name",
-			input:    fmcappliance.NewUpdateInput(FmcSpecificUid, queueTriggerState, stateMachineContext),
+			input:    fmcappliance.NewUpdateInput(FmcApplianceUid, queueTriggerState, stateMachineContext),
 
 			setupFunc: func() {
 				httpmock.RegisterResponder(
 					http.MethodPut,
-					url.UpdateFmcAppliance(baseUrl, FmcSpecificUid),
+					url.UpdateFmcAppliance(baseUrl, FmcApplianceUid),
 					httpmock.NewJsonResponderOrPanic(http.StatusOK, validUpdateOutput),
 				)
 			},
@@ -50,12 +50,12 @@ func TestUpdate(t *testing.T) {
 
 		{
 			testName: "error when update FMC Appliance name error",
-			input:    fmcappliance.NewUpdateInput(FmcSpecificUid, queueTriggerState, stateMachineContext),
+			input:    fmcappliance.NewUpdateInput(FmcApplianceUid, queueTriggerState, stateMachineContext),
 
 			setupFunc: func() {
 				httpmock.RegisterResponder(
 					http.MethodPut,
-					url.UpdateFmcAppliance(baseUrl, FmcSpecificUid),
+					url.UpdateFmcAppliance(baseUrl, FmcApplianceUid),
 					httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, "internal server error"),
 				)
 			},

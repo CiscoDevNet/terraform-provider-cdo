@@ -162,11 +162,23 @@ func (r *Request) addQueryParams(req *http.Request) {
 func (r *Request) addHeaders(req *http.Request) {
 	r.addAuthHeader(req)
 	r.addOtherHeader(req)
+	r.addJsonContentTypeHeaderIfNotPresent(req)
+}
+
+func (r *Request) addJsonContentTypeHeaderIfNotPresent(req *http.Request) {
+	// unfortunately golang has no constant for content type
+	// https://github.com/golang/go/issues/31572
+	if r.Header.Get("Content-Type") == "" && req.Header.Get("Content-Type") == "" {
+		req.Header.Add("Content-Type", "application/json")
+	}
 }
 
 func (r *Request) addAuthHeader(req *http.Request) {
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.config.ApiToken))
-	req.Header.Add("Content-Type", "application/json")
+}
+
+func (r *Request) addContentTypeHeader(req *http.Request, contentType string) {
+	req.Header.Add("Content-Type", contentType)
 }
 
 func (r *Request) addOtherHeader(req *http.Request) {

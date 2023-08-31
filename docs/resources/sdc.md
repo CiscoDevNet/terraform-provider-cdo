@@ -3,12 +3,12 @@
 page_title: "cdo_sdc Resource - cdo"
 subcategory: ""
 description: |-
-  Provides an SDC connector resource. This allows SDC to be onboarded, updated, and deleted on CDO.
+  Provides an SDC connector resource. This allows an SDC to be onboarded, updated, and deleted on CDO.
 ---
 
 # cdo_sdc (Resource)
 
-Provides an SDC connector resource. This allows SDC to be onboarded, updated, and deleted on CDO.
+Provides an SDC connector resource. This allows an SDC to be onboarded, updated, and deleted on CDO.
 
 
 

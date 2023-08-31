@@ -168,10 +168,6 @@ func (r *Request) addAuthHeader(req *http.Request) {
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.config.ApiToken))
 }
 
-func (r *Request) addContentTypeHeader(req *http.Request, contentType string) {
-	req.Header.Add("Content-Type", contentType)
-}
-
 func (r *Request) addOtherHeader(req *http.Request) {
 	for k, vs := range r.Header {
 		for _, v := range vs {

@@ -5,6 +5,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -16,12 +17,12 @@ func TestReadSpecificCloudFmc(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	validReadSpecificOutput := cloudfmc.NewReadSpecificOutputBuilder().
-		SpecificUid(specificDeviceUid).
-		DomainUid(domainUid).
-		Status(status).
-		State(deviceState).
-		Build()
+	validReadSpecificOutput := cloudfmc.ReadSpecificOutput{
+		SpecificUid: specificDeviceUid,
+		DomainUid:   domainUid,
+		State:       state.DONE,
+		Status:      status,
+	}
 
 	testCases := []struct {
 		testName   string

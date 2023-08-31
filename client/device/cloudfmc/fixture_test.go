@@ -1,9 +1,6 @@
 package cloudfmc_test
 
-import (
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
-	"time"
-)
+import "time"
 
 const (
 	smartLicenseEvalExpiresInDays = 123456
@@ -32,7 +29,6 @@ const (
 	deviceHost              = "https://unit-test.com"
 	devicePort              = 1234
 	deviceCloudConnectorUId = "unit-test-uid"
-	deviceState             = state.DONE
 
 	specificDeviceUid = "unit-test-specific-device-uid"
 

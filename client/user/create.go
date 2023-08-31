@@ -11,9 +11,10 @@ import (
 func Create(ctx context.Context, client http.Client, createInp CreateUserInput) (*CreateUserOutput, error) {
 	client.Logger.Println(fmt.Sprintf("Creating user %s", createInp.Username))
 	req := NewCreateRequest(ctx, client, createInp)
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	var outp UserTenantAssociation
-	if err := req.SendFormUrlEncoded(&outp); err != nil {
+	if err := req.Send(&outp); err != nil {
 		return nil, err
 	}
 

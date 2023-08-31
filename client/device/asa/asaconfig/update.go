@@ -3,9 +3,10 @@ package asaconfig
 import (
 	"context"
 	"encoding/json"
+	"strings"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
-	"strings"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
@@ -129,7 +130,7 @@ func makeUpdateCredentialsReqBody(isWaitForUserToUpdateCreds bool, creds []byte)
 		}
 	} else {
 		return &updateCredentialsBodyWithState{
-			State: "WAIT_FOR_USER_TO_UPDATE_CREDS",
+			QueueTriggerState: "WAIT_FOR_USER_TO_UPDATE_CREDS",
 			SmContext: SmContext{
 				Credentials: string(creds),
 			},
@@ -143,8 +144,8 @@ type updateBody struct {
 }
 
 type updateCredentialsBodyWithState struct {
-	State     string    `json:"state"`
-	SmContext SmContext `json:"stateMachineContext"`
+	QueueTriggerState string    `json:"queueTriggerState"`
+	SmContext         SmContext `json:"stateMachineContext"`
 }
 
 type updateCredentialsBody struct {

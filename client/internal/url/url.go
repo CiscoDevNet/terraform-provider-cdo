@@ -3,6 +3,7 @@ package url
 
 import (
 	"fmt"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 )
 
@@ -91,4 +92,24 @@ func ReadStateMachineInstance(baseUrl string) string {
 
 func ReadFmcDomainInfo(fmcHost string) string {
 	return fmt.Sprintf("https://%s/api/fmc_platform/v1/info/domain", fmcHost)
+}
+
+func CreateUser(baseUrl string, username string) string {
+	return fmt.Sprintf("%s/anubis/rest/v1/users/%s", baseUrl, username)
+}
+
+func ReadUserByUsername(baseUrl string) string {
+	return fmt.Sprintf("%s/anubis/rest/v1/users", baseUrl)
+}
+
+func ReadOrUpdateUserByUid(baseUrl string, uid string) string {
+	return fmt.Sprintf("%s/anubis/rest/v1/users/%s", baseUrl, uid)
+}
+
+func GenerateApiToken(baseUrl string, username string) string {
+	return fmt.Sprintf("%s/anubis/rest/v1/oauth/token/%s", baseUrl, username)
+}
+
+func RevokeApiToken(baseUrl string, tokenId string) string {
+	return fmt.Sprintf("%s/anubis/rest/v1/oauth/revoke/%s", baseUrl, tokenId)
 }

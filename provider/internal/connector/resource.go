@@ -37,7 +37,7 @@ func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, r
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Provides an SDC connector resource. This allows SDC to be onboarded, updated, and deleted on CDO.",
+		MarkdownDescription: "Provides an SDC connector resource. This allows an SDC to be onboarded, updated, and deleted on CDO.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{

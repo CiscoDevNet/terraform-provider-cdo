@@ -7,14 +7,14 @@ import (
 )
 
 type UpdateInput struct {
-	FmcApplianceUid     string
+	FmcSpecificUid      string
 	QueueTriggerState   string
 	StateMachineContext map[string]string
 }
 
-func NewUpdateInput(FmcApplianceUid, queueTriggerState string, stateMachineContext map[string]string) UpdateInput {
+func NewUpdateInput(FmcSpecificUid, queueTriggerState string, stateMachineContext map[string]string) UpdateInput {
 	return UpdateInput{
-		FmcApplianceUid:     FmcApplianceUid,
+		FmcSpecificUid:      FmcSpecificUid,
 		QueueTriggerState:   queueTriggerState,
 		StateMachineContext: stateMachineContext,
 	}
@@ -32,7 +32,7 @@ type updateRequestBody struct {
 }
 
 func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*UpdateOutput, error) {
-	updateUrl := url.UpdateFmcAppliance(client.BaseUrl(), updateInp.FmcApplianceUid)
+	updateUrl := url.UpdateFmcAppliance(client.BaseUrl(), updateInp.FmcSpecificUid)
 	updateBody := newUpdateRequestBodyBuilder().
 		QueueTriggerState(updateInp.QueueTriggerState).
 		StateMachineContext(updateInp.StateMachineContext).

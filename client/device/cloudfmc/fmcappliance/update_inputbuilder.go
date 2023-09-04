@@ -10,8 +10,8 @@ func NewUpdateInputBuilder() *UpdateInputBuilder {
 	return b
 }
 
-func (b *UpdateInputBuilder) FmcApplianceUid(fmcApplianceUid string) *UpdateInputBuilder {
-	b.updateInput.FmcApplianceUid = fmcApplianceUid
+func (b *UpdateInputBuilder) FmcSpecificUid(fmcSpecificUid string) *UpdateInputBuilder {
+	b.updateInput.FmcSpecificUid = fmcSpecificUid
 	return b
 }
 

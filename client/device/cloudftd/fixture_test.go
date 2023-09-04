@@ -39,9 +39,9 @@ const (
 	fmcAccessPolicyItemType = "unit-test-access-policy-item-type"
 	fmcAccessPolicyItemUid  = "unit-test-access-policy-item-uid"
 
-	fmcSpecificUid    = "unit-test-fmc-specific-uid"
-	fmcSpecificStatus = "unit-test-fmc-specific-status"
-	fmcSpecificState  = "unit-test-fmc-specific-state"
+	fmcApplianceUid    = "unit-test-fmc-specific-uid"
+	fmcApplianceStatus = "unit-test-fmc-specific-status"
+	fmcApplianceState  = "unit-test-fmc-specific-state"
 
 	ftdName    = "unit-test-ftdName"
 	ftdUid     = "unit-test-ftdUid"
@@ -139,15 +139,15 @@ var (
 						Build()
 
 	validReadSpecificOutput = cloudfmc.ReadSpecificOutput{
-		SpecificUid: fmcSpecificUid,
+		SpecificUid: fmcApplianceUid,
 		DomainUid:   fmcDomainUid,
 		State:       state.DONE,
-		Status:      fmcSpecificStatus,
+		Status:      fmcApplianceStatus,
 	}
 
 	validUpdateFmcSpecificOutput = fmcappliance.NewUpdateOutputBuilder().
-					Uid(fmcSpecificUid).
-					State(fmcSpecificState).
+					Uid(fmcApplianceUid).
+					State(fmcApplianceState).
 					DomainUid(fmcDomainUid).
 					Build()
 

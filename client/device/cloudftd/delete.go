@@ -41,7 +41,7 @@ func Delete(ctx context.Context, client http.Client, deleteInp DeleteInput) (*De
 		ctx,
 		client,
 		fmcappliance.NewUpdateInputBuilder().
-			FmcSpecificUid(fmcReadSpecificRes.SpecificUid).
+			FmcApplianceUid(fmcReadSpecificRes.SpecificUid).
 			QueueTriggerState("PENDING_DELETE_FTDC").
 			StateMachineContext(map[string]string{"ftdCDeviceIDs": deleteInp.Uid}).
 			Build(),

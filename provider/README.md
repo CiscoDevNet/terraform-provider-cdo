@@ -66,12 +66,11 @@ make testacc
 ### Testing
 
 Terraform providers generally use acceptance tests to verify behaviours, so it will creates, destroy and update real infrastructure. This means that the tests will require to interact with CDO, so it needs some setups.
-
-The acceptance tests are run in the CDO CI environment. You need to be part of the CDO team to access this tenant.
+To achieve this, a CDO CI account is created: **terraform-provider-cdo@lockhart.io**, things will be ran there.
 
 #### API Token
 
-In order to interact with CDO, an API-only user with super-admin privileges exists in the tenant, and a token generated for that user is used to run the acceptance tests. If you are a CDO engineer with access to this tenant, please log in as a super-admin user on this tenant and create an API-only user for your local testing. If you are not a CDO engineer, you will have to rely on the pull requests you create to be tested on Github.
+In order to interact with CDO, a API token is generated using the above account, it is stored in the staging aws secret manager called **staging-terraform-provider-cdo-acceptance-test-api-token**. If you accidentally refresh a new token, please change it in the secret manager as well.
 
 When developing locally, you can overwrite this token using environment variable, see files in `provider/internal/acctest` for details.
 
@@ -80,3 +79,11 @@ When developing locally, you can overwrite this token using environment variable
 ### Devices
 
 Since terraform requires interacting with real infrastructure, tests under the `provider` folder are mostly acceptance tests, and they communicate with devices in the CI environment. At the moment we need to create and onboard some devices in CI for our tests to work. (It will be more self-contained in the future, and this section will no longer be needed, hopefully).
+
+| Pre-requisite                                  | Tests           |
+| ---------------------------------------------- | --------------- |
+| IOS 10.10.0.198:22                             | ios resource    |
+| IOS 10.10.0.198:22                             | ios data source |
+| ASA vasa-gb-ravpn-03-mgmt.dev.lockhart.io:443  | asa data source |
+| ASA 52.53.230.145:443                          | asa resource    |
+| Tenant ID ae98d25f-1089-4286-a3c5-505dcb4431a2 | sdc data source |

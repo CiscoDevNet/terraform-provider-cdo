@@ -7,8 +7,8 @@ terraform {
 }
 
 provider "cdo" {
-  base_url  = "<https://www.defenseorchestrator.com|https://www.defenseorchestrator.eu|https://apj.cdo.cisco.com>"
-  api_token = "<replace-with-api-token-generated-from-cdo>"
+  base_url  = "https://staging.dev.lockhart.io"
+  api_token = "<FILL_ME>"
 }
 
 resource "cdo_sdc" "example" {

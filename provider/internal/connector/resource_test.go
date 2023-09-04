@@ -38,26 +38,7 @@ func TestAccSdcResource(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_sdc.test", "name", testSdcResource.Name),
 				),
 			},
-			// Delete testing automatically occurs in TestCase
-		},
-	})
-}
-
-func TestAccUpdateSdcResource(t *testing.T) {
-	t.Skip("Requires us to figure out how to wait for the resource to finish updating")
-	resource.Test(t, resource.TestCase{
-		PreCheck:                 acctest.PreCheckFunc(t),
-		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
-		Steps: []resource.TestStep{
-			// Create and Read testing
-			{
-				Config: acctest.ProviderConfig() + testSdcResourceConfig,
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("cdo_sdc.test", "name", testSdcResource.Name),
-				),
-			},
 			// Update and Read testing
-			// commenting out because this test is flaking in CI
 			{
 				Config: acctest.ProviderConfig() + testResourceConfig_NewName,
 				Check: resource.ComposeAggregateTestCheckFunc(

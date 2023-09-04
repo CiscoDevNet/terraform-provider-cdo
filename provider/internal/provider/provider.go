@@ -6,11 +6,9 @@ package provider
 import (
 	"context"
 	"fmt"
-	"os"
-
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/connector"
-	"github.com/CiscoDevnet/terraform-provider-cdo/internal/user"
-	"github.com/CiscoDevnet/terraform-provider-cdo/internal/user_api_token"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/device/ftd"
+	"os"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/device/ios"
 
@@ -64,7 +62,7 @@ func (p *CdoProvider) Schema(ctx context.Context, req provider.SchemaRequest, re
 				MarkdownDescription: "The base CDO URL. This is the URL you enter when logging into your CDO account.",
 				Required:            true,
 				Validators: []validator.String{
-					stringvalidator.OneOf("https://www.defenseorchestrator.com", "https://www.defenseorchestrator.eu", "https://apj.cdo.cisco.com", "https://staging.dev.lockhart.io", "https://ci.dev.lockhart.io", "https://scale.dev.lockhart.io", "http://localhost:9000"),
+					stringvalidator.OneOf("https://www.defenseorchestrator.com", "https://www.defenseorchestrator.eu", "https://apj.cdo.cisco.com", "https://staging.dev.lockhart.io", "https://ci.dev.lockhart.io", "https://scale.dev.lockhart.io"),
 				},
 			},
 		},
@@ -150,8 +148,7 @@ func (p *CdoProvider) Resources(ctx context.Context) []func() resource.Resource 
 		connector.NewResource,
 		asa.NewAsaDeviceResource,
 		ios.NewIosDeviceResource,
-		user.NewResource,
-		user_api_token.NewResource,
+		ftd.NewResource,
 	}
 }
 
@@ -160,7 +157,6 @@ func (p *CdoProvider) DataSources(ctx context.Context) []func() datasource.DataS
 		connector.NewDataSource,
 		asa.NewAsaDataSource,
 		ios.NewIosDataSource,
-		user.NewDataSource,
 	}
 }
 

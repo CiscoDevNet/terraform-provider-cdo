@@ -143,7 +143,7 @@ type updateBody struct {
 }
 
 type updateCredentialsBodyWithState struct {
-	QueueTriggerState string    `json:"state"`
+	QueueTriggerState string    `json:"queueTriggerState"`
 	SmContext         SmContext `json:"stateMachineContext"`
 }
 

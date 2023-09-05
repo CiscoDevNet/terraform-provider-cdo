@@ -115,8 +115,8 @@ func UpdateLocation(ctx context.Context, client http.Client, options UpdateLocat
 
 func makeReqBody(creds []byte) *updateBody {
 	return &updateBody{
-		QueueTriggerState: "CERT_VALIDATED", // question: should this be hardcoded?
-		Credentials:       string(creds),
+		State:       "CERT_VALIDATED", // question: should this be hardcoded?
+		Credentials: string(creds),
 	}
 }
 
@@ -129,7 +129,7 @@ func makeUpdateCredentialsReqBody(isWaitForUserToUpdateCreds bool, creds []byte)
 		}
 	} else {
 		return &updateCredentialsBodyWithState{
-			QueueTriggerState: "WAIT_FOR_USER_TO_UPDATE_CREDS",
+			State: "WAIT_FOR_USER_TO_UPDATE_CREDS",
 			SmContext: SmContext{
 				Credentials: string(creds),
 			},
@@ -138,13 +138,13 @@ func makeUpdateCredentialsReqBody(isWaitForUserToUpdateCreds bool, creds []byte)
 }
 
 type updateBody struct {
-	QueueTriggerState string `json:"queueTriggerState"`
-	Credentials       string `json:"credentials"`
+	State       string `json:"state"`
+	Credentials string `json:"credentials"`
 }
 
 type updateCredentialsBodyWithState struct {
-	QueueTriggerState string    `json:"queueTriggerState"`
-	SmContext         SmContext `json:"stateMachineContext"`
+	State     string    `json:"state"`
+	SmContext SmContext `json:"stateMachineContext"`
 }
 
 type updateCredentialsBody struct {

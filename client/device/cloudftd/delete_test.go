@@ -160,7 +160,7 @@ func waitForFtdDeleteStateMachineTriggeredIsSuccessful(success bool) {
 	} else {
 		httpmock.RegisterResponder(
 			http.MethodPut,
-			url.UpdateFmcAppliance(baseUrl, fmcApplianceUid),
+			url.UpdateFmcAppliance(baseUrl, fmcSpecificUid),
 			httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, "internal server error"),
 		)
 	}
@@ -170,7 +170,7 @@ func waitForFtdDeleteStateMachineTriggeredReturnedNotFound() {
 	httpmock.RegisterResponder(
 		http.MethodGet,
 		url.ReadStateMachineInstance(baseUrl),
-		httpmock.NewJsonResponderOrPanic(http.StatusNotFound, statemachine.NotFoundError),
+		httpmock.NewJsonResponderOrPanic(http.StatusNotFound, statemachine.StateMachineNotFoundError),
 	)
 }
 
@@ -178,13 +178,13 @@ func triggerFtdDeleteOnFmcIsSuccessful(success bool) {
 	if success {
 		httpmock.RegisterResponder(
 			http.MethodPut,
-			url.UpdateFmcAppliance(baseUrl, fmcApplianceUid),
+			url.UpdateFmcAppliance(baseUrl, fmcSpecificUid),
 			httpmock.NewJsonResponderOrPanic(http.StatusOK, validUpdateFmcSpecificOutput),
 		)
 	} else {
 		httpmock.RegisterResponder(
 			http.MethodPut,
-			url.UpdateFmcAppliance(baseUrl, fmcApplianceUid),
+			url.UpdateFmcAppliance(baseUrl, fmcSpecificUid),
 			httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, "internal server error"),
 		)
 	}

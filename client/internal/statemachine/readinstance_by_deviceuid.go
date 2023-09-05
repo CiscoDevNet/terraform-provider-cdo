@@ -35,12 +35,13 @@ func ReadInstanceByDeviceUid(ctx context.Context, client http.Client, readInp Re
 		return nil, err
 	}
 	if len(readRes) == 0 {
-		return nil, NotFoundError
+		return nil, StateMachineNotFoundError
 	}
 
-	if len(readRes) > 1 {
-		return nil, MoreThanOneRunningError
-	}
+	// TODO: this can happen, no idea why, limit 1 does not seems to work
+	//if len(readRes) > 1 {
+	//	return nil, MoreThanOneStateMachineRunningError
+	//}
 
 	return &readRes[0], nil
 }

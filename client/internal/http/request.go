@@ -136,6 +136,21 @@ func (r *Request) build() (*http.Request, error) {
 		return nil, err
 	}
 
+	// TODO: remove these debug lines
+	//if r.method != "GET" && r.method != "DELETE" {
+	//	bodyReader2, err := toReader(r.body)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	bs, err := io.ReadAll(bodyReader2)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+	//	fmt.Println("request_check")
+	//	fmt.Printf("Request: %+v\n", r)
+	//	fmt.Printf("Request: %s, %s, %s\n", r.url, r.method, string(bs))
+	//}
+
 	req, err := http.NewRequest(r.method, r.url, bodyReader)
 	if err != nil {
 		return nil, err
@@ -162,23 +177,11 @@ func (r *Request) addQueryParams(req *http.Request) {
 func (r *Request) addHeaders(req *http.Request) {
 	r.addAuthHeader(req)
 	r.addOtherHeader(req)
-	r.addJsonContentTypeHeaderIfNotPresent(req)
-}
-
-func (r *Request) addJsonContentTypeHeaderIfNotPresent(req *http.Request) {
-	// unfortunately golang has no constant for content type
-	// https://github.com/golang/go/issues/31572
-	if r.Header.Get("Content-Type") == "" && req.Header.Get("Content-Type") == "" {
-		req.Header.Add("Content-Type", "application/json")
-	}
 }
 
 func (r *Request) addAuthHeader(req *http.Request) {
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.config.ApiToken))
-}
-
-func (r *Request) addContentTypeHeader(req *http.Request, contentType string) {
-	req.Header.Add("Content-Type", contentType)
+	req.Header.Add("Content-Type", "application/json")
 }
 
 func (r *Request) addOtherHeader(req *http.Request) {

@@ -6,6 +6,6 @@ import (
 )
 
 var (
-	NotFoundError           = fmt.Errorf("statemachine instance not found")
-	MoreThanOneRunningError = fmt.Errorf("multiple running instances found, this is not an expected error, please report this issue at: %s", cdo.TerraformProviderCDOIssuesUrl)
+	StateMachineNotFoundError           = fmt.Errorf("statemachine instance not found")
+	MoreThanOneStateMachineRunningError = fmt.Errorf("multiple running instance found, this is an expected error, please report this issue at: %s", cdo.TerraformProviderCDOIssuesUrl)
 )

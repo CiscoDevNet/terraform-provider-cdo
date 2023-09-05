@@ -2,6 +2,7 @@ package cloudftd
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
 )

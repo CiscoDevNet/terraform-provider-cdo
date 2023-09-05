@@ -87,7 +87,7 @@ func TestAsaConfigUpdate(t *testing.T) {
 					func(r *http.Request) (*http.Response, error) {
 						requestBody, err := internalHttp.ReadRequestBody[updateBody](r)
 						assert.Nil(t, err)
-						assert.Equal(t, requestBody.State, "CERT_VALIDATED", fmt.Sprintf("expected 'State' to equal 'CERT_VALIDATED', got: %s", requestBody.State))
+						assert.Equal(t, requestBody.State, "CERT_VALIDATED", fmt.Sprintf("expected 'QueueTriggerState' to equal 'CERT_VALIDATED', got: %s", requestBody.State))
 
 						credentials, err := jsonutil.UnmarshalStruct[model.Credentials]([]byte(requestBody.Credentials))
 						assert.Nil(t, err)

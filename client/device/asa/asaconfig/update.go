@@ -3,10 +3,9 @@ package asaconfig
 import (
 	"context"
 	"encoding/json"
-	"strings"
-
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
+	"strings"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"

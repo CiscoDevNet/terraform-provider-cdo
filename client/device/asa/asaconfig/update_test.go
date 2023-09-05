@@ -5,13 +5,12 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
-	"net/http"
-	"testing"
-	"time"
-
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 	"github.com/stretchr/testify/assert"
+	"net/http"
+	"testing"
+	"time"
 
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/jsonutil"
@@ -88,7 +87,7 @@ func TestAsaConfigUpdate(t *testing.T) {
 					func(r *http.Request) (*http.Response, error) {
 						requestBody, err := internalHttp.ReadRequestBody[updateBody](r)
 						assert.Nil(t, err)
-						assert.Equal(t, requestBody.State, "CERT_VALIDATED", fmt.Sprintf("expected 'State' to equal 'CERT_VALIDATED', got: %s", requestBody.State))
+						assert.Equal(t, requestBody.State, "CERT_VALIDATED", fmt.Sprintf("expected 'QueueTriggerState' to equal 'CERT_VALIDATED', got: %s", requestBody.State))
 
 						credentials, err := jsonutil.UnmarshalStruct[model.Credentials]([]byte(requestBody.Credentials))
 						assert.Nil(t, err)

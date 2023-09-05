@@ -115,8 +115,8 @@ func UpdateLocation(ctx context.Context, client http.Client, options UpdateLocat
 
 func makeReqBody(creds []byte) *updateBody {
 	return &updateBody{
-		State:       "CERT_VALIDATED", // question: should this be hardcoded?
-		Credentials: string(creds),
+		QueueTriggerState: "CERT_VALIDATED", // question: should this be hardcoded?
+		Credentials:       string(creds),
 	}
 }
 
@@ -138,8 +138,8 @@ func makeUpdateCredentialsReqBody(isWaitForUserToUpdateCreds bool, creds []byte)
 }
 
 type updateBody struct {
-	State       string `json:"state"`
-	Credentials string `json:"credentials"`
+	QueueTriggerState string `json:"queueTriggerState"`
+	Credentials       string `json:"credentials"`
 }
 
 type updateCredentialsBodyWithState struct {

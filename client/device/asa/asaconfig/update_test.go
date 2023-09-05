@@ -51,8 +51,8 @@ func TestAsaConfigUpdate(t *testing.T) {
 						assert.Nil(t, err)
 
 						expectedBody := updateBody{
-							State:       "CERT_VALIDATED",
-							Credentials: fmt.Sprintf(`{"username":"%s","password":"%s"}`, input.Username, input.Password),
+							QueueTriggerState: "CERT_VALIDATED",
+							Credentials:       fmt.Sprintf(`{"username":"%s","password":"%s"}`, input.Username, input.Password),
 						}
 						assert.Equal(t, expectedBody, *requestBody)
 
@@ -87,7 +87,7 @@ func TestAsaConfigUpdate(t *testing.T) {
 					func(r *http.Request) (*http.Response, error) {
 						requestBody, err := internalHttp.ReadRequestBody[updateBody](r)
 						assert.Nil(t, err)
-						assert.Equal(t, requestBody.State, "CERT_VALIDATED", fmt.Sprintf("expected 'QueueTriggerState' to equal 'CERT_VALIDATED', got: %s", requestBody.State))
+						assert.Equal(t, requestBody.QueueTriggerState, "CERT_VALIDATED", fmt.Sprintf("expected 'QueueTriggerState' to equal 'CERT_VALIDATED', got: %s", requestBody.QueueTriggerState))
 
 						credentials, err := jsonutil.UnmarshalStruct[model.Credentials]([]byte(requestBody.Credentials))
 						assert.Nil(t, err)

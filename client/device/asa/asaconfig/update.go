@@ -12,11 +12,11 @@ import (
 )
 
 type UpdateInput struct {
-	SpecificUid string
-	Username    string
-	Password    string
-	PublicKey   *model.PublicKey
-	State       string
+	SpecificUid       string
+	Username          string
+	Password          string
+	PublicKey         *model.PublicKey
+	QueueTriggerState string
 }
 
 type UpdateOutput struct {
@@ -25,11 +25,11 @@ type UpdateOutput struct {
 
 func NewUpdateInput(specificUid string, username string, password string, publicKey *model.PublicKey, state string) *UpdateInput {
 	return &UpdateInput{
-		SpecificUid: specificUid,
-		Username:    username,
-		Password:    password,
-		PublicKey:   publicKey,
-		State:       state,
+		SpecificUid:       specificUid,
+		Username:          username,
+		Password:          password,
+		PublicKey:         publicKey,
+		QueueTriggerState: state,
 	}
 }
 
@@ -66,7 +66,7 @@ func UpdateCredentials(ctx context.Context, client http.Client, updateInput Upda
 		return nil, err
 	}
 
-	isWaitForUserToUpdateCreds := strings.EqualFold(updateInput.State, "WAIT_FOR_USER_TO_UPDATE_CREDS") || strings.EqualFold(updateInput.State, "$PRE_WAIT_FOR_USER_TO_UPDATE_CREDS")
+	isWaitForUserToUpdateCreds := strings.EqualFold(updateInput.QueueTriggerState, "WAIT_FOR_USER_TO_UPDATE_CREDS") || strings.EqualFold(updateInput.QueueTriggerState, "$PRE_WAIT_FOR_USER_TO_UPDATE_CREDS")
 	req := client.NewPut(ctx, url, makeUpdateCredentialsReqBody(isWaitForUserToUpdateCreds, creds))
 
 	var outp UpdateOutput

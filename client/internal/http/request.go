@@ -136,21 +136,6 @@ func (r *Request) build() (*http.Request, error) {
 		return nil, err
 	}
 
-	// TODO: remove these debug lines
-	//if r.method != "GET" && r.method != "DELETE" {
-	//	bodyReader2, err := toReader(r.body)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//	bs, err := io.ReadAll(bodyReader2)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-	//	fmt.Println("request_check")
-	//	fmt.Printf("Request: %+v\n", r)
-	//	fmt.Printf("Request: %s, %s, %s\n", r.url, r.method, string(bs))
-	//}
-
 	req, err := http.NewRequest(r.method, r.url, bodyReader)
 	if err != nil {
 		return nil, err

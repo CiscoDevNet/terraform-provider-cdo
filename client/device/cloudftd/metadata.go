@@ -2,7 +2,6 @@ package cloudftd
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
 )
@@ -34,7 +33,6 @@ type internalMetadata struct {
 // Note that this method is defined on the *Metadata type, so if you unmarshal or marshal a Metadata without pointer,
 // it will not be called.
 func (metadata *Metadata) UnmarshalJSON(data []byte) error {
-	fmt.Printf("\nunmarshalling Metadata: %s\n", string(data))
 	var internalMeta internalMetadata
 	err := json.Unmarshal(data, &internalMeta)
 	if err != nil {
@@ -60,7 +58,6 @@ func (metadata *Metadata) UnmarshalJSON(data []byte) error {
 }
 
 func (metadata *Metadata) MarshalJSON() ([]byte, error) {
-	fmt.Printf("\nmarshalling Metadata: %+v\n", metadata)
 	var internalMeta internalMetadata
 	internalMeta.AccessPolicyName = metadata.AccessPolicyName
 	internalMeta.AccessPolicyUuid = metadata.AccessPolicyUid

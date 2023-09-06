@@ -68,7 +68,6 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 	planData.Name = types.StringValue(res.Name)
 	planData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
 	planData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUid)
-	//planData.Virtual = types.BoolValue(res.Metadata.PerformanceTier != nil)
 	planData.Licenses = util.GoStringSliceToTFStringList(sliceutil.Map(res.Metadata.LicenseCaps, func(l license.Type) string { return string(l) }))
 	if res.Metadata.PerformanceTier != nil { // nil means physical cloud ftd
 		planData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))

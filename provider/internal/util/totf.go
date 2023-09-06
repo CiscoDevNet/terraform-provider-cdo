@@ -1,14 +1,12 @@
 package util
 
 import (
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 func GoStringSliceToTFStringList(stringSlice []string) []types.String {
-	l := make([]types.String, len(stringSlice))
-	for i, v := range stringSlice {
-		l[i] = types.StringValue(v)
-	}
-
-	return l
+	return sliceutil.Map(stringSlice, func(s string) types.String {
+		return types.StringValue(s)
+	})
 }

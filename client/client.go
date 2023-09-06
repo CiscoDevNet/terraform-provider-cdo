@@ -4,12 +4,12 @@ package client
 
 import (
 	"context"
-	"net/http"
-
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/genericssh"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
+	"net/http"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios"
@@ -121,6 +121,26 @@ func (c *Client) UpdateGenericSSH(ctx context.Context, inp genericssh.UpdateInpu
 
 func (c *Client) DeleteGenericSSH(ctx context.Context, inp genericssh.DeleteInput) (*genericssh.DeleteOutput, error) {
 	return genericssh.Delete(ctx, c.client, inp)
+}
+
+func (c *Client) ReadCloudFtdByUid(ctx context.Context, inp cloudftd.ReadByUidInput) (*cloudftd.ReadOutput, error) {
+	return cloudftd.ReadByUid(ctx, c.client, inp)
+}
+
+func (c *Client) ReadCloudFtdByName(ctx context.Context, inp cloudftd.ReadByNameInput) (*cloudftd.ReadOutput, error) {
+	return cloudftd.ReadByName(ctx, c.client, inp)
+}
+
+func (c *Client) CreateCloudFtd(ctx context.Context, inp cloudftd.CreateInput) (*cloudftd.CreateOutput, error) {
+	return cloudftd.Create(ctx, c.client, inp)
+}
+
+func (c *Client) UpdateCloudFtd(ctx context.Context, inp cloudftd.UpdateInput) (*cloudftd.UpdateOutput, error) {
+	return cloudftd.Update(ctx, c.client, inp)
+}
+
+func (c *Client) DeleteCloudFtd(ctx context.Context, inp cloudftd.DeleteInput) (*cloudftd.DeleteOutput, error) {
+	return cloudftd.Delete(ctx, c.client, inp)
 }
 
 func (c *Client) ReadUserByUsername(ctx context.Context, inp user.ReadByUsernameInput) (*user.ReadUserOutput, error) {

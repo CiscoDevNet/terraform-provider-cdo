@@ -3,7 +3,6 @@ package url
 
 import (
 	"fmt"
-
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 )
 

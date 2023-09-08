@@ -112,3 +112,22 @@ func GenerateApiToken(baseUrl string, username string) string {
 func RevokeApiToken(baseUrl string, tokenId string) string {
 	return fmt.Sprintf("%s/anubis/rest/v1/oauth/revoke/%s", baseUrl, tokenId)
 }
+
+func ReadTokenInfo(baseUrl string) string {
+	return fmt.Sprintf("%s/anubis/rest/v1/oauth/check_token", baseUrl)
+}
+
+func ReadTenantContext(baseUrl string) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/common/tenantcontext", baseUrl)
+}
+
+func CreateSystemToken(baseUrl string, scope string) string {
+	return fmt.Sprintf("%s/anubis/rest/v1/oauth/token/system/%s", baseUrl, scope)
+}
+
+func CreateFmcDeviceRecord(baseUrl string, fmcDomainId string) string {
+	return fmt.Sprintf("%s/fmc/api/fmc_config/v1/domain/%s/devices/devicerecords", baseUrl, fmcDomainId)
+}
+func ReadFmcTaskStatus(baseUrl string, fmcDomainUid string, taskId string) string {
+	return fmt.Sprintf("%s/fmc/api/fmc_config/v1/domain/%s/job/taskstatuses/%s", baseUrl, fmcDomainUid, taskId)
+}

@@ -17,6 +17,19 @@ const (
 	URLFilter Type = "URLFilter"
 )
 
+func (t *Type) MarshalJSON() ([]byte, error) {
+	return []byte(*t), nil
+}
+
+func (t *Type) UnmarshalJSON(b []byte) error {
+	deserialized, err := Deserialize(string(b))
+	if err != nil {
+		return err
+	}
+	*t = deserialized
+	return nil
+}
+
 var licenseMap = map[string]Type{
 	"BASE":      Base,
 	"CARRIER":   Carrier,

@@ -1,15 +1,18 @@
 package fmcconfig
 
-import "github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/internal"
+import (
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/fmcconfig/fmctaskstatus"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/internal"
+)
 
 type TaskStatus struct {
-	Id       string         `json:"id"`
-	Type     string         `json:"type"`
-	Links    internal.Links `json:"links"`
-	TaskType string         `json:"taskType"`
-	Message  string         `json:"message"`
-	Status   string         `json:"status"`
-	SubTasks []SubTask      `json:"subTasks"`
+	Id       string             `json:"id"`
+	Type     string             `json:"type"`
+	Links    internal.Links     `json:"links"`
+	TaskType string             `json:"taskType"`
+	Message  string             `json:"message"`
+	Status   fmctaskstatus.Type `json:"status"`
+	SubTasks []SubTask          `json:"subTasks"`
 }
 
 type SubTask struct {

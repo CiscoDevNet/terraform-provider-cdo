@@ -19,6 +19,7 @@ func NewCreateSystemTokenInput(scope string) CreateSystemTokenInput {
 
 type CreateSystemTokenOutput = auth.Token
 
+// CreateSystemToken returns a system token that is valid for 24 hrs
 func CreateSystemToken(ctx context.Context, client http.Client, getSystemTokenInp CreateSystemTokenInput) (*CreateSystemTokenOutput, error) {
 
 	createUrl := url.CreateSystemToken(client.BaseUrl(), getSystemTokenInp.Scope)

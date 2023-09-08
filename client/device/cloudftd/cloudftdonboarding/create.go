@@ -8,7 +8,9 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc/fmcplatform"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
+	"time"
 )
 
 type CreateInput struct {
@@ -62,16 +64,15 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		return nil, err
 	}
 
-	// TODO: loop here
 	// 3. post device record
 	client.Logger.Println("creating FTD device record in FMC")
+
 	// 3.1 read ftd metadata
 	readFtdOutp, err := cloudftd.ReadByName(ctx, client, cloudftd.NewReadByNameInput(createInp.FtdName))
 	if err != nil {
 		return nil, err
 	}
 	// 3.2 create ftd device
-	// TODO: use system token
 	createDeviceInp := fmcconfig.NewCreateDeviceRecordInputBuilder().
 		Type("Device").
 		NatId(readFtdOutp.Metadata.NatID).
@@ -81,24 +82,41 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		PerformanceTier(readFtdOutp.Metadata.PerformanceTier).
 		RegKey(readFtdOutp.Metadata.RegKey).
 		FmcDomainUid(fmcDomainInfo.Uuid).
+		SystemApiToken(createTokenOutp.AccessToken).
 		Build()
-	createOutp, err := fmcconfig.CreateDeviceRecord(ctx, client, createDeviceInp)
+	err = retry.Do(
+		fmcconfig.UntilCreateDeviceRecordSuccess(ctx, client, createDeviceInp),
+		retry.NewOptionsBuilder().
+			Retries(-1).
+			Delay(3*time.Second).
+			Timeout(1*time.Hour). // it can take 15-20 minutes for FTD to come up + 10 minutes to create device record
+			Logger(client.Logger).
+			EarlyExitOnError(false).
+			Build(),
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	// 4 read task until success
-	// TODO: loop here
-	readTaskOutp, err := fmcconfig.ReadTaskStatus(ctx, client, fmcconfig.NewReadTaskStatusInput(fmcDomainInfo.Uuid, createOutp.Id))
+	// 4. trigger FTD onboarding state machine
+	client.Logger.Println("re-triggering FTD onboarding state machine")
+
+	// 4.1 get ftd specific device
+	ftdSpecificOutp, err := cloudftd.ReadSpecific(ctx, client, cloudftd.NewReadSpecificInputBuilder().Uid(readFtdOutp.Uid).Build())
 	if err != nil {
 		return nil, err
 	}
-	if readTaskOutp.Status == "RUNNING" {
-		// TODO: continue
+	// 4.2 trigger register state machine
+	_, err = cloudftd.UpdateSpecific(ctx, client,
+		cloudftd.NewUpdateSpecificFtdInput(
+			ftdSpecificOutp.SpecificUid,
+			"INITIATE_FTDC_REGISTER",
+		),
+	)
+	if err != nil {
+		return nil, err
 	}
-
-	// 5. trigger FTD onboarding state machine
-	// TODO
+	// TODO: wait until state done
 
 	return nil, nil
 }

@@ -19,6 +19,7 @@ type CreateDeviceRecordInput struct {
 	LicenseCaps     []license.Type
 	AccessPolicyUid string
 	Type            string
+	SystemApiToken  string // normal cdo token does not work for this request, a cdo system token is needed
 }
 
 type createDeviceRecordRequestBody struct {

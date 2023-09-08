@@ -128,6 +128,10 @@ func (r *Request) send(output any) error {
 	return nil
 }
 
+func (r *Request) OverrideApiToken(apiToken string) {
+	r.config.ApiToken = apiToken
+}
+
 // build the net/http.Request
 func (r *Request) build() (*http.Request, error) {
 

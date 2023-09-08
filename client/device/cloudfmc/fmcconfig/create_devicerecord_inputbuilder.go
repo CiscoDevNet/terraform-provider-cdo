@@ -20,6 +20,11 @@ func (b *CreateDeviceRecordInputBuilder) FmcDomainUid(fmcDomainUid string) *Crea
 	return b
 }
 
+func (b *CreateDeviceRecordInputBuilder) SystemApiToken(systemApiToken string) *CreateDeviceRecordInputBuilder {
+	b.createDeviceRecordInput.SystemApiToken = systemApiToken
+	return b
+}
+
 func (b *CreateDeviceRecordInputBuilder) Name(name string) *CreateDeviceRecordInputBuilder {
 	b.createDeviceRecordInput.Name = name
 	return b

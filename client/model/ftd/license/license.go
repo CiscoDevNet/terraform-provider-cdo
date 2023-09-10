@@ -18,17 +18,36 @@ const (
 )
 
 func (t *Type) MarshalJSON() ([]byte, error) {
-	return []byte(*t), nil
+	return []byte("\"" + Serialize(*t) + "\""), nil
 }
 
 func (t *Type) UnmarshalJSON(b []byte) error {
-	deserialized, err := Deserialize(string(b))
+	if len(b) <= 2 || b == nil {
+		return fmt.Errorf("cannot unmarshal empty tring as a license type, it should be one of valid roles: %+v", licenseMap)
+	}
+	deserialized, err := Deserialize(string(b[1 : len(b)-1])) // strip off quote
 	if err != nil {
 		return err
 	}
 	*t = deserialized
 	return nil
 }
+
+//func (t *Types) MarshalJSON() ([]byte, error) {
+//	return []byte("\"" + SerializeAll(*t) + "\""), nil
+//}
+//
+//func (t *Types) UnmarshalJSON(b []byte) error {
+//	if len(b) <= 2 || b == nil {
+//		return fmt.Errorf("cannot unmarshal empty tring as a license type, it should be one of valid roles: %+v", licenseMap)
+//	}
+//	deserialized, err := DeserializeAll(string(b[1 : len(b)-1])) // strip off bracket
+//	if err != nil {
+//		return err
+//	}
+//	*t = deserialized
+//	return nil
+//}
 
 var licenseMap = map[string]Type{
 	"BASE":      Base,
@@ -41,7 +60,7 @@ var licenseMap = map[string]Type{
 func MustParse(name string) Type {
 	l, ok := licenseMap[name]
 	if !ok {
-		panic(fmt.Errorf("FTD License of name: \"%s\" not found", name))
+		panic(fmt.Errorf("FTD License of name: \"%s\" not found, should be one of %+v", name, licenseMap))
 	}
 	return l
 }

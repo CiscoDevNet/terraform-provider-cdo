@@ -20,6 +20,11 @@ func (b *CreateDeviceRecordInputBuilder) FmcDomainUid(fmcDomainUid string) *Crea
 	return b
 }
 
+func (b *CreateDeviceRecordInputBuilder) FmcHostname(fmcHostname string) *CreateDeviceRecordInputBuilder {
+	b.createDeviceRecordInput.FmcHostname = fmcHostname
+	return b
+}
+
 func (b *CreateDeviceRecordInputBuilder) SystemApiToken(systemApiToken string) *CreateDeviceRecordInputBuilder {
 	b.createDeviceRecordInput.SystemApiToken = systemApiToken
 	return b
@@ -45,7 +50,7 @@ func (b *CreateDeviceRecordInputBuilder) PerformanceTier(performanceTier *tier.T
 	return b
 }
 
-func (b *CreateDeviceRecordInputBuilder) LicenseCaps(licenseCaps []license.Type) *CreateDeviceRecordInputBuilder {
+func (b *CreateDeviceRecordInputBuilder) LicenseCaps(licenseCaps *[]license.Type) *CreateDeviceRecordInputBuilder {
 	b.createDeviceRecordInput.LicenseCaps = licenseCaps
 	return b
 }

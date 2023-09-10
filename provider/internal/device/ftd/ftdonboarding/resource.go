@@ -1,4 +1,4 @@
-package ftd
+package ftdonboarding
 
 import (
 	"context"
@@ -24,7 +24,7 @@ type Resource struct {
 
 type ResourceModel struct {
 	ID    types.String `tfsdk:"id"`
-	FtdId types.String `tfsdk:"ftdId"`
+	FtdId types.String `tfsdk:"ftd_id"`
 }
 
 func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -43,7 +43,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"ftdId": schema.StringAttribute{
+			"ftd_id": schema.StringAttribute{
 				MarkdownDescription: "TODO_FILL_ME",
 				Required:            true,
 				PlanModifiers: []planmodifier.String{

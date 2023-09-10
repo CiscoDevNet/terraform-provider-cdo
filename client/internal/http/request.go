@@ -89,6 +89,25 @@ func (r *Request) send(output any) error {
 		return err
 	}
 
+	if r.method != "GET" && r.method != "DELETE" {
+		bodyReader2, err := toReader(r.body)
+		if err != nil {
+			return err
+		}
+		fmt.Println("request_check")
+		if bodyReader2 != nil {
+			bs, err := io.ReadAll(bodyReader2)
+			if err != nil {
+				return err
+			}
+			r.logger.Printf("Request: %+v\n", r)
+			r.logger.Printf("Request: %s, %s, %s\n", r.url, r.method, string(bs))
+		} else {
+			r.logger.Printf("empty body\n")
+		}
+
+	}
+
 	// send request
 	res, err := r.httpClient.Do(req)
 	if err != nil {
@@ -100,6 +119,7 @@ func (r *Request) send(output any) error {
 	// check status
 	if res.StatusCode >= 400 {
 		body, err := io.ReadAll(res.Body)
+		r.logger.Printf("failed: url=%s, code=%d, status=%s, body=%s, readBodyErr=%s, method=%s, header=%s, reqBody=%s\n\n", r.url, res.StatusCode, res.Status, string(body), err, r.method, r.Header, r.body)
 		err = fmt.Errorf("failed: url=%s, code=%d, status=%s, body=%s, readBodyErr=%s, method=%s, header=%s", r.url, res.StatusCode, res.Status, string(body), err, r.method, r.Header)
 		r.Error = err
 		return err
@@ -107,6 +127,7 @@ func (r *Request) send(output any) error {
 
 	// request is all good, now parse body
 	resBody, err := io.ReadAll(res.Body)
+	r.logger.Printf("success: url=%s, code=%d, status=%s, body=%s, readBodyErr=%s, method=%s, header=%s, reqBody=%s\n", r.url, res.StatusCode, res.Status, string(resBody), err, r.method, r.Header, r.body)
 	if err != nil {
 		r.Error = err
 		return err

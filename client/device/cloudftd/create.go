@@ -20,7 +20,7 @@ type CreateInput struct {
 	AccessPolicyName string
 	PerformanceTier  *tier.Type // ignored if it is physical device
 	Virtual          bool
-	Licenses         []license.Type
+	Licenses         *[]license.Type
 }
 
 type CreateOutput struct {
@@ -34,7 +34,7 @@ func NewCreateInput(
 	accessPolicyName string,
 	performanceTier *tier.Type,
 	virtual bool,
-	licenses []license.Type,
+	licenses *[]license.Type,
 ) CreateInput {
 	return CreateInput{
 		Name:             name,

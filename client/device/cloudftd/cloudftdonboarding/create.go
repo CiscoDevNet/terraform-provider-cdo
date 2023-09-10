@@ -14,17 +14,16 @@ import (
 )
 
 type CreateInput struct {
-	FtdName string
+	FtdId string
 }
 
-func NewCreateInput(ftdName string) CreateInput {
+func NewCreateInput(ftdId string) CreateInput {
 	return CreateInput{
-		FtdName: ftdName,
+		FtdId: ftdId,
 	}
 }
 
-type CreateOutput struct {
-}
+type CreateOutput = fmcconfig.CreateDeviceRecordOutput
 
 func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, error) {
 
@@ -68,7 +67,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	client.Logger.Println("creating FTD device record in FMC")
 
 	// 3.1 read ftd metadata
-	readFtdOutp, err := cloudftd.ReadByName(ctx, client, cloudftd.NewReadByNameInput(createInp.FtdName))
+	readFtdOutp, err := cloudftd.ReadByUid(ctx, client, cloudftd.NewReadByUidInput(createInp.FtdId))
 	if err != nil {
 		return nil, err
 	}
@@ -82,14 +81,16 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		PerformanceTier(readFtdOutp.Metadata.PerformanceTier).
 		RegKey(readFtdOutp.Metadata.RegKey).
 		FmcDomainUid(fmcDomainInfo.Uuid).
+		FmcHostname(fmcRes.Host).
 		SystemApiToken(createTokenOutp.AccessToken).
 		Build()
+	var createOutp fmcconfig.CreateDeviceRecordOutput
 	err = retry.Do(
-		fmcconfig.UntilCreateDeviceRecordSuccess(ctx, client, createDeviceInp),
+		fmcconfig.UntilCreateDeviceRecordSuccess(ctx, client, createDeviceInp, &createOutp),
 		retry.NewOptionsBuilder().
 			Retries(-1).
 			Delay(3*time.Second).
-			Timeout(1*time.Hour). // it can take 15-20 minutes for FTD to come up + 10 minutes to create device record
+			Timeout(15*time.Minute). // it can take 15-20 minutes for FTD to come up + 10 minutes to create device record
 			Logger(client.Logger).
 			EarlyExitOnError(false).
 			Build(),
@@ -118,5 +119,5 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	}
 	// TODO: wait until state done
 
-	return nil, nil
+	return &createOutp, nil
 }

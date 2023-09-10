@@ -1,12 +1,14 @@
 package role
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Type string
 
 const (
-	USER               Type = "ROLE_USER"
-	ADMIN              Type = "ROLE_ADMIN"
+	User               Type = "ROLE_USER"
+	Admin              Type = "ROLE_ADMIN"
 	ReadOnly           Type = "ROLE_READ_ONLY"
 	SuperAdmin         Type = "ROLE_SUPER_ADMIN"
 	DeployOnly         Type = "ROLE_DEPLOY_ONLY"
@@ -16,21 +18,28 @@ const (
 )
 
 var NameToType = map[string]Type{
-	"ROLE_USER":                 USER,
-	"ROLE_ADMIN":                ADMIN,
-	"ROLE_READ_ONLY":            ReadOnly,
-	"ROLE_SUPER_ADMIN":          SuperAdmin,
-	"ROLE_DEPLOY_ONLY":          DeployOnly,
-	"ROLE_EDIT_ONLY":            EditOnly,
-	"ROLE_VPN_SESSIONS_MANAGER": VpnSessionsManager,
-	"ROLE_CHOICE_ADMIN":         ChoiceAdmin,
+	string(User):               User,
+	string(Admin):              Admin,
+	string(ReadOnly):           ReadOnly,
+	string(SuperAdmin):         SuperAdmin,
+	string(DeployOnly):         DeployOnly,
+	string(EditOnly):           EditOnly,
+	string(VpnSessionsManager): VpnSessionsManager,
+	string(ChoiceAdmin):        ChoiceAdmin,
 }
 
 func (t *Type) UnmarshalJSON(b []byte) error {
-	role, ok := NameToType[string(b)]
+	if len(b) <= 2 || b == nil {
+		return fmt.Errorf("cannot unmarshal empty tring as a role type, it should be one of valid roles: %+v", NameToType)
+	}
+	role, ok := NameToType[string(b[1:len(b)-1])]
 	if !ok {
 		return fmt.Errorf("cannot unmarshal %s as a role type, it should be one of valid roles: %+v", string(b), NameToType)
 	}
 	*t = role
 	return nil
+}
+
+func (t *Type) MarshalJSON() ([]byte, error) {
+	return []byte(*t), nil
 }

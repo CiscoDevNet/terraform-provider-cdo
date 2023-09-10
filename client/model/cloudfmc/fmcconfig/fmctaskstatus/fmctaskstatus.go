@@ -23,7 +23,10 @@ func (t *Type) MarshalJSON() ([]byte, error) {
 }
 
 func (t *Type) UnmarshalJSON(b []byte) error {
-	type_, ok := NameToTypeMap[string(b)]
+	if len(b) <= 2 || b == nil {
+		return fmt.Errorf("cannot unmarshal empty tring as a fmc task status, it should be one of valid roles: %+v", NameToTypeMap)
+	}
+	type_, ok := NameToTypeMap[string(b[1:len(b)-1])] // strip off quote
 	if !ok {
 		return fmt.Errorf("failed to unmarshal %s into FMC task status, should be one of %+v", type_, NameToTypeMap)
 	}

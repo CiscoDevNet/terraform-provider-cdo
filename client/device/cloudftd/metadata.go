@@ -7,14 +7,14 @@ import (
 )
 
 type Metadata struct {
-	AccessPolicyName   string         `json:"accessPolicyName,omitempty"`
-	AccessPolicyUid    string         `json:"accessPolicyUuid,omitempty"`
-	CloudManagerDomain string         `json:"cloudManagerDomain,omitempty"`
-	GeneratedCommand   string         `json:"generatedCommand,omitempty"`
-	LicenseCaps        []license.Type `json:"license_caps,omitempty"`
-	NatID              string         `json:"natID,omitempty"`
-	PerformanceTier    *tier.Type     `json:"performanceTier,omitempty"`
-	RegKey             string         `json:"regKey,omitempty"`
+	AccessPolicyName   string          `json:"accessPolicyName,omitempty"`
+	AccessPolicyUid    string          `json:"accessPolicyUuid,omitempty"`
+	CloudManagerDomain string          `json:"cloudManagerDomain,omitempty"`
+	GeneratedCommand   string          `json:"generatedCommand,omitempty"`
+	LicenseCaps        *[]license.Type `json:"license_caps,omitempty"`
+	NatID              string          `json:"natID,omitempty"`
+	PerformanceTier    *tier.Type      `json:"performanceTier,omitempty"`
+	RegKey             string          `json:"regKey,omitempty"`
 }
 
 type internalMetadata struct {
@@ -52,7 +52,7 @@ func (metadata *Metadata) UnmarshalJSON(data []byte) error {
 	(*metadata).PerformanceTier = internalMeta.PerformanceTier
 	(*metadata).RegKey = internalMeta.RegKey
 
-	(*metadata).LicenseCaps = licenseCaps // set it as usual
+	(*metadata).LicenseCaps = &licenseCaps // set it as usual
 
 	return nil
 }
@@ -63,7 +63,7 @@ func (metadata *Metadata) MarshalJSON() ([]byte, error) {
 	internalMeta.AccessPolicyUuid = metadata.AccessPolicyUid
 	internalMeta.CloudManagerDomain = metadata.CloudManagerDomain
 	internalMeta.GeneratedCommand = metadata.GeneratedCommand
-	internalMeta.LicenseCaps = license.SerializeAll(metadata.LicenseCaps)
+	internalMeta.LicenseCaps = license.SerializeAll(*metadata.LicenseCaps)
 	internalMeta.NatID = metadata.NatID
 	internalMeta.PerformanceTier = metadata.PerformanceTier
 	internalMeta.RegKey = metadata.RegKey

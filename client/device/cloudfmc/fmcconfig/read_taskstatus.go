@@ -9,13 +9,15 @@ import (
 
 type ReadTaskStatusInput struct {
 	FmcDomainUid string
+	FmcHostname  string
 	TaskId       string
 }
 
-func NewReadTaskStatusInput(fmcDomainUid string, taskId string) ReadTaskStatusInput {
+func NewReadTaskStatusInput(fmcDomainUid string, taskId string, fmcHostname string) ReadTaskStatusInput {
 	return ReadTaskStatusInput{
 		FmcDomainUid: fmcDomainUid,
 		TaskId:       taskId,
+		FmcHostname:  fmcHostname,
 	}
 }
 
@@ -25,6 +27,7 @@ func ReadTaskStatus(ctx context.Context, client http.Client, readTaskStatusInp R
 
 	readUrl := url.ReadFmcTaskStatus(client.BaseUrl(), readTaskStatusInp.FmcDomainUid, readTaskStatusInp.TaskId)
 	req := client.NewGet(ctx, readUrl)
+	req.Header.Add("Fmc-Hostname", readTaskStatusInp.FmcHostname)
 
 	var readOutp ReadTaskStatusOutput
 	if err := req.Send(&readOutp); err != nil {

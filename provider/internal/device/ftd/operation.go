@@ -8,6 +8,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"strings"
 )
 
 func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) error {
@@ -25,7 +26,7 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 	stateData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
 	stateData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUid)
 	stateData.Virtual = types.BoolValue(res.Metadata.PerformanceTier != nil)
-	stateData.Licenses = util.GoStringSliceToTFStringList(sliceutil.Map(res.Metadata.LicenseCaps, func(l license.Type) string { return string(l) }))
+	stateData.Licenses = util.GoStringSliceToTFStringList(sliceutil.Map(*res.Metadata.LicenseCaps, func(l license.Type) string { return string(l) }))
 	if res.Metadata.PerformanceTier != nil { // nil means physical cloudftd
 		stateData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))
 	}
@@ -47,7 +48,7 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 	}
 
 	licensesGoList := util.TFStringListToGoStringList(planData.Licenses)
-	licenses, err := sliceutil.MapWithError(licensesGoList, func(s string) (license.Type, error) { return license.Deserialize(s) })
+	licenses, err := license.DeserializeAll(strings.Join(licensesGoList, ","))
 	if err != nil {
 		return err
 	}
@@ -56,7 +57,7 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 		planData.AccessPolicyName.ValueString(),
 		performanceTier,
 		planData.Virtual.ValueBool(),
-		licenses,
+		&licenses,
 	)
 	res, err := resource.client.CreateCloudFtd(ctx, createInp)
 	if err != nil {
@@ -68,7 +69,7 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 	planData.Name = types.StringValue(res.Name)
 	planData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
 	planData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUid)
-	planData.Licenses = util.GoStringSliceToTFStringList(sliceutil.Map(res.Metadata.LicenseCaps, func(l license.Type) string { return string(l) }))
+	planData.Licenses = util.GoStringSliceToTFStringList(sliceutil.Map(*res.Metadata.LicenseCaps, func(l license.Type) string { return string(l) }))
 	if res.Metadata.PerformanceTier != nil { // nil means physical cloud ftd
 		planData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))
 	}

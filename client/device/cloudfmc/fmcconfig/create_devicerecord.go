@@ -2,7 +2,6 @@ package fmcconfig
 
 import (
 	"context"
-	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/fmcconfig"
@@ -12,24 +11,25 @@ import (
 
 type CreateDeviceRecordInput struct {
 	FmcDomainUid    string
+	FmcHostname     string
 	Name            string
 	NatId           string
 	RegKey          string
 	PerformanceTier *tier.Type
-	LicenseCaps     []license.Type
+	LicenseCaps     *[]license.Type
 	AccessPolicyUid string
 	Type            string
 	SystemApiToken  string // normal cdo token does not work for this request, a cdo system token is needed
 }
 
 type createDeviceRecordRequestBody struct {
-	Name            string         `json:"name"`
-	NatId           string         `json:"natID"`
-	RegKey          string         `json:"regKey"`
-	PerformanceTier *tier.Type     `json:"performanceTier"`
-	Type            string         `json:"type"`
-	LicenseCaps     []license.Type `json:"license_caps"`
-	AccessPolicy    accessPolicy   `json:"accessPolicy"`
+	Name            string          `json:"name"`
+	NatId           string          `json:"natID"`
+	RegKey          string          `json:"regKey"`
+	PerformanceTier *tier.Type      `json:"performanceTier"`
+	Type            string          `json:"type"`
+	LicenseCaps     *[]license.Type `json:"license_caps"`
+	AccessPolicy    accessPolicy    `json:"accessPolicy"`
 }
 
 type accessPolicy struct {
@@ -56,7 +56,7 @@ func NewCreateDeviceRecordInput(fmcDomainUid string) CreateDeviceRecordInput {
 //  }
 //}
 
-type CreateDeviceRecordOutput = fmcconfig.DeviceRecordCreationItem
+type CreateDeviceRecordOutput = fmcconfig.DeviceRecordCreation
 
 func CreateDeviceRecord(ctx context.Context, client http.Client, createInp CreateDeviceRecordInput) (*CreateDeviceRecordOutput, error) {
 
@@ -75,13 +75,19 @@ func CreateDeviceRecord(ctx context.Context, client http.Client, createInp Creat
 		},
 	}
 	req := client.NewPost(ctx, createUrl, body)
+	client.Logger.Printf("fmc hostname=%s\n\n", createInp.FmcHostname)
+	req.Header.Add("Fmc-Hostname", createInp.FmcHostname)
+	req.OverrideApiToken(createInp.SystemApiToken)
+
+	client.Logger.Printf("create device record request: %+v\n\n", req)
+
 	var createOutp fmcconfig.DeviceRecordCreation
 	if err := req.Send(&createOutp); err != nil {
 		return nil, err
 	}
-	if len(createOutp.Items) < 1 {
-		return nil, fmt.Errorf("failed to find device create record task item in response")
-	}
+	//if len(createOutp.Items) < 1 {
+	//	return nil, fmt.Errorf("failed to find device create record task item in response")
+	//}
 
-	return &createOutp.Items[0], nil
+	return &createOutp, nil
 }

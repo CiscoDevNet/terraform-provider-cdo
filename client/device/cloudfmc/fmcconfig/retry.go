@@ -17,7 +17,9 @@ var (
 
 func UntilTaskStatusSuccess(ctx context.Context, client http.Client, readInp ReadTaskStatusInput) retry.Func {
 	return func() (bool, error) {
+		client.Logger.Printf("UntilTaskStatusSuccess: reading status")
 		readTaskOutp, err := ReadTaskStatus(ctx, client, readInp)
+		client.Logger.Printf("UntilTaskStatusSuccess: read output=%+v", readTaskOutp)
 		if err != nil {
 			return false, err
 		}
@@ -34,19 +36,22 @@ func UntilTaskStatusSuccess(ctx context.Context, client http.Client, readInp Rea
 	}
 }
 
-func UntilCreateDeviceRecordSuccess(ctx context.Context, client http.Client, createDeviceRecordInput CreateDeviceRecordInput) retry.Func {
+func UntilCreateDeviceRecordSuccess(ctx context.Context, client http.Client, createDeviceRecordInput CreateDeviceRecordInput, output *CreateDeviceRecordOutput) retry.Func {
 	return func() (bool, error) {
+		client.Logger.Printf("UntilCreateDeviceRecordSuccess: creating device record ")
 		createDeviceOutp, err := CreateDeviceRecord(ctx, client, createDeviceRecordInput)
+		*output = *createDeviceOutp
+		client.Logger.Printf("UntilCreateDeviceRecordSuccess: create output=%+v", createDeviceOutp)
 		if err != nil {
 			return false, err
 		}
-		readInp := NewReadTaskStatusInput(createDeviceRecordInput.FmcDomainUid, createDeviceOutp.Id)
+		readInp := NewReadTaskStatusInput(createDeviceRecordInput.FmcDomainUid, createDeviceOutp.Metadata.Task.Id, createDeviceRecordInput.FmcHostname)
 		err = retry.Do(
 			UntilTaskStatusSuccess(ctx, client, readInp),
 			retry.NewOptionsBuilder().
 				Retries(-1).
 				Logger(client.Logger).
-				Timeout(30*time.Minute). // usually takes ~5 minutes
+				Timeout(20*time.Minute). // usually takes ~5 minutes
 				EarlyExitOnError(true).
 				Delay(3*time.Second).
 				Build(),

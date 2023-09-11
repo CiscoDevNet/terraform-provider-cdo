@@ -1,8 +1,12 @@
 package cloudftd
 
+/**
+* The cloud FTD corresponds to the CDO Device Type FTDC, which is an FTD managed by a cdFMC.
+ */
 import (
 	"context"
 	"fmt"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc/fmcplatform"

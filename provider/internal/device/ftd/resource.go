@@ -3,7 +3,9 @@ package ftd
 import (
 	"context"
 	"fmt"
+
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -11,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -55,11 +58,11 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "A human-readable name for the Firewall Threat Defense (FTD). This should be unique among FTDs",
+				MarkdownDescription: "A human-readable name for the Firewall Threat Defense (FTD). This should be unique across your tenant.",
 				Required:            true,
 			},
 			"access_policy_name": schema.StringAttribute{
-				MarkdownDescription: "The name of the Cloud FMC access policy that will be used by the FTD",
+				MarkdownDescription: "The name of the Cloud-Delivered FMC (cdFMC) access policy that will be used by the FTD.",
 				Required:            true,
 				// TODO: make this optional, and use default access policy when not given
 				PlanModifiers: []planmodifier.String{
@@ -86,21 +89,25 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			},
 			"licenses": schema.ListAttribute{
 				ElementType:         types.StringType,
-				MarkdownDescription: "Comma separated list of licenses of this FTD, it must at least contains the \"BASE\" license.",
+				MarkdownDescription: "Comma separated list of licenses to apply to this FTD. You must enable at least the `BASE` license.",
 				Required:            true,
 				// TODO: make this not required, when not given, use BASE license
 				PlanModifiers: []planmodifier.List{
 					listplanmodifier.RequiresReplace(), // TODO: can we modify license after FTD is created?
 					// TODO: always sort the licenses so that it is the same order, so that it does not change when order of licenses changes
 				},
+				Validators: []validator.List{
+					listvalidator.SizeAtLeast(1),
+					listvalidator.UniqueValues(),
+				},
 				// TODO: validate the licenses are valid input.
 			},
 			"generated_command": schema.StringAttribute{
-				MarkdownDescription: "The command to run in the FTD to register itself with Cloud FMC.",
+				MarkdownDescription: "The command to run in the FTD to register itself with Cloud-Deliered FMC (cdFMC).",
 				Computed:            true,
 			},
 			"access_policy_id": schema.StringAttribute{
-				MarkdownDescription: "The id of the access policy used by this FTD.",
+				MarkdownDescription: "The id of the Cloud-Delivered FMC (cdFMC) access policy applied to this FTD.",
 				Computed:            true,
 			},
 		},

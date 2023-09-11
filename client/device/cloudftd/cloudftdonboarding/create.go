@@ -38,7 +38,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		return nil, err
 	}
 	// 1.2 read fmc domain info in its specific/appliance device
-	readFmcDomainRes, err := fmcplatform.ReadFmcDomainInfo(ctx, client, fmcplatform.NewReadDomainInfo(fmcRes.Host))
+	readFmcDomainRes, err := fmcplatform.ReadFmcDomainInfo(ctx, client, fmcplatform.NewReadDomainInfoInput(fmcRes.Host))
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	}
 
 	// 4. trigger FTD onboarding state machine
-	client.Logger.Println("re-triggering FTD onboarding state machine")
+	client.Logger.Println("triggering FTD onboarding state machine")
 
 	// 4.1 get ftd specific device
 	ftdSpecificOutp, err := cloudftd.ReadSpecific(ctx, client, cloudftd.NewReadSpecificInputBuilder().Uid(readFtdOutp.Uid).Build())

@@ -11,7 +11,7 @@ type ReadDomainInfoInput struct {
 	FmcHost string
 }
 
-func NewReadDomainInfo(fmcHost string) ReadDomainInfoInput {
+func NewReadDomainInfoInput(fmcHost string) ReadDomainInfoInput {
 	return ReadDomainInfoInput{
 		FmcHost: fmcHost,
 	}

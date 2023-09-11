@@ -20,6 +20,7 @@ type ReadOutput struct {
 	Uid      string   `json:"uid"`
 	Name     string   `json:"name"`
 	Metadata Metadata `json:"metadata,omitempty"`
+	State    string   `json:"state"`
 }
 
 func ReadByUid(ctx context.Context, client http.Client, readInp ReadByUidInput) (*ReadOutput, error) {

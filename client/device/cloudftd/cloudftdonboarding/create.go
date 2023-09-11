@@ -14,12 +14,12 @@ import (
 )
 
 type CreateInput struct {
-	FtdId string
+	FtdUid string
 }
 
 func NewCreateInput(ftdId string) CreateInput {
 	return CreateInput{
-		FtdId: ftdId,
+		FtdUid: ftdId,
 	}
 }
 
@@ -67,7 +67,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	client.Logger.Println("creating FTD device record in FMC")
 
 	// 3.1 read ftd metadata
-	readFtdOutp, err := cloudftd.ReadByUid(ctx, client, cloudftd.NewReadByUidInput(createInp.FtdId))
+	readFtdOutp, err := cloudftd.ReadByUid(ctx, client, cloudftd.NewReadByUidInput(createInp.FtdUid))
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,20 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	if err != nil {
 		return nil, err
 	}
-	// TODO: wait until state done
+	// 4.3 wait until state machine done
+	err = retry.Do(
+		cloudftd.UntilStateDone(ctx, client, cloudftd.NewReadByUidInput(createInp.FtdUid)),
+		retry.NewOptionsBuilder().
+			Retries(-1).
+			Delay(1*time.Second).
+			Timeout(10*time.Minute).
+			Logger(client.Logger).
+			EarlyExitOnError(false).
+			Build(),
+	)
+	if err != nil {
+		return nil, err
+	}
 
 	return &createOutp, nil
 }

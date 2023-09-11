@@ -23,7 +23,7 @@ type Resource struct {
 }
 
 type ResourceModel struct {
-	ID    types.String `tfsdk:"id"`
+	Id    types.String `tfsdk:"id"`
 	FtdId types.String `tfsdk:"ftd_id"`
 }
 

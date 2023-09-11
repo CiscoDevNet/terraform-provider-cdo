@@ -102,7 +102,6 @@ func Do(retryFunc Func, opt Options) error {
 
 	// attempt once before starting retries
 	ok, err := retryFunc()
-	opt.Logger.Printf("err=%+v", err)
 	accumulatedErrs = append(accumulatedErrs, err)
 	if err != nil && opt.EarlyExitOnError {
 		return fmt.Errorf("error in retry func, cause=%w", err)
@@ -124,7 +123,6 @@ func Do(retryFunc Func, opt Options) error {
 
 		// attempt
 		ok, err = retryFunc()
-		opt.Logger.Printf("err=%+v", err)
 		accumulatedErrs = append(accumulatedErrs, err)
 		if err != nil && opt.EarlyExitOnError {
 			return fmt.Errorf("error in retry func, cause=%w", err)
@@ -134,6 +132,7 @@ func Do(retryFunc Func, opt Options) error {
 			return nil
 		}
 		opt.Logger.Println("[RETRY] failed")
+		opt.Logger.Printf("[RETRY] reason: ok=%t err=%+v", ok, err)
 	}
 
 	return fmt.Errorf(

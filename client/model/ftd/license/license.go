@@ -33,22 +33,6 @@ func (t *Type) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-//func (t *Types) MarshalJSON() ([]byte, error) {
-//	return []byte("\"" + SerializeAll(*t) + "\""), nil
-//}
-//
-//func (t *Types) UnmarshalJSON(b []byte) error {
-//	if len(b) <= 2 || b == nil {
-//		return fmt.Errorf("cannot unmarshal empty tring as a license type, it should be one of valid roles: %+v", licenseMap)
-//	}
-//	deserialized, err := DeserializeAll(string(b[1 : len(b)-1])) // strip off bracket
-//	if err != nil {
-//		return err
-//	}
-//	*t = deserialized
-//	return nil
-//}
-
 var licenseMap = map[string]Type{
 	"BASE":      Base,
 	"CARRIER":   Carrier,

@@ -33,7 +33,7 @@ func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, r
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "",
+		MarkdownDescription: "TODO_FILL_ME",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{

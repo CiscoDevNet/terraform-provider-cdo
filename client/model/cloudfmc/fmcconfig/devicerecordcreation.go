@@ -6,8 +6,6 @@ import (
 )
 
 type DeviceRecordCreation struct {
-	//Links internal.Links             `json:"links"`
-	//Items []DeviceRecordCreationItem `json:"items"`
 	Type            string `json:"type"`
 	Name            string `json:"name"`
 	Version         string `json:"version"`
@@ -46,28 +44,3 @@ type DeviceRecordCreationItem struct {
 	Version         string         `json:"version"`
 	KeepLocalEvents bool           `json:"keepLocalEvents"`
 }
-
-//{
-//    "type": "Device",
-//    "name": "test-wl-ftd",
-//    "version": "6.0.1",
-//    "accessPolicy": {
-//        "id": "06AE8B8C-5F91-0ed3-0000-004294967346",
-//        "type": "AccessPolicy"
-//    },
-//    "regKey": "NVSr9JszUQh69oNTHjRk8ztXdtzkwurX",
-//    "license_caps": [
-//        "BASE"
-//    ],
-//    "performanceTier": "FTDv5",
-//    "natID": "Vbufy7GTmZK0xXvzs3WEHZC2ueXChwUH",
-//    "keepLocalEvents": false,
-//    "metadata": {
-//        "task": {
-//            "name": "DEVICE_REGISTRATION",
-//            "id": "4294972234",
-//            "type": "TaskStatus"
-//        },
-//        "isPartOfContainer": false,
-//        "isMultiInstance": false
-//    },

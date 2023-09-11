@@ -51,14 +51,3 @@ func NewConfig(baseUrl string, apiToken string, retries int, delay time.Duration
 		Timeout: timeout,
 	}, nil
 }
-
-func (c *Config) Copy() Config {
-	return *c
-}
-
-func (c *Config) CopyWithNewToken(token string) Config {
-	copy_ := c.Copy()
-	copy_.ApiToken = token
-
-	return copy_
-}

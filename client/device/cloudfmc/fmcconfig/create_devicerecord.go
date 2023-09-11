@@ -43,19 +43,6 @@ func NewCreateDeviceRecordInput(fmcDomainUid string) CreateDeviceRecordInput {
 	}
 }
 
-//{
-//"name": "wl-ftd",
-//"natID": "9vJh4UIakWIn3hYTMv665VRram7DuR9C",
-//"regKey": "2ACVIlY1TuOvXgnNb1R0577lh0urDvcH",
-//"performanceTier": "FTDv5",
-//"type": "Device",
-//"license_caps": ["BASE"],
-//"accessPolicy": {
-//  "id": "06AE8B8C-5F91-0ed3-0000-004294967346",
-//  "type": "AccessPolicy"
-//  }
-//}
-
 type CreateDeviceRecordOutput = fmcconfig.DeviceRecordCreation
 
 func CreateDeviceRecord(ctx context.Context, client http.Client, createInp CreateDeviceRecordInput) (*CreateDeviceRecordOutput, error) {
@@ -75,19 +62,13 @@ func CreateDeviceRecord(ctx context.Context, client http.Client, createInp Creat
 		},
 	}
 	req := client.NewPost(ctx, createUrl, body)
-	client.Logger.Printf("fmc hostname=%s\n\n", createInp.FmcHostname)
 	req.Header.Add("Fmc-Hostname", createInp.FmcHostname)
 	req.OverrideApiToken(createInp.SystemApiToken)
-
-	client.Logger.Printf("create device record request: %+v\n\n", req)
 
 	var createOutp fmcconfig.DeviceRecordCreation
 	if err := req.Send(&createOutp); err != nil {
 		return nil, err
 	}
-	//if len(createOutp.Items) < 1 {
-	//	return nil, fmt.Errorf("failed to find device create record task item in response")
-	//}
 
 	return &createOutp, nil
 }

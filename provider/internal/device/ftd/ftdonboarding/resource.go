@@ -74,7 +74,7 @@ func (r *Resource) Configure(ctx context.Context, req resource.ConfigureRequest,
 }
 
 func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	tflog.Trace(ctx, "read FTD resource")
+	tflog.Trace(ctx, "read FTD onboarding resource")
 
 	// 1. read terraform plan data into the model
 	var stateData ResourceModel
@@ -85,17 +85,17 @@ func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *res
 
 	// 2. do read
 	if err := Read(ctx, r, &stateData); err != nil {
-		resp.Diagnostics.AddError("failed to read FTD resource", err.Error())
+		resp.Diagnostics.AddError("failed to read FTD onboarding resource", err.Error())
 		return
 	}
 
 	// 3. save data into terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &stateData)...)
-	tflog.Trace(ctx, "read FTD resource done")
+	tflog.Trace(ctx, "read FTD onboarding resource done")
 }
 
 func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, res *resource.CreateResponse) {
-	tflog.Trace(ctx, "create FTD resource")
+	tflog.Trace(ctx, "create FTD onboarding resource")
 
 	// 1. read terraform plan data into model
 	var planData ResourceModel
@@ -106,17 +106,17 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, res *
 
 	// 2. create resource & fill model data
 	if err := Create(ctx, r, &planData); err != nil {
-		res.Diagnostics.AddError("failed to create FTD resource", err.Error())
+		res.Diagnostics.AddError("failed to create FTD onboarding resource", err.Error())
 		return
 	}
 
 	// 3. fill terraform state using model data
 	res.Diagnostics.Append(res.State.Set(ctx, &planData)...)
-	tflog.Trace(ctx, "create FTD resource done")
+	tflog.Trace(ctx, "create FTD onboarding resource done")
 }
 
 func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, res *resource.UpdateResponse) {
-	tflog.Trace(ctx, "update FTD resource")
+	tflog.Trace(ctx, "update FTD onboarding resource")
 
 	// 1. read plan and state data from terraform
 	var planData ResourceModel
@@ -132,17 +132,17 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, res *
 
 	// 2. update resource & state data
 	if err := Update(ctx, r, &planData, &stateData); err != nil {
-		res.Diagnostics.AddError("failed to update FTD resource", err.Error())
+		res.Diagnostics.AddError("failed to update FTD onboarding resource", err.Error())
 		return
 	}
 
 	// 3. update terraform state with updated state data
 	res.Diagnostics.Append(res.State.Set(ctx, &stateData)...)
-	tflog.Trace(ctx, "update FTD resource done")
+	tflog.Trace(ctx, "update FTD onboarding resource done")
 }
 
 func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, res *resource.DeleteResponse) {
-	tflog.Trace(ctx, "delete FTD resource")
+	tflog.Trace(ctx, "delete FTD onboarding resource")
 
 	// 1. read state data from terraform state
 	var stateData ResourceModel
@@ -153,6 +153,6 @@ func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, res *
 
 	// 2. delete the resource
 	if err := Delete(ctx, r, &stateData); err != nil {
-		res.Diagnostics.AddError("failed to delete FTD resource", err.Error())
+		res.Diagnostics.AddError("failed to delete FTD onboarding resource", err.Error())
 	}
 }

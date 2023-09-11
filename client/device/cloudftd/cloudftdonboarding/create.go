@@ -45,10 +45,10 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	if len(readFmcDomainRes.Items) == 0 {
 		return nil, fmt.Errorf("failed to read fmc domain uid, fmc domain info not found")
 	}
-	fmcDomainInfo := readFmcDomainRes.Items[0] // contains uid
+	fmcDomainUid := readFmcDomainRes.Items[0].Uuid
 
 	// 2. get a system token for creating FTD device record in FMC
-	// CDO token does not work, otherwise 405 method not allowed
+	// CDO token does not work, we will get a 405 method not allowed if we do that
 	client.Logger.Println("getting a system token for creating FTD device record in FMC")
 
 	// 2.1 get tenant context => tenant uid
@@ -80,7 +80,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		LicenseCaps(readFtdOutp.Metadata.LicenseCaps).
 		PerformanceTier(readFtdOutp.Metadata.PerformanceTier).
 		RegKey(readFtdOutp.Metadata.RegKey).
-		FmcDomainUid(fmcDomainInfo.Uuid).
+		FmcDomainUid(fmcDomainUid).
 		FmcHostname(fmcRes.Host).
 		SystemApiToken(createTokenOutp.AccessToken).
 		Build()
@@ -90,7 +90,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		retry.NewOptionsBuilder().
 			Retries(-1).
 			Delay(3*time.Second).
-			Timeout(15*time.Minute). // it can take 15-20 minutes for FTD to come up + 10 minutes to create device record
+			Timeout(1*time.Hour). // it can take 15-20 minutes for FTD to come up + 10 minutes to create device record
 			Logger(client.Logger).
 			EarlyExitOnError(false).
 			Build(),

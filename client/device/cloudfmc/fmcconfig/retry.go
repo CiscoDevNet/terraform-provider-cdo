@@ -17,9 +17,7 @@ var (
 
 func UntilTaskStatusSuccess(ctx context.Context, client http.Client, readInp ReadTaskStatusInput) retry.Func {
 	return func() (bool, error) {
-		client.Logger.Printf("UntilTaskStatusSuccess: reading status")
 		readTaskOutp, err := ReadTaskStatus(ctx, client, readInp)
-		client.Logger.Printf("UntilTaskStatusSuccess: read output=%+v", readTaskOutp)
 		if err != nil {
 			return false, err
 		}
@@ -38,10 +36,8 @@ func UntilTaskStatusSuccess(ctx context.Context, client http.Client, readInp Rea
 
 func UntilCreateDeviceRecordSuccess(ctx context.Context, client http.Client, createDeviceRecordInput CreateDeviceRecordInput, output *CreateDeviceRecordOutput) retry.Func {
 	return func() (bool, error) {
-		client.Logger.Printf("UntilCreateDeviceRecordSuccess: creating device record ")
 		createDeviceOutp, err := CreateDeviceRecord(ctx, client, createDeviceRecordInput)
 		*output = *createDeviceOutp
-		client.Logger.Printf("UntilCreateDeviceRecordSuccess: create output=%+v", createDeviceOutp)
 		if err != nil {
 			return false, err
 		}
@@ -51,7 +47,7 @@ func UntilCreateDeviceRecordSuccess(ctx context.Context, client http.Client, cre
 			retry.NewOptionsBuilder().
 				Retries(-1).
 				Logger(client.Logger).
-				Timeout(20*time.Minute). // usually takes ~5 minutes
+				Timeout(30*time.Minute). // usually takes ~5 minutes
 				EarlyExitOnError(true).
 				Delay(3*time.Second).
 				Build(),

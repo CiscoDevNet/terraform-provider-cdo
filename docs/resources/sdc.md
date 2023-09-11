@@ -17,9 +17,9 @@ Provides an SDC connector resource. This allows SDC to be onboarded, updated, an
 
 ### Required
 
-- `name` (String) A human-readable name for the Secure Device Connector (SDC). This should be unique among SDCs
+- `name` (String) A human-readable name for the Secure Device Connector (SDC). This name must be unique.
 
 ### Read-Only
 
 - `bootstrap_data` (String, Sensitive) SDC bootstrap data
-- `id` (String) Unique identifier of the device. This is a UUID and will be automatically generated when the device is created.
+- `id` (String) Unique identifier of the device. This is a UUID and is automatically generated when the device is created.

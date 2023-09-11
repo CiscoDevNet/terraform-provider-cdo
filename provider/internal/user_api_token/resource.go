@@ -67,7 +67,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"api_token": schema.StringAttribute{
-				MarkdownDescription: "The API token for the user. This API token has no expiry; to re-generate it, delete the resource and recreate it.",
+				MarkdownDescription: "The API token for the user. This API token does not expire; to re-generate it, delete the resource and recreate it.",
 				Computed:            true,
 				Sensitive:           true,
 			},

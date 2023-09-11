@@ -17,11 +17,11 @@ ASA data source
 
 ### Required
 
-- `name` (String) The human-readable name of the device. This is the name that is displayed in the CDO inventory page. Device names are unique across a CDO tenant.
+- `name` (String) The human-readable name of the device. This is the name displayed on the CDO Inventory page. Device names are unique across a CDO tenant.
 
 ### Read-Only
 
-- `connector_type` (String) The type of the connector that is used to communicate with the device. CDO can communicate with your device using either a Cloud Connector (CDG) or a Secure Device Connector (SDC); see [the CDO documentation](https://docs.defenseorchestrator.com/c-connect-cisco-defense-orchestratortor-the-secure-device-connector.html) to learn mor (Valid values: [CDG, SDC]).
+- `connector_type` (String) The type of the connector that is used to communicate with the device. CDO can communicate with your device using either a Cloud Connector (CDG) or a Secure Device Connector (SDC); see [the CDO documentation](https://docs.defenseorchestrator.com/c-connect-cisco-defense-orchestratortor-the-secure-device-connector.html) to learn more (Valid values: [CDG, SDC]).
 - `host` (String) The host used to connect to the device.
 - `id` (String) Universally unique identifier of the device.
 - `ignore_certificate` (Boolean) This attribute indicates whether certificates were ignored when onboarding this device.

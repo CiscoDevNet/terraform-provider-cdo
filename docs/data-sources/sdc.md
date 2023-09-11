@@ -23,7 +23,7 @@ SDC data source
 
 - `id` (String) Id of the Secure Device Connector (SDC).
 - `public_key` (Object) public key of the Secure Device Connector (SDC). (see [below for nested schema](#nestedatt--public_key))
-- `tenant_uid` (String) The tenant uid this SDC belongs to.
+- `tenant_uid` (String) The UID of the tenant to which this SDC belongs.
 
 <a id="nestedatt--public_key"></a>
 ### Nested Schema for `public_key`

@@ -43,7 +43,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Required:            true,
 			},
 			"is_api_only_user": schema.BoolAttribute{
-				MarkdownDescription: "CDO has two kinds of users: actual users with email addresses and API-only users which are used for programmatic access. This boolean indicates which of the two this user is.",
+				MarkdownDescription: "CDO has two kinds of users: actual users with email addresses and API-only users for programmatic access. This boolean indicates what type of user this is.",
 				Computed:            true,
 			},
 			"role": schema.StringAttribute{

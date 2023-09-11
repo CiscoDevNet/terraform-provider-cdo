@@ -17,8 +17,8 @@ Provides an ASA device resource. This allows ASA devices to be onboarded, update
 
 ### Required
 
-- `connector_type` (String) The type of the connector that will be used to communicate with the device. CDO can communicate with your device using either a Cloud Connector (CDG) or a Secure Device Connector (SDC); see [the CDO documentation](https://docs.defenseorchestrator.com/c-connect-cisco-defense-orchestratortor-the-secure-device-connector.html) to learn mor (Valid values: [CDG, SDC]).
-- `ignore_certificate` (Boolean) Set this attribute to true if you do not wish for CDO to validate the certificate of this device before onboarding.
+- `connector_type` (String) The type of the connector that will be used to communicate with the device. CDO can communicate with your device using either a Cloud Connector (CDG) or a Secure Device Connector (SDC); see [the CDO documentation](https://docs.defenseorchestrator.com/c-connect-cisco-defense-orchestratortor-the-secure-device-connector.html) to learn more (Valid values: [CDG, SDC]).
+- `ignore_certificate` (Boolean) Set this attribute to true if you do not want CDO to validate the certificate of this device before onboarding.
 - `name` (String) A human-readable name for the device.
 - `password` (String, Sensitive) The password used to authenticate with the device.
 - `socket_address` (String) The address of the device to onboard, specified in the format `host:port`.
@@ -31,5 +31,5 @@ Provides an ASA device resource. This allows ASA devices to be onboarded, update
 ### Read-Only
 
 - `host` (String) The host used to connect to the device.
-- `id` (String) Unique identifier of the device. This is a UUID and will be automatically generated when the device is created.
+- `id` (String) Unique identifier of the device. This is a UUID and is automatically generated when the device is created.
 - `port` (Number) The port used to connect to the device.

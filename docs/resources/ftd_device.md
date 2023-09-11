@@ -17,9 +17,9 @@ Provides an Firepower Threat Defense device resource. This allows FTD to be onbo
 
 ### Required
 
-- `access_policy_name` (String) The name of the Cloud-Delivered FMC (cdFMC) access policy that will be used by the FTD.
-- `licenses` (List of String) Comma separated list of licenses to apply to this FTD. You must enable at least the `BASE` license.
-- `name` (String) A human-readable name for the Firewall Threat Defense (FTD). This should be unique across your tenant.
+- `access_policy_name` (String) The name of the Cloud FMC access policy that will be used by the FTD
+- `licenses` (List of String) Comma separated list of licenses of this FTD, it must at least contains the "BASE" license.
+- `name` (String) A human-readable name for the Firewall Threat Defense (FTD). This name must be unique.
 - `virtual` (Boolean) Whether this FTD is virtual. If false, performance_tier is ignored
 
 ### Optional
@@ -28,6 +28,6 @@ Provides an Firepower Threat Defense device resource. This allows FTD to be onbo
 
 ### Read-Only
 
-- `access_policy_id` (String) The id of the Cloud-Delivered FMC (cdFMC) access policy applied to this FTD.
-- `generated_command` (String) The command to run in the FTD to register itself with Cloud-Deliered FMC (cdFMC).
-- `id` (String) Unique identifier of the device. This is a UUID and will be automatically generated when the device is created.
+- `access_policy_id` (String) The id of the access policy used by this FTD.
+- `generated_command` (String) The command to run in the FTD to register itself with Cloud FMC.
+- `id` (String) Unique identifier of the device. This is a UUID and is automatically generated when the device is created.

@@ -3,6 +3,7 @@ package ftd
 import (
 	"context"
 	"fmt"
+
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
@@ -54,14 +55,14 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "Unique identifier of the device. This is a UUID and will be automatically generated when the device is created.",
+				MarkdownDescription: "Unique identifier of the device. This is a UUID and is automatically generated when the device is created.",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "A human-readable name for the Firewall Threat Defense (FTD). This should be unique across your tenant.",
+				MarkdownDescription: "A human-readable name for the Firewall Threat Defense (FTD). This name must be unique.",
 				Required:            true,
 			},
 			"access_policy_name": schema.StringAttribute{

@@ -123,7 +123,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		retry.NewOptionsBuilder().
 			Retries(-1).
 			Delay(1*time.Second).
-			Timeout(10*time.Minute).
+			Timeout(20*time.Minute). // usually done in less than 5 minutes because we already registered in FTD
 			Logger(client.Logger).
 			EarlyExitOnError(false).
 			Build(),

@@ -6,6 +6,7 @@ package connector
 import (
 	"context"
 	"fmt"
+
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -51,7 +52,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Required:            true,
 			},
 			"tenant_uid": schema.StringAttribute{
-				MarkdownDescription: "The tenant uid this SDC belongs to.",
+				MarkdownDescription: "The UID of the tenant to which this SDC belongs.",
 				Computed:            true,
 			},
 			"public_key": schema.ObjectAttribute{

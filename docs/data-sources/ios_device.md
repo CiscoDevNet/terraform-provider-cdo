@@ -17,7 +17,7 @@ IOS data source
 
 ### Required
 
-- `name` (String) The human-readable name of the device. This is the name that is displayed in the CDO inventory page. Device names are unique across a CDO tenant.
+- `name` (String) The human-readable name of the device. This is the name displayed on the CDO Inventory page. Device names are unique across a CDO tenant.
 
 ### Read-Only
 

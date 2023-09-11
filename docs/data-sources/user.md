@@ -22,5 +22,5 @@ Use this data source to get the identifiers of users to be referenced elsewhere,
 ### Read-Only
 
 - `id` (String) Universally unique identifier for the user.
-- `is_api_only_user` (Boolean) CDO has two kinds of users: actual users with email addresses and API-only users which are used for programmatic access. This boolean indicates which of the two this user is.
+- `is_api_only_user` (Boolean) CDO has two kinds of users: actual users with email addresses and API-only users for programmatic access. This boolean indicates what type of user this is.
 - `role` (String) Role assigned to the user in this tenant.

@@ -62,18 +62,18 @@ func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, r
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Provides an user resource. This allows a user to be created, updated, and deleted on CDO.",
+		MarkdownDescription: "Provides a user resource. This allows a user to be created, updated, and deleted on CDO.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "Unique identifier of the user. This is a UUID and will be automatically generated when the user is created.",
+				MarkdownDescription: "Unique identifier of the user. This is a UUID and is automatically generated when the user is created.",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "The username. If the user is not an [API only user](https://www.cisco.com/c/en/us/td/docs/security/cdo/managing-ftd-with-cdo/managing-ftd-with-cisco-defense-orchestrator/basics-of-cisco-defense-orchestrator.html?bookSearch=true#Cisco_Task.dita_d5ae397b-5aa5-4de0-82c1-a4aff63c5ba1), it must be an e-mail address. Otherwise, it must not be an e-mail address.",
+				MarkdownDescription: "The username. If the user is not an [API only user](https://www.cisco.com/c/en/us/td/docs/security/cdo/managing-ftd-with-cdo/managing-ftd-with-cisco-defense-orchestrator/basics-of-cisco-defense-orchestrator.html?bookSearch=true#Cisco_Task.dita_d5ae397b-5aa5-4de0-82c1-a4aff63c5ba1), it must be an e-mail address; if the user is an API-only user, it must not be an email address, and CDO will generate a name for the user prefixed by the value provided here (see `generated_username`).",
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
@@ -91,7 +91,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"role": schema.StringAttribute{
-				MarkdownDescription: "There are a variety of user roles in Cisco Defense Orchestrator (CDO). User roles are configured for each user on each tenant. Valid Values: (ROLE_READ_ONLY, ROLE_ADMIN, ROLE_SUPER_ADMIN, ROLE_DEPLOY_ONLY, ROLE_EDIT_ONLY, ROLE_VPN_SESSIONS_MANAGER)",
+				MarkdownDescription: "There are a variety of user roles in Cisco Defense Orchestrator (CDO). User roles are configured for each user on each tenant. See [User Roles in CDO](https://www.cisco.com/c/en/us/td/docs/security/cdo/managing-asa-with-cdo/managing-asa-with-cisco-defense-orchestrator/basics-of-cisco-defense-orchestrator.html#User_Roles) to learn more. Valid Values: (ROLE_READ_ONLY, ROLE_ADMIN, ROLE_SUPER_ADMIN, ROLE_DEPLOY_ONLY, ROLE_EDIT_ONLY, ROLE_VPN_SESSIONS_MANAGER)",
 				Required:            true,
 				Validators: []validator.String{
 					stringvalidator.OneOf("ROLE_READ_ONLY", "ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_DEPLOY_ONLY", "ROLE_EDIT_ONLY", "ROLE_VPN_SESSIONS_MANAGER"),

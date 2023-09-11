@@ -16,8 +16,5 @@ type UpdateOutput struct {
 }
 
 func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*UpdateOutput, error) {
-
-	// TODO
-
-	return nil, nil
+	return &UpdateOutput{}, nil
 }

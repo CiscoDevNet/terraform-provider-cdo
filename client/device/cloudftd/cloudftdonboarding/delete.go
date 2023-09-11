@@ -16,8 +16,5 @@ type DeleteOutput struct {
 }
 
 func Delete(ctx context.Context, client http.Client, deleteInp DeleteInput) (*DeleteOutput, error) {
-
-	// TODO
-
-	return nil, nil
+	return &DeleteOutput{}, nil
 }

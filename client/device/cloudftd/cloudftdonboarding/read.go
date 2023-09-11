@@ -16,8 +16,5 @@ type ReadOutput struct {
 }
 
 func Read(ctx context.Context, client http.Client, readInp ReadInput) (*ReadOutput, error) {
-
-	// TODO
-
-	return nil, nil
+	return &ReadOutput{}, nil
 }

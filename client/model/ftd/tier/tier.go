@@ -1,6 +1,8 @@
 package tier
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Type string
 
@@ -15,7 +17,7 @@ const (
 	FTDv    Type = "FTDv"
 )
 
-var AllTiers = []Type{
+var All = []Type{
 	FTDv5,
 	FTDv10,
 	FTDv20,
@@ -25,8 +27,16 @@ var AllTiers = []Type{
 	FTDv,
 }
 
+var AllAsString = make([]string, len(All))
+
+func init() {
+	for i, t := range All {
+		AllAsString[i] = string(t)
+	}
+}
+
 func Parse(name string) (Type, error) {
-	for _, tier := range AllTiers {
+	for _, tier := range All {
 		if string(tier) == name {
 			return tier, nil
 		}

@@ -3,9 +3,12 @@ package ftd
 import (
 	"context"
 	"fmt"
-
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
+	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -66,23 +69,22 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Required:            true,
 				// TODO: make this optional, and use default access policy when not given
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(), // TODO: can we change access policy after it is created?
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"performance_tier": schema.StringAttribute{
 				MarkdownDescription: "The performance tier of the virtual FTD, if virtual is set to false, this field is ignored.",
 				Optional:            true,
-				// TODO: validator for performance tier, check valid performance tier is given
-				// TODO: ignore changes in this field when virtual is false
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(), // TODO: can we change performance tier after it is created?
+					stringplanmodifier.RequiresReplace(),
+				},
+				Validators: []validator.String{
+					stringvalidator.OneOf(tier.AllAsString...),
 				},
 			},
 			"virtual": schema.BoolAttribute{
 				MarkdownDescription: "Whether this FTD is virtual. If false, performance_tier is ignored",
 				Required:            true,
-				// TODO: can we change this after created?
-				// TODO: default value false
 				PlanModifiers: []planmodifier.Bool{
 					boolplanmodifier.RequiresReplace(),
 				},
@@ -91,16 +93,15 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				ElementType:         types.StringType,
 				MarkdownDescription: "Comma separated list of licenses to apply to this FTD. You must enable at least the `BASE` license.",
 				Required:            true,
-				// TODO: make this not required, when not given, use BASE license
 				PlanModifiers: []planmodifier.List{
-					listplanmodifier.RequiresReplace(), // TODO: can we modify license after FTD is created?
-					// TODO: always sort the licenses so that it is the same order, so that it does not change when order of licenses changes
+					listplanmodifier.RequiresReplace(),
 				},
 				Validators: []validator.List{
 					listvalidator.SizeAtLeast(1),
 					listvalidator.UniqueValues(),
+					listvalidator.ValueStringsAre(stringvalidator.OneOf(license.AllAsString...)),
+					validators.ValueStringsAtLeast(stringvalidator.OneOf(string(license.Base))),
 				},
-				// TODO: validate the licenses are valid input.
 			},
 			"generated_command": schema.StringAttribute{
 				MarkdownDescription: "The command to run in the FTD to register itself with Cloud-Deliered FMC (cdFMC).",

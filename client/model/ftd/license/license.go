@@ -3,6 +3,7 @@ package license
 import (
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/sliceutil"
+	"strconv"
 	"strings"
 )
 
@@ -17,15 +18,34 @@ const (
 	URLFilter Type = "URLFilter"
 )
 
+var All = []Type{
+	Base, Carrier, Threat, Malware, URLFilter,
+}
+
+var AllAsString = make([]string, len(All))
+
+var nameToTypeMap = make(map[string]Type, len(All))
+
+func init() {
+	for i, l := range All {
+		nameToTypeMap[string(l)] = l
+		AllAsString[i] = string(l)
+	}
+}
+
 func (t *Type) MarshalJSON() ([]byte, error) {
-	return []byte("\"" + Serialize(*t) + "\""), nil
+	return []byte(strconv.Quote(string(*t))), nil
 }
 
 func (t *Type) UnmarshalJSON(b []byte) error {
 	if len(b) <= 2 || b == nil {
-		return fmt.Errorf("cannot unmarshal empty tring as a license type, it should be one of valid roles: %+v", licenseMap)
+		return fmt.Errorf("cannot unmarshal empty tring as a license type, it should be one of valid roles: %+v", nameToTypeMap)
 	}
-	deserialized, err := Deserialize(string(b[1 : len(b)-1])) // strip off quote
+	unquoteType, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	deserialized, err := deserialize(unquoteType)
 	if err != nil {
 		return err
 	}
@@ -33,26 +53,10 @@ func (t *Type) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-var licenseMap = map[string]Type{
-	"BASE":      Base,
-	"CARRIER":   Carrier,
-	"THREAT":    Threat,
-	"MALWARE":   Malware,
-	"URLFilter": URLFilter,
-}
-
-func MustParse(name string) Type {
-	l, ok := licenseMap[name]
+func deserialize(name string) (Type, error) {
+	l, ok := nameToTypeMap[name]
 	if !ok {
-		panic(fmt.Errorf("FTD License of name: \"%s\" not found, should be one of %+v", name, licenseMap))
-	}
-	return l
-}
-
-func Deserialize(name string) (Type, error) {
-	l, ok := licenseMap[name]
-	if !ok {
-		return "", fmt.Errorf("FTD License of name: \"%s\" not found, should be one of: %+v", name, licenseMap)
+		return "", fmt.Errorf("FTD License of name: \"%s\" not found, should be one of: %+v", name, nameToTypeMap)
 	}
 	return l, nil
 }
@@ -61,7 +65,7 @@ func DeserializeAll(names string) ([]Type, error) {
 	licenseStrs := strings.Split(names, ",")
 	licenses := make([]Type, len(licenseStrs))
 	for i, name := range licenseStrs {
-		t, err := Deserialize(name)
+		t, err := deserialize(name)
 		if err != nil {
 			return nil, err
 		}
@@ -71,9 +75,9 @@ func DeserializeAll(names string) ([]Type, error) {
 }
 
 func SerializeAll(licenses []Type) string {
-	return strings.Join(sliceutil.Map(licenses, func(l Type) string { return Serialize(l) }), ",")
+	return strings.Join(sliceutil.Map(licenses, func(l Type) string { return serialize(l) }), ",")
 }
 
-func Serialize(license Type) string {
+func serialize(license Type) string {
 	return string(license)
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
 	"time"
 )
@@ -71,13 +72,18 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	if err != nil {
 		return nil, err
 	}
+	// 3.1.5 handle license
+	licenseCaps, err := license.DeserializeAllFromCdo(readFtdOutp.Metadata.LicenseCaps)
+	if err != nil {
+		return nil, err
+	}
 	// 3.2 create ftd device
 	createDeviceInp := fmcconfig.NewCreateDeviceRecordInputBuilder().
 		Type("Device").
 		NatId(readFtdOutp.Metadata.NatID).
 		Name(readFtdOutp.Name).
 		AccessPolicyUid(readFtdOutp.Metadata.AccessPolicyUid).
-		LicenseCaps(readFtdOutp.Metadata.LicenseCaps).
+		LicenseCaps(&licenseCaps).
 		PerformanceTier(readFtdOutp.Metadata.PerformanceTier).
 		RegKey(readFtdOutp.Metadata.RegKey).
 		FmcDomainUid(fmcDomainUid).
@@ -119,7 +125,13 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	}
 	// 4.3 wait until state machine done
 	err = retry.Do(
-		cloudftd.UntilStateDone(ctx, client, cloudftd.NewReadByUidInput(createInp.FtdUid)),
+		cloudftd.UntilSpecificStateDone(
+			ctx,
+			client,
+			cloudftd.NewReadSpecificInputBuilder().
+				Uid(ftdSpecificOutp.SpecificUid).
+				Build(),
+		),
 		retry.NewOptionsBuilder().
 			Retries(-1).
 			Delay(1*time.Second).

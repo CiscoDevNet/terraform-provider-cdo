@@ -3,6 +3,7 @@ package license
 import (
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/sliceutil"
+	"strconv"
 	"strings"
 )
 
@@ -17,8 +18,24 @@ const (
 	URLFilter Type = "URLFilter"
 )
 
+var All = []Type{
+	Base,
+	Carrier,
+	Threat,
+	Malware,
+	URLFilter,
+}
+
+var nameToTypeMap = make(map[string]Type, len(All))
+
+func init() {
+	for _, l := range All {
+		nameToTypeMap[string(l)] = l
+	}
+}
+
 func (t *Type) MarshalJSON() ([]byte, error) {
-	return []byte("\"" + Serialize(*t) + "\""), nil
+	return []byte(strconv.Quote(string(*t))), nil
 }
 
 func (t *Type) UnmarshalJSON(b []byte) error {
@@ -57,23 +74,16 @@ func Deserialize(name string) (Type, error) {
 	return l, nil
 }
 
-func DeserializeAll(names string) ([]Type, error) {
-	licenseStrs := strings.Split(names, ",")
-	licenses := make([]Type, len(licenseStrs))
-	for i, name := range licenseStrs {
-		t, err := Deserialize(name)
-		if err != nil {
-			return nil, err
+func SerializeAllAsCdo(licenses []Type) string {
+	return strings.Join(sliceutil.Map(licenses, func(l Type) string { return string(l) }), ",")
+}
+
+func DeserializeAllFromCdo(licenses string) ([]Type, error) {
+	return sliceutil.MapWithError(strings.Split(licenses, ","), func(l string) (Type, error) {
+		t, ok := nameToTypeMap[l]
+		if !ok {
+			return "", fmt.Errorf("cannot deserialize %s as license, should be one of %+v", l, All)
 		}
-		licenses[i] = t
-	}
-	return licenses, nil
-}
-
-func SerializeAll(licenses []Type) string {
-	return strings.Join(sliceutil.Map(licenses, func(l Type) string { return Serialize(l) }), ",")
-}
-
-func Serialize(license Type) string {
-	return string(license)
+		return t, nil
+	})
 }

@@ -2,6 +2,7 @@ package role
 
 import (
 	"fmt"
+	"strconv"
 )
 
 type Type string
@@ -41,5 +42,5 @@ func (t *Type) UnmarshalJSON(b []byte) error {
 }
 
 func (t *Type) MarshalJSON() ([]byte, error) {
-	return []byte(*t), nil
+	return []byte(strconv.Quote(string(*t))), nil
 }

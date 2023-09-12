@@ -35,7 +35,7 @@ func (b *MetadataBuilder) GeneratedCommand(generatedCommand string) *MetadataBui
 	return b
 }
 
-func (b *MetadataBuilder) LicenseCaps(licenseCaps []license.Type) *MetadataBuilder {
+func (b *MetadataBuilder) LicenseCaps(licenseCaps *[]license.Type) *MetadataBuilder {
 	b.metadata.LicenseCaps = licenseCaps
 	return b
 }

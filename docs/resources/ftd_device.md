@@ -3,12 +3,12 @@
 page_title: "cdo_ftd_device Resource - cdo"
 subcategory: ""
 description: |-
-  Provides an Firepower Threat Defense device resource. This allows FTD to be onboarded, updated, and deleted on CDO.
+  Provides a Firewall Threat Defense device resource. Use this to onboard, update, and delete FTDs from CDO.
 ---
 
 # cdo_ftd_device (Resource)
 
-Provides an Firepower Threat Defense device resource. This allows FTD to be onboarded, updated, and deleted on CDO.
+Provides a Firewall Threat Defense device resource. Use this to onboard, update, and delete FTDs from CDO.
 
 
 
@@ -17,17 +17,20 @@ Provides an Firepower Threat Defense device resource. This allows FTD to be onbo
 
 ### Required
 
-- `access_policy_name` (String) The name of the Cloud FMC access policy that will be used by the FTD
-- `licenses` (List of String) Comma separated list of licenses of this FTD, it must at least contains the "BASE" license.
+- `access_policy_name` (String) The name of the Cloud-Delivered FMC (cdFMC) access policy that will be used by the FTD.
+- `licenses` (List of String) Comma-separated list of licenses to apply to this FTD. You must enable at least the `BASE` license.
 - `name` (String) A human-readable name for the Firewall Threat Defense (FTD). This name must be unique.
-- `virtual` (Boolean) Whether this FTD is virtual. If false, performance_tier is ignored
+- `virtual` (Boolean) his determines if this FTD is virtual. If false, performance_tier is ignored as performance tiers are not applicable to physical FTD devices.
 
 ### Optional
 
-- `performance_tier` (String) The performance tier of the virtual FTD, if virtual is set to false, this field is ignored.
+- `performance_tier` (String) The performance tier of the virtual FTD, if virtual is set to false, this field is ignored as performance tiers are not applicable to physical FTD devices.
 
 ### Read-Only
 
-- `access_policy_id` (String) The id of the access policy used by this FTD.
-- `generated_command` (String) The command to run in the FTD to register itself with Cloud FMC.
+- `access_policy_id` (String) The ID of the cloud-delivered FMC (cdFMC) access policy applied to this FTD.
+- `generated_command` (String) The command to run in the FTD CLI to register it with the cloud-delivered FMC (cdFMC).
+- `hostname` (String) The Hostname of the cloud-delivered FMC (cdFMC) manages this FTD.
 - `id` (String) Unique identifier of the device. This is a UUID and is automatically generated when the device is created.
+- `nat_id` (String) The Network Address Translation (NAT) ID of this FTD.
+- `reg_key` (String) The Registration Key of this FTD.

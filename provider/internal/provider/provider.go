@@ -6,6 +6,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/device/ftd/ftdonboarding"
 	"os"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/device/ftd"
@@ -156,6 +157,7 @@ func (p *CdoProvider) Resources(ctx context.Context) []func() resource.Resource 
 		ftd.NewResource,
 		user.NewResource,
 		user_api_token.NewResource,
+		ftdonboarding.NewResource,
 	}
 }
 

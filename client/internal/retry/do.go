@@ -132,6 +132,7 @@ func Do(retryFunc Func, opt Options) error {
 			return nil
 		}
 		opt.Logger.Println("[RETRY] failed")
+		opt.Logger.Printf("[RETRY] reason: ok=%t err=%+v", ok, err)
 	}
 
 	return fmt.Errorf(

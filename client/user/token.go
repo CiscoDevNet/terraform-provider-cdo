@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/user/auth"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
@@ -9,14 +10,7 @@ import (
 
 type GetTokenInput struct{}
 
-type GetTokenOutput struct {
-	TenantUid    string `json:"tenantUid"`
-	TenantName   string `json:"tenantName"`
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-	TokenType    string `json:"token_type"`
-	Scope        string `json:"scope"`
-}
+type GetTokenOutput = auth.Token
 
 func NewGetTokenInput() GetTokenInput {
 	return GetTokenInput{}

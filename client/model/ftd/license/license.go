@@ -73,6 +73,8 @@ func SerializeAllAsCdo(licenses []Type) string {
 	return strings.Join(sliceutil.Map(licenses, func(l Type) string { return string(l) }), ",")
 }
 
+// DeserializeAllFromCdo exists because CDO store license caps as one comma-sep string
+// but fmc store it as list of string, use this method to handle CDO's special case
 func DeserializeAllFromCdo(licenses string) ([]Type, error) {
 	return sliceutil.MapWithError(strings.Split(licenses, ","), func(l string) (Type, error) {
 		t, ok := nameToTypeMap[l]

@@ -6,8 +6,8 @@ package provider
 import (
 	"context"
 	"fmt"
-	"os"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/device/ftd/ftdonboarding"
+	"os"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/device/ftd"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/tenant"

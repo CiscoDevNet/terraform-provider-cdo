@@ -9,6 +9,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd/cloudftdonboarding"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/genericssh"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/tenant"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
@@ -171,6 +172,22 @@ func (c *Client) GenerateApiToken(ctx context.Context, inp user.GenerateApiToken
 
 func (c *Client) RevokeApiToken(ctx context.Context, inp user.RevokeApiTokenInput) (*user.RevokeApiTokenOutput, error) {
 	return user.RevokeApiToken(ctx, c.client, inp)
+}
+
+func (c *Client) CreateFtdOnboarding(ctx context.Context, inp cloudftdonboarding.CreateInput) (*cloudftdonboarding.CreateOutput, error) {
+	return cloudftdonboarding.Create(ctx, c.client, inp)
+}
+
+func (c *Client) UpdateFtdOnboarding(ctx context.Context, inp cloudftdonboarding.UpdateInput) (*cloudftdonboarding.UpdateOutput, error) {
+	return cloudftdonboarding.Update(ctx, c.client, inp)
+}
+
+func (c *Client) ReadFtdOnboarding(ctx context.Context, inp cloudftdonboarding.ReadInput) (*cloudftdonboarding.ReadOutput, error) {
+	return cloudftdonboarding.Read(ctx, c.client, inp)
+}
+
+func (c *Client) DeleteFtdOnboarding(ctx context.Context, inp cloudftdonboarding.DeleteInput) (*cloudftdonboarding.DeleteOutput, error) {
+	return cloudftdonboarding.Delete(ctx, c.client, inp)
 }
 
 func (c *Client) ReadTenantDetails(ctx context.Context) (*tenant.ReadTenantDetailsOutput, error) {

@@ -79,7 +79,7 @@ func TestReadDomainInfo(t *testing.T) {
 			output, err := fmcplatform.ReadFmcDomainInfo(
 				context.Background(),
 				*internalHttp.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
-				fmcplatform.NewReadDomainInfo(fmcHostname),
+				fmcplatform.NewReadDomainInfoInput(fmcHostname),
 			)
 
 			testCase.assertFunc(output, err, t)

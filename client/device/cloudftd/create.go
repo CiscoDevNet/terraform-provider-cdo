@@ -1,8 +1,12 @@
 package cloudftd
 
+/**
+* The cloud FTD corresponds to the CDO Device Type FTDC, which is an FTD managed by a cdFMC.
+ */
 import (
 	"context"
 	"fmt"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc/fmcplatform"
@@ -20,7 +24,7 @@ type CreateInput struct {
 	AccessPolicyName string
 	PerformanceTier  *tier.Type // ignored if it is physical device
 	Virtual          bool
-	Licenses         []license.Type
+	Licenses         *[]license.Type
 }
 
 type CreateOutput struct {
@@ -34,7 +38,7 @@ func NewCreateInput(
 	accessPolicyName string,
 	performanceTier *tier.Type,
 	virtual bool,
-	licenses []license.Type,
+	licenses *[]license.Type,
 ) CreateInput {
 	return CreateInput{
 		Name:             name,
@@ -66,7 +70,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	}
 
 	// 2. get FMC domain uid by reading Cloud FMC domain info
-	readFmcDomainRes, err := fmcplatform.ReadFmcDomainInfo(ctx, client, fmcplatform.NewReadDomainInfo(fmcRes.Host))
+	readFmcDomainRes, err := fmcplatform.ReadFmcDomainInfo(ctx, client, fmcplatform.NewReadDomainInfoInput(fmcRes.Host))
 	if err != nil {
 		return nil, err
 	}

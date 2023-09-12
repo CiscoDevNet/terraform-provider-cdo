@@ -60,7 +60,7 @@ const (
 )
 
 var (
-	ftdLicenseCaps     = []license.Type{license.Base, license.Carrier}
+	ftdLicenseCaps     = &[]license.Type{license.Base, license.Carrier}
 	ftdPerformanceTier = tier.FTDv5
 )
 

@@ -128,6 +128,10 @@ func (r *Request) send(output any) error {
 	return nil
 }
 
+func (r *Request) OverrideApiToken(apiToken string) {
+	r.config.ApiToken = apiToken
+}
+
 // build the net/http.Request
 func (r *Request) build() (*http.Request, error) {
 
@@ -175,10 +179,6 @@ func (r *Request) addJsonContentTypeHeaderIfNotPresent(req *http.Request) {
 
 func (r *Request) addAuthHeader(req *http.Request) {
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.config.ApiToken))
-}
-
-func (r *Request) addContentTypeHeader(req *http.Request, contentType string) {
-	req.Header.Add("Content-Type", contentType)
 }
 
 func (r *Request) addOtherHeader(req *http.Request) {

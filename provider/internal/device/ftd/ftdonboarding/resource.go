@@ -3,6 +3,7 @@ package ftdonboarding
 import (
 	"context"
 	"fmt"
+
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -33,8 +34,12 @@ func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, r
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "This resource is meant to be used together with the `cdo_ftd_device` resource. The `cdo_ftd_device` creates an CDO FTD device and output a generated command to be entered in the FTD console to configure it to talk to the FMC. This resource poll and ask the FMC to register the FTD with FMC and onboard the FTD to CDO, this process will timeout and fail if the FTD is not configured in time. So to onboard a FTD using terraform, you need to write the `cdo_ftd_device` and `cdo_ftd_onboarding` resource, after apply has started, go to CDO and find the FTD device created, copy the `generated_command` or get it from the output of `cdo_ftd_device` (in this case you will need to create the `cdo_ftd_onboarding` resource later), then SSH and login to your FTD, and run the command. Only then the `cdo_ftd_onboarding` resource will success and your device will be onboarded properly in CDO. The reason for all this is because, for security reason, FTD needs its manager to be configured before FMC can communicate with it (you wouldn't want anybody, include cisco, to be able to login to your FTD and configure its manager).",
-
+		MarkdownDescription: "This resource is meant to be in conjunction with the `cdo_ftd_device` resource to complete the onboarding process of an FTD to a cdFMC. " +
+			"The `cdo_ftd_device` creates an FTD device on CDO and generates a command with the registration key that should be pasted into the FTD device's CLI over SSH (see **step 10** [here](https://docs.defenseorchestrator.com/c_onboard-an-ftd.html#!t-onboard-an-ftd-device-with-regkey.html)). " +
+			"This resource waits for you to finish pasting the registration command, and onboards the FTD to CDO. " +
+			"If you are spinning up an FTDv using Terraform, you can pass the output of the `cdo_ftd_device` through to the FTDv. " +
+			"If you are using a manually deployed FTDv or a physical FTD, you cannot add this resource to your Terraform code until after you have applied the `cdo_ftd_device` resource, retrieved the `generated_command` from the resource, and pasted it into the FTD device's CLI. " +
+			"This resource will time out if the registration command is not applied on the FTD CLI within 30 minutes of it starting to poll.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "The unique identifier of this FTD onboarding resource, it is the registration key of the FTD.",
@@ -44,7 +49,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"ftd_uid": schema.StringAttribute{
-				MarkdownDescription: "The FTD uid to be used to register with FMC, can be found in the output of the `cdo_ftd_device` resource.",
+				MarkdownDescription: "The ID of the FTD to add to the cdFMC. This value is returned by the `id` attribute of the `cdo_ftd_device` resource.",
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),

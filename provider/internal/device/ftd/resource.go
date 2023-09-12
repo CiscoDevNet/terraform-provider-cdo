@@ -54,7 +54,9 @@ func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, r
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Provides a Firewall Threat Defense device resource. Use this to onboard, update, and delete FTDs from CDO.",
+		MarkdownDescription: "Provides a Firewall Threat Defense device resource. Use this to onboard, update, and delete FTDs from CDO. This resource does not complete the onboarding of an FTD into CDO and cdFMC. " +
+			"It creates a FTD device entry in the CDO Inventory, and generates a registration command (see the `generated_command` attribute) that needs to be pasted into the FTD CLI (see **step 10** [here](https://docs.defenseorchestrator.com/c_onboard-an-ftd.html#!t-onboard-an-ftd-device-with-regkey.html)). " +
+			"To finish adding the FTD device to CDO and cdFMC, use the `cdo_ftd_device_onboarding` resource after you have applied this resource.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{

@@ -6,8 +6,10 @@ package provider
 import (
 	"context"
 	"fmt"
-	"github.com/CiscoDevnet/terraform-provider-cdo/internal/device/ftd"
 	"os"
+
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/device/ftd"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/tenant"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/user"
@@ -163,6 +165,7 @@ func (p *CdoProvider) DataSources(ctx context.Context) []func() datasource.DataS
 		asa.NewAsaDataSource,
 		ios.NewIosDataSource,
 		user.NewDataSource,
+		tenant.NewDataSource,
 	}
 }
 

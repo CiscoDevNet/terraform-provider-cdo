@@ -28,7 +28,7 @@ data "aws_ami" "ftdv" {
 
 data "template_file" "startup_file" {
   template = file("startup_file.txt")
-  vars     = {
+  vars = {
     admin_password = var.admin_password
     ftd_hostname   = cdo_ftd_device.test.hostname
     fmc_reg_key    = cdo_ftd_device.test.reg_key
@@ -56,8 +56,6 @@ data "aws_internet_gateway" "default" {
 #########################################################################################################################
 
 provider "aws" {
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
   region     = var.region
 }
 
@@ -75,7 +73,7 @@ resource "aws_vpc" "ftd_vpc" {
   enable_dns_support   = true
   enable_dns_hostnames = true
   instance_tenancy     = "default"
-  tags                 = {
+  tags = {
     Name = var.vpc_name
   }
 }
@@ -84,7 +82,7 @@ resource "aws_subnet" "mgmt_subnet" {
   vpc_id            = local.nw
   cidr_block        = var.mgmt_subnet
   availability_zone = "${var.region}a"
-  tags              = {
+  tags = {
     Name = "Managment subnet"
   }
 }
@@ -93,7 +91,7 @@ resource "aws_subnet" "diag_subnet" {
   vpc_id            = local.nw
   cidr_block        = var.diag_subnet
   availability_zone = "${var.region}a"
-  tags              = {
+  tags = {
     Name = "diag subnet"
   }
 }
@@ -102,7 +100,7 @@ resource "aws_subnet" "outside_subnet" {
   vpc_id            = local.nw
   cidr_block        = var.outside_subnet
   availability_zone = "${var.region}a"
-  tags              = {
+  tags = {
     Name = "outside subnet"
   }
 }
@@ -111,7 +109,7 @@ resource "aws_subnet" "inside_subnet" {
   vpc_id            = local.nw
   cidr_block        = var.inside_subnet
   availability_zone = "${var.region}a"
-  tags              = {
+  tags = {
     Name = "inside subnet"
   }
 }
@@ -199,7 +197,7 @@ resource "aws_network_interface_sg_attachment" "ftd_inside_attachment" {
 resource "aws_internet_gateway" "int_gw" {
   count  = var.create_igw ? 1 : 0
   vpc_id = local.nw
-  tags   = {
+  tags = {
     Name = "Internet Gateway"
   }
 }
@@ -256,17 +254,17 @@ resource "aws_route_table_association" "inside_association" {
 //External ip address creation 
 
 resource "aws_eip" "ftd01mgmt-EIP" {
-  domain     = "vpc"
+#   domain     = "vpc"
   depends_on = [aws_internet_gateway.int_gw, aws_instance.ftdv]
-  tags       = {
+  tags = {
     "Name" = "FTDv-01 Management IP"
   }
 }
 
 resource "aws_eip" "ftd01outside-EIP" {
-  domain     = "vpc"
+#   domain     = "vpc"
   depends_on = [aws_internet_gateway.int_gw, aws_instance.ftdv]
-  tags       = {
+  tags = {
     "Name" = "FTDv-01 outside IP"
   }
 }
@@ -338,7 +336,6 @@ resource "aws_key_pair" "deployer" {
 output "ip" {
   value = aws_eip.ftd01mgmt-EIP.public_ip
 }
-
 output "SSHCommand" {
   value = "ssh -i cisco-ftdv-key admin@${aws_eip.ftd01mgmt-EIP.public_ip}"
 }

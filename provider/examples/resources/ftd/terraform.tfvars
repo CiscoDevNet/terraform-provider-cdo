@@ -1,8 +1,8 @@
 // AWS Environment
-aws_access_key      = "<FILL_ME>"
-aws_secret_key      = "<FILL_ME>"
+# aws_access_key      = ""
+# aws_secret_key      = ""
 
-region              = "eu-central-1"
+region              = "us-east-1"
 
 // "Valid values for FTD_version are ftdv-7.0.5, ftdv-7.1.0, ftdv-7.2.4, ftdv-7.3.0."
 FTD_version         = "ftdv-7.3.0"
@@ -20,4 +20,5 @@ ftd01_outside_ip    =  "10.1.1.11"
 ftd01_diag_ip       =  "10.1.2.11"
 ftd01_inside_ip     =  "10.1.3.11"
 
-create_igw = false
+create_igw = true
+existing_vpc = false

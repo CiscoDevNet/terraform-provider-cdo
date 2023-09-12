@@ -11,8 +11,8 @@ terraform {
 }
 
 provider "cdo" {
-  base_url  = "<FILL_ME>"
-  api_token = "<FILL_ME>"
+  base_url  = "https://ci.dev.lockhart.io"
+  api_token = file("${path.module}/api_token.txt")
 }
 
 resource "cdo_ftd_device" "test" {

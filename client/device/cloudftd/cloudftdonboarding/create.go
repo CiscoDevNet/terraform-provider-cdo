@@ -117,20 +117,6 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	if err != nil {
 		return nil, err
 	}
-	// 4.3 wait until state machine done
-	err = retry.Do(
-		cloudftd.UntilStateDone(ctx, client, cloudftd.NewReadByUidInput(createInp.FtdUid)),
-		retry.NewOptionsBuilder().
-			Retries(-1).
-			Delay(1*time.Second).
-			Timeout(20*time.Minute). // usually done in less than 5 minutes because we already registered in FTDc
-			Logger(client.Logger).
-			EarlyExitOnError(false).
-			Build(),
-	)
-	if err != nil {
-		return nil, err
-	}
 
 	return &createOutp, nil
 }

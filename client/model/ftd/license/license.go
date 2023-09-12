@@ -26,11 +26,14 @@ var All = []Type{
 	URLFilter,
 }
 
+var AllAsString = make([]string, len(All))
+
 var nameToTypeMap = make(map[string]Type, len(All))
 
 func init() {
-	for _, l := range All {
+	for i, l := range All {
 		nameToTypeMap[string(l)] = l
+		AllAsString[i] = string(l)
 	}
 }
 
@@ -40,7 +43,7 @@ func (t *Type) MarshalJSON() ([]byte, error) {
 
 func (t *Type) UnmarshalJSON(b []byte) error {
 	if len(b) <= 2 || b == nil {
-		return fmt.Errorf("cannot unmarshal empty tring as a license type, it should be one of valid roles: %+v", licenseMap)
+		return fmt.Errorf("cannot unmarshal empty tring as a license type, it should be one of valid roles: %+v", AllAsString)
 	}
 	deserialized, err := Deserialize(string(b[1 : len(b)-1])) // strip off quote
 	if err != nil {
@@ -50,26 +53,18 @@ func (t *Type) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-var licenseMap = map[string]Type{
-	"BASE":      Base,
-	"CARRIER":   Carrier,
-	"THREAT":    Threat,
-	"MALWARE":   Malware,
-	"URLFilter": URLFilter,
-}
-
 func MustParse(name string) Type {
-	l, ok := licenseMap[name]
+	l, ok := nameToTypeMap[name]
 	if !ok {
-		panic(fmt.Errorf("FTD License of name: \"%s\" not found, should be one of %+v", name, licenseMap))
+		panic(fmt.Errorf("FTD License of name: \"%s\" not found, should be one of %+v", name, AllAsString))
 	}
 	return l
 }
 
 func Deserialize(name string) (Type, error) {
-	l, ok := licenseMap[name]
+	l, ok := nameToTypeMap[name]
 	if !ok {
-		return "", fmt.Errorf("FTD License of name: \"%s\" not found, should be one of: %+v", name, licenseMap)
+		return "", fmt.Errorf("FTD License of name: \"%s\" not found, should be one of: %+v", name, AllAsString)
 	}
 	return l, nil
 }

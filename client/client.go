@@ -4,12 +4,14 @@ package client
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/genericssh"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/tenant"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
-	"net/http"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios"
@@ -169,4 +171,8 @@ func (c *Client) GenerateApiToken(ctx context.Context, inp user.GenerateApiToken
 
 func (c *Client) RevokeApiToken(ctx context.Context, inp user.RevokeApiTokenInput) (*user.RevokeApiTokenOutput, error) {
 	return user.RevokeApiToken(ctx, c.client, inp)
+}
+
+func (c *Client) ReadTenantDetails(ctx context.Context) (*tenant.ReadTenantDetailsOutput, error) {
+	return tenant.ReadTenantDetails(ctx, c.client)
 }

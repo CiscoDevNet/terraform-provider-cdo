@@ -3,6 +3,7 @@ package url
 
 import (
 	"fmt"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 )
 
@@ -111,4 +112,8 @@ func GenerateApiToken(baseUrl string, username string) string {
 
 func RevokeApiToken(baseUrl string, tokenId string) string {
 	return fmt.Sprintf("%s/anubis/rest/v1/oauth/revoke/%s", baseUrl, tokenId)
+}
+
+func ReadTenantDetails(baseUrl string) string {
+	return fmt.Sprintf("%s/anubis/rest/v1/oauth/check_token", baseUrl)
 }

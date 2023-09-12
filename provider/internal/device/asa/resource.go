@@ -3,9 +3,10 @@ package asa
 import (
 	"context"
 	"fmt"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"strconv"
 	"strings"
+
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -60,7 +61,7 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "Unique identifier of the device. This is a UUID and will be automatically generated when the device is created.",
+				MarkdownDescription: "Unique identifier of the device. This is a UUID and is automatically generated when the device is created.",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
@@ -78,7 +79,7 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				},
 			},
 			"connector_type": schema.StringAttribute{
-				MarkdownDescription: "The type of the connector that will be used to communicate with the device. CDO can communicate with your device using either a Cloud Connector (CDG) or a Secure Device Connector (SDC); see [the CDO documentation](https://docs.defenseorchestrator.com/c-connect-cisco-defense-orchestratortor-the-secure-device-connector.html) to learn mor (Valid values: [CDG, SDC]).",
+				MarkdownDescription: "The type of the connector that will be used to communicate with the device. CDO can communicate with your device using either a Cloud Connector (CDG) or a Secure Device Connector (SDC); see [the CDO documentation](https://docs.defenseorchestrator.com/c-connect-cisco-defense-orchestratortor-the-secure-device-connector.html) to learn more (Valid values: [CDG, SDC]).",
 				Required:            true,
 				Validators: []validator.String{
 					stringvalidator.OneOf("CDG", "SDC"),
@@ -112,7 +113,7 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				Sensitive:           true,
 			},
 			"ignore_certificate": schema.BoolAttribute{
-				MarkdownDescription: "Set this attribute to true if you do not wish for CDO to validate the certificate of this device before onboarding.",
+				MarkdownDescription: "Set this attribute to true if you do not want CDO to validate the certificate of this device before onboarding.",
 				Required:            true,
 			},
 		},

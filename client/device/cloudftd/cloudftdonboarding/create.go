@@ -52,13 +52,13 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	// CDO token does not work, we will get a 405 method not allowed if we do that
 	client.Logger.Println("getting a system token for creating FTD device record in FMC")
 
-	// 2.1 get tenant context => tenant uid
+	// 2.1 get tenant uid from API token
 	readOutp, err := user.GetTokenInfo(ctx, client, user.NewGetTokenInfoInput())
 	if err != nil {
 		return nil, err
 	}
 	tenantUid := readOutp.UserAuthentication.Details.TenantUid
-	// 2.2 get a system token with scope of tenant uid
+	// 2.2 get a system token with scope of the tenant uid of the API token
 	createTokenOutp, err := user.CreateSystemToken(ctx, client, user.NewCreateSystemTokenInput(tenantUid))
 	if err != nil {
 		return nil, err

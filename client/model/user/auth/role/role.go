@@ -18,24 +18,36 @@ const (
 	ChoiceAdmin        Type = "ROLE_CHOICE_ADMIN"
 )
 
-var NameToType = map[string]Type{
-	string(User):               User,
-	string(Admin):              Admin,
-	string(ReadOnly):           ReadOnly,
-	string(SuperAdmin):         SuperAdmin,
-	string(DeployOnly):         DeployOnly,
-	string(EditOnly):           EditOnly,
-	string(VpnSessionsManager): VpnSessionsManager,
-	string(ChoiceAdmin):        ChoiceAdmin,
+var All = []Type{
+	User,
+	Admin,
+	ReadOnly,
+	SuperAdmin,
+	DeployOnly,
+	EditOnly,
+	VpnSessionsManager,
+	ChoiceAdmin,
+}
+
+var nameToType = make(map[string]Type, len(All))
+
+func init() {
+	for _, t := range All {
+		nameToType[string(t)] = t
+	}
 }
 
 func (t *Type) UnmarshalJSON(b []byte) error {
 	if len(b) <= 2 || b == nil {
-		return fmt.Errorf("cannot unmarshal empty tring as a role type, it should be one of valid roles: %+v", NameToType)
+		return fmt.Errorf("cannot unmarshal empty tring as a role type, it should be one of valid roles: %+v", nameToType)
 	}
-	role, ok := NameToType[string(b[1:len(b)-1])]
+	unquotedType, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	role, ok := nameToType[unquotedType]
 	if !ok {
-		return fmt.Errorf("cannot unmarshal %s as a role type, it should be one of valid roles: %+v", string(b), NameToType)
+		return fmt.Errorf("cannot unmarshal %s as a role type, it should be one of valid roles: %+v", string(b), nameToType)
 	}
 	*t = role
 	return nil

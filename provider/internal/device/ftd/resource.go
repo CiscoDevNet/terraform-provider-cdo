@@ -5,7 +5,11 @@ import (
 	"fmt"
 
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
+	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -39,6 +43,9 @@ type ResourceModel struct {
 
 	AccessPolicyUid  types.String `tfsdk:"access_policy_id"`
 	GeneratedCommand types.String `tfsdk:"generated_command"`
+	Hostname         types.String `tfsdk:"hostname"`
+	NatId            types.String `tfsdk:"nat_id"`
+	RegKey           types.String `tfsdk:"reg_key"`
 }
 
 func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -47,18 +54,18 @@ func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, r
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Provides an Firepower Threat Defense device resource. This allows FTD to be onboarded, updated, and deleted on CDO.",
+		MarkdownDescription: "Provides a Firewall Threat Defense device resource. Use this to onboard, update, and delete FTDs from CDO.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "Unique identifier of the device. This is a UUID and will be automatically generated when the device is created.",
+				MarkdownDescription: "Unique identifier of the device. This is a UUID and is automatically generated when the device is created.",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "A human-readable name for the Firewall Threat Defense (FTD). This should be unique across your tenant.",
+				MarkdownDescription: "A human-readable name for the Firewall Threat Defense (FTD). This name must be unique.",
 				Required:            true,
 			},
 			"access_policy_name": schema.StringAttribute{
@@ -66,48 +73,58 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Required:            true,
 				// TODO: make this optional, and use default access policy when not given
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(), // TODO: can we change access policy after it is created?
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"performance_tier": schema.StringAttribute{
-				MarkdownDescription: "The performance tier of the virtual FTD, if virtual is set to false, this field is ignored.",
+				MarkdownDescription: "The performance tier of the virtual FTD, if virtual is set to false, this field is ignored as performance tiers are not applicable to physical FTD devices.",
 				Optional:            true,
-				// TODO: validator for performance tier, check valid performance tier is given
-				// TODO: ignore changes in this field when virtual is false
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(), // TODO: can we change performance tier after it is created?
+					stringplanmodifier.RequiresReplace(),
+				},
+				Validators: []validator.String{
+					stringvalidator.OneOf(tier.AllAsString...),
 				},
 			},
 			"virtual": schema.BoolAttribute{
-				MarkdownDescription: "Whether this FTD is virtual. If false, performance_tier is ignored",
+				MarkdownDescription: "his determines if this FTD is virtual. If false, performance_tier is ignored as performance tiers are not applicable to physical FTD devices.",
 				Required:            true,
-				// TODO: can we change this after created?
-				// TODO: default value false
 				PlanModifiers: []planmodifier.Bool{
 					boolplanmodifier.RequiresReplace(),
 				},
 			},
 			"licenses": schema.ListAttribute{
 				ElementType:         types.StringType,
-				MarkdownDescription: "Comma separated list of licenses to apply to this FTD. You must enable at least the `BASE` license.",
+				MarkdownDescription: "Comma-separated list of licenses to apply to this FTD. You must enable at least the `BASE` license.",
 				Required:            true,
-				// TODO: make this not required, when not given, use BASE license
 				PlanModifiers: []planmodifier.List{
-					listplanmodifier.RequiresReplace(), // TODO: can we modify license after FTD is created?
-					// TODO: always sort the licenses so that it is the same order, so that it does not change when order of licenses changes
+					listplanmodifier.RequiresReplace(),
 				},
 				Validators: []validator.List{
 					listvalidator.SizeAtLeast(1),
 					listvalidator.UniqueValues(),
+					listvalidator.ValueStringsAre(stringvalidator.OneOf(license.AllAsString...)),
+					validators.ValueStringsAtLeast(stringvalidator.OneOf(string(license.Base))),
 				},
-				// TODO: validate the licenses are valid input.
 			},
 			"generated_command": schema.StringAttribute{
-				MarkdownDescription: "The command to run in the FTD to register itself with Cloud-Deliered FMC (cdFMC).",
+				MarkdownDescription: "The command to run in the FTD CLI to register it with the cloud-delivered FMC (cdFMC).",
 				Computed:            true,
 			},
 			"access_policy_id": schema.StringAttribute{
-				MarkdownDescription: "The id of the Cloud-Delivered FMC (cdFMC) access policy applied to this FTD.",
+				MarkdownDescription: "The ID of the cloud-delivered FMC (cdFMC) access policy applied to this FTD.",
+				Computed:            true,
+			},
+			"hostname": schema.StringAttribute{
+				MarkdownDescription: "The Hostname of the cloud-delivered FMC (cdFMC) manages this FTD.",
+				Computed:            true,
+			},
+			"nat_id": schema.StringAttribute{
+				MarkdownDescription: "The Network Address Translation (NAT) ID of this FTD.",
+				Computed:            true,
+			},
+			"reg_key": schema.StringAttribute{
+				MarkdownDescription: "The Registration Key of this FTD.",
 				Computed:            true,
 			},
 		},

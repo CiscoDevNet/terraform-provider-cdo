@@ -4,13 +4,15 @@ package client
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd/cloudftdonboarding"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/genericssh"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/tenant"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
-	"net/http"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios"
@@ -186,4 +188,8 @@ func (c *Client) ReadFtdOnboarding(ctx context.Context, inp cloudftdonboarding.R
 
 func (c *Client) DeleteFtdOnboarding(ctx context.Context, inp cloudftdonboarding.DeleteInput) (*cloudftdonboarding.DeleteOutput, error) {
 	return cloudftdonboarding.Delete(ctx, c.client, inp)
+}
+
+func (c *Client) ReadTenantDetails(ctx context.Context) (*tenant.ReadTenantDetailsOutput, error) {
+	return tenant.ReadTenantDetails(ctx, c.client)
 }

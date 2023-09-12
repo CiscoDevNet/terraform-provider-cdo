@@ -3,12 +3,12 @@
 page_title: "cdo_ftd_device_onboarding Resource - cdo"
 subcategory: ""
 description: |-
-  TODOFILLME
+  This resource is meant to be used together with the cdo_ftd_device resource. The cdo_ftd_device creates an CDO FTD device and output a generated command to be entered in the FTD console to configure it to talk to the FMC. This resource poll and ask the FMC to register the FTD with FMC and onboard the FTD to CDO, this process will timeout and fail if the FTD is not configured in time. So to onboard a FTD using terraform, you need to write the cdo_ftd_device and cdo_ftd_onboarding resource, after apply has started, go to CDO and find the FTD device created, copy the generated_command or get it from the output of cdo_ftd_device (in this case you will need to create the cdo_ftd_onboarding resource later), then SSH and login to your FTD, and run the command. Only then the cdo_ftd_onboarding resource will success and your device will be onboarded properly in CDO. The reason for all this is because, for security reason, FTD needs its manager to be configured before FMC can communicate with it (you wouldn't want anybody, include cisco, to be able to login to your FTD and configure its manager).
 ---
 
 # cdo_ftd_device_onboarding (Resource)
 
-TODO_FILL_ME
+This resource is meant to be used together with the `cdo_ftd_device` resource. The `cdo_ftd_device` creates an CDO FTD device and output a generated command to be entered in the FTD console to configure it to talk to the FMC. This resource poll and ask the FMC to register the FTD with FMC and onboard the FTD to CDO, this process will timeout and fail if the FTD is not configured in time. So to onboard a FTD using terraform, you need to write the `cdo_ftd_device` and `cdo_ftd_onboarding` resource, after apply has started, go to CDO and find the FTD device created, copy the `generated_command` or get it from the output of `cdo_ftd_device` (in this case you will need to create the `cdo_ftd_onboarding` resource later), then SSH and login to your FTD, and run the command. Only then the `cdo_ftd_onboarding` resource will success and your device will be onboarded properly in CDO. The reason for all this is because, for security reason, FTD needs its manager to be configured before FMC can communicate with it (you wouldn't want anybody, include cisco, to be able to login to your FTD and configure its manager).
 
 
 
@@ -17,8 +17,8 @@ TODO_FILL_ME
 
 ### Required
 
-- `ftd_id` (String) TODO_FILL_ME
+- `ftd_uid` (String) The FTD uid to be used to register with FMC, can be found in the output of the `cdo_ftd_device` resource.
 
 ### Read-Only
 
-- `id` (String) TODO_FILL_ME
+- `id` (String) The unique identifier of this FTD onboarding resource, it is the registration key of the FTD.

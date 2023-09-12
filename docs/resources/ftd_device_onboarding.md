@@ -17,7 +17,7 @@ This resource is meant to be used together with the `cdo_ftd_device` resource. T
 
 ### Required
 
-- `ftd_id` (String) The FTD uid to be used to register with FMC, can be found in the output of the `cdo_ftd_device` resource.
+- `ftd_uid` (String) The FTD uid to be used to register with FMC, can be found in the output of the `cdo_ftd_device` resource.
 
 ### Read-Only
 

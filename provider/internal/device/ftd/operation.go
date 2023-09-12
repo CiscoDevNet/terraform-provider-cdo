@@ -31,6 +31,9 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 		stateData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))
 	}
 	stateData.GeneratedCommand = types.StringValue(res.Metadata.GeneratedCommand)
+	stateData.Hostname = types.StringValue(res.Metadata.CloudManagerDomain)
+	stateData.NatId = types.StringValue(res.Metadata.NatID)
+	stateData.RegKey = types.StringValue(res.Metadata.RegKey)
 
 	return nil
 }
@@ -74,6 +77,9 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 		planData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))
 	}
 	planData.GeneratedCommand = types.StringValue(res.Metadata.GeneratedCommand)
+	planData.Hostname = types.StringValue(res.Metadata.CloudManagerDomain)
+	planData.NatId = types.StringValue(res.Metadata.NatID)
+	planData.RegKey = types.StringValue(res.Metadata.RegKey)
 
 	return nil
 }

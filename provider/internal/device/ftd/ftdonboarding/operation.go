@@ -18,7 +18,7 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 
 func Create(ctx context.Context, resource *Resource, planData *ResourceModel) error {
 
-	createOutp, err := resource.client.CreateFtdOnboarding(ctx, cloudftdonboarding.NewCreateInput(planData.FtdId.ValueString()))
+	createOutp, err := resource.client.CreateFtdOnboarding(ctx, cloudftdonboarding.NewCreateInput(planData.FtdUid.ValueString()))
 	if err != nil {
 		return err
 	}

@@ -3,6 +3,10 @@ terraform {
     cdo = {
       source = "hashicorp.com/CiscoDevnet/cdo"
     }
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.27.0"
+    }
   }
 }
 
@@ -20,5 +24,5 @@ resource "cdo_ftd_device" "test" {
 }
 
 resource "cdo_ftd_device_onboarding" "test" {
-  ftd_id = cdo_ftd_device.test.id
+  ftd_uid = cdo_ftd_device.test.id
 }

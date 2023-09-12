@@ -23,8 +23,8 @@ type Resource struct {
 }
 
 type ResourceModel struct {
-	Id    types.String `tfsdk:"id"`
-	FtdId types.String `tfsdk:"ftd_id"`
+	Id     types.String `tfsdk:"id"`
+	FtdUid types.String `tfsdk:"ftd_uid"`
 }
 
 func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -43,7 +43,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"ftd_id": schema.StringAttribute{
+			"ftd_uid": schema.StringAttribute{
 				MarkdownDescription: "The FTD uid to be used to register with FMC, can be found in the output of the `cdo_ftd_device` resource.",
 				Required:            true,
 				PlanModifiers: []planmodifier.String{

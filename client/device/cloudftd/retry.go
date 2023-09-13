@@ -29,11 +29,11 @@ func UntilGeneratedCommandAvailable(ctx context.Context, client http.Client, uid
 	}
 }
 
-func UntilStateDone(ctx context.Context, client http.Client, inp ReadByUidInput) retry.Func {
+func UntilSpecificStateDone(ctx context.Context, client http.Client, inp ReadSpecificInput) retry.Func {
 	return func() (bool, error) {
-		client.Logger.Println("check FTD state")
+		client.Logger.Println("check FTD specific device state")
 
-		readOutp, err := ReadByUid(ctx, client, inp)
+		readOutp, err := ReadSpecific(ctx, client, inp)
 		if err != nil {
 			return false, err
 		}
@@ -43,7 +43,7 @@ func UntilStateDone(ctx context.Context, client http.Client, inp ReadByUidInput)
 		} else if readOutp.State == state.ERROR {
 			return false, fmt.Errorf("workflow ended in error")
 		} else {
-			return false, fmt.Errorf("generated command not found in metadata: %+v", readOutp.Metadata)
+			return false, nil
 		}
 	}
 }

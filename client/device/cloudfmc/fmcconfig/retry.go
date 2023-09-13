@@ -37,6 +37,9 @@ func UntilTaskStatusSuccess(ctx context.Context, client http.Client, readInp Rea
 func UntilCreateDeviceRecordSuccess(ctx context.Context, client http.Client, createDeviceRecordInput CreateDeviceRecordInput, output *CreateDeviceRecordOutput) retry.Func {
 	return func() (bool, error) {
 		createDeviceOutp, err := CreateDeviceRecord(ctx, client, createDeviceRecordInput)
+		if err != nil {
+			return false, err
+		}
 		*output = *createDeviceOutp
 		if err != nil {
 			return false, err

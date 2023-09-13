@@ -8,6 +8,7 @@ import (
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 )
@@ -19,13 +20,13 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 	testCases := []struct {
 		testName   string
 		input      cloudftdonboarding.CreateInput
-		setupFunc  func()
+		setupFunc  func(t *testing.T)
 		assertFunc func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T)
 	}{
 		{
 			testName: "successful ftd onboarding",
 			input:    cloudftdonboarding.NewCreateInput(ftdUid),
-			setupFunc: func() {
+			setupFunc: func(t *testing.T) {
 				ReadFmcIsSuccessful(true)
 				ReadFmcDomainInfoIsSuccessful(true)
 				ReadApiTokenInfoIsSuccessful(true)
@@ -40,12 +41,13 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 			assertFunc: func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
+				assert.Equal(t, *output, validCreateFmcDeviceRecordOutput)
 			},
 		},
 		{
 			testName: "error when read fmc failed",
 			input:    cloudftdonboarding.NewCreateInput(ftdUid),
-			setupFunc: func() {
+			setupFunc: func(t *testing.T) {
 				ReadFmcIsSuccessful(false)
 				ReadFmcDomainInfoIsSuccessful(true)
 				ReadApiTokenInfoIsSuccessful(true)
@@ -60,12 +62,13 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 			assertFunc: func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T) {
 				assert.NotNil(t, err)
 				assert.Nil(t, output)
+				assert.True(t, strings.Contains(err.Error(), url.ReadAllDevicesByType(baseUrl)))
 			},
 		},
 		{
 			testName: "error when read fmc domain info failed",
 			input:    cloudftdonboarding.NewCreateInput(ftdUid),
-			setupFunc: func() {
+			setupFunc: func(t *testing.T) {
 				ReadFmcIsSuccessful(true)
 				ReadFmcDomainInfoIsSuccessful(false)
 				ReadApiTokenInfoIsSuccessful(true)
@@ -80,12 +83,13 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 			assertFunc: func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T) {
 				assert.NotNil(t, err)
 				assert.Nil(t, output)
+				assert.True(t, strings.Contains(err.Error(), url.ReadFmcDomainInfo(fmcHost)))
 			},
 		},
 		{
 			testName: "error when read api token info failed",
 			input:    cloudftdonboarding.NewCreateInput(ftdUid),
-			setupFunc: func() {
+			setupFunc: func(t *testing.T) {
 				ReadFmcIsSuccessful(true)
 				ReadFmcDomainInfoIsSuccessful(true)
 				ReadApiTokenInfoIsSuccessful(false)
@@ -100,12 +104,13 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 			assertFunc: func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T) {
 				assert.NotNil(t, err)
 				assert.Nil(t, output)
+				assert.True(t, strings.Contains(err.Error(), url.ReadTokenInfo(baseUrl)))
 			},
 		},
 		{
 			testName: "error when create system token failed",
 			input:    cloudftdonboarding.NewCreateInput(ftdUid),
-			setupFunc: func() {
+			setupFunc: func(t *testing.T) {
 				ReadFmcIsSuccessful(true)
 				ReadFmcDomainInfoIsSuccessful(true)
 				ReadApiTokenInfoIsSuccessful(true)
@@ -120,12 +125,13 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 			assertFunc: func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T) {
 				assert.NotNil(t, err)
 				assert.Nil(t, output)
+				assert.True(t, strings.Contains(err.Error(), url.CreateSystemToken(baseUrl, systemTokenScope)))
 			},
 		},
 		{
 			testName: "error when read FTD metadata failed",
 			input:    cloudftdonboarding.NewCreateInput(ftdUid),
-			setupFunc: func() {
+			setupFunc: func(t *testing.T) {
 				ReadFmcIsSuccessful(true)
 				ReadFmcDomainInfoIsSuccessful(true)
 				ReadApiTokenInfoIsSuccessful(true)
@@ -140,55 +146,58 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 			assertFunc: func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T) {
 				assert.NotNil(t, err)
 				assert.Nil(t, output)
+				assert.True(t, strings.Contains(err.Error(), url.ReadDevice(baseUrl, ftdUid)))
 			},
 		},
+		{
+			testName: "error when create FTD device record failed",
+			input:    cloudftdonboarding.NewCreateInput(ftdUid),
+			setupFunc: func(t *testing.T) {
+				t.Skip("requires override inner retry config support")
+				ReadFmcIsSuccessful(true)
+				ReadFmcDomainInfoIsSuccessful(true)
+				ReadApiTokenInfoIsSuccessful(true)
+				CreateSystemApiTokenIsSuccessful(true)
+				ReadFtdMetadataIsSuccessful(true)
+				CreateFmcDeviceRecordIsSuccessful(false)
+				ReadTaskStatusIsSuccessful(true)
+				ReadFtdSpecificDeviceIsSuccessful(true)
+				TriggerRegisterFmcStateMachineSuccess(true)
+				TriggerRegisterFmcStateMachineEndsInDone(true)
+			},
+			assertFunc: func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+				assert.True(t, strings.Contains(err.Error(), url.CreateFmcDeviceRecord(baseUrl, fmcDomainUid)))
+			},
+		},
+		{
+			testName: "error when read task status failed",
+			input:    cloudftdonboarding.NewCreateInput(ftdUid),
+			setupFunc: func(t *testing.T) {
+				t.Skip("requires override inner retry config support")
+				ReadFmcIsSuccessful(true)
+				ReadFmcDomainInfoIsSuccessful(true)
+				ReadApiTokenInfoIsSuccessful(true)
+				CreateSystemApiTokenIsSuccessful(true)
+				ReadFtdMetadataIsSuccessful(true)
+				CreateFmcDeviceRecordIsSuccessful(true)
+				ReadTaskStatusIsSuccessful(false)
+				ReadFtdSpecificDeviceIsSuccessful(true)
+				TriggerRegisterFmcStateMachineSuccess(true)
+				TriggerRegisterFmcStateMachineEndsInDone(true)
+			},
+			assertFunc: func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+				assert.True(t, strings.Contains(err.Error(), url.ReadFmcTaskStatus(baseUrl, fmcDomainUid, fmcCreateDeviceTaskId)))
 
-		// t.Skip("requires override inner retry config support")
-
-		//{
-		//	testName: "error when create FTD device record failed",
-		//	input:    cloudftdonboarding.NewCreateInput(ftdUid),
-		//	setupFunc: func() {
-		//		ReadFmcIsSuccessful(true)
-		//		ReadFmcDomainInfoIsSuccessful(true)
-		//		ReadApiTokenInfoIsSuccessful(true)
-		//		CreateSystemApiTokenIsSuccessful(true)
-		//		ReadFtdMetadataIsSuccessful(true)
-		//		CreateFmcDeviceRecordIsSuccessful(false)
-		//		ReadTaskStatusIsSuccessful(true)
-		//		ReadFtdSpecificDeviceIsSuccessful(true)
-		//		TriggerRegisterFmcStateMachineSuccess(true)
-		//		TriggerRegisterFmcStateMachineEndsInDone(true)
-		//	},
-		//	assertFunc: func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T) {
-		//		assert.NotNil(t, err)
-		//		assert.Nil(t, output)
-		//	},
-		//},
-		//{
-		//	testName: "error when read task status failed",
-		//	input:    cloudftdonboarding.NewCreateInput(ftdUid),
-		//	setupFunc: func() {
-		//		ReadFmcIsSuccessful(true)
-		//		ReadFmcDomainInfoIsSuccessful(true)
-		//		ReadApiTokenInfoIsSuccessful(true)
-		//		CreateSystemApiTokenIsSuccessful(true)
-		//		ReadFtdMetadataIsSuccessful(true)
-		//		CreateFmcDeviceRecordIsSuccessful(true)
-		//		ReadTaskStatusIsSuccessful(false)
-		//		ReadFtdSpecificDeviceIsSuccessful(true)
-		//		TriggerRegisterFmcStateMachineSuccess(true)
-		//		TriggerRegisterFmcStateMachineEndsInDone(true)
-		//	},
-		//	assertFunc: func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T) {
-		//		assert.NotNil(t, err)
-		//		assert.Nil(t, output)
-		//	},
-		//},
+			},
+		},
 		{
 			testName: "error when read FTD specific device failed",
 			input:    cloudftdonboarding.NewCreateInput(ftdUid),
-			setupFunc: func() {
+			setupFunc: func(t *testing.T) {
 				ReadFmcIsSuccessful(true)
 				ReadFmcDomainInfoIsSuccessful(true)
 				ReadApiTokenInfoIsSuccessful(true)
@@ -203,12 +212,13 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 			assertFunc: func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T) {
 				assert.NotNil(t, err)
 				assert.Nil(t, output)
+				assert.True(t, strings.Contains(err.Error(), url.ReadSpecificDevice(baseUrl, ftdUid)))
 			},
 		},
 		{
 			testName: "error when update FTD specific device failed",
 			input:    cloudftdonboarding.NewCreateInput(ftdUid),
-			setupFunc: func() {
+			setupFunc: func(t *testing.T) {
 				ReadFmcIsSuccessful(true)
 				ReadFmcDomainInfoIsSuccessful(true)
 				ReadApiTokenInfoIsSuccessful(true)
@@ -223,35 +233,38 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 			assertFunc: func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T) {
 				assert.NotNil(t, err)
 				assert.Nil(t, output)
+				assert.True(t, strings.Contains(err.Error(), url.UpdateSpecificCloudFtd(baseUrl, ftdSpecificUid)))
 			},
 		},
-		//{
-		//	testName: "error when read FTD specific device failed",
-		//	input:    cloudftdonboarding.NewCreateInput(ftdUid),
-		//	setupFunc: func() {
-		//		ReadFmcIsSuccessful(true)
-		//		ReadFmcDomainInfoIsSuccessful(true)
-		//		ReadApiTokenInfoIsSuccessful(true)
-		//		CreateSystemApiTokenIsSuccessful(true)
-		//		ReadFtdMetadataIsSuccessful(true)
-		//		CreateFmcDeviceRecordIsSuccessful(true)
-		//		ReadTaskStatusIsSuccessful(true)
-		//		ReadFtdSpecificDeviceIsSuccessful(true)
-		//		TriggerRegisterFmcStateMachineSuccess(true)
-		//		TriggerRegisterFmcStateMachineEndsInDone(false)
-		//	},
-		//	assertFunc: func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T) {
-		//		assert.NotNil(t, err)
-		//		assert.Nil(t, output)
-		//	},
-		//},
+		{
+			testName: "error when read FTD specific device failed",
+			input:    cloudftdonboarding.NewCreateInput(ftdUid),
+			setupFunc: func(t *testing.T) {
+				t.Skip("requires override inner retry config support")
+				ReadFmcIsSuccessful(true)
+				ReadFmcDomainInfoIsSuccessful(true)
+				ReadApiTokenInfoIsSuccessful(true)
+				CreateSystemApiTokenIsSuccessful(true)
+				ReadFtdMetadataIsSuccessful(true)
+				CreateFmcDeviceRecordIsSuccessful(true)
+				ReadTaskStatusIsSuccessful(true)
+				ReadFtdSpecificDeviceIsSuccessful(true)
+				TriggerRegisterFmcStateMachineSuccess(true)
+				TriggerRegisterFmcStateMachineEndsInDone(false)
+			},
+			assertFunc: func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+				assert.True(t, strings.Contains(err.Error(), url.ReadSpecificDevice(baseUrl, ftdSpecificUid)))
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.testName, func(t *testing.T) {
 			httpmock.Reset()
 
-			testCase.setupFunc()
+			testCase.setupFunc(t)
 
 			output, err := cloudftdonboarding.Create(
 				context.Background(),

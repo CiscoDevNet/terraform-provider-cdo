@@ -16,7 +16,7 @@ type DeviceRecordCreation struct {
 
 	AccessPolicy accessPolicy    `json:"accessPolicy"`
 	LicenseCaps  *[]license.Type `json:"license_caps"`
-	Metadata     metadata        `json:"metadata"`
+	Metadata     Metadata        `json:"metadata"`
 }
 
 type accessPolicy struct {
@@ -24,13 +24,13 @@ type accessPolicy struct {
 	Type string `json:"type"`
 }
 
-type metadata struct {
-	Task              task `json:"task"`
+type Metadata struct {
+	Task              Task `json:"task"`
 	IsPartOfContainer bool `json:"isPartOfContainer"`
 	IsMultiInstance   bool `json:"isMultiInstance"`
 }
 
-type task struct {
+type Task struct {
 	Name string `json:"name"`
 	Id   string `json:"id"`
 	Type string `json:"type"`

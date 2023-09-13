@@ -19,7 +19,11 @@ const (
 )
 
 var All = []Type{
-	Base, Carrier, Threat, Malware, URLFilter,
+	Base,
+	Carrier,
+	Threat,
+	Malware,
+	URLFilter,
 }
 
 var AllAsString = make([]string, len(All))
@@ -39,13 +43,9 @@ func (t *Type) MarshalJSON() ([]byte, error) {
 
 func (t *Type) UnmarshalJSON(b []byte) error {
 	if len(b) <= 2 || b == nil {
-		return fmt.Errorf("cannot unmarshal empty tring as a license type, it should be one of valid roles: %+v", nameToTypeMap)
+		return fmt.Errorf("cannot unmarshal empty tring as a license type, it should be one of valid roles: %+v", AllAsString)
 	}
-	unquoteType, err := strconv.Unquote(string(b))
-	if err != nil {
-		return err
-	}
-	deserialized, err := deserialize(unquoteType)
+	deserialized, err := Deserialize(string(b[1 : len(b)-1])) // strip off quote
 	if err != nil {
 		return err
 	}
@@ -53,31 +53,34 @@ func (t *Type) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func deserialize(name string) (Type, error) {
+func MustParse(name string) Type {
 	l, ok := nameToTypeMap[name]
 	if !ok {
-		return "", fmt.Errorf("FTD License of name: \"%s\" not found, should be one of: %+v", name, nameToTypeMap)
+		panic(fmt.Errorf("FTD License of name: \"%s\" not found, should be one of %+v", name, AllAsString))
+	}
+	return l
+}
+
+func Deserialize(name string) (Type, error) {
+	l, ok := nameToTypeMap[name]
+	if !ok {
+		return "", fmt.Errorf("FTD License of name: \"%s\" not found, should be one of: %+v", name, AllAsString)
 	}
 	return l, nil
 }
 
-func DeserializeAll(names string) ([]Type, error) {
-	licenseStrs := strings.Split(names, ",")
-	licenses := make([]Type, len(licenseStrs))
-	for i, name := range licenseStrs {
-		t, err := deserialize(name)
-		if err != nil {
-			return nil, err
+func SerializeAllAsCdo(licenses []Type) string {
+	return strings.Join(sliceutil.Map(licenses, func(l Type) string { return string(l) }), ",")
+}
+
+// DeserializeAllFromCdo exists because CDO store license caps as one comma-sep string
+// but fmc store it as list of string, use this method to handle CDO's special case
+func DeserializeAllFromCdo(licenses string) ([]Type, error) {
+	return sliceutil.MapWithError(strings.Split(licenses, ","), func(l string) (Type, error) {
+		t, ok := nameToTypeMap[l]
+		if !ok {
+			return "", fmt.Errorf("cannot deserialize %s as license, should be one of %+v", l, All)
 		}
-		licenses[i] = t
-	}
-	return licenses, nil
-}
-
-func SerializeAll(licenses []Type) string {
-	return strings.Join(sliceutil.Map(licenses, func(l Type) string { return serialize(l) }), ",")
-}
-
-func serialize(license Type) string {
-	return string(license)
+		return t, nil
+	})
 }

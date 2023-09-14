@@ -1,4 +1,4 @@
-package cdfmc
+package cloudfmc
 
 import (
 	"context"
@@ -21,20 +21,21 @@ type ReadOutput = device.ReadOutput
 
 func Read(ctx context.Context, client http.Client, readInp ReadInput) (*ReadOutput, error) {
 
-	client.Logger.Println("reading cdFMC")
+	client.Logger.Println("reading cloud FMC")
 
-	cdfmcDevices, err := device.ReadAllByType(ctx, client, device.NewReadAllByTypeInput(devicetype.Cdfmc))
-	if err != nil {
+	req := device.ReadAllByTypeRequest(ctx, client, device.NewReadAllByTypeInput(devicetype.CloudFmc))
+	var cloudFmcDevices []ReadOutput
+	if err := req.Send(&cloudFmcDevices); err != nil {
 		return nil, err
 	}
 
-	if len(*cdfmcDevices) == 0 {
+	if len(cloudFmcDevices) == 0 {
 		return nil, fmt.Errorf("firewall management center (FMC) not found")
 	}
 
-	if len(*cdfmcDevices) > 1 {
+	if len(cloudFmcDevices) > 1 {
 		return nil, fmt.Errorf("more than one firewall management center (FMC) found, please report this issue at: %s", cdo.TerraformProviderCDOIssuesUrl)
 	}
 
-	return &(*cdfmcDevices)[0], nil
+	return &cloudFmcDevices[0], nil
 }

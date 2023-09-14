@@ -60,7 +60,7 @@ func (d *IosDataSource) Schema(ctx context.Context, req datasource.SchemaRequest
 				Computed:            true,
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "The human-readable name of the device. This is the name that is displayed in the CDO inventory page. Device names are unique across a CDO tenant.",
+				MarkdownDescription: "The human-readable name of the device. This is the name displayed on the CDO Inventory page. Device names are unique across a CDO tenant.",
 				Required:            true,
 			},
 			"connector_name": schema.StringAttribute{

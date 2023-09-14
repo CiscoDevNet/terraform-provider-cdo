@@ -21,4 +21,4 @@ Provides a resource to generate an API token for an API-only user. This allows a
 
 ### Read-Only
 
-- `api_token` (String, Sensitive) The API token for the user. This API token has no expiry; to re-generate it, delete the resource and recreate it.
+- `api_token` (String, Sensitive) The API token for the user. This API token does not expire; to re-generate it, delete the resource and recreate it.

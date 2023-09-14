@@ -37,18 +37,18 @@ func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, r
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Provides an SDC connector resource. This allows an SDC to be onboarded, updated, and deleted on CDO.",
+		MarkdownDescription: "Provides an SDC connector resource. This allows SDC to be onboarded, updated, and deleted on CDO.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "Unique identifier of the device. This is a UUID and will be automatically generated when the device is created.",
+				MarkdownDescription: "Unique identifier of the device. This is a UUID and is automatically generated when the device is created.",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "A human-readable name for the Secure Device Connector (SDC). This should be unique among SDCs",
+				MarkdownDescription: "A human-readable name for the Secure Device Connector (SDC). This name must be unique.",
 				Required:            true,
 			},
 			"bootstrap_data": schema.StringAttribute{

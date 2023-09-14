@@ -33,7 +33,7 @@ func (builder *readOutputBuilder) AsIos() *readOutputBuilder {
 	return builder
 }
 
-func (builder *readOutputBuilder) AsCdfmc() *readOutputBuilder {
+func (builder *readOutputBuilder) AsCloudFmc() *readOutputBuilder {
 	builder.readOutput.DeviceType = "FMCE"
 	return builder
 }

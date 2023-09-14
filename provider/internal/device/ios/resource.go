@@ -54,7 +54,7 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "Unique identifier of the device. This is a UUID and will be automatically generated when the device is created.",
+				MarkdownDescription: "Unique identifier of the device. This is a UUID and is automatically generated when the device is created.",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
@@ -105,7 +105,7 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				},
 			},
 			"ignore_certificate": schema.BoolAttribute{
-				MarkdownDescription: "Set this attribute to true if you do not wish for CDO to validate the certificate of this device before onboarding.",
+				MarkdownDescription: "Set this attribute to true if you do not want CDO to validate the certificate of this device before onboarding.",
 				Required:            true,
 			},
 		},

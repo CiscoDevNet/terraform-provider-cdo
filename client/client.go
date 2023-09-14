@@ -8,6 +8,7 @@ import (
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd/cloudftdonboarding"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/genericssh"
@@ -192,4 +193,8 @@ func (c *Client) DeleteFtdOnboarding(ctx context.Context, inp cloudftdonboarding
 
 func (c *Client) ReadTenantDetails(ctx context.Context) (*tenant.ReadTenantDetailsOutput, error) {
 	return tenant.ReadTenantDetails(ctx, c.client)
+}
+
+func (c *Client) ReadCloudFmc(ctx context.Context) (*device.ReadOutput, error) {
+	return cloudfmc.Read(ctx, c.client, cloudfmc.NewReadInput())
 }

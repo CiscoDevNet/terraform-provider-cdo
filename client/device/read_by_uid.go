@@ -2,6 +2,7 @@ package device
 
 import (
 	"context"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
@@ -20,6 +21,7 @@ type ReadOutput struct {
 	ConnectorUid    string          `json:"larUid"`
 	ConnectorType   string          `json:"larType"`
 	SocketAddress   string          `json:"ipv4"`
+	SoftwareVersion string          `json:"softwareVersion"`
 	Port            string          `json:"port"`
 	Host            string          `json:"host"`
 

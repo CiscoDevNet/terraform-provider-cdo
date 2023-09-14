@@ -195,6 +195,10 @@ func (c *Client) ReadTenantDetails(ctx context.Context) (*tenant.ReadTenantDetai
 	return tenant.ReadTenantDetails(ctx, c.client)
 }
 
-func (c *Client) ReadCloudFmc(ctx context.Context) (*device.ReadOutput, error) {
+func (c *Client) ReadCloudFmcDevice(ctx context.Context) (*device.ReadOutput, error) {
 	return cloudfmc.Read(ctx, c.client, cloudfmc.NewReadInput())
+}
+
+func (c *Client) ReadCloudFmcSpecificDevice(ctx context.Context, inp cloudfmc.ReadSpecificInput) (*cloudfmc.ReadSpecificOutput, error) {
+	return cloudfmc.ReadSpecific(ctx, c.client, inp)
 }

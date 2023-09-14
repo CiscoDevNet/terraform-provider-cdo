@@ -11,16 +11,18 @@ var testCdFmc = struct {
 	Hostname        string
 	Uid             string
 	SoftwareVersion string
+	DomainUuid      string
 }{
 	Hostname:        "terraform-provider-cdo.app.staging.cdo.cisco.com",
 	Uid:             "ac12b246-ed93-4a09-bc8a-5c4708854a2f",
 	SoftwareVersion: "7.3.1-build 6035",
+	DomainUuid:      "e276abec-e0f2-11e3-8169-6d9ed49b625f",
 }
 
-const testTenantTemplate = `
+const testCdFmcTemplate = `
 data "cdo_cdfmc" "test" {}`
 
-var testTenantConfig = acctest.MustParseTemplate(testTenantTemplate, testCdFmc)
+var testCdfmcConfig = acctest.MustParseTemplate(testCdFmcTemplate, testCdFmc)
 
 func TestAccCdFmcDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -29,11 +31,12 @@ func TestAccCdFmcDataSource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Read testing
 			{
-				Config: acctest.ProviderConfig() + testTenantConfig,
+				Config: acctest.ProviderConfig() + testCdfmcConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.cdo_cdfmc.test", "hostname", testCdFmc.Hostname),
 					resource.TestCheckResourceAttr("data.cdo_cdfmc.test", "id", testCdFmc.Uid),
 					resource.TestCheckResourceAttr("data.cdo_cdfmc.test", "software_version", testCdFmc.SoftwareVersion),
+					resource.TestCheckResourceAttr("data.cdo_cdfmc.test", "domain_uuid", testCdFmc.DomainUuid),
 				),
 			},
 		},

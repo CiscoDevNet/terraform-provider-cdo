@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -14,6 +15,7 @@ type DataSourceModel struct {
 	Uid             types.String `tfsdk:"id"`
 	Hostname        types.String `tfsdk:"hostname"`
 	SoftwareVersion types.String `tfsdk:"software_version"`
+	DomainUuid      types.String `tfsdk:"domain_uuid"`
 }
 
 func NewDataSource() datasource.DataSource {
@@ -42,6 +44,10 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 			},
 			"software_version": schema.StringAttribute{
 				MarkdownDescription: "Software version of the cdFMC.",
+				Computed:            true,
+			},
+			"domain_uuid": schema.StringAttribute{
+				MarkdownDescription: "The domain UUID of the cdFMC.",
 				Computed:            true,
 			},
 		},
@@ -77,14 +83,21 @@ func (d *DataSource) Read(ctx context.Context, req datasource.ReadRequest, resp 
 		return
 	}
 
-	cloudFmc, err := d.client.ReadCloudFmc(ctx)
+	cloudFmcDevice, err := d.client.ReadCloudFmcDevice(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("Failed to read cdFMC", err.Error())
 		return
 	}
-	planData.Uid = types.StringValue(cloudFmc.Uid)
-	planData.Hostname = types.StringValue(cloudFmc.Host)
-	planData.SoftwareVersion = types.StringValue(cloudFmc.SoftwareVersion)
+	cloudFmcSpecificDevice, cloudFmcSpecificDeviceErr := d.client.ReadCloudFmcSpecificDevice(ctx, cloudfmc.NewReadSpecificInput(cloudFmcDevice.Uid))
+	if cloudFmcSpecificDeviceErr != nil {
+		resp.Diagnostics.AddError("Failed to read cdFMC specific device", err.Error())
+		return
+	}
+
+	planData.Uid = types.StringValue(cloudFmcDevice.Uid)
+	planData.Hostname = types.StringValue(cloudFmcDevice.Host)
+	planData.DomainUuid = types.StringValue(cloudFmcSpecificDevice.DomainUid)
+	planData.SoftwareVersion = types.StringValue(cloudFmcDevice.SoftwareVersion)
 
 	// Save data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &planData)...)

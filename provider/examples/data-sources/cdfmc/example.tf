@@ -25,3 +25,7 @@ output "cdfmc_software_version" {
 output "cdfmc_uid" {
     value = data.cdo_cdfmc.current.id
 }
+
+output "cdfmc_domain_uuid" {
+    value = data.cdo_cdfmc.current.domain_uuid
+}

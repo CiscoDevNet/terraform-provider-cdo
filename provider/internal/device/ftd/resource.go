@@ -79,7 +79,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"performance_tier": schema.StringAttribute{
-				MarkdownDescription: "The performance tier of the virtual FTD, if virtual is set to false, this field is ignored as performance tiers are not applicable to physical FTD devices. Allow values are: \"FTDv5\", \"FTDv10\", \"FTDv20\", \"FTDv30\", \"FTDv50\", \"FTDv100\", \"FTDv\".",
+				MarkdownDescription: "The performance tier of the virtual FTD, if virtual is set to false, this field is ignored as performance tiers are not applicable to physical FTD devices. Allowed values are: [\"FTDv5\", \"FTDv10\", \"FTDv20\", \"FTDv30\", \"FTDv50\", \"FTDv100\", \"FTDv\"].",
 				Optional:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
@@ -89,7 +89,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"virtual": schema.BoolAttribute{
-				MarkdownDescription: "his determines if this FTD is virtual. If false, performance_tier is ignored as performance tiers are not applicable to physical FTD devices.",
+				MarkdownDescription: "This determines if this FTD is virtual. If false, performance_tier is ignored as performance tiers are not applicable to physical FTD devices.",
 				Required:            true,
 				PlanModifiers: []planmodifier.Bool{
 					boolplanmodifier.RequiresReplace(),
@@ -97,7 +97,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			},
 			"licenses": schema.ListAttribute{
 				ElementType:         types.StringType,
-				MarkdownDescription: "Comma-separated list of licenses to apply to this FTD. You must enable at least the `BASE` license.",
+				MarkdownDescription: "Comma-separated list of licenses to apply to this FTD. You must enable at least the \"BASE\" license. Allowed values are: [\"BASE\", \"CARRIER\", \"THREAT\", \"MALWARE\", \"URLFilter\",].",
 				Required:            true,
 				PlanModifiers: []planmodifier.List{
 					listplanmodifier.RequiresReplace(),

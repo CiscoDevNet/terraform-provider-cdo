@@ -18,13 +18,13 @@ Provides a Firewall Threat Defense device resource. Use this to onboard, update,
 ### Required
 
 - `access_policy_name` (String) The name of the Cloud-Delivered FMC (cdFMC) access policy that will be used by the FTD.
-- `licenses` (List of String) Comma-separated list of licenses to apply to this FTD. You must enable at least the `BASE` license.
+- `licenses` (List of String) Comma-separated list of licenses to apply to this FTD. You must enable at least the "BASE" license. Allowed values are: ["BASE", "CARRIER", "THREAT", "MALWARE", "URLFilter",].
 - `name` (String) A human-readable name for the Firewall Threat Defense (FTD). This name must be unique.
-- `virtual` (Boolean) his determines if this FTD is virtual. If false, performance_tier is ignored as performance tiers are not applicable to physical FTD devices.
+- `virtual` (Boolean) This determines if this FTD is virtual. If false, performance_tier is ignored as performance tiers are not applicable to physical FTD devices.
 
 ### Optional
 
-- `performance_tier` (String) The performance tier of the virtual FTD, if virtual is set to false, this field is ignored as performance tiers are not applicable to physical FTD devices.
+- `performance_tier` (String) The performance tier of the virtual FTD, if virtual is set to false, this field is ignored as performance tiers are not applicable to physical FTD devices. Allowed values are: ["FTDv5", "FTDv10", "FTDv20", "FTDv30", "FTDv50", "FTDv100", "FTDv"].
 
 ### Read-Only
 

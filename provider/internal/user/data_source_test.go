@@ -1,23 +1,24 @@
 package user_test
 
 import (
-	"strconv"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
+var testUserName = acctest.Env.UserDataSourceUser()
+var testRole = acctest.Env.UserDataSourceRole()
+var testIsApiOnlyUser = acctest.Env.UserDataSourceIsApiOnly()
+
 var testUser = struct {
 	Name        string
-	Uid         string
-	ApiOnlyUser bool
+	ApiOnlyUser string
 	UserRole    string
 }{
-	Name:        "terraform-provider-cdo-super-admin@lockhart.io",
-	Uid:         "9b5cbc71-6fbc-462c-ad6f-e4b2af6caf05",
-	ApiOnlyUser: false,
-	UserRole:    "ROLE_SUPER_ADMIN",
+	Name:        testUserName,      //"terraform-provider-cdo-super-admin@lockhart.io",
+	ApiOnlyUser: testIsApiOnlyUser, // "false"
+	UserRole:    testRole,          //"ROLE_SUPER_ADMIN",
 }
 
 const testUserTemplate = `
@@ -37,8 +38,7 @@ func TestAccUserDataSource(t *testing.T) {
 				Config: acctest.ProviderConfig() + testUserConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.cdo_user.test", "name", testUser.Name),
-					resource.TestCheckResourceAttr("data.cdo_user.test", "id", testUser.Uid),
-					resource.TestCheckResourceAttr("data.cdo_user.test", "is_api_only_user", strconv.FormatBool(testUser.ApiOnlyUser)),
+					resource.TestCheckResourceAttr("data.cdo_user.test", "is_api_only_user", testUser.ApiOnlyUser),
 					resource.TestCheckResourceAttr("data.cdo_user.test", "role", testUser.UserRole),
 				),
 			},

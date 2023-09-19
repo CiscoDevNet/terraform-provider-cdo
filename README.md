@@ -111,7 +111,7 @@ go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --pr
 
 To release a new version of the Terraform CDO Provider, perform the following steps.
 1. Fork the repository and create a new PR that contains the followings:
-    - link the commit.
+    - link the commit to be tagged for release.
     - link to Github action run (after merging into main).
     - link to Github action run (after pushing the tag).
     - link to Jenkins CI job that runs acceptance tests (not required if you are external contributor, a maintainer will fill this in).
@@ -123,6 +123,7 @@ To release a new version of the Terraform CDO Provider, perform the following st
    - Add a tag: `git tag vMAJOR.MINOR.PATCH`, e.g. `git tag v0.1.3` (following semver conventions as described in https://www.semver.org).
      - To add a tag for past commit: `git tag -a vMAJOR.MINOR.PATCH COMMIT_HASH`, e.g. `git tag -a v1.2.3 9fceb02`. 
    - Push the tag: `git push --tags origin main`.
+4. Github actions will be triggered to run tests and publish a new version to terraform registry, keep a close eye and update the PR created.
 
 ## Troubleshooting
 - Error: Inconsistent dependency lock file

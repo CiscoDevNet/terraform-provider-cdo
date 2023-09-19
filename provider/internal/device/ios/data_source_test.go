@@ -15,12 +15,12 @@ var testIosDataSource = struct {
 	Port              string
 	IgnoreCertificate string
 }{
-	Id:                "cd0483d0-5ec5-4d8e-b92d-8eb389f88417",
-	Name:              "weilue-test-ios",
-	SocketAddress:     "10.10.0.198:22",
-	Host:              "10.10.0.198",
-	Port:              "22",
-	IgnoreCertificate: "false",
+	Id:                acctest.Env.IosDataSourceId(),
+	Name:              acctest.Env.IosDataSourceName(),
+	SocketAddress:     acctest.Env.IosDataSourceSocketAddress(),
+	Host:              acctest.Env.IosDataSourceHost(),
+	Port:              acctest.Env.IosDataSourcePort(),
+	IgnoreCertificate: acctest.Env.IosDataSourceIgnoreCertificate(),
 }
 
 var testIosDataSourceTemplate = `

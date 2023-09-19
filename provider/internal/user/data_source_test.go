@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-var testUserName = acctest.Env.UserDataSourceUser()
+var testUserName = acctest.Env.UserDataSourceName()
 var testRole = acctest.Env.UserDataSourceRole()
 var testIsApiOnlyUser = acctest.Env.UserDataSourceIsApiOnly()
 

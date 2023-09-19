@@ -17,12 +17,12 @@ resource "cdo_sdc" "test" {
 }`
 
 var testSdcResource = testSdcResourceType{
-	Name: "test-sdc-1",
+	Name: acctest.Env.ConnectorResourceName(),
 }
 var testSdcResourceConfig = acctest.MustParseTemplate(testResourceTemplate, testSdcResource)
 
 var testResource_NewName = acctest.MustOverrideFields(testSdcResource, map[string]any{
-	"Name": "test-sdc-2",
+	"Name": acctest.Env.ConnectorResourceNewName(),
 })
 var testResourceConfig_NewName = acctest.MustParseTemplate(testResourceTemplate, testResource_NewName)
 

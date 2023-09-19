@@ -14,7 +14,7 @@ type testIosResourceType struct {
 	Username          string
 	Password          string
 	ConnectorName     string
-	IgnoreCertificate bool
+	IgnoreCertificate string
 
 	Host string
 	Port string
@@ -31,21 +31,21 @@ resource "cdo_ios_device" "test" {
 }`
 
 var testIosResource = testIosResourceType{
-	Name:              "test-ios-device-1",
-	SocketAddress:     "10.10.0.198:22",
-	ConnectorType:     "SDC",
-	Username:          "lockhart",
-	Password:          "BlueSkittles123!!",
-	ConnectorName:     "CDO_terraform-provider-cdo-SDC-1",
-	IgnoreCertificate: true,
+	Name:              acctest.Env.IosResourceName(),
+	SocketAddress:     acctest.Env.IosResourceSocketAddress(),
+	ConnectorType:     acctest.Env.IosResourceConnectorType(),
+	Username:          acctest.Env.IosResourceUsername(),
+	Password:          acctest.Env.IosResourcePassword(),
+	ConnectorName:     acctest.Env.IosResourceConnectorName(),
+	IgnoreCertificate: acctest.Env.IosResourceIgnoreCertificate(),
 
-	Host: "10.10.0.198",
-	Port: "22",
+	Host: acctest.Env.IosResourceHost(),
+	Port: acctest.Env.IosResourcePort(),
 }
 var testIosResourceConfig = acctest.MustParseTemplate(testIosResourceTemplate, testIosResource)
 
 var testIosResource_NewName = acctest.MustOverrideFields(testIosResource, map[string]any{
-	"Name": "test-ios-device-2",
+	"Name": acctest.Env.IosResourceNewName(),
 })
 var testIosResourceConfig_NewName = acctest.MustParseTemplate(testIosResourceTemplate, testIosResource_NewName)
 

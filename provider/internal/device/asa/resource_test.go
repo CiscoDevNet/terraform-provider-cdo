@@ -15,7 +15,7 @@ type testAsaResourceType struct {
 	ConnectorType     string
 	Username          string
 	Password          string
-	IgnoreCertificate bool
+	IgnoreCertificate string
 
 	Host string
 	Port string
@@ -36,31 +36,31 @@ resource "cdo_asa_device" "test" {
 
 // default config.
 var testAsaResource_SDC = testAsaResourceType{
-	Name:              "test-asa-device-1",
-	SocketAddress:     "vasa-gb-ravpn-03-mgmt.dev.lockhart.io:443",
-	ConnectorName:     "CDO_terraform-provider-cdo-SDC-1",
-	ConnectorType:     "SDC",
-	Username:          "lockhart",
-	Password:          "BlueSkittles123!!",
-	IgnoreCertificate: true,
+	Name:              acctest.Env.AsaResourceSdcName(),
+	SocketAddress:     acctest.Env.AsaResourceSdcSocketAddress(),
+	ConnectorName:     acctest.Env.AsaResourceSdcConnectorName(),
+	ConnectorType:     acctest.Env.AsaResourceSdcConnectorType(),
+	Username:          acctest.Env.AsaResourceSdcUsername(),
+	Password:          acctest.Env.AsaResourceSdcPassword(),
+	IgnoreCertificate: acctest.Env.AsaResourceSdcIgnoreCertificate(),
 
-	Host: "vasa-gb-ravpn-03-mgmt.dev.lockhart.io",
-	Port: "443",
+	Host: acctest.Env.AsaResourceSdcHost(),
+	Port: acctest.Env.AsaResourceSdcPort(),
 }
 
-const alternativeDeviceLocation = "35.177.20.218:443"
+var alternativeDeviceLocation = acctest.Env.AsaResourceAlternativeDeviceLocation()
 
 var testAsaResourceConfig_SDC = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC)
 
 // new name config.
 var testAsaResource_SDC_NewName = acctest.MustOverrideFields(testAsaResource_SDC, map[string]any{
-	"Name": "test-asa-device-2",
+	"Name": acctest.Env.AsaResourceSdcNewName(),
 })
 var testAsaResourceConfig_SDC_NewName = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC_NewName)
 
 // new creds config.
 var testAsaResource_SDC_BadCreds = acctest.MustOverrideFields(testAsaResource_SDC, map[string]any{
-	"Password": "WrongPassword",
+	"Password": acctest.Env.AsaResourceSdcWrongPassword(),
 })
 var testAsaResourceConfig_SDC_NewCreds = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC_BadCreds)
 
@@ -77,22 +77,22 @@ var testAsaResource_CDG = testAsaResourceType{
 	ConnectorType:     "CDG",
 	Username:          "lockhart",
 	Password:          "BlueSkittles123!!",
-	IgnoreCertificate: false,
+	IgnoreCertificate: "false",
 
-	Host: "vasa-gb-ravpn-03-mgmt.dev.lockhart.io",
-	Port: "443",
+	Host: acctest.Env.AsaResourceCdgHost(),
+	Port: acctest.Env.AsaResourceCdgPort(),
 }
 var testAsaResourceConfig_CDG = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_CDG)
 
 // new name config.
 var testAsaResource_CDG_NewName = acctest.MustOverrideFields(testAsaResource_CDG, map[string]any{
-	"Name": "test-asa-device-2",
+	"Name": acctest.Env.AsaResourceCdgNewName(),
 })
 var testAsaResourceConfig_CDG_NewName = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_CDG_NewName)
 
 // bad credentials config.
 var testAsaResource_CDG_BadCreds = acctest.MustOverrideFields(testAsaResource_CDG, map[string]any{
-	"Password": "WrongPassword",
+	"Password": acctest.Env.AsaResourceCdgWrongPassword(),
 })
 var testAsaResourceConfig_CDG_NewCreds = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_CDG_BadCreds)
 

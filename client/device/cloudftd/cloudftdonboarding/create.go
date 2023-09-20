@@ -3,6 +3,8 @@ package cloudftdonboarding
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc/fmcconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc/fmcplatform"
@@ -11,7 +13,6 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
-	"time"
 )
 
 type CreateInput struct {
@@ -106,7 +107,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	}
 
 	// 4. trigger FTD onboarding state machine
-	client.Logger.Println("triggering FTD onboarding state machine")
+	client.Logger.Println("triggering ftdcRegisterStateMachine")
 
 	// 4.1 get ftd specific device
 	ftdSpecificOutp, err := cloudftd.ReadSpecific(ctx, client, cloudftd.NewReadSpecificInputBuilder().Uid(readFtdOutp.Uid).Build())
@@ -129,7 +130,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 			ctx,
 			client,
 			cloudftd.NewReadSpecificInputBuilder().
-				Uid(ftdSpecificOutp.SpecificUid).
+				Uid(readFtdOutp.Uid).
 				Build(),
 		),
 		retry.NewOptionsBuilder().

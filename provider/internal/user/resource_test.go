@@ -21,13 +21,13 @@ resource "cdo_user" "test" {
 }`
 
 var testUserResource = testUserResourceType{
-	Name:        "sam@example.com",
-	ApiOnlyUser: false,
-	UserRole:    "ROLE_SUPER_ADMIN",
+	Name:        acctest.Env.UserResourceName(),
+	ApiOnlyUser: acctest.Env.UserResourceIsApiOnly(),
+	UserRole:    acctest.Env.UserResourceRole(),
 }
 var testUserResourceConfig = acctest.MustParseTemplate(testResourceTemplate, testUserResource)
 var testResource_NewName = acctest.MustOverrideFields(testUserResource, map[string]any{
-	"Name": "jim@example.com",
+	"Name": acctest.Env.UserResourceNewName(),
 })
 var testResourceConfig_NewName = acctest.MustParseTemplate(testResourceTemplate, testResource_NewName)
 

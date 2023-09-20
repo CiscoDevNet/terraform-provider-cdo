@@ -1,6 +1,7 @@
 package ios_test
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/acctest"
@@ -14,10 +15,10 @@ type testIosResourceType struct {
 	Username          string
 	Password          string
 	ConnectorName     string
-	IgnoreCertificate bool
+	IgnoreCertificate string
 
 	Host string
-	Port string
+	Port int64
 }
 
 const testIosResourceTemplate = `
@@ -31,21 +32,21 @@ resource "cdo_ios_device" "test" {
 }`
 
 var testIosResource = testIosResourceType{
-	Name:              "test-ios-device-1",
-	SocketAddress:     "10.10.0.198:22",
-	ConnectorType:     "SDC",
-	Username:          "lockhart",
-	Password:          "BlueSkittles123!!",
-	ConnectorName:     "CDO_terraform-provider-cdo-SDC-1",
-	IgnoreCertificate: true,
+	Name:              acctest.Env.IosResourceName(),
+	SocketAddress:     acctest.Env.IosResourceSocketAddress(),
+	ConnectorType:     acctest.Env.IosResourceConnectorType(),
+	Username:          acctest.Env.IosResourceUsername(),
+	Password:          acctest.Env.IosResourcePassword(),
+	ConnectorName:     acctest.Env.IosResourceConnectorName(),
+	IgnoreCertificate: acctest.Env.IosResourceIgnoreCertificate(),
 
-	Host: "10.10.0.198",
-	Port: "22",
+	Host: acctest.Env.IosResourceHost(),
+	Port: acctest.Env.IosResourcePort(),
 }
 var testIosResourceConfig = acctest.MustParseTemplate(testIosResourceTemplate, testIosResource)
 
 var testIosResource_NewName = acctest.MustOverrideFields(testIosResource, map[string]any{
-	"Name": "test-ios-device-2",
+	"Name": acctest.Env.IosResourceNewName(),
 })
 var testIosResourceConfig_NewName = acctest.MustParseTemplate(testIosResourceTemplate, testIosResource_NewName)
 
@@ -62,7 +63,7 @@ func TestAccIosDeviceResource_SDC(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "name", testIosResource.Name),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "socket_address", testIosResource.SocketAddress),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "host", testIosResource.Host),
-					resource.TestCheckResourceAttr("cdo_ios_device.test", "port", testIosResource.Port),
+					resource.TestCheckResourceAttr("cdo_ios_device.test", "port", strconv.FormatInt(testIosResource.Port, 10)),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "connector_type", testIosResource.ConnectorType),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "username", testIosResource.Username),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "password", testIosResource.Password),

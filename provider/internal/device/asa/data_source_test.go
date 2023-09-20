@@ -1,6 +1,7 @@
 package asa_test
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/acctest"
@@ -12,8 +13,8 @@ var testAsaDataSource = struct {
 	Name              string
 	SocketAddress     string
 	Host              string
-	Port              string
-	IgnoreCertificate string
+	Port              int64
+	IgnoreCertificate bool
 }{
 	ConnectorType:     acctest.Env.AsaDataSourceConnectorType(),
 	Name:              acctest.Env.AsaDataSourceName(),
@@ -43,8 +44,8 @@ func TestAccAsaDeviceDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "name", testAsaDataSource.Name),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "socket_address", testAsaDataSource.SocketAddress),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "host", testAsaDataSource.Host),
-					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "port", testAsaDataSource.Port),
-					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "ignore_certificate", testAsaDataSource.IgnoreCertificate),
+					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "port", strconv.FormatInt(testAsaDataSource.Port, 10)),
+					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "ignore_certificate", strconv.FormatBool(testAsaDataSource.IgnoreCertificate)),
 				),
 			},
 		},

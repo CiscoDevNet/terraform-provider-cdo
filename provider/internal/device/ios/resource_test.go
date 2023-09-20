@@ -1,6 +1,7 @@
 package ios_test
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/acctest"
@@ -17,7 +18,7 @@ type testIosResourceType struct {
 	IgnoreCertificate string
 
 	Host string
-	Port string
+	Port int64
 }
 
 const testIosResourceTemplate = `
@@ -62,7 +63,7 @@ func TestAccIosDeviceResource_SDC(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "name", testIosResource.Name),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "socket_address", testIosResource.SocketAddress),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "host", testIosResource.Host),
-					resource.TestCheckResourceAttr("cdo_ios_device.test", "port", testIosResource.Port),
+					resource.TestCheckResourceAttr("cdo_ios_device.test", "port", strconv.FormatInt(testIosResource.Port, 10)),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "connector_type", testIosResource.ConnectorType),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "username", testIosResource.Username),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "password", testIosResource.Password),

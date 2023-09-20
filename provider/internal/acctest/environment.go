@@ -18,8 +18,8 @@ func (e *env) UserDataSourceRole() string {
 	return e.mustGetString("USER_DATA_SOURCE_ROLE")
 }
 
-func (e *env) UserDataSourceIsApiOnly() string {
-	return e.mustGetString("USER_DATA_SOURCE_IS_API_ONLY")
+func (e *env) UserDataSourceIsApiOnly() bool {
+	return e.mustGetBool("USER_DATA_SOURCE_IS_API_ONLY")
 }
 
 func (e *env) UserResourceName() string {
@@ -30,8 +30,8 @@ func (e *env) UserResourceNewName() string {
 	return e.mustGetString("USER_RESOURCE_NEW_NAME")
 }
 
-func (e *env) UserResourceIsApiOnly() string {
-	return e.mustGetString("USER_RESOURCE_IS_API_ONLY")
+func (e *env) UserResourceIsApiOnly() bool {
+	return e.mustGetBool("USER_RESOURCE_IS_API_ONLY")
 }
 
 func (e *env) UserResourceRole() string {

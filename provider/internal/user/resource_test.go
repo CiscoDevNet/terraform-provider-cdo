@@ -9,7 +9,7 @@ import (
 
 type testUserResourceType struct {
 	Name        string
-	ApiOnlyUser string
+	ApiOnlyUser bool
 	UserRole    string
 }
 

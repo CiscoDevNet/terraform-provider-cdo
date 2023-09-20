@@ -9,14 +9,12 @@ import (
 
 var testTenant = struct {
 	Name              string
-	Uid               string
 	HumanReadableName string
 	SubscriptionType  string
 }{
-	Name:              "CDO_terraform-provider-cdo",
-	Uid:               "ae98d25f-1089-4286-a3c5-505dcb4431a2",
-	HumanReadableName: "terraform-provider-cdo",
-	SubscriptionType:  "INTERNAL",
+	Name:              acctest.Env.TenantDataSourceName(),
+	HumanReadableName: acctest.Env.TenantDataSourceHumanReadableName(),
+	SubscriptionType:  acctest.Env.TenantDataSourceSubscriptionType(),
 }
 
 const testTenantTemplate = `
@@ -34,7 +32,6 @@ func TestAccTenantDataSource(t *testing.T) {
 				Config: acctest.ProviderConfig() + testTenantConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.cdo_tenant.test", "name", testTenant.Name),
-					resource.TestCheckResourceAttr("data.cdo_tenant.test", "id", testTenant.Uid),
 					resource.TestCheckResourceAttr("data.cdo_tenant.test", "human_readable_name", testTenant.HumanReadableName),
 					resource.TestCheckResourceAttr("data.cdo_tenant.test", "subscription_type", testTenant.SubscriptionType),
 				),

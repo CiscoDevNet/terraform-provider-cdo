@@ -113,6 +113,7 @@ jobs:
           terraform_version: ${{ matrix.terraform }}
           terraform_wrapper: false
       - run: go mod download
+      - run: cat .github-action.env >> $GITHUB_ENV  # https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
       - env:
           TF_ACC: "1"
           ACC_TEST_CISCO_CDO_API_TOKEN: ${{ secrets.ACC_TEST_CISCO_CDO_API_TOKEN }}

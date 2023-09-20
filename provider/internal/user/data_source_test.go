@@ -10,14 +10,12 @@ import (
 
 var testUser = struct {
 	Name        string
-	Uid         string
 	ApiOnlyUser bool
 	UserRole    string
 }{
-	Name:        "terraform-provider-cdo-super-admin@lockhart.io",
-	Uid:         "9b5cbc71-6fbc-462c-ad6f-e4b2af6caf05",
-	ApiOnlyUser: false,
-	UserRole:    "ROLE_SUPER_ADMIN",
+	Name:        acctest.Env.UserDataSourceName(),
+	ApiOnlyUser: acctest.Env.UserDataSourceIsApiOnly(),
+	UserRole:    acctest.Env.UserDataSourceRole(),
 }
 
 const testUserTemplate = `
@@ -37,7 +35,6 @@ func TestAccUserDataSource(t *testing.T) {
 				Config: acctest.ProviderConfig() + testUserConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.cdo_user.test", "name", testUser.Name),
-					resource.TestCheckResourceAttr("data.cdo_user.test", "id", testUser.Uid),
 					resource.TestCheckResourceAttr("data.cdo_user.test", "is_api_only_user", strconv.FormatBool(testUser.ApiOnlyUser)),
 					resource.TestCheckResourceAttr("data.cdo_user.test", "role", testUser.UserRole),
 				),

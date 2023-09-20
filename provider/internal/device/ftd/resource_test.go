@@ -29,16 +29,16 @@ resource "cdo_ftd_device" "test" {
 }`
 
 var testResource = ResourceType{
-	Name:             "test-cloud-ftd-12345",
-	AccessPolicyName: "Default Access Control Policy",
-	PerformanceTier:  "FTDv5",
-	Virtual:          "true",
-	Licenses:         "[\"BASE\"]",
+	Name:             acctest.Env.FtdResourceName(),
+	AccessPolicyName: acctest.Env.FtdResourceAccessPolicyName(),
+	PerformanceTier:  acctest.Env.FtdResourcePerformanceTier(),
+	Virtual:          acctest.Env.FtdResourceVirtual(),
+	Licenses:         acctest.Env.FtdResourceLicenses(),
 }
 var testResourceConfig = acctest.MustParseTemplate(ResourceTemplate, testResource)
 
 var testResource_NewName = acctest.MustOverrideFields(testResource, map[string]any{
-	"Name": "test-cloud-ftd-new-name",
+	"Name": acctest.Env.FtdResourceNewName(),
 })
 
 var testResourceConfig_NewName = acctest.MustParseTemplate(ResourceTemplate, testResource_NewName)
@@ -57,7 +57,7 @@ func TestAccFtdResource(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_ftd_device.test", "access_policy_name", testResource.AccessPolicyName),
 					resource.TestCheckResourceAttr("cdo_ftd_device.test", "performance_tier", testResource.PerformanceTier),
 					resource.TestCheckResourceAttr("cdo_ftd_device.test", "virtual", testResource.Virtual),
-					resource.TestCheckResourceAttrSet("cdo_ftd_device.test", "licenses.0"),
+					resource.TestCheckResourceAttrSet("cdo_ftd_device.test", "licenses.0"),   // there is something at position 0 of licenses array
 					resource.TestCheckResourceAttr("cdo_ftd_device.test", "licenses.#", "1"), // number of licenses = 1
 					resource.TestCheckResourceAttr("cdo_ftd_device.test", "access_policy_name", testResource.AccessPolicyName),
 					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "generated_command", func(value string) error {

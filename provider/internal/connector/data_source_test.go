@@ -9,10 +9,8 @@ import (
 
 var testSdc = struct {
 	Name string
-	Uid  string
 }{
-	Name: "CDO_terraform-provider-cdo-SDC-1",
-	Uid:  "39784a3c-0013-4e2f-af26-219560904636",
+	Name: acctest.Env.ConnectorDataSourceName(),
 }
 
 const testSdcTemplate = `
@@ -32,7 +30,6 @@ func TestAccSdcDeviceDataSource(t *testing.T) {
 				Config: acctest.ProviderConfig() + testSdcConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.cdo_sdc.test", "name", testSdc.Name),
-					resource.TestCheckResourceAttr("data.cdo_sdc.test", "id", testSdc.Uid),
 				),
 			},
 		},

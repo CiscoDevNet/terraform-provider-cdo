@@ -2,6 +2,7 @@ package asa_test
 
 import (
 	"regexp"
+	"strconv"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/acctest"
@@ -18,7 +19,7 @@ type testAsaResourceType struct {
 	IgnoreCertificate bool
 
 	Host string
-	Port string
+	Port int64
 }
 
 const asaResourceTemplate = `
@@ -36,31 +37,31 @@ resource "cdo_asa_device" "test" {
 
 // default config.
 var testAsaResource_SDC = testAsaResourceType{
-	Name:              "test-asa-device-1",
-	SocketAddress:     "vasa-gb-ravpn-03-mgmt.dev.lockhart.io:443",
-	ConnectorName:     "CDO_terraform-provider-cdo-SDC-1",
-	ConnectorType:     "SDC",
-	Username:          "lockhart",
-	Password:          "BlueSkittles123!!",
-	IgnoreCertificate: true,
+	Name:              acctest.Env.AsaResourceSdcName(),
+	SocketAddress:     acctest.Env.AsaResourceSdcSocketAddress(),
+	ConnectorName:     acctest.Env.AsaResourceSdcConnectorName(),
+	ConnectorType:     acctest.Env.AsaResourceSdcConnectorType(),
+	Username:          acctest.Env.AsaResourceSdcUsername(),
+	Password:          acctest.Env.AsaResourceSdcPassword(),
+	IgnoreCertificate: acctest.Env.AsaResourceSdcIgnoreCertificate(),
 
-	Host: "vasa-gb-ravpn-03-mgmt.dev.lockhart.io",
-	Port: "443",
+	Host: acctest.Env.AsaResourceSdcHost(),
+	Port: acctest.Env.AsaResourceSdcPort(),
 }
 
-const alternativeDeviceLocation = "35.177.20.218:443"
+var alternativeDeviceLocation = acctest.Env.AsaResourceAlternativeDeviceLocation()
 
 var testAsaResourceConfig_SDC = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC)
 
 // new name config.
 var testAsaResource_SDC_NewName = acctest.MustOverrideFields(testAsaResource_SDC, map[string]any{
-	"Name": "test-asa-device-2",
+	"Name": acctest.Env.AsaResourceSdcNewName(),
 })
 var testAsaResourceConfig_SDC_NewName = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC_NewName)
 
 // new creds config.
 var testAsaResource_SDC_BadCreds = acctest.MustOverrideFields(testAsaResource_SDC, map[string]any{
-	"Password": "WrongPassword",
+	"Password": acctest.Env.AsaResourceSdcWrongPassword(),
 })
 var testAsaResourceConfig_SDC_NewCreds = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC_BadCreds)
 
@@ -71,28 +72,28 @@ var testAsaResourceConfig_SDC_NewLocation = acctest.MustParseTemplate(asaResourc
 
 // default config.
 var testAsaResource_CDG = testAsaResourceType{
-	Name:              "test-asa-device-1",
-	SocketAddress:     "vasa-gb-ravpn-03-mgmt.dev.lockhart.io:443",
-	ConnectorName:     "CDO_terraform-provider-cdo-SDC-1",
-	ConnectorType:     "CDG",
-	Username:          "lockhart",
-	Password:          "BlueSkittles123!!",
-	IgnoreCertificate: false,
+	Name:              acctest.Env.AsaResourceCdgName(),
+	SocketAddress:     acctest.Env.AsaResourceCdgSocketAddress(),
+	ConnectorName:     acctest.Env.AsaResourceCdgConnectorName(),
+	ConnectorType:     acctest.Env.AsaResourceCdgConnectorType(),
+	Username:          acctest.Env.AsaResourceCdgUsername(),
+	Password:          acctest.Env.AsaResourceCdgPassword(),
+	IgnoreCertificate: acctest.Env.AsaResourceCdgIgnoreCertificate(),
 
-	Host: "vasa-gb-ravpn-03-mgmt.dev.lockhart.io",
-	Port: "443",
+	Host: acctest.Env.AsaResourceCdgHost(),
+	Port: acctest.Env.AsaResourceCdgPort(),
 }
 var testAsaResourceConfig_CDG = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_CDG)
 
 // new name config.
 var testAsaResource_CDG_NewName = acctest.MustOverrideFields(testAsaResource_CDG, map[string]any{
-	"Name": "test-asa-device-2",
+	"Name": acctest.Env.AsaResourceCdgNewName(),
 })
 var testAsaResourceConfig_CDG_NewName = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_CDG_NewName)
 
 // bad credentials config.
 var testAsaResource_CDG_BadCreds = acctest.MustOverrideFields(testAsaResource_CDG, map[string]any{
-	"Password": "WrongPassword",
+	"Password": acctest.Env.AsaResourceCdgWrongPassword(),
 })
 var testAsaResourceConfig_CDG_NewCreds = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_CDG_BadCreds)
 
@@ -111,7 +112,7 @@ func TestAccAsaDeviceResource_SDC(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_SDC.Name),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "socket_address", testAsaResource_SDC.SocketAddress),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "host", testAsaResource_SDC.Host),
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "port", testAsaResource_SDC.Port),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "port", strconv.FormatInt(testAsaResource_SDC.Port, 10)),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "connector_type", testAsaResource_SDC.ConnectorType),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "username", testAsaResource_SDC.Username),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_SDC.Password),
@@ -165,7 +166,7 @@ func TestAccAsaDeviceResource_CDG(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_CDG.Name),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "socket_address", testAsaResource_CDG.SocketAddress),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "host", testAsaResource_CDG.Host),
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "port", testAsaResource_CDG.Port),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "port", strconv.FormatInt(testAsaResource_CDG.Port, 10)),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "connector_type", testAsaResource_CDG.ConnectorType),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "username", testAsaResource_CDG.Username),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_CDG.Password),

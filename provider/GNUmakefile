@@ -1,5 +1,9 @@
 default: testacc
 
+# https://unix.stackexchange.com/questions/235223/makefile-include-env-file
+include	.github-action.env
+export
+
 # Run acceptance tests
 .PHONY: testacc
 testacc:

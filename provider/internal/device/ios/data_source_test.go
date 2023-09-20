@@ -1,6 +1,7 @@
 package ios_test
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/acctest"
@@ -12,15 +13,15 @@ var testIosDataSource = struct {
 	Name              string
 	SocketAddress     string
 	Host              string
-	Port              string
+	Port              int64
 	IgnoreCertificate string
 }{
-	Id:                "cd0483d0-5ec5-4d8e-b92d-8eb389f88417",
-	Name:              "weilue-test-ios",
-	SocketAddress:     "10.10.0.198:22",
-	Host:              "10.10.0.198",
-	Port:              "22",
-	IgnoreCertificate: "false",
+	Id:                acctest.Env.IosDataSourceId(),
+	Name:              acctest.Env.IosDataSourceName(),
+	SocketAddress:     acctest.Env.IosDataSourceSocketAddress(),
+	Host:              acctest.Env.IosDataSourceHost(),
+	Port:              acctest.Env.IosDataSourcePort(),
+	IgnoreCertificate: acctest.Env.IosDataSourceIgnoreCertificate(),
 }
 
 var testIosDataSourceTemplate = `
@@ -42,7 +43,7 @@ func TestAccIosDeviceDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "name", testIosDataSource.Name),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "socket_address", testIosDataSource.SocketAddress),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "host", testIosDataSource.Host),
-					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "port", testIosDataSource.Port),
+					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "port", strconv.FormatInt(testIosDataSource.Port, 10)),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "ignore_certificate", testIosDataSource.IgnoreCertificate),
 				),
 			},

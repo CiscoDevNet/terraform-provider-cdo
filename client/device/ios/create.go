@@ -64,7 +64,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	client.Logger.Println("creating ios device")
 
 	deviceCreateOutp, err := device.Create(ctx, client, *device.NewCreateRequestInput(
-		createInp.Name, "IOS", createInp.ConnectorUid, createInp.ConnectorType, createInp.SocketAddress, false, createInp.IgnoreCertificate,
+		createInp.Name, "IOS", createInp.ConnectorUid, createInp.ConnectorType, createInp.SocketAddress, false, createInp.IgnoreCertificate, nil,
 	))
 	var createdResourceId *string = nil
 	if deviceCreateOutp != nil {

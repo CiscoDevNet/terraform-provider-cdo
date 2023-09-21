@@ -28,7 +28,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 
 	client.Logger.Println("creating generic ssh")
 
-	deviceInput := device.NewCreateRequestInput(createInp.Name, "GENERIC_SSH", createInp.ConnectorUid, createInp.ConnectorType, createInp.SocketAddress, false, false)
+	deviceInput := device.NewCreateRequestInput(createInp.Name, "GENERIC_SSH", createInp.ConnectorUid, createInp.ConnectorType, createInp.SocketAddress, false, false, nil)
 	outp, err := device.Create(ctx, client, *deviceInput)
 	if err != nil {
 		return nil, err

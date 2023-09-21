@@ -8,19 +8,24 @@ import (
 )
 
 type CreateInput struct {
-	Name          string `json:"name"`
-	DeviceType    string `json:"deviceType"`
-	ConnectorUid  string `json:"larUid,omitempty"`
-	ConnectorType string `json:"larType"`
-	SocketAddress string `json:"ipv4"`
-	Model         bool   `json:"model"`
-
-	IgnoreCertificate bool `json:"ignoreCertificate"`
+	Name              string       `json:"name"`
+	DeviceType        string       `json:"deviceType"`
+	ConnectorUid      string       `json:"larUid,omitempty"`
+	ConnectorType     string       `json:"larType"`
+	SocketAddress     string       `json:"ipv4"`
+	Model             bool         `json:"model"`
+	IgnoreCertificate bool         `json:"ignoreCertificate"`
+	Metadata          *interface{} `json:"metadata,omitempty"`
 }
 
 type CreateOutput = ReadOutput
 
-func NewCreateRequestInput(name, deviceType, connectorUid, connectorType, socketAddress string, model bool, ignoreCertificate bool) *CreateInput {
+func NewCreateRequestInput(name, deviceType, connectorUid, connectorType, socketAddress string, model bool, ignoreCertificate bool, metadata interface{}) *CreateInput {
+	var metadataPtr *interface{} = nil
+	if metadata != nil {
+		metadataPtr = &metadata
+	}
+
 	return &CreateInput{
 		Name:              name,
 		DeviceType:        deviceType,
@@ -29,6 +34,7 @@ func NewCreateRequestInput(name, deviceType, connectorUid, connectorType, socket
 		SocketAddress:     socketAddress,
 		Model:             model,
 		IgnoreCertificate: ignoreCertificate,
+		Metadata:          metadataPtr,
 	}
 }
 

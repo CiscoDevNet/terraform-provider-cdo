@@ -2,10 +2,14 @@ package asa_test
 
 import (
 	"context"
+	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/featureflag"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/user/auth"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/user/auth/role"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -45,6 +49,43 @@ func TestAsaCreate(t *testing.T) {
 		Uid:   asaSpecificDevice.SpecificUid,
 		State: state.DONE,
 	}
+	readApiTokenInfo_NoNewModelFeatureFlag := auth.Info{UserAuthentication: auth.Authentication{
+		Authorities: []auth.Authority{
+			{Authority: role.Admin},
+		},
+		Details: auth.Details{
+			TenantUid:              "11111111-1111-1111-1111-111111111111",
+			TenantName:             "",
+			SseTenantUid:           "",
+			TenantOrganizationName: "",
+			TenantDbFeatures:       "{}",
+			TenantUserRoles:        "",
+			TenantDatabaseName:     "",
+			TenantPayType:          "",
+		},
+		Authenticated: false,
+		Principle:     "",
+		Name:          "",
+	}}
+
+	readApiTokenInfo_NewModelFeatureFlag := auth.Info{UserAuthentication: auth.Authentication{
+		Authorities: []auth.Authority{
+			{Authority: role.Admin},
+		},
+		Details: auth.Details{
+			TenantUid:              "11111111-1111-1111-1111-111111111111",
+			TenantName:             "",
+			SseTenantUid:           "",
+			TenantOrganizationName: "",
+			TenantDbFeatures:       fmt.Sprintf("{\"%s\":true}", featureflag.AsaConfigurationObjectMigration),
+			TenantUserRoles:        "",
+			TenantDatabaseName:     "",
+			TenantPayType:          "",
+		},
+		Authenticated: false,
+		Principle:     "",
+		Name:          "",
+	}}
 
 	validConnector := connector.NewConnectorOutputBuilder().
 		WithName("CloudDeviceGateway").
@@ -71,6 +112,7 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			setupFunc: func(input asa.CreateInput) {
+				configureReadApiTokenInfoSuccessfully(readApiTokenInfo_NoNewModelFeatureFlag)
 				configureDeviceCreateToRespondSuccessfully(asaDevice)
 				configureDeviceReadSpecificToRespondSuccessfully(asaDevice.Uid, asaSpecificDevice)
 				configureAsaConfigReadToRespondSuccessfully(asaSpecificDevice.SpecificUid, asaConfig)
@@ -101,6 +143,81 @@ func TestAsaCreate(t *testing.T) {
 		},
 
 		{
+			testName: "returns error when invalid api token is given",
+			input: asa.CreateInput{
+				Name:              asaDevice.Name,
+				ConnectorType:     asaDevice.ConnectorType,
+				SocketAddress:     asaDevice.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: false,
+			},
+
+			setupFunc: func(input asa.CreateInput) {
+				configureReadApiTokenInfoFailed()
+				configureDeviceCreateToRespondSuccessfully(asaDevice)
+				configureDeviceReadSpecificToRespondSuccessfully(asaDevice.Uid, asaSpecificDevice)
+				configureAsaConfigReadToRespondSuccessfully(asaSpecificDevice.SpecificUid, asaConfig)
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
+			},
+
+			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+			},
+		},
+
+		{
+			testName: "should call create device with new policy model metadata if feature flag for new model is enable",
+			input: asa.CreateInput{
+				Name:              asaDevice.Name,
+				ConnectorType:     asaDevice.ConnectorType,
+				SocketAddress:     asaDevice.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: false,
+			},
+
+			setupFunc: func(input asa.CreateInput) {
+				configureReadApiTokenInfoSuccessfully(readApiTokenInfo_NewModelFeatureFlag)
+				configureDeviceCreateToRespondSuccessfullyWithNewModel(t, asaDevice)
+				configureDeviceReadSpecificToRespondSuccessfully(asaDevice.Uid, asaSpecificDevice)
+				configureAsaConfigReadToRespondSuccessfully(asaSpecificDevice.SpecificUid, asaConfig)
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
+			},
+
+			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+			},
+		},
+
+		{
+			testName: "should not call create device with new policy model metadata if feature flag for new model is not enabled",
+			input: asa.CreateInput{
+				Name:              asaDevice.Name,
+				ConnectorType:     asaDevice.ConnectorType,
+				SocketAddress:     asaDevice.SocketAddress,
+				Username:          "unittestuser",
+				Password:          "not a real password",
+				IgnoreCertificate: false,
+			},
+
+			setupFunc: func(input asa.CreateInput) {
+				configureReadApiTokenInfoSuccessfully(readApiTokenInfo_NoNewModelFeatureFlag)
+				configureDeviceCreateToRespondSuccessfullyWithoutNewModel(t, asaDevice)
+				configureDeviceReadSpecificToRespondSuccessfully(asaDevice.Uid, asaSpecificDevice)
+				configureAsaConfigReadToRespondSuccessfully(asaSpecificDevice.SpecificUid, asaConfig)
+				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.Uid, asaconfig.UpdateOutput{Uid: asaConfig.Uid})
+			},
+
+			assertFunc: func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+			},
+		},
+
+		{
 			testName: "successfully onboards ASA when using CDG after recovering from certificate error",
 
 			input: asa.CreateInput{
@@ -113,6 +230,7 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			setupFunc: func(input asa.CreateInput) {
+				configureReadApiTokenInfoSuccessfully(readApiTokenInfo_NoNewModelFeatureFlag)
 				configureDeviceCreateToRespondSuccessfully(asaDevice)
 				configureDeviceReadSpecificToRespondSuccessfully(asaDevice.Uid, asaSpecificDevice)
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
@@ -163,6 +281,7 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			setupFunc: func(input asa.CreateInput) {
+				configureReadApiTokenInfoSuccessfully(readApiTokenInfo_NoNewModelFeatureFlag)
 				configureDeviceCreateToRespondSuccessfully(asaDeviceUsingSdc)
 				configureDeviceReadSpecificToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaSpecificDevice)
 				configureAsaConfigReadToRespondSuccessfully(asaSpecificDevice.SpecificUid, asaConfig)
@@ -208,6 +327,7 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			setupFunc: func(input asa.CreateInput) {
+				configureReadApiTokenInfoSuccessfully(readApiTokenInfo_NoNewModelFeatureFlag)
 				configureDeviceCreateToRespondSuccessfully(asaDeviceUsingSdc)
 				configureDeviceReadSpecificToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaSpecificDevice)
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
@@ -261,6 +381,7 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			setupFunc: func(input asa.CreateInput) {
+				configureReadApiTokenInfoSuccessfully(readApiTokenInfo_NoNewModelFeatureFlag)
 				configureDeviceCreateToRespondWithError()
 				configureDeviceReadSpecificToRespondSuccessfully(asaDeviceUsingSdc.Uid, asaSpecificDevice)
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{
@@ -295,6 +416,7 @@ func TestAsaCreate(t *testing.T) {
 			},
 
 			setupFunc: func(input asa.CreateInput) {
+				configureReadApiTokenInfoSuccessfully(readApiTokenInfo_NoNewModelFeatureFlag)
 				configureDeviceCreateToRespondSuccessfully(asaDeviceUsingSdc)
 				configureDeviceReadSpecificToRespondWithError(asaDeviceUsingSdc.Uid)
 				configureAsaConfigReadToRespondWithCalls(asaConfig.Uid, []httpmock.Responder{

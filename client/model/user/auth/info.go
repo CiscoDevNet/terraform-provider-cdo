@@ -48,7 +48,8 @@ func (info *Info) getFeatureMap() map[string]bool {
 		// feature flag received is not a json
 		panic(fmt.Sprintf("feature flag received from authentication service is not in valid format: %s", info.UserAuthentication.Details.TenantDbFeatures))
 	}
-
+	// convert feature flag keys to lowercase
+	// TODO: make use of lh-feature
 	normalizedFeatureMap := map[string]bool{}
 	for k, v := range featureMap {
 		normalizedFeatureMap[strings.ToLower(k)] = v

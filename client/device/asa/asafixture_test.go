@@ -1,10 +1,17 @@
 package asa_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
+	internalhttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
+	"github.com/stretchr/testify/assert"
 	"net/http"
+	"reflect"
 	"testing"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
@@ -38,6 +45,47 @@ func configureDeviceCreateToRespondSuccessfully(createOutput device.CreateOutput
 		http.MethodPost,
 		deviceCreatePath,
 		httpmock.NewJsonResponderOrPanic(200, createOutput),
+	)
+}
+
+func configureDeviceCreateToRespondSuccessfullyWithNewModel(t *testing.T, createOutput device.CreateOutput) {
+	httpmock.RegisterResponder(
+		http.MethodPost,
+		deviceCreatePath,
+		func(req *http.Request) (*http.Response, error) {
+			createInp, err := internalhttp.ReadRequestBody[device.CreateInput](req)
+			if err != nil {
+				return nil, err
+			}
+			expectedMetadata := &asa.Metadata{IsNewPolicyObjectModel: true}
+			expectedBytes, err := json.Marshal(expectedMetadata)
+			if err != nil {
+				return nil, err
+			}
+			actualBytes, err := json.Marshal(createInp.Metadata)
+			if err != nil {
+				return nil, err
+			}
+			expectedMetadataPayload := string(expectedBytes)
+			actualMetadataPayload := string(actualBytes)
+			assert.Equal(t, expectedMetadataPayload, actualMetadataPayload)
+			return httpmock.NewJsonResponse(http.StatusOK, createOutput)
+		},
+	)
+}
+
+func configureDeviceCreateToRespondSuccessfullyWithoutNewModel(t *testing.T, createOutput device.CreateOutput) {
+	httpmock.RegisterResponder(
+		http.MethodPost,
+		deviceCreatePath,
+		func(req *http.Request) (*http.Response, error) {
+			createInp, err := internalhttp.ReadRequestBody[device.CreateInput](req)
+			if err != nil {
+				return nil, err
+			}
+			assert.True(t, reflect.TypeOf(createInp.Metadata).Kind() == reflect.Pointer)
+			return httpmock.NewJsonResponse(http.StatusOK, createOutput)
+		},
 	)
 }
 
@@ -172,6 +220,22 @@ func configureConnectorReadToRespondWithError(connectorUid string) {
 		http.MethodGet,
 		buildConnectorPath(connectorUid),
 		httpmock.NewStringResponder(500, ""),
+	)
+}
+
+func configureReadApiTokenInfoSuccessfully(tokenInfo user.GetTokenInfoOutput) {
+	httpmock.RegisterResponder(
+		http.MethodGet,
+		url.ReadTokenInfo(baseUrl),
+		httpmock.NewJsonResponderOrPanic(http.StatusOK, tokenInfo),
+	)
+}
+
+func configureReadApiTokenInfoFailed() {
+	httpmock.RegisterResponder(
+		http.MethodGet,
+		url.ReadTokenInfo(baseUrl),
+		httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, "internal server error"),
 	)
 }
 

@@ -21,6 +21,7 @@ type CreateInput struct {
 type CreateOutput = ReadOutput
 
 func NewCreateRequestInput(name, deviceType, connectorUid, connectorType, socketAddress string, model bool, ignoreCertificate bool, metadata interface{}) *CreateInput {
+	// convert interface{} to a pointer
 	var metadataPtr *interface{} = nil
 	if metadata != nil {
 		metadataPtr = &metadata

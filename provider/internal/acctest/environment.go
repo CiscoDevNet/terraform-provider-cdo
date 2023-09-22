@@ -90,24 +90,8 @@ func (e *env) IosResourceNewName() string {
 	return e.mustGetString("IOS_RESOURCE_NEW_NAME")
 }
 
-func (e *env) IosDataSourceId() string {
-	return e.mustGetString("IOS_DATA_SOURCE_ID")
-}
-
 func (e *env) IosDataSourceName() string {
 	return e.mustGetString("IOS_DATA_SOURCE_NAME")
-}
-
-func (e *env) IosDataSourceSocketAddress() string {
-	return e.mustGetString("IOS_DATA_SOURCE_SOCKET_ADDRESS")
-}
-
-func (e *env) IosDataSourceHost() string {
-	return e.mustGetString("IOS_DATA_SOURCE_HOST")
-}
-
-func (e *env) IosDataSourcePort() int64 {
-	return e.mustGetInt("IOS_DATA_SOURCE_PORT")
 }
 
 func (e *env) IosDataSourceIgnoreCertificate() string {

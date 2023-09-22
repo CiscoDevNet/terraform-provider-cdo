@@ -24,5 +24,6 @@ output "sdc_uid" {
 }
 
 output "sdc_bootstrap_data" {
-  value = cdo_sdc.example.bootstrap_data
+  value     = cdo_sdc.example.bootstrap_data
+  sensitive = true
 }

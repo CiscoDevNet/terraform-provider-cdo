@@ -70,6 +70,10 @@ func UserToken(baseUrl string) string {
 	return fmt.Sprintf("%s/anubis/rest/v1/oauth/token", baseUrl)
 }
 
+func ExternalComputeToken(baseUrl string) string {
+	return fmt.Sprintf("%s/anubis/rest/v1/oauth/token/external-compute", baseUrl)
+}
+
 func ReadSmartLicense(baseUrl string) string {
 	return fmt.Sprintf("%s/fmc/api/fmc_platform/v1/license/smartlicenses", baseUrl)
 }

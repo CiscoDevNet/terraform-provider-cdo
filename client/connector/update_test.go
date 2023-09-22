@@ -3,13 +3,14 @@ package connector_test
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"testing"
+	"time"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"testing"
-	"time"
 
 	"github.com/jarcoal/httpmock"
 )
@@ -57,7 +58,7 @@ func TestUpdate(t *testing.T) {
 				)
 				httpmock.RegisterResponder(
 					http.MethodPost,
-					"/anubis/rest/v1/oauth/token",
+					"/anubis/rest/v1/oauth/token/external-compute",
 					httpmock.NewJsonResponderOrPanic(200, validUserToken),
 				)
 			},
@@ -81,7 +82,7 @@ func TestUpdate(t *testing.T) {
 				)
 				httpmock.RegisterResponder(
 					http.MethodPost,
-					"/anubis/rest/v1/oauth/token",
+					"/anubis/rest/v1/oauth/token/external-compute",
 					httpmock.NewJsonResponderOrPanic(200, validUserToken),
 				)
 			},
@@ -104,7 +105,7 @@ func TestUpdate(t *testing.T) {
 				)
 				httpmock.RegisterResponder(
 					http.MethodPost,
-					"/anubis/rest/v1/oauth/token",
+					"/anubis/rest/v1/oauth/token/external-compute",
 					httpmock.NewJsonResponderOrPanic(500, nil),
 				)
 			},

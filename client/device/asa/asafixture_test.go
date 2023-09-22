@@ -1,8 +1,10 @@
 package asa_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	internalhttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"

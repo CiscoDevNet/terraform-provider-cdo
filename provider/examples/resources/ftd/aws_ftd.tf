@@ -56,7 +56,7 @@ data "aws_internet_gateway" "default" {
 #########################################################################################################################
 
 provider "aws" {
-  region     = var.region
+  region = var.region
 }
 
 ###########################################################################################################################
@@ -254,7 +254,7 @@ resource "aws_route_table_association" "inside_association" {
 //External ip address creation 
 
 resource "aws_eip" "ftd01mgmt-EIP" {
-#   domain     = "vpc"
+  #   domain     = "vpc"
   depends_on = [aws_internet_gateway.int_gw, aws_instance.ftdv]
   tags = {
     "Name" = "FTDv-01 Management IP"
@@ -262,7 +262,7 @@ resource "aws_eip" "ftd01mgmt-EIP" {
 }
 
 resource "aws_eip" "ftd01outside-EIP" {
-#   domain     = "vpc"
+  #   domain     = "vpc"
   depends_on = [aws_internet_gateway.int_gw, aws_instance.ftdv]
   tags = {
     "Name" = "FTDv-01 outside IP"

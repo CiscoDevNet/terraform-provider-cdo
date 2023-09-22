@@ -12,7 +12,7 @@ import (
 )
 
 func generateBootstrapData(ctx context.Context, client http.Client, sdcName string) (string, error) {
-	userToken, err := user.GetToken(ctx, client, user.NewGetTokenInput())
+	userToken, err := user.GetExternalComputeToken(ctx, client, user.NewGetTokenInput())
 	if err != nil {
 		return "", err
 	}

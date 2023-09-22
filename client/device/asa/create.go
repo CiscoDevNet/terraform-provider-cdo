@@ -186,7 +186,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		}
 	}
 
-	// poll until asa config state done
+	// poll until asaconfig's state done
 	client.Logger.Println("waiting for device to reach state done")
 
 	err = retry.Do(asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), *retry.NewOptionsWithLogger(client.Logger))

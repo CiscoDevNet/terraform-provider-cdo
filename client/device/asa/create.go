@@ -39,7 +39,7 @@ type CreateOutput struct {
 }
 
 type Metadata struct {
-	IsNewPolicyObjectModel bool `json:"isNewPolicyObjectModel"`
+	IsNewPolicyObjectModel string `json:"isNewPolicyObjectModel"` // yes it is a string, but it should be either "true" or "false" :/
 }
 
 type CreateError struct {
@@ -79,7 +79,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	// 1.2 set metadata according to whether we want to use new asa model
 	var metadata *Metadata = nil
 	if userInfo.HasFeatureFlagEnabled(featureflag.AsaConfigurationObjectMigration) {
-		metadata = &Metadata{IsNewPolicyObjectModel: true}
+		metadata = &Metadata{IsNewPolicyObjectModel: "true"}
 	}
 	// 1.3 create the device
 	deviceCreateOutp, err := device.Create(ctx, client, *device.NewCreateRequestInput(

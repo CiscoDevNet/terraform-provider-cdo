@@ -57,7 +57,7 @@ func configureDeviceCreateToRespondSuccessfullyWithNewModel(t *testing.T, create
 			if err != nil {
 				return nil, err
 			}
-			expectedMetadata := &asa.Metadata{IsNewPolicyObjectModel: true}
+			expectedMetadata := &asa.Metadata{IsNewPolicyObjectModel: "true"}
 			expectedBytes, err := json.Marshal(expectedMetadata)
 			if err != nil {
 				return nil, err

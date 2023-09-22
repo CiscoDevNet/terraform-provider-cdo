@@ -1,10 +1,8 @@
 package asa_test
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	internalhttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
@@ -57,7 +55,7 @@ func configureDeviceCreateToRespondSuccessfullyWithNewModel(t *testing.T, create
 			if err != nil {
 				return nil, err
 			}
-			expectedMetadata := &asa.Metadata{IsNewPolicyObjectModel: true}
+			expectedMetadata := &asa.Metadata{IsNewPolicyObjectModel: "true"}
 			expectedBytes, err := json.Marshal(expectedMetadata)
 			if err != nil {
 				return nil, err

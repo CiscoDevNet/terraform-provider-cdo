@@ -19,10 +19,10 @@ resource "cdo_user" "new_api_only_user" {
 }
 
 resource "cdo_api_token" "new_api_only_user_api_token" {
-    username = cdo_user.new_api_only_user.generated_username
+  username = cdo_user.new_api_only_user.generated_username
 }
 
 output "api_only_user_api_token_value" {
-    value = cdo_api_token.new_api_only_user_api_token.api_token
-    sensitive = true
+  value     = cdo_api_token.new_api_only_user_api_token.api_token
+  sensitive = true
 }

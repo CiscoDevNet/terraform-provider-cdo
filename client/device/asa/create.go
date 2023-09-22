@@ -10,6 +10,8 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/featureflag"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
 	"strings"
 )
 
@@ -34,6 +36,10 @@ type CreateOutput struct {
 	SocketAddress string          `json:"ipv4"`
 	ConnectorType string          `json:"larType"`
 	ConnectorUid  string          `json:"larUid"`
+}
+
+type Metadata struct {
+	IsNewPolicyObjectModel string `json:"isNewPolicyObjectModel"` // yes it is a string, but it should be either "true" or "false" :/
 }
 
 type CreateError struct {
@@ -61,8 +67,23 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 
 	client.Logger.Println("creating asa device")
 
+	// 1. create a general CDO device with device type ASA
+	// 1.1 check if we should use the new asa model
+	userInfo, err := user.GetTokenInfo(ctx, client, user.NewGetTokenInfoInput())
+	if err != nil {
+		return nil, &CreateError{
+			CreatedResourceId: nil,
+			Err:               err,
+		}
+	}
+	// 1.2 set metadata according to whether we want to use new asa model
+	var metadata *Metadata = nil
+	if userInfo.HasFeatureFlagEnabled(featureflag.AsaConfigurationObjectMigration) {
+		metadata = &Metadata{IsNewPolicyObjectModel: "true"}
+	}
+	// 1.3 create the device
 	deviceCreateOutp, err := device.Create(ctx, client, *device.NewCreateRequestInput(
-		createInp.Name, "ASA", createInp.ConnectorUid, createInp.ConnectorType, createInp.SocketAddress, false, createInp.IgnoreCertificate,
+		createInp.Name, "ASA", createInp.ConnectorUid, createInp.ConnectorType, createInp.SocketAddress, false, createInp.IgnoreCertificate, metadata,
 	))
 	var createdResourceId *string = nil
 	if deviceCreateOutp != nil {
@@ -75,6 +96,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		}
 	}
 
+	// 2. wait for creation to be done, by waiting until asa specific device state is done
 	client.Logger.Println("reading specific device uid")
 
 	asaReadSpecOutp, err := device.ReadSpecific(ctx, client, *device.NewReadSpecificInput(
@@ -118,7 +140,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		}
 	}
 
-	// encrypt credentials on prem connector
+	// 3. encrypt credentials for on prem connector (sdc)
 	var publicKey *model.PublicKey
 	if strings.EqualFold(deviceCreateOutp.ConnectorType, "SDC") {
 

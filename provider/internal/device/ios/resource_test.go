@@ -1,6 +1,7 @@
 package ios_test
 
 import (
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/testutil"
 	"strconv"
 	"testing"
 
@@ -16,6 +17,7 @@ type testIosResourceType struct {
 	Password          string
 	ConnectorName     string
 	IgnoreCertificate string
+	Tags              string
 
 	Host string
 	Port int64
@@ -29,6 +31,7 @@ resource "cdo_ios_device" "test" {
 	password = "{{.Password}}"
 	connector_name = "{{.ConnectorName}}"
 	ignore_certificate = "{{.IgnoreCertificate}}"
+	tags = {{.Tags}}
 }`
 
 var testIosResource = testIosResourceType{
@@ -39,6 +42,7 @@ var testIosResource = testIosResourceType{
 	Password:          acctest.Env.IosResourcePassword(),
 	ConnectorName:     acctest.Env.IosResourceConnectorName(),
 	IgnoreCertificate: acctest.Env.IosResourceIgnoreCertificate(),
+	Tags:              acctest.Env.IosResourceTags().AsJsonArrayString(),
 
 	Host: acctest.Env.IosResourceHost(),
 	Port: acctest.Env.IosResourcePort(),
@@ -67,6 +71,9 @@ func TestAccIosDeviceResource_SDC(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "connector_type", testIosResource.ConnectorType),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "username", testIosResource.Username),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "password", testIosResource.Password),
+					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "tags.0", testutil.CheckEqual(acctest.Env.IosResourceTags().Labels[0])),
+					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "tags.1", testutil.CheckEqual(acctest.Env.IosResourceTags().Labels[1])),
+					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "tags.2", testutil.CheckEqual(acctest.Env.IosResourceTags().Labels[2])),
 				),
 			},
 			// Update and Read testing

@@ -2,6 +2,7 @@ package device
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
@@ -16,11 +17,12 @@ type CreateInput struct {
 	Model             bool         `json:"model"`
 	IgnoreCertificate bool         `json:"ignoreCertificate"`
 	Metadata          *interface{} `json:"metadata,omitempty"`
+	Tags              tags.Type    `json:"tags,omitempty"`
 }
 
 type CreateOutput = ReadOutput
 
-func NewCreateRequestInput(name, deviceType, connectorUid, connectorType, socketAddress string, model bool, ignoreCertificate bool, metadata interface{}) *CreateInput {
+func NewCreateRequestInput(name, deviceType, connectorUid, connectorType, socketAddress string, model bool, ignoreCertificate bool, metadata interface{}, tags tags.Type) *CreateInput {
 	// convert interface{} to a pointer
 	var metadataPtr *interface{} = nil
 	if metadata != nil {
@@ -36,6 +38,7 @@ func NewCreateRequestInput(name, deviceType, connectorUid, connectorType, socket
 		Model:             model,
 		IgnoreCertificate: ignoreCertificate,
 		Metadata:          metadataPtr,
+		Tags:              tags,
 	}
 }
 

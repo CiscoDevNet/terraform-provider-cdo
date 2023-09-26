@@ -2,6 +2,7 @@ package device
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
@@ -10,17 +11,19 @@ import (
 type UpdateInput struct {
 	Uid string `json:"-"`
 
-	Name              string `json:"name,omitempty"`
-	IgnoreCertificate bool   `json:"ignoreCertificate,omitempty"`
+	Name              string    `json:"name,omitempty"`
+	Tags              tags.Type `json:"tags,omitempty"`
+	IgnoreCertificate bool      `json:"ignoreCertificate,omitempty"`
 }
 
 type UpdateOutput = ReadOutput
 
-func NewUpdateInput(uid string, name string, ignoreCertificate bool) *UpdateInput {
+func NewUpdateInput(uid string, name string, ignoreCertificate bool, tags tags.Type) *UpdateInput {
 	return &UpdateInput{
 		Uid:               uid,
 		Name:              name,
 		IgnoreCertificate: ignoreCertificate,
+		Tags:              tags,
 	}
 }
 

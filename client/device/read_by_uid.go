@@ -2,6 +2,7 @@ package device
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
@@ -24,6 +25,7 @@ type ReadOutput struct {
 	SoftwareVersion string          `json:"softwareVersion"`
 	Port            string          `json:"port"`
 	Host            string          `json:"host"`
+	Tags            tags.Type       `json:"tags"`
 
 	IgnoreCertificate bool   `json:"ignoreCertificate"`
 	ConnectivityState int    `json:"connectivityState,omitempty"`

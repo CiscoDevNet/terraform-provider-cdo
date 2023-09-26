@@ -40,6 +40,7 @@ type ResourceModel struct {
 	PerformanceTier  types.String   `tfsdk:"performance_tier"`
 	Virtual          types.Bool     `tfsdk:"virtual"`
 	Licenses         []types.String `tfsdk:"licenses"`
+	Tags             []types.String `tfsdk:"tags"`
 
 	AccessPolicyUid  types.String `tfsdk:"access_policy_id"`
 	GeneratedCommand types.String `tfsdk:"generated_command"`
@@ -107,6 +108,14 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					listvalidator.UniqueValues(),
 					listvalidator.ValueStringsAre(stringvalidator.OneOf(license.AllAsString...)),
 					validators.ValueStringsAtLeast(stringvalidator.OneOf(string(license.Base))),
+				},
+			},
+			"tags": schema.ListAttribute{
+				MarkdownDescription: "The tag associated with the device.",
+				Optional:            true,
+				ElementType:         types.StringType,
+				Validators: []validator.List{
+					listvalidator.UniqueValues(),
 				},
 			},
 			"generated_command": schema.StringAttribute{

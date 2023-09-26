@@ -3,6 +3,7 @@ package ios
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"strings"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
@@ -30,12 +31,13 @@ type IosDeviceResource struct {
 }
 
 type IosDeviceResourceModel struct {
-	ID            types.String `tfsdk:"id"`
-	ConnectorName types.String `tfsdk:"connector_name"`
-	Name          types.String `tfsdk:"name"`
-	Ipv4          types.String `tfsdk:"socket_address"`
-	Host          types.String `tfsdk:"host"`
-	Port          types.Int64  `tfsdk:"port"`
+	ID            types.String   `tfsdk:"id"`
+	ConnectorName types.String   `tfsdk:"connector_name"`
+	Name          types.String   `tfsdk:"name"`
+	Ipv4          types.String   `tfsdk:"socket_address"`
+	Host          types.String   `tfsdk:"host"`
+	Port          types.Int64    `tfsdk:"port"`
+	Tags          []types.String `tfsdk:"tags"`
 
 	Username types.String `tfsdk:"username"`
 	Password types.String `tfsdk:"password"`
@@ -107,6 +109,14 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 			"ignore_certificate": schema.BoolAttribute{
 				MarkdownDescription: "Set this attribute to true if you do not want CDO to validate the certificate of this device before onboarding.",
 				Required:            true,
+			},
+			"tags": schema.ListAttribute{
+				MarkdownDescription: "The tag associated with the device.",
+				Optional:            true,
+				ElementType:         types.StringType,
+				Validators: []validator.List{
+					listvalidator.UniqueValues(),
+				},
 			},
 		},
 	}

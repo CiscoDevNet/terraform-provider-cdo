@@ -6,7 +6,6 @@ package cloudftd
 import (
 	"context"
 	"fmt"
-
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc/fmcplatform"
@@ -14,6 +13,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
@@ -25,12 +25,14 @@ type CreateInput struct {
 	PerformanceTier  *tier.Type // ignored if it is physical device
 	Virtual          bool
 	Licenses         *[]license.Type
+	Tags             tags.Type
 }
 
 type CreateOutput struct {
 	Uid      string    `json:"uid"`
 	Name     string    `json:"name"`
 	Metadata *Metadata `json:"metadata"`
+	Tags     tags.Type `json:"tags"`
 }
 
 func NewCreateInput(
@@ -39,6 +41,7 @@ func NewCreateInput(
 	performanceTier *tier.Type,
 	virtual bool,
 	licenses *[]license.Type,
+	tags tags.Type,
 ) CreateInput {
 	return CreateInput{
 		Name:             name,
@@ -46,6 +49,7 @@ func NewCreateInput(
 		PerformanceTier:  performanceTier,
 		Virtual:          virtual,
 		Licenses:         licenses,
+		Tags:             tags,
 	}
 }
 
@@ -57,6 +61,7 @@ type createRequestBody struct {
 	State      string          `json:"state"` // TODO: use queueTriggerState?
 	Type       string          `json:"type"`
 	Model      bool            `json:"model"`
+	Tags       tags.Type       `json:"tags"`
 }
 
 func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, error) {
@@ -120,6 +125,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		State: "NEW",
 		Type:  "devices",
 		Model: false,
+		Tags:  createInp.Tags,
 	}
 	createReq := client.NewPost(ctx, createUrl, createBody)
 	var createOup CreateOutput
@@ -158,5 +164,6 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		Uid:      createOup.Uid,
 		Name:     createOup.Name,
 		Metadata: &metadata,
+		Tags:     createOup.Tags,
 	}, nil
 }

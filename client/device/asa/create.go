@@ -9,6 +9,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/featureflag"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
@@ -20,6 +21,7 @@ type CreateInput struct {
 	ConnectorUid  string
 	ConnectorType string
 	SocketAddress string
+	Tags          tags.Type
 
 	Username string
 	Password string
@@ -36,6 +38,7 @@ type CreateOutput struct {
 	SocketAddress string          `json:"ipv4"`
 	ConnectorType string          `json:"larType"`
 	ConnectorUid  string          `json:"larUid"`
+	Tags          tags.Type       `json:"tags"`
 }
 
 type Metadata struct {
@@ -51,7 +54,7 @@ func (r *CreateError) Error() string {
 	return r.Err.Error()
 }
 
-func NewCreateRequestInput(name, connectorUid, connectorType, socketAddress, username, password string, ignoreCertificate bool) *CreateInput {
+func NewCreateRequestInput(name, connectorUid, connectorType, socketAddress, username, password string, ignoreCertificate bool, tags tags.Type) *CreateInput {
 	return &CreateInput{
 		Name:              name,
 		ConnectorUid:      connectorUid,
@@ -60,6 +63,7 @@ func NewCreateRequestInput(name, connectorUid, connectorType, socketAddress, use
 		Username:          username,
 		Password:          password,
 		IgnoreCertificate: ignoreCertificate,
+		Tags:              tags,
 	}
 }
 
@@ -83,7 +87,15 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	}
 	// 1.3 create the device
 	deviceCreateOutp, err := device.Create(ctx, client, *device.NewCreateRequestInput(
-		createInp.Name, "ASA", createInp.ConnectorUid, createInp.ConnectorType, createInp.SocketAddress, false, createInp.IgnoreCertificate, metadata,
+		createInp.Name,
+		"ASA",
+		createInp.ConnectorUid,
+		createInp.ConnectorType,
+		createInp.SocketAddress,
+		false,
+		createInp.IgnoreCertificate,
+		metadata,
+		createInp.Tags,
 	))
 	var createdResourceId *string = nil
 	if deviceCreateOutp != nil {
@@ -207,6 +219,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		SocketAddress: deviceCreateOutp.SocketAddress,
 		ConnectorUid:  deviceCreateOutp.ConnectorUid,
 		ConnectorType: deviceCreateOutp.ConnectorType,
+		Tags:          deviceCreateOutp.Tags,
 	}
 	return &createOutp, nil
 }

@@ -24,7 +24,14 @@ func TestCreateCloudFtd(t *testing.T) {
 	}{
 		{
 			testName: "successfully create Cloud FTD",
-			input:    cloudftd.NewCreateInput(ftdName, ftdAccessPolicyName, &ftdPerformanceTier, ftdVirtual, ftdLicenseCaps),
+			input: cloudftd.NewCreateInput(
+				ftdName,
+				ftdAccessPolicyName,
+				&ftdPerformanceTier,
+				ftdVirtual,
+				ftdLicenseCaps,
+				ftdTags,
+			),
 			setupFunc: func() {
 				readFmcIsSuccessful(true)
 				readFmcDomainInfoIsSuccessful(true)
@@ -42,7 +49,14 @@ func TestCreateCloudFtd(t *testing.T) {
 		},
 		{
 			testName: "error when failed to read FMC",
-			input:    cloudftd.NewCreateInput(ftdName, ftdAccessPolicyName, &ftdPerformanceTier, ftdVirtual, ftdLicenseCaps),
+			input: cloudftd.NewCreateInput(
+				ftdName,
+				ftdAccessPolicyName,
+				&ftdPerformanceTier,
+				ftdVirtual,
+				ftdLicenseCaps,
+				ftdTags,
+			),
 			setupFunc: func() {
 				readFmcIsSuccessful(false)
 			},
@@ -53,7 +67,14 @@ func TestCreateCloudFtd(t *testing.T) {
 		},
 		{
 			testName: "error when failed to read FMC domain info",
-			input:    cloudftd.NewCreateInput(ftdName, ftdAccessPolicyName, &ftdPerformanceTier, ftdVirtual, ftdLicenseCaps),
+			input: cloudftd.NewCreateInput(
+				ftdName,
+				ftdAccessPolicyName,
+				&ftdPerformanceTier,
+				ftdVirtual,
+				ftdLicenseCaps,
+				ftdTags,
+			),
 			setupFunc: func() {
 				readFmcIsSuccessful(true)
 				readFmcDomainInfoIsSuccessful(false)
@@ -70,7 +91,14 @@ func TestCreateCloudFtd(t *testing.T) {
 		},
 		{
 			testName: "error when failed to read FMC Access Policy",
-			input:    cloudftd.NewCreateInput(ftdName, ftdAccessPolicyName, &ftdPerformanceTier, ftdVirtual, ftdLicenseCaps),
+			input: cloudftd.NewCreateInput(
+				ftdName,
+				ftdAccessPolicyName,
+				&ftdPerformanceTier,
+				ftdVirtual,
+				ftdLicenseCaps,
+				ftdTags,
+			),
 			setupFunc: func() {
 				readFmcIsSuccessful(true)
 				readFmcDomainInfoIsSuccessful(true)
@@ -87,7 +115,14 @@ func TestCreateCloudFtd(t *testing.T) {
 		},
 		{
 			testName: "error when failed to create FTD",
-			input:    cloudftd.NewCreateInput(ftdName, ftdAccessPolicyName, &ftdPerformanceTier, ftdVirtual, ftdLicenseCaps),
+			input: cloudftd.NewCreateInput(
+				ftdName,
+				ftdAccessPolicyName,
+				&ftdPerformanceTier,
+				ftdVirtual,
+				ftdLicenseCaps,
+				ftdTags,
+			),
 			setupFunc: func() {
 				readFmcIsSuccessful(true)
 				readFmcDomainInfoIsSuccessful(true)
@@ -104,7 +139,14 @@ func TestCreateCloudFtd(t *testing.T) {
 		},
 		{
 			testName: "error when failed to read FTD specific device",
-			input:    cloudftd.NewCreateInput(ftdName, ftdAccessPolicyName, &ftdPerformanceTier, ftdVirtual, ftdLicenseCaps),
+			input: cloudftd.NewCreateInput(
+				ftdName,
+				ftdAccessPolicyName,
+				&ftdPerformanceTier,
+				ftdVirtual,
+				ftdLicenseCaps,
+				ftdTags,
+			),
 			setupFunc: func() {
 				readFmcIsSuccessful(true)
 				readFmcDomainInfoIsSuccessful(true)
@@ -121,7 +163,14 @@ func TestCreateCloudFtd(t *testing.T) {
 		},
 		{
 			testName: "error when failed to read trigger FTD onboarding",
-			input:    cloudftd.NewCreateInput(ftdName, ftdAccessPolicyName, &ftdPerformanceTier, ftdVirtual, ftdLicenseCaps),
+			input: cloudftd.NewCreateInput(
+				ftdName,
+				ftdAccessPolicyName,
+				&ftdPerformanceTier,
+				ftdVirtual,
+				ftdLicenseCaps,
+				ftdTags,
+			),
 			setupFunc: func() {
 				readFmcIsSuccessful(true)
 				readFmcDomainInfoIsSuccessful(true)
@@ -138,7 +187,14 @@ func TestCreateCloudFtd(t *testing.T) {
 		},
 		{
 			testName: "error when failed to read retrieve FTD configure manager command",
-			input:    cloudftd.NewCreateInput(ftdName, ftdAccessPolicyName, &ftdPerformanceTier, ftdVirtual, ftdLicenseCaps),
+			input: cloudftd.NewCreateInput(
+				ftdName,
+				ftdAccessPolicyName,
+				&ftdPerformanceTier,
+				ftdVirtual,
+				ftdLicenseCaps,
+				ftdTags,
+			),
 			setupFunc: func() {
 				readFmcIsSuccessful(true)
 				readFmcDomainInfoIsSuccessful(true)

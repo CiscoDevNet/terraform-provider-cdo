@@ -3,6 +3,9 @@ package asa
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"strconv"
 	"strings"
 
@@ -36,18 +39,18 @@ type AsaDeviceResource struct {
 }
 
 type AsaDeviceResourceModel struct {
-	ID            types.String `tfsdk:"id"`
-	ConnectorType types.String `tfsdk:"connector_type"`
-	ConnectorName types.String `tfsdk:"connector_name"`
-	Name          types.String `tfsdk:"name"`
-	SocketAddress types.String `tfsdk:"socket_address"`
-	Host          types.String `tfsdk:"host"`
-	Port          types.Int64  `tfsdk:"port"`
+	ID            types.String   `tfsdk:"id"`
+	ConnectorType types.String   `tfsdk:"connector_type"`
+	ConnectorName types.String   `tfsdk:"connector_name"`
+	Name          types.String   `tfsdk:"name"`
+	SocketAddress types.String   `tfsdk:"socket_address"`
+	Host          types.String   `tfsdk:"host"`
+	Port          types.Int64    `tfsdk:"port"`
+	Tags          []types.String `tfsdk:"tags"`
 
-	Username types.String `tfsdk:"username"`
-	Password types.String `tfsdk:"password"`
-
-	IgnoreCertificate types.Bool `tfsdk:"ignore_certificate"`
+	Username          types.String `tfsdk:"username"`
+	Password          types.String `tfsdk:"password"`
+	IgnoreCertificate types.Bool   `tfsdk:"ignore_certificate"`
 }
 
 func (r *AsaDeviceResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -102,6 +105,14 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 			"host": schema.StringAttribute{
 				MarkdownDescription: "The host used to connect to the device.",
 				Computed:            true,
+			},
+			"tags": schema.ListAttribute{
+				MarkdownDescription: "The tag associated with the device.",
+				Optional:            true,
+				ElementType:         types.StringType,
+				Validators: []validator.List{
+					listvalidator.UniqueValues(),
+				},
 			},
 			"username": schema.StringAttribute{
 				MarkdownDescription: "The username used to authenticate with the device.",
@@ -179,6 +190,7 @@ func (r *AsaDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 	stateData.SocketAddress = types.StringValue(asaReadOutp.SocketAddress)
 	stateData.Host = types.StringValue(asaReadOutp.Host)
 	stateData.IgnoreCertificate = types.BoolValue(asaReadOutp.IgnoreCertificate)
+	stateData.Tags = util.GoStringSliceToTFStringList(asaReadOutp.Tags.Labels)
 
 	tflog.Trace(ctx, "done read ASA device resource")
 
@@ -213,6 +225,8 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 		specificSdcOutp = &connector.ReadOutput{}
 	}
 
+	tagsInp := tags.New(util.TFStringListToGoStringList(planData.Tags)...)
+
 	createInp := asa.NewCreateRequestInput(
 		planData.Name.ValueString(),
 		specificSdcOutp.Uid,
@@ -221,6 +235,7 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 		planData.Username.ValueString(),
 		planData.Password.ValueString(),
 		planData.IgnoreCertificate.ValueBool(),
+		tagsInp,
 	)
 
 	createOutp, createErr := r.client.CreateAsa(ctx, *createInp)
@@ -243,6 +258,7 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 	planData.ConnectorName = getConnectorName(&planData)
 	planData.Name = types.StringValue(createOutp.Name)
 	planData.Host = types.StringValue(createOutp.Host)
+	planData.Tags = util.GoStringSliceToTFStringList(createOutp.Tags.Labels)
 
 	port, err := strconv.ParseInt(createOutp.Port, 10, 16)
 	if err != nil {
@@ -271,7 +287,15 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
-	updateInp := asa.NewUpdateInput(stateData.ID.ValueString(), stateData.Name.ValueString(), "", "")
+	tagsInp := tags.New(util.TFStringListToGoStringList(stateData.Tags)...)
+
+	updateInp := asa.NewUpdateInput(
+		stateData.ID.ValueString(),
+		stateData.Name.ValueString(),
+		"",
+		"",
+		tagsInp,
+	)
 
 	if isNameUpdated(planData, stateData) {
 		updateInp.Name = planData.Name.ValueString()
@@ -312,6 +336,7 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 	stateData.SocketAddress = planData.SocketAddress
 	stateData.Host = types.StringValue(updateOutp.Host)
 	stateData.Port = types.Int64Value(port)
+	stateData.Tags = util.GoStringSliceToTFStringList(updateOutp.Tags.Labels)
 
 	stateData.IgnoreCertificate = planData.IgnoreCertificate
 

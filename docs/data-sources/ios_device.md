@@ -27,3 +27,4 @@ IOS data source
 - `ignore_certificate` (Boolean) This attribute indicates whether certificates were ignored when onboarding this device.
 - `port` (Number) The port used to connect to the device.
 - `socket_address` (String) The address of the device to onboard, specified in the format `host:port`.
+- `tags` (List of String) The tag associated with the device.

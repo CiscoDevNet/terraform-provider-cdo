@@ -25,6 +25,7 @@ Provides a Firewall Threat Defense device resource. Use this to onboard, update,
 ### Optional
 
 - `performance_tier` (String) The performance tier of the virtual FTD, if virtual is set to false, this field is ignored as performance tiers are not applicable to physical FTD devices. Allowed values are: ["FTDv5", "FTDv10", "FTDv20", "FTDv30", "FTDv50", "FTDv100", "FTDv"].
+- `tags` (List of String) The tag associated with the device.
 
 ### Read-Only
 

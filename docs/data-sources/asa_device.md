@@ -28,3 +28,4 @@ ASA data source
 - `port` (Number) The port used to connect to the device.
 - `sdc_name` (String) The name of the Secure Device Connector (SDC) that is used by CDO to communicate with the device. This value will be empty if the device was onboarded using a Cloud Connector (CDG).
 - `socket_address` (String) The address of the device to onboard, specified in the format `host:port`.
+- `tags` (List of String) The tags associated with the device.

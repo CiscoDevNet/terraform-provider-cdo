@@ -27,6 +27,7 @@ Provides an ASA device resource. This allows ASA devices to be onboarded, update
 ### Optional
 
 - `connector_name` (String) The name of the Secure Device Connector (SDC) that will be used to communicate with the device. This value is not required if the connector type selected is Cloud Connector (CDG).
+- `tags` (List of String) The tag associated with the device.
 
 ### Read-Only
 

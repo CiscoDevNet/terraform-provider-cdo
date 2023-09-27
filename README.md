@@ -4,7 +4,7 @@ This repo provides a terraform provider to provision resources on the Cisco CDO 
 
 ## Structure
 
-We make use of Go workspaces - this is to split the repsonsibility of the provider and the Go CDO client. 
+We make use of Go workspaces - this is to split the responsibility of the provider and the Go CDO client. 
 Eventually the client will be moved to its own repo, but in the interest of hitting the ground running they both live in here.
 
 ```
@@ -33,7 +33,7 @@ Ensure you have an active terraform:
 tfenv use 1.3.1
 ```
 
-Then in the provider dir you can run the acceptances tests:
+Then in the provider dir you can run the acceptance tests:
 
 ```bash
 cd ./provider
@@ -61,7 +61,7 @@ Examples are provided so that you can do the usual `plan`, `apply`, `destroy` et
       go install .
       ```
    3. Verify installation
-      The installation path that you figured out above should contains an executable called **terraform-provider-cdo**.
+      The installation path that you figured out above should contain an executable called **terraform-provider-cdo**.
 2. Tell terraform to use your local build
    1. Modify local terraform configuration
       ```bash

@@ -6,6 +6,9 @@ package ios
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"strconv"
 
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
@@ -33,13 +36,14 @@ type IosDataSource struct {
 /////
 
 type IosDataSourceModel struct {
-	ID                types.String `tfsdk:"id"`
-	Name              types.String `tfsdk:"name"`
-	ConnectorName     types.String `tfsdk:"connector_name"`
-	SocketAddress     types.String `tfsdk:"socket_address"`
-	Host              types.String `tfsdk:"host"`
-	Port              types.Int64  `tfsdk:"port"`
-	IgnoreCertificate types.Bool   `tfsdk:"ignore_certificate"`
+	ID                types.String   `tfsdk:"id"`
+	Name              types.String   `tfsdk:"name"`
+	ConnectorName     types.String   `tfsdk:"connector_name"`
+	SocketAddress     types.String   `tfsdk:"socket_address"`
+	Host              types.String   `tfsdk:"host"`
+	Port              types.Int64    `tfsdk:"port"`
+	IgnoreCertificate types.Bool     `tfsdk:"ignore_certificate"`
+	Labels            []types.String `tfsdk:"labels"`
 }
 
 // define the name for this data source.
@@ -82,6 +86,14 @@ func (d *IosDataSource) Schema(ctx context.Context, req datasource.SchemaRequest
 			"ignore_certificate": schema.BoolAttribute{
 				MarkdownDescription: "This attribute indicates whether certificates were ignored when onboarding this device.",
 				Computed:            true,
+			},
+			"labels": schema.ListAttribute{
+				MarkdownDescription: "The labels applied to the device. Labels are used to group devices in CDO. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
+				Computed:            true,
+				ElementType:         types.StringType,
+				Validators: []validator.List{
+					listvalidator.UniqueValues(),
+				},
 			},
 		},
 	}
@@ -149,6 +161,7 @@ func (d *IosDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	configData.SocketAddress = types.StringValue(readOutp.SocketAddress)
 	configData.Host = types.StringValue(readOutp.Host)
 	configData.IgnoreCertificate = types.BoolValue(readOutp.IgnoreCertificate)
+	configData.Labels = util.GoStringSliceToTFStringList(readOutp.Tags.Labels)
 
 	tflog.Trace(ctx, "done read IOS device data source")
 

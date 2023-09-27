@@ -2,6 +2,7 @@ package ios
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
@@ -20,6 +21,7 @@ type ReadOutput struct {
 	SocketAddress   string          `json:"ipv4"`
 	Port            string          `json:"port"`
 	Host            string          `json:"host"`
+	Tags            tags.Type       `json:"tags"`
 
 	IgnoreCertificate bool `json:"ignoreCertificate"`
 }

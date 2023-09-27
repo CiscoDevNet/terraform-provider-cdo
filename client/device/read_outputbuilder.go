@@ -2,6 +2,7 @@ package device
 
 import (
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 	"time"
 )
@@ -46,6 +47,12 @@ func (builder *readOutputBuilder) WithUid(uid string) *readOutputBuilder {
 
 func (builder *readOutputBuilder) WithName(name string) *readOutputBuilder {
 	builder.readOutput.Name = name
+
+	return builder
+}
+
+func (builder *readOutputBuilder) WithTags(tags tags.Type) *readOutputBuilder {
+	builder.readOutput.Tags = tags
 
 	return builder
 }

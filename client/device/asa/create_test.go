@@ -6,6 +6,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/featureflag"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/user/auth"
@@ -29,6 +30,7 @@ func TestAsaCreate(t *testing.T) {
 		WithName("my-asa").
 		OnboardedUsingCloudConnector("88888888-8888-8888-8888-888888888888").
 		WithLocation("10.10.0.1", 443).
+		WithTags(tags.New("tag1", "tag2")).
 		Build()
 
 	asaDeviceUsingSdc := device.NewReadOutputBuilder().
@@ -132,6 +134,7 @@ func TestAsaCreate(t *testing.T) {
 					SocketAddress: asaDevice.SocketAddress,
 					ConnectorType: asaDevice.ConnectorType,
 					ConnectorUid:  asaDevice.ConnectorUid,
+					Tags:          asaDevice.Tags,
 				}
 				assert.Equal(t, expectedCreatedOutput, *output)
 
@@ -257,6 +260,7 @@ func TestAsaCreate(t *testing.T) {
 					SocketAddress: asaDevice.SocketAddress,
 					ConnectorType: asaDevice.ConnectorType,
 					ConnectorUid:  asaDevice.ConnectorUid,
+					Tags:          asaDevice.Tags,
 				}
 				assert.Equal(t, expectedCreatedOutput, *output)
 

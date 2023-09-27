@@ -40,6 +40,7 @@ type ResourceModel struct {
 	PerformanceTier  types.String   `tfsdk:"performance_tier"`
 	Virtual          types.Bool     `tfsdk:"virtual"`
 	Licenses         []types.String `tfsdk:"licenses"`
+	Labels           []types.String `tfsdk:"labels"`
 
 	AccessPolicyUid  types.String `tfsdk:"access_policy_id"`
 	GeneratedCommand types.String `tfsdk:"generated_command"`
@@ -107,6 +108,14 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					listvalidator.UniqueValues(),
 					listvalidator.ValueStringsAre(stringvalidator.OneOf(license.AllAsString...)),
 					validators.ValueStringsAtLeast(stringvalidator.OneOf(string(license.Base))),
+				},
+			},
+			"labels": schema.ListAttribute{
+				MarkdownDescription: "Set a list of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
+				Optional:            true,
+				ElementType:         types.StringType,
+				Validators: []validator.List{
+					listvalidator.UniqueValues(),
 				},
 			},
 			"generated_command": schema.StringAttribute{

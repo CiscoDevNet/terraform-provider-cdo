@@ -6,6 +6,8 @@ package asa
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"strconv"
 
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
@@ -35,14 +37,15 @@ type AsaDataSource struct {
 /////
 
 type AsaDataSourceModel struct {
-	ID                types.String `tfsdk:"id"`
-	ConnectorType     types.String `tfsdk:"connector_type"`
-	SdcName           types.String `tfsdk:"sdc_name"`
-	Name              types.String `tfsdk:"name"`
-	Ipv4              types.String `tfsdk:"socket_address"`
-	Host              types.String `tfsdk:"host"`
-	Port              types.Int64  `tfsdk:"port"`
-	IgnoreCertificate types.Bool   `tfsdk:"ignore_certificate"`
+	ID                types.String   `tfsdk:"id"`
+	ConnectorType     types.String   `tfsdk:"connector_type"`
+	SdcName           types.String   `tfsdk:"sdc_name"`
+	Name              types.String   `tfsdk:"name"`
+	Ipv4              types.String   `tfsdk:"socket_address"`
+	Host              types.String   `tfsdk:"host"`
+	Port              types.Int64    `tfsdk:"port"`
+	IgnoreCertificate types.Bool     `tfsdk:"ignore_certificate"`
+	Labels            []types.String `tfsdk:"labels"`
 }
 
 // define the name for this data source.
@@ -92,6 +95,14 @@ func (d *AsaDataSource) Schema(ctx context.Context, req datasource.SchemaRequest
 			"ignore_certificate": schema.BoolAttribute{
 				MarkdownDescription: "This attribute indicates whether certificates were ignored when onboarding this device.",
 				Computed:            true,
+			},
+			"labels": schema.ListAttribute{
+				ElementType:         types.StringType,
+				Computed:            true,
+				MarkdownDescription: "The labels applied to the device. Labels are used to group devices in CDO. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
+				Validators: []validator.List{
+					listvalidator.UniqueValues(),
+				},
 			},
 		},
 	}
@@ -160,6 +171,7 @@ func (d *AsaDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	configData.Ipv4 = types.StringValue(readOutp.SocketAddress)
 	configData.Host = types.StringValue(readOutp.Host)
 	configData.IgnoreCertificate = types.BoolValue(readOutp.IgnoreCertificate)
+	configData.Labels = util.GoStringSliceToTFStringList(readOutp.Tags.Labels)
 
 	tflog.Trace(ctx, "done read ASA device data source")
 

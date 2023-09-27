@@ -1,5 +1,7 @@
 package cloudftd
 
+import "github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
+
 type ReadOutputBuilder struct {
 	readOutput *ReadOutput
 }
@@ -22,6 +24,11 @@ func (b *ReadOutputBuilder) Name(name string) *ReadOutputBuilder {
 
 func (b *ReadOutputBuilder) Metadata(metadata Metadata) *ReadOutputBuilder {
 	b.readOutput.Metadata = metadata
+	return b
+}
+
+func (b *ReadOutputBuilder) tags(tags tags.Type) *ReadOutputBuilder {
+	b.readOutput.Tags = tags
 	return b
 }
 

@@ -7,6 +7,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 )
@@ -17,17 +18,19 @@ type UpdateInput struct {
 	Username  string
 	Password  string
 	PublicKey *model.PublicKey
+	Tags      tags.Type
 }
 
 type UpdateOutput = device.ReadOutput
 
-func NewUpdateInput(uid, name, username, password string, publicKey *model.PublicKey) UpdateInput {
+func NewUpdateInput(uid, name, username, password string, publicKey *model.PublicKey, tags tags.Type) UpdateInput {
 	return UpdateInput{
 		Uid:       uid,
 		Name:      name,
 		Username:  username,
 		Password:  password,
 		PublicKey: publicKey,
+		Tags:      tags,
 	}
 }
 
@@ -56,6 +59,7 @@ type UpdateBody struct {
 	Name        string    `json:"name,omitempty"`
 	Credentials string    `json:"credentials,omitempty"`
 	SmContext   SmContext `json:"stateMachineContext,omitempty"`
+	Tags        tags.Type `json:"tags,omitempty"`
 }
 
 type SmContext struct {
@@ -65,6 +69,7 @@ type SmContext struct {
 func makeUpdateBody(updateInp UpdateInput) (UpdateBody, error) {
 	updateBody := UpdateBody{
 		Name: updateInp.Name,
+		Tags: updateInp.Tags,
 	}
 	if updateInp.Username != "" {
 		creds, err := makeCredentials(updateInp)

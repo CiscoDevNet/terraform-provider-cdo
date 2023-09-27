@@ -24,6 +24,10 @@ Provides an iOS device resource. This allows iOS devices to be onboarded, update
 - `socket_address` (String) The address of the device to onboard, specified in the format `host:port`.
 - `username` (String) The username used to authenticate with the device.
 
+### Optional
+
+- `labels` (List of String) Set a list of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.
+
 ### Read-Only
 
 - `host` (String) The host used to connect to the device.

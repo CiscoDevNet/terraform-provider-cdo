@@ -6,6 +6,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"strings"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
@@ -16,21 +17,23 @@ import (
 )
 
 type UpdateInput struct {
-	Uid      string `json:"-"`
-	Name     string `json:"name"`
-	Location string
-	Username string
-	Password string
+	Uid      string    `json:"-"`
+	Name     string    `json:"name"`
+	Location string    `json:"-"`
+	Username string    `json:"-"`
+	Password string    `json:"-"`
+	Tags     tags.Type `json:"tags"`
 }
 
 type UpdateOutput = device.UpdateOutput
 
-func NewUpdateInput(uid string, name string, username string, password string) *UpdateInput {
+func NewUpdateInput(uid string, name string, username string, password string, tags tags.Type) *UpdateInput {
 	return &UpdateInput{
 		Uid:      uid,
 		Name:     name,
 		Username: username,
 		Password: password,
+		Tags:     tags,
 	}
 }
 

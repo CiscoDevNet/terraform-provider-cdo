@@ -3,6 +3,7 @@ package ios
 import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -29,6 +30,7 @@ func TestIosUpdate(t *testing.T) {
 		WithName("my-ios").
 		OnboardedUsingOnPremConnector(onPremConnector.Uid).
 		WithLocation("10.10.0.1", 443).
+		WithTags(tags.New("tags1", "tags2", "tags3")).
 		Build()
 
 	testCases := []struct {

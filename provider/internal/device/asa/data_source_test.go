@@ -1,6 +1,8 @@
 package asa_test
 
 import (
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/testutil"
 	"strconv"
 	"testing"
 
@@ -15,6 +17,7 @@ var testAsaDataSource = struct {
 	Host              string
 	Port              int64
 	IgnoreCertificate bool
+	Tags              tags.Type
 }{
 	ConnectorType:     acctest.Env.AsaDataSourceConnectorType(),
 	Name:              acctest.Env.AsaDataSourceName(),
@@ -22,6 +25,7 @@ var testAsaDataSource = struct {
 	Host:              acctest.Env.AsaDataSourceHost(),
 	Port:              acctest.Env.AsaDataSourcePort(),
 	IgnoreCertificate: acctest.Env.AsaDataSourceIgnoreCertificate(),
+	Tags:              acctest.Env.AsaDataSourceTags(),
 }
 
 const testAsaDataSourceTemplate = `
@@ -46,6 +50,10 @@ func TestAccAsaDeviceDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "host", testAsaDataSource.Host),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "port", strconv.FormatInt(testAsaDataSource.Port, 10)),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "ignore_certificate", strconv.FormatBool(testAsaDataSource.IgnoreCertificate)),
+					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "labels.#", strconv.Itoa(len(testAsaDataSource.Tags.Labels))),
+					resource.TestCheckResourceAttrWith("data.cdo_asa_device.test", "labels.0", testutil.CheckEqual(testAsaDataSource.Tags.Labels[0])),
+					resource.TestCheckResourceAttrWith("data.cdo_asa_device.test", "labels.1", testutil.CheckEqual(testAsaDataSource.Tags.Labels[1])),
+					resource.TestCheckResourceAttrWith("data.cdo_asa_device.test", "labels.2", testutil.CheckEqual(testAsaDataSource.Tags.Labels[2])),
 				),
 			},
 		},

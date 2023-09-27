@@ -2,8 +2,10 @@ package acctest
 
 import (
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"os"
 	"strconv"
+	"strings"
 )
 
 type env struct{}
@@ -78,6 +80,11 @@ func (e *env) IosResourceIgnoreCertificate() string {
 	return e.mustGetString("IOS_RESOURCE_IGNORE_CERTIFICATE")
 }
 
+func (e *env) IosResourceTags() tags.Type {
+	tagsEnv := e.mustGetString("IOS_RESOURCE_TAGS")
+	return tags.New(strings.Split(tagsEnv, ",")...)
+}
+
 func (e *env) IosResourceHost() string {
 	return e.mustGetString("IOS_RESOURCE_HOST")
 }
@@ -98,6 +105,11 @@ func (e *env) IosDataSourceIgnoreCertificate() string {
 	return e.mustGetString("IOS_DATA_SOURCE_IGNORE_CERTIFICATE")
 }
 
+func (e *env) IosDataSourceTags() tags.Type {
+	tagsEnv := e.mustGetString("IOS_DATA_SOURCE_TAGS")
+	return tags.New(strings.Split(tagsEnv, ",")...)
+}
+
 func (e *env) FtdResourceName() string {
 	return e.mustGetString("FTD_RESOURCE_NAME")
 }
@@ -116,6 +128,11 @@ func (e *env) FtdResourceVirtual() string {
 
 func (e *env) FtdResourceLicenses() string {
 	return e.mustGetString("FTD_RESOURCE_LICENSES")
+}
+
+func (e *env) FtdResourceTags() tags.Type {
+	tagsEnv := e.mustGetString("FTD_RESOURCE_TAGS")
+	return tags.New(strings.Split(tagsEnv, ",")...)
 }
 
 func (e *env) FtdResourceNewName() string {
@@ -158,6 +175,11 @@ func (e *env) AsaResourceSdcIgnoreCertificate() bool {
 	return e.mustGetBool("ASA_RESOURCE_SDC_IGNORE_CERTIFICATE")
 }
 
+func (e *env) AsaResourceSdcTags() tags.Type {
+	tagsEnv := e.mustGetString("ASA_RESOURCE_SDC_TAGS")
+	return tags.New(strings.Split(tagsEnv, ",")...)
+}
+
 func (e *env) AsaResourceAlternativeDeviceLocation() string {
 	return e.mustGetString("ASA_RESOURCE_SDC_ALTERNATIVE_DEVICE_LOCATION")
 }
@@ -198,6 +220,11 @@ func (e *env) AsaResourceCdgIgnoreCertificate() bool {
 	return e.mustGetBool("ASA_RESOURCE_CDG_IGNORE_CERTIFICATE")
 }
 
+func (e *env) AsaResourceCdgTags() tags.Type {
+	tagsEnv := e.mustGetString("ASA_RESOURCE_CDG_TAGS")
+	return tags.New(strings.Split(tagsEnv, ",")...)
+}
+
 func (e *env) AsaResourceCdgHost() string {
 	return e.mustGetString("ASA_RESOURCE_CDG_HOST")
 }
@@ -236,6 +263,11 @@ func (e *env) AsaDataSourcePort() int64 {
 
 func (e *env) AsaDataSourceIgnoreCertificate() bool {
 	return e.mustGetBool("ASA_DATA_SOURCE_IGNORE_CERTIFICATE")
+}
+
+func (e *env) AsaDataSourceTags() tags.Type {
+	tagsEnv := e.mustGetString("ASA_DATA_SOURCE_TAGS")
+	return tags.New(strings.Split(tagsEnv, ",")...)
 }
 
 func (e *env) ConnectorDataSourceName() string {

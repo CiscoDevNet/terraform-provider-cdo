@@ -5,6 +5,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/genericssh"
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
@@ -21,6 +22,7 @@ func TestGenericSshCreate(t *testing.T) {
 		Uid:   genericSshUid,
 		Name:  genericSshName,
 		State: state.DONE,
+		Tags:  tags.New("tags1", "tags2", "tags3"),
 	}
 
 	testCases := []struct {
@@ -71,7 +73,7 @@ func TestGenericSshCreate(t *testing.T) {
 			output, err := genericssh.Create(
 				context.Background(),
 				*internalHttp.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
-				genericssh.NewCreateInput(genericSshUid, genericSshConnectorUid, genericSshConnectorSocketAddress),
+				genericssh.NewCreateInput(genericSshUid, genericSshConnectorUid, genericSshConnectorSocketAddress, validGenericSsh.Tags),
 			)
 
 			testCase.assertFunc(output, err, t)

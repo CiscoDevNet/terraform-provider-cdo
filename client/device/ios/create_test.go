@@ -3,6 +3,7 @@ package ios
 import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -31,6 +32,7 @@ func TestIosCreate(t *testing.T) {
 		WithName("my-ios").
 		OnboardedUsingOnPremConnector(validConnector.Uid).
 		WithLocation("10.10.0.1", 443).
+		WithTags(tags.New("tags1", "tags2", "tags3")).
 		Build()
 
 	testCases := []struct {
@@ -49,6 +51,7 @@ func TestIosCreate(t *testing.T) {
 				Username:          "unittestuser",
 				Password:          "not a real password",
 				IgnoreCertificate: false,
+				Tags:              iosDevice.Tags,
 			},
 
 			setupFunc: func(input CreateInput) {
@@ -74,6 +77,7 @@ func TestIosCreate(t *testing.T) {
 					SocketAddress: iosDevice.SocketAddress,
 					ConnectorType: iosDevice.ConnectorType,
 					ConnectorUid:  iosDevice.ConnectorUid,
+					Tags:          iosDevice.Tags,
 				}
 				assert.Equal(t, expectedCreatedOutput, *output)
 
@@ -122,6 +126,7 @@ func TestIosCreate(t *testing.T) {
 				Username:          "unittestuser",
 				Password:          "not a real password",
 				IgnoreCertificate: false,
+				Tags:              iosDevice.Tags,
 			},
 
 			setupFunc: func(input CreateInput) {
@@ -150,6 +155,7 @@ func TestIosCreate(t *testing.T) {
 				Username:          "unittestuser",
 				Password:          "not a real password",
 				IgnoreCertificate: false,
+				Tags:              iosDevice.Tags,
 			},
 
 			setupFunc: func(input CreateInput) {
@@ -177,6 +183,7 @@ func TestIosCreate(t *testing.T) {
 				Username:          "unittestuser",
 				Password:          "not a real password",
 				IgnoreCertificate: false,
+				Tags:              iosDevice.Tags,
 			},
 
 			setupFunc: func(input CreateInput) {

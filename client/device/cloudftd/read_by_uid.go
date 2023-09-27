@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 )
 
 type ReadByUidInput struct {
@@ -17,10 +18,11 @@ func NewReadByUidInput(uid string) ReadByUidInput {
 }
 
 type ReadOutput struct {
-	Uid      string   `json:"uid"`
-	Name     string   `json:"name"`
-	Metadata Metadata `json:"metadata,omitempty"`
-	State    string   `json:"state"`
+	Uid      string    `json:"uid"`
+	Name     string    `json:"name"`
+	Metadata Metadata  `json:"metadata,omitempty"`
+	State    string    `json:"state"`
+	Tags     tags.Type `json:"tags"`
 }
 
 func ReadByUid(ctx context.Context, client http.Client, readInp ReadByUidInput) (*ReadOutput, error) {

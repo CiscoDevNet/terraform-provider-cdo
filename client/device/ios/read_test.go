@@ -2,6 +2,7 @@ package ios
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -21,6 +22,7 @@ func TestIosRead(t *testing.T) {
 		WithName("my-ios").
 		OnboardedUsingOnPremConnector("88888888-8888-8888-8888-888888888888").
 		WithLocation("10.10.0.1", 443).
+		WithTags(tags.New("tags1", "tags2", "tags3")).
 		Build()
 
 	testCases := []struct {
@@ -54,6 +56,7 @@ func TestIosRead(t *testing.T) {
 					SocketAddress:   iosDevice.SocketAddress,
 					Host:            iosDevice.Host,
 					Port:            iosDevice.Port,
+					Tags:            iosDevice.Tags,
 				}
 				assert.Equal(t, expectedReadOutput, *output)
 			},

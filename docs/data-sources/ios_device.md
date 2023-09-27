@@ -25,6 +25,6 @@ IOS data source
 - `host` (String) The host used to connect to the device.
 - `id` (String) Universally unique identifier of the device.
 - `ignore_certificate` (Boolean) This attribute indicates whether certificates were ignored when onboarding this device.
-- `labels` (List of String) Set a list of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.
+- `labels` (List of String) The labels applied to the device. Labels are used to group devices in CDO. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.
 - `port` (Number) The port used to connect to the device.
 - `socket_address` (String) The address of the device to onboard, specified in the format `host:port`.

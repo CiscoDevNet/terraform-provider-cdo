@@ -14,11 +14,11 @@ var asaDataSourceTags = acctest.Env.IosDataSourceTags()
 var testIosDataSource = struct {
 	Name              string
 	IgnoreCertificate string
-	Tags              string
+	Labels            string
 }{
 	Name:              acctest.Env.IosDataSourceName(),
 	IgnoreCertificate: acctest.Env.IosDataSourceIgnoreCertificate(),
-	Tags:              asaDataSourceTags.AsJsonArrayString(),
+	Labels:            asaDataSourceTags.GetLabelsJsonArrayString(),
 }
 
 var testIosDataSourceTemplate = `
@@ -38,10 +38,10 @@ func TestAccIosDeviceDataSource(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "name", testIosDataSource.Name),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "ignore_certificate", testIosDataSource.IgnoreCertificate),
-					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "tags.#", strconv.Itoa(len(asaDataSourceTags.Labels))),
-					resource.TestCheckResourceAttrWith("data.cdo_ios_device.test", "tags.0", testutil.CheckEqual(asaDataSourceTags.Labels[0])),
-					resource.TestCheckResourceAttrWith("data.cdo_ios_device.test", "tags.1", testutil.CheckEqual(asaDataSourceTags.Labels[1])),
-					resource.TestCheckResourceAttrWith("data.cdo_ios_device.test", "tags.2", testutil.CheckEqual(asaDataSourceTags.Labels[2])),
+					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "labels.#", strconv.Itoa(len(asaDataSourceTags.Labels))),
+					resource.TestCheckResourceAttrWith("data.cdo_ios_device.test", "labels.0", testutil.CheckEqual(asaDataSourceTags.Labels[0])),
+					resource.TestCheckResourceAttrWith("data.cdo_ios_device.test", "labels.1", testutil.CheckEqual(asaDataSourceTags.Labels[1])),
+					resource.TestCheckResourceAttrWith("data.cdo_ios_device.test", "labels.2", testutil.CheckEqual(asaDataSourceTags.Labels[2])),
 				),
 			},
 		},

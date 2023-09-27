@@ -46,7 +46,7 @@ type AsaDeviceResourceModel struct {
 	SocketAddress types.String   `tfsdk:"socket_address"`
 	Host          types.String   `tfsdk:"host"`
 	Port          types.Int64    `tfsdk:"port"`
-	Tags          []types.String `tfsdk:"tags"`
+	Labels        []types.String `tfsdk:"labels"`
 
 	Username          types.String `tfsdk:"username"`
 	Password          types.String `tfsdk:"password"`
@@ -106,8 +106,8 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				MarkdownDescription: "The host used to connect to the device.",
 				Computed:            true,
 			},
-			"tags": schema.ListAttribute{
-				MarkdownDescription: "The tag associated with the device.",
+			"labels": schema.ListAttribute{
+				MarkdownDescription: "Set a list of labels to identify the device as part of a group. Refer to the CDO documentation for details on how labels are used in CDO.",
 				Optional:            true,
 				ElementType:         types.StringType,
 				Validators: []validator.List{
@@ -190,7 +190,7 @@ func (r *AsaDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 	stateData.SocketAddress = types.StringValue(asaReadOutp.SocketAddress)
 	stateData.Host = types.StringValue(asaReadOutp.Host)
 	stateData.IgnoreCertificate = types.BoolValue(asaReadOutp.IgnoreCertificate)
-	stateData.Tags = util.GoStringSliceToTFStringList(asaReadOutp.Tags.Labels)
+	stateData.Labels = util.GoStringSliceToTFStringList(asaReadOutp.Tags.Labels)
 
 	tflog.Trace(ctx, "done read ASA device resource")
 
@@ -225,7 +225,7 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 		specificSdcOutp = &connector.ReadOutput{}
 	}
 
-	tagsInp := tags.New(util.TFStringListToGoStringList(planData.Tags)...)
+	tagsInp := tags.New(util.TFStringListToGoStringList(planData.Labels)...)
 
 	createInp := asa.NewCreateRequestInput(
 		planData.Name.ValueString(),
@@ -258,7 +258,7 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 	planData.ConnectorName = getConnectorName(&planData)
 	planData.Name = types.StringValue(createOutp.Name)
 	planData.Host = types.StringValue(createOutp.Host)
-	planData.Tags = util.GoStringSliceToTFStringList(createOutp.Tags.Labels)
+	planData.Labels = util.GoStringSliceToTFStringList(createOutp.Tags.Labels)
 
 	port, err := strconv.ParseInt(createOutp.Port, 10, 16)
 	if err != nil {
@@ -287,7 +287,7 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
-	tagsInp := tags.New(util.TFStringListToGoStringList(stateData.Tags)...)
+	tagsInp := tags.New(util.TFStringListToGoStringList(stateData.Labels)...)
 
 	updateInp := asa.NewUpdateInput(
 		stateData.ID.ValueString(),
@@ -336,7 +336,7 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 	stateData.SocketAddress = planData.SocketAddress
 	stateData.Host = types.StringValue(updateOutp.Host)
 	stateData.Port = types.Int64Value(port)
-	stateData.Tags = util.GoStringSliceToTFStringList(updateOutp.Tags.Labels)
+	stateData.Labels = util.GoStringSliceToTFStringList(updateOutp.Tags.Labels)
 
 	stateData.IgnoreCertificate = planData.IgnoreCertificate
 

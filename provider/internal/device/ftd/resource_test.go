@@ -19,7 +19,7 @@ type ResourceType struct {
 	Virtual          string
 	Licenses         string
 	AccessPolicyUid  string
-	Tags             string
+	Labels           string
 }
 
 const ResourceTemplate = `
@@ -29,7 +29,7 @@ resource "cdo_ftd_device" "test" {
 	performance_tier = "{{.PerformanceTier}}"
 	virtual = "{{.Virtual}}"
 	licenses = {{.Licenses}}
-	tags = {{.Tags}}
+	labels = {{.Labels}}
 }`
 
 var testResource = ResourceType{
@@ -38,7 +38,7 @@ var testResource = ResourceType{
 	PerformanceTier:  acctest.Env.FtdResourcePerformanceTier(),
 	Virtual:          acctest.Env.FtdResourceVirtual(),
 	Licenses:         acctest.Env.FtdResourceLicenses(),
-	Tags:             acctest.Env.FtdResourceTags().AsJsonArrayString(),
+	Labels:           acctest.Env.FtdResourceTags().GetLabelsJsonArrayString(),
 }
 var testResourceConfig = acctest.MustParseTemplate(ResourceTemplate, testResource)
 
@@ -65,10 +65,10 @@ func TestAccFtdResource(t *testing.T) {
 					resource.TestCheckResourceAttrSet("cdo_ftd_device.test", "licenses.0"),   // there is something at position 0 of licenses array
 					resource.TestCheckResourceAttr("cdo_ftd_device.test", "licenses.#", "1"), // number of licenses = 1
 					resource.TestCheckResourceAttr("cdo_ftd_device.test", "access_policy_name", testResource.AccessPolicyName),
-					resource.TestCheckResourceAttr("cdo_ftd_device.test", "tags.#", strconv.Itoa(len(acctest.Env.FtdResourceTags().Labels))),
-					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "tags.0", testutil.CheckEqual(acctest.Env.FtdResourceTags().Labels[0])),
-					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "tags.1", testutil.CheckEqual(acctest.Env.FtdResourceTags().Labels[1])),
-					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "tags.2", testutil.CheckEqual(acctest.Env.FtdResourceTags().Labels[2])),
+					resource.TestCheckResourceAttr("cdo_ftd_device.test", "labels.#", strconv.Itoa(len(acctest.Env.FtdResourceTags().Labels))),
+					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "labels.0", testutil.CheckEqual(acctest.Env.FtdResourceTags().Labels[0])),
+					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "labels.1", testutil.CheckEqual(acctest.Env.FtdResourceTags().Labels[1])),
+					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "labels.2", testutil.CheckEqual(acctest.Env.FtdResourceTags().Labels[2])),
 					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "generated_command", func(value string) error {
 						ok := strings.HasPrefix(value, "configure manager add")
 						if !ok {

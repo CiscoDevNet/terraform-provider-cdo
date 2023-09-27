@@ -45,7 +45,7 @@ type AsaDataSourceModel struct {
 	Host              types.String   `tfsdk:"host"`
 	Port              types.Int64    `tfsdk:"port"`
 	IgnoreCertificate types.Bool     `tfsdk:"ignore_certificate"`
-	Tags              []types.String `tfsdk:"tags"`
+	Labels            []types.String `tfsdk:"labels"`
 }
 
 // define the name for this data source.
@@ -96,10 +96,10 @@ func (d *AsaDataSource) Schema(ctx context.Context, req datasource.SchemaRequest
 				MarkdownDescription: "This attribute indicates whether certificates were ignored when onboarding this device.",
 				Computed:            true,
 			},
-			"tags": schema.ListAttribute{
+			"labels": schema.ListAttribute{
 				ElementType:         types.StringType,
 				Computed:            true,
-				MarkdownDescription: "The tags associated with the device.",
+				MarkdownDescription: "Set a list of labels to identify the device as part of a group. Refer to the CDO documentation for details on how labels are used in CDO.",
 				Validators: []validator.List{
 					listvalidator.UniqueValues(),
 				},
@@ -171,7 +171,7 @@ func (d *AsaDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	configData.Ipv4 = types.StringValue(readOutp.SocketAddress)
 	configData.Host = types.StringValue(readOutp.Host)
 	configData.IgnoreCertificate = types.BoolValue(readOutp.IgnoreCertificate)
-	configData.Tags = util.GoStringSliceToTFStringList(readOutp.Tags.Labels)
+	configData.Labels = util.GoStringSliceToTFStringList(readOutp.Tags.Labels)
 
 	tflog.Trace(ctx, "done read ASA device data source")
 

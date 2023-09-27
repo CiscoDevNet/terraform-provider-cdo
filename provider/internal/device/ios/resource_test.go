@@ -17,7 +17,7 @@ type testIosResourceType struct {
 	Password          string
 	ConnectorName     string
 	IgnoreCertificate string
-	Tags              string
+	Labels            string
 
 	Host string
 	Port int64
@@ -31,7 +31,7 @@ resource "cdo_ios_device" "test" {
 	password = "{{.Password}}"
 	connector_name = "{{.ConnectorName}}"
 	ignore_certificate = "{{.IgnoreCertificate}}"
-	tags = {{.Tags}}
+	tags = {{.Labels}}
 }`
 
 var testIosResource = testIosResourceType{
@@ -42,7 +42,7 @@ var testIosResource = testIosResourceType{
 	Password:          acctest.Env.IosResourcePassword(),
 	ConnectorName:     acctest.Env.IosResourceConnectorName(),
 	IgnoreCertificate: acctest.Env.IosResourceIgnoreCertificate(),
-	Tags:              acctest.Env.IosResourceTags().AsJsonArrayString(),
+	Labels:            acctest.Env.IosResourceTags().GetLabelsJsonArrayString(),
 
 	Host: acctest.Env.IosResourceHost(),
 	Port: acctest.Env.IosResourcePort(),

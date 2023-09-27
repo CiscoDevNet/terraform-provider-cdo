@@ -20,7 +20,7 @@ func New(tags ...string) Type {
 	}
 }
 
-func (tags Type) AsJsonArrayString() string {
+func (tags Type) GetLabelsJsonArrayString() string {
 	b, _ := json.Marshal(tags.Labels)
 	return fmt.Sprintf("%v", string(b))
 }

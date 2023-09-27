@@ -37,7 +37,7 @@ type IosDeviceResourceModel struct {
 	Ipv4          types.String   `tfsdk:"socket_address"`
 	Host          types.String   `tfsdk:"host"`
 	Port          types.Int64    `tfsdk:"port"`
-	Tags          []types.String `tfsdk:"tags"`
+	Labels        []types.String `tfsdk:"labels"`
 
 	Username types.String `tfsdk:"username"`
 	Password types.String `tfsdk:"password"`
@@ -110,8 +110,8 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				MarkdownDescription: "Set this attribute to true if you do not want CDO to validate the certificate of this device before onboarding.",
 				Required:            true,
 			},
-			"tags": schema.ListAttribute{
-				MarkdownDescription: "The tag associated with the device.",
+			"labels": schema.ListAttribute{
+				MarkdownDescription: "Set a list of labels to identify the device as part of a group. Refer to the CDO documentation for details on how labels are used in CDO.",
 				Optional:            true,
 				ElementType:         types.StringType,
 				Validators: []validator.List{

@@ -43,7 +43,7 @@ type IosDataSourceModel struct {
 	Host              types.String   `tfsdk:"host"`
 	Port              types.Int64    `tfsdk:"port"`
 	IgnoreCertificate types.Bool     `tfsdk:"ignore_certificate"`
-	Tags              []types.String `tfsdk:"tags"`
+	Labels            []types.String `tfsdk:"labels"`
 }
 
 // define the name for this data source.
@@ -87,8 +87,8 @@ func (d *IosDataSource) Schema(ctx context.Context, req datasource.SchemaRequest
 				MarkdownDescription: "This attribute indicates whether certificates were ignored when onboarding this device.",
 				Computed:            true,
 			},
-			"tags": schema.ListAttribute{
-				MarkdownDescription: "The tag associated with the device.",
+			"labels": schema.ListAttribute{
+				MarkdownDescription: "Set a list of labels to identify the device as part of a group. Refer to the CDO documentation for details on how labels are used in CDO.",
 				Computed:            true,
 				ElementType:         types.StringType,
 				Validators: []validator.List{
@@ -161,7 +161,7 @@ func (d *IosDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	configData.SocketAddress = types.StringValue(readOutp.SocketAddress)
 	configData.Host = types.StringValue(readOutp.Host)
 	configData.IgnoreCertificate = types.BoolValue(readOutp.IgnoreCertificate)
-	configData.Tags = util.GoStringSliceToTFStringList(readOutp.Tags.Labels)
+	configData.Labels = util.GoStringSliceToTFStringList(readOutp.Tags.Labels)
 
 	tflog.Trace(ctx, "done read IOS device data source")
 

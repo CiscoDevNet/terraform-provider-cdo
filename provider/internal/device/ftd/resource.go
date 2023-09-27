@@ -40,7 +40,7 @@ type ResourceModel struct {
 	PerformanceTier  types.String   `tfsdk:"performance_tier"`
 	Virtual          types.Bool     `tfsdk:"virtual"`
 	Licenses         []types.String `tfsdk:"licenses"`
-	Tags             []types.String `tfsdk:"tags"`
+	Labels           []types.String `tfsdk:"labels"`
 
 	AccessPolicyUid  types.String `tfsdk:"access_policy_id"`
 	GeneratedCommand types.String `tfsdk:"generated_command"`
@@ -110,8 +110,8 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					validators.ValueStringsAtLeast(stringvalidator.OneOf(string(license.Base))),
 				},
 			},
-			"tags": schema.ListAttribute{
-				MarkdownDescription: "The tag associated with the device.",
+			"labels": schema.ListAttribute{
+				MarkdownDescription: "Set a list of labels to identify the device as part of a group. Refer to the CDO documentation for details on how labels are used in CDO.",
 				Optional:            true,
 				ElementType:         types.StringType,
 				Validators: []validator.List{

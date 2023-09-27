@@ -35,7 +35,7 @@ func Read(ctx context.Context, resource *IosDeviceResource, stateData *IosDevice
 	stateData.Ipv4 = types.StringValue(readOutp.SocketAddress)
 	stateData.Host = types.StringValue(readOutp.Host)
 	stateData.IgnoreCertificate = types.BoolValue(readOutp.IgnoreCertificate)
-	stateData.Tags = util.GoStringSliceToTFStringList(readOutp.Tags.Labels)
+	stateData.Labels = util.GoStringSliceToTFStringList(readOutp.Tags.Labels)
 
 	return nil
 }
@@ -59,7 +59,7 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 		planData.Username.ValueString(),
 		planData.Password.ValueString(),
 		planData.IgnoreCertificate.ValueBool(),
-		tags.New(util.TFStringListToGoStringList(planData.Tags)...),
+		tags.New(util.TFStringListToGoStringList(planData.Labels)...),
 	)
 
 	createOutp, createErr := resource.client.CreateIos(ctx, *createInp)
@@ -87,7 +87,7 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 		return fmt.Errorf("failed to parse IOS port, cause=%w", err)
 	}
 	planData.Port = types.Int64Value(port)
-	planData.Tags = util.GoStringSliceToTFStringList(createOutp.Tags.Labels)
+	planData.Labels = util.GoStringSliceToTFStringList(createOutp.Tags.Labels)
 
 	return nil
 }
@@ -96,14 +96,14 @@ func Update(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 	updateInp := *ios.NewUpdateInput(
 		stateData.ID.ValueString(),
 		planData.Name.ValueString(),
-		tags.New(util.TFStringListToGoStringList(planData.Tags)...),
+		tags.New(util.TFStringListToGoStringList(planData.Labels)...),
 	)
 	updateOutp, err := resource.client.UpdateIos(ctx, updateInp)
 	if err != nil {
 		return err
 	}
 	stateData.Name = types.StringValue(updateOutp.Name)
-	stateData.Tags = util.GoStringSliceToTFStringList(updateOutp.Tags.Labels)
+	stateData.Labels = util.GoStringSliceToTFStringList(updateOutp.Tags.Labels)
 
 	return nil
 }

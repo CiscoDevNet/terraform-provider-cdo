@@ -18,7 +18,7 @@ type testAsaResourceType struct {
 	Username          string
 	Password          string
 	IgnoreCertificate bool
-	Tags              string
+	Labels            string
 
 	Host string
 	Port int64
@@ -33,7 +33,7 @@ resource "cdo_asa_device" "test" {
 	username = "{{.Username}}"
 	password = "{{.Password}}"
 	ignore_certificate = "{{.IgnoreCertificate}}"
-	tags = {{.Tags}}
+	labels = {{.Labels}}
 }`
 
 // SDC configs.
@@ -47,7 +47,7 @@ var testAsaResource_SDC = testAsaResourceType{
 	Username:          acctest.Env.AsaResourceSdcUsername(),
 	Password:          acctest.Env.AsaResourceSdcPassword(),
 	IgnoreCertificate: acctest.Env.AsaResourceSdcIgnoreCertificate(),
-	Tags:              acctest.Env.AsaResourceSdcTags().AsJsonArrayString(),
+	Labels:            acctest.Env.AsaResourceSdcTags().GetLabelsJsonArrayString(),
 
 	Host: acctest.Env.AsaResourceSdcHost(),
 	Port: acctest.Env.AsaResourceSdcPort(),
@@ -83,7 +83,7 @@ var testAsaResource_CDG = testAsaResourceType{
 	Username:          acctest.Env.AsaResourceCdgUsername(),
 	Password:          acctest.Env.AsaResourceCdgPassword(),
 	IgnoreCertificate: acctest.Env.AsaResourceCdgIgnoreCertificate(),
-	Tags:              acctest.Env.AsaResourceCdgTags().AsJsonArrayString(),
+	Labels:            acctest.Env.AsaResourceCdgTags().GetLabelsJsonArrayString(),
 
 	Host: acctest.Env.AsaResourceCdgHost(),
 	Port: acctest.Env.AsaResourceCdgPort(),
@@ -121,10 +121,10 @@ func TestAccAsaDeviceResource_SDC(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "connector_type", testAsaResource_SDC.ConnectorType),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "username", testAsaResource_SDC.Username),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_SDC.Password),
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "tags.#", strconv.Itoa(len(acctest.Env.AsaResourceSdcTags().Labels))),
-					resource.TestCheckResourceAttrWith("cdo_asa_device.test", "tags.0", testutil.CheckEqual(acctest.Env.AsaResourceSdcTags().Labels[0])),
-					resource.TestCheckResourceAttrWith("cdo_asa_device.test", "tags.1", testutil.CheckEqual(acctest.Env.AsaResourceSdcTags().Labels[1])),
-					resource.TestCheckResourceAttrWith("cdo_asa_device.test", "tags.2", testutil.CheckEqual(acctest.Env.AsaResourceSdcTags().Labels[2])),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "labels.#", strconv.Itoa(len(acctest.Env.AsaResourceSdcTags().Labels))),
+					resource.TestCheckResourceAttrWith("cdo_asa_device.test", "labels.0", testutil.CheckEqual(acctest.Env.AsaResourceSdcTags().Labels[0])),
+					resource.TestCheckResourceAttrWith("cdo_asa_device.test", "labels.1", testutil.CheckEqual(acctest.Env.AsaResourceSdcTags().Labels[1])),
+					resource.TestCheckResourceAttrWith("cdo_asa_device.test", "labels.2", testutil.CheckEqual(acctest.Env.AsaResourceSdcTags().Labels[2])),
 				),
 			},
 			// Update and Read testing
@@ -179,10 +179,10 @@ func TestAccAsaDeviceResource_CDG(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "connector_type", testAsaResource_CDG.ConnectorType),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "username", testAsaResource_CDG.Username),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_CDG.Password),
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "tags.#", strconv.Itoa(len(acctest.Env.AsaResourceCdgTags().Labels))),
-					resource.TestCheckResourceAttrWith("cdo_asa_device.test", "tags.0", testutil.CheckEqual(acctest.Env.AsaResourceCdgTags().Labels[0])),
-					resource.TestCheckResourceAttrWith("cdo_asa_device.test", "tags.1", testutil.CheckEqual(acctest.Env.AsaResourceCdgTags().Labels[1])),
-					resource.TestCheckResourceAttrWith("cdo_asa_device.test", "tags.2", testutil.CheckEqual(acctest.Env.AsaResourceCdgTags().Labels[2])),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "labels.#", strconv.Itoa(len(acctest.Env.AsaResourceCdgTags().Labels))),
+					resource.TestCheckResourceAttrWith("cdo_asa_device.test", "labels.0", testutil.CheckEqual(acctest.Env.AsaResourceCdgTags().Labels[0])),
+					resource.TestCheckResourceAttrWith("cdo_asa_device.test", "labels.1", testutil.CheckEqual(acctest.Env.AsaResourceCdgTags().Labels[1])),
+					resource.TestCheckResourceAttrWith("cdo_asa_device.test", "labels.2", testutil.CheckEqual(acctest.Env.AsaResourceCdgTags().Labels[2])),
 				),
 			},
 			// Update and Read testing

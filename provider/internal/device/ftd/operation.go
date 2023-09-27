@@ -34,7 +34,7 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 	stateData.Hostname = types.StringValue(res.Metadata.CloudManagerDomain)
 	stateData.NatId = types.StringValue(res.Metadata.NatID)
 	stateData.RegKey = types.StringValue(res.Metadata.RegKey)
-	stateData.Tags = util.GoStringSliceToTFStringList(res.Tags.Labels)
+	stateData.Labels = util.GoStringSliceToTFStringList(res.Tags.Labels)
 
 	return nil
 }
@@ -54,7 +54,7 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 	licensesGoList := util.TFStringListToGoStringList(planData.Licenses)
 	licenses, err := license.DeserializeAllFromCdo(strings.Join(licensesGoList, ","))
 
-	tagsGoList := tags.New(util.TFStringListToGoStringList(planData.Tags)...)
+	tagsGoList := tags.New(util.TFStringListToGoStringList(planData.Labels)...)
 
 	if err != nil {
 		return err
@@ -85,7 +85,7 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 	planData.Hostname = types.StringValue(res.Metadata.CloudManagerDomain)
 	planData.NatId = types.StringValue(res.Metadata.NatID)
 	planData.RegKey = types.StringValue(res.Metadata.RegKey)
-	planData.Tags = util.GoStringSliceToTFStringList(res.Tags.Labels)
+	planData.Labels = util.GoStringSliceToTFStringList(res.Tags.Labels)
 
 	return nil
 }
@@ -96,7 +96,7 @@ func Update(ctx context.Context, resource *Resource, planData *ResourceModel, st
 	inp := cloudftd.NewUpdateInput(
 		planData.ID.ValueString(),
 		planData.Name.ValueString(),
-		tags.New(util.TFStringListToGoStringList(planData.Tags)...),
+		tags.New(util.TFStringListToGoStringList(planData.Labels)...),
 	)
 	res, err := resource.client.UpdateCloudFtd(ctx, inp)
 	if err != nil {

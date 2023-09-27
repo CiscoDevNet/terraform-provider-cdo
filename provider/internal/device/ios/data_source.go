@@ -88,7 +88,7 @@ func (d *IosDataSource) Schema(ctx context.Context, req datasource.SchemaRequest
 				Computed:            true,
 			},
 			"labels": schema.ListAttribute{
-				MarkdownDescription: "Set a list of labels to identify the device as part of a group. Refer to the CDO documentation for details on how labels are used in CDO.",
+				MarkdownDescription: "Set a list of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
 				Computed:            true,
 				ElementType:         types.StringType,
 				Validators: []validator.List{

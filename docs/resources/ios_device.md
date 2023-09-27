@@ -26,7 +26,7 @@ Provides an iOS device resource. This allows iOS devices to be onboarded, update
 
 ### Optional
 
-- `labels` (List of String) Set a list of labels to identify the device as part of a group. Refer to the CDO documentation for details on how labels are used in CDO.
+- `labels` (List of String) Set a list of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.
 
 ### Read-Only
 

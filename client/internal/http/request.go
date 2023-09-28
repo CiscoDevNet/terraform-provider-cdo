@@ -89,6 +89,8 @@ func (r *Request) send(output any) error {
 		return err
 	}
 
+	req.Header.Add("User-Agent", fmt.Sprintf("cdo_tf_provider/%s", Version))
+
 	// send request
 	res, err := r.httpClient.Do(req)
 	if err != nil {

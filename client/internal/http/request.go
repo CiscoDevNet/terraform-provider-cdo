@@ -89,8 +89,6 @@ func (r *Request) send(output any) error {
 		return err
 	}
 
-	req.Header.Add("User-Agent", fmt.Sprintf("cdo_tf_provider/%s", Version))
-
 	// send request
 	res, err := r.httpClient.Do(req)
 	if err != nil {
@@ -169,6 +167,7 @@ func (r *Request) addHeaders(req *http.Request) {
 	r.addAuthHeader(req)
 	r.addOtherHeader(req)
 	r.addJsonContentTypeHeaderIfNotPresent(req)
+	r.addUserAgentHeader(req)
 }
 
 func (r *Request) addJsonContentTypeHeaderIfNotPresent(req *http.Request) {
@@ -181,6 +180,10 @@ func (r *Request) addJsonContentTypeHeaderIfNotPresent(req *http.Request) {
 
 func (r *Request) addAuthHeader(req *http.Request) {
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.config.ApiToken))
+}
+
+func (r *Request) addUserAgentHeader(req *http.Request) {
+	req.Header.Add("User-Agent", fmt.Sprintf("cdo_tf_provider/%s", Version))
 }
 
 func (r *Request) addOtherHeader(req *http.Request) {

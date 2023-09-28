@@ -287,7 +287,7 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
-	tagsInp := tags.New(util.TFStringListToGoStringList(stateData.Labels)...)
+	tagsInp := tags.New(util.TFStringListToGoStringList(planData.Labels)...)
 
 	updateInp := asa.NewUpdateInput(
 		stateData.ID.ValueString(),

@@ -111,8 +111,6 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 	req := client.NewPut(ctx, url, updateInp)
 
 	var outp UpdateOutput
-	fmt.Println("hello update asa")
-	fmt.Printf("hello %+v\n", outp)
 	if err := req.Send(&outp); err != nil {
 		return nil, err
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/status"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
@@ -24,6 +25,7 @@ type ReadOutput struct {
 	Cdg              bool            `json:"cdg"`
 	TenantUid        string          `json:"tenantUid"`
 	PublicKey        model.PublicKey `json:"larPublicKey"`
+	LarStatus        status.Type     `json:"larStatus"`
 }
 
 func NewReadByUidInput(connectorUid string) *ReadByUidInput {

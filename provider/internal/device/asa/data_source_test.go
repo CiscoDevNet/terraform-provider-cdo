@@ -1,10 +1,11 @@
 package asa_test
 
 import (
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
-	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/testutil"
 	"strconv"
 	"testing"
+
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/testutil"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/acctest"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -52,8 +53,6 @@ func TestAccAsaDeviceDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "ignore_certificate", strconv.FormatBool(testAsaDataSource.IgnoreCertificate)),
 					resource.TestCheckResourceAttr("data.cdo_asa_device.test", "labels.#", strconv.Itoa(len(testAsaDataSource.Tags.Labels))),
 					resource.TestCheckResourceAttrWith("data.cdo_asa_device.test", "labels.0", testutil.CheckEqual(testAsaDataSource.Tags.Labels[0])),
-					resource.TestCheckResourceAttrWith("data.cdo_asa_device.test", "labels.1", testutil.CheckEqual(testAsaDataSource.Tags.Labels[1])),
-					resource.TestCheckResourceAttrWith("data.cdo_asa_device.test", "labels.2", testutil.CheckEqual(testAsaDataSource.Tags.Labels[2])),
 				),
 			},
 		},

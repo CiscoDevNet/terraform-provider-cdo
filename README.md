@@ -145,3 +145,7 @@ To release a new version of the Terraform CDO Provider, perform the following st
   provider hashicorp/CiscoDevnet/cdo: required by this configuration but no version is selected
   ```
   - This means you have not setup the dev override properly, make sure your `~/.terraformrc` has the right override for the provider in question.
+
+## Gitleaks License
+
+The Gitleaks License is free, and stored in the `GITLEAKS_LICENSE` secret. In addition, it is saved to [Conjur](https://secrets.cisco.com/conjur/nonprod/eng/cdo/gitleaks-license). Speak to Jay, Doron, Siddhu, or Pedro to access it.

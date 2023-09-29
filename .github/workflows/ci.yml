@@ -115,6 +115,8 @@ jobs:
       - env:
           TF_ACC: "1"
           ACC_TEST_CISCO_CDO_API_TOKEN: ${{ secrets.ACC_TEST_CISCO_CDO_API_TOKEN }}
+          IOS_RESOURCE_PASSWORD: ${{ secrets.IOS_RESOURCE_PASSWORD }}
+          ASA_RESOURCE_SDC_PASSWORD: ${{ secrets.ASA_RESOURCE_SDC_PASSWORD }}
         run: go test -v -cover ./...
         timeout-minutes: 10
   release:

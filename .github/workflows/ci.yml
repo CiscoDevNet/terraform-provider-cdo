@@ -41,7 +41,17 @@ jobs:
           version: latest
           working-directory: provider
           skip-pkg-cache: true
-
+  scan-for-secrets:
+    name: Scan for Secrets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE}}
   generate:
     name: Generate
     runs-on: ubuntu-latest

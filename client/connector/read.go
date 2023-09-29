@@ -25,7 +25,7 @@ type ReadOutput struct {
 	Cdg              bool            `json:"cdg"`
 	TenantUid        string          `json:"tenantUid"`
 	PublicKey        model.PublicKey `json:"larPublicKey"`
-	LarStatus        status.Type     `json:"larStatus"`
+	ConnectorStatus  status.Type     `json:"larStatus"`
 }
 
 func NewReadByUidInput(connectorUid string) *ReadByUidInput {
@@ -51,9 +51,10 @@ func newReadByUidRequest(ctx context.Context, client http.Client, readInp ReadBy
 
 func newReadByNameRequest(ctx context.Context, client http.Client, readInp ReadByNameInput) *http.Request {
 
-	url := url.ReadConnectorByName(client.BaseUrl(), readInp.ConnectorName)
+	url := url.ReadConnectorByName(client.BaseUrl())
 
 	req := client.NewGet(ctx, url)
+	req.QueryParams.Add("q", fmt.Sprintf("name:%s", readInp.ConnectorName))
 
 	return req
 }

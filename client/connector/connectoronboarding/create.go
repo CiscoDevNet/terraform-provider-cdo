@@ -23,9 +23,9 @@ type CreateOutput struct {
 
 func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, error) {
 
-	// wait for larStatus to be "Active"
+	// wait for connector status to be "Active"
 	err := retry.Do(
-		UntilLarStatusIsActive(ctx, client, *connector.NewReadByNameInput(createInp.Name)),
+		UntilConnectorStatusIsActive(ctx, client, *connector.NewReadByNameInput(createInp.Name)),
 		retry.NewOptionsBuilder().
 			Timeout(15*time.Minute).
 			Retries(-1).

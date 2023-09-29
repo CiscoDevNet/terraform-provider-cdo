@@ -2,36 +2,88 @@ package connectoronboarding_test
 
 import (
 	"context"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/examples"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/connectoronboarding"
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/status"
 	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
 	"time"
 )
 
-func TestExampleCreate(t *testing.T) {
+func TestCreate(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
+	activeConnector := connector.ReadOutput{
+		Uid:              "",
+		Name:             "test-sdc",
+		DefaultConnector: false,
+		Cdg:              false,
+		TenantUid:        "",
+		PublicKey:        model.PublicKey{},
+		ConnectorStatus:  status.Active,
+	}
+
+	onboardingConnector := connector.ReadOutput{
+		Uid:              "",
+		Name:             "test-sdc",
+		DefaultConnector: false,
+		Cdg:              false,
+		TenantUid:        "",
+		PublicKey:        model.PublicKey{},
+		ConnectorStatus:  status.Onboarding,
+	}
+
+	validCreateOutput := &connectoronboarding.CreateOutput{}
+
+	baseUrl := "https://unittest.cdo.cisco.com"
+
 	testCases := []struct {
 		testName   string
-		input      examples.CreateInput
+		input      connectoronboarding.CreateInput
 		setupFunc  func()
-		assertFunc func(output *examples.CreateOutput, err error, t *testing.T)
+		assertFunc func(output *connectoronboarding.CreateOutput, err error, t *testing.T)
 	}{
 		{
-			testName: "example test",
-			input:    examples.NewCreateInput("unittest-device-uid"),
+			testName: "should finish on connector Active status",
+			input:    connectoronboarding.NewCreateInput(activeConnector.Name),
 			setupFunc: func() {
 				httpmock.RegisterResponder(
 					http.MethodGet,
-					url.ReadDevice("https://unittest.cdo.cisco.com", "unittest-device-uid"),
-					httpmock.NewJsonResponderOrPanic(http.StatusOK, "{\"a\":\"b\"}"),
+					url.ReadConnectorByName(baseUrl),
+					httpmock.NewJsonResponderOrPanic(http.StatusOK, []connector.ReadOutput{activeConnector}),
 				)
 			},
-			assertFunc: func(output *examples.CreateOutput, err error, t *testing.T) {
+			assertFunc: func(output *connectoronboarding.CreateOutput, err error, t *testing.T) {
+				assert.NotNil(t, output)
+				assert.Nil(t, err)
+				assert.Equal(t, output, validCreateOutput)
+			},
+		},
+		{
+			testName: "should ends on connector Active status after an Onboarding state",
+			input:    connectoronboarding.NewCreateInput(activeConnector.Name),
+			setupFunc: func() {
+				httpmock.RegisterResponder(
+					http.MethodGet,
+					url.ReadConnectorByName(baseUrl),
+					httpmock.NewJsonResponderOrPanic(http.StatusOK, []connector.ReadOutput{onboardingConnector}),
+				)
+				httpmock.RegisterResponder(
+					http.MethodGet,
+					url.ReadConnectorByName(baseUrl),
+					httpmock.NewJsonResponderOrPanic(http.StatusOK, []connector.ReadOutput{activeConnector}),
+				)
+			},
+			assertFunc: func(output *connectoronboarding.CreateOutput, err error, t *testing.T) {
+				assert.NotNil(t, output)
+				assert.Nil(t, err)
+				assert.Equal(t, output, validCreateOutput)
 			},
 		},
 	}
@@ -42,9 +94,9 @@ func TestExampleCreate(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := examples.Create(
+			output, err := connectoronboarding.Create(
 				context.Background(),
-				*internalHttp.MustNewWithConfig("https://unittest.cdo.cisco.com", "a_valid_token", 0, 0, time.Minute),
+				*internalHttp.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
 				testCase.input,
 			)
 

@@ -50,8 +50,8 @@ func ReadConnectorByUid(baseUrl string, connectorUid string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/proxies/%s", baseUrl, connectorUid)
 }
 
-func ReadConnectorByName(baseUrl string, connectorName string) string {
-	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/proxies?q=name:%s", baseUrl, connectorName)
+func ReadConnectorByName(baseUrl string) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/proxies", baseUrl)
 }
 
 func CreateConnector(baseUrl string) string {

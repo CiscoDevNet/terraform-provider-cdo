@@ -8,13 +8,13 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/status"
 )
 
-func UntilLarStatusIsActive(ctx context.Context, client http.Client, readInp connector.ReadByNameInput) retry.Func {
+func UntilConnectorStatusIsActive(ctx context.Context, client http.Client, readInp connector.ReadByNameInput) retry.Func {
 	return func() (bool, error) {
 		readRes, err := connector.ReadByName(ctx, client, readInp)
 		if err != nil {
 			return false, err
 		}
-		if readRes.LarStatus == status.Active {
+		if readRes.ConnectorStatus == status.Active {
 			return true, nil
 		}
 		return false, nil

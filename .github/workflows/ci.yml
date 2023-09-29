@@ -112,6 +112,10 @@ jobs:
           terraform_wrapper: false
       - run: go mod download
       - run: cat .github-action.env >> $GITHUB_ENV  # https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
+      - run: |
+          echo IOS_RESOURCE_PASSWORD=${{ secrets.IOS_RESOURCE_PASSWORD }} >> $GITHUB_ENV
+          echo ASA_RESOURCE_SDC_PASSWORD=${{ secrets.ASA_RESOURCE_SDC_PASSWORD }} >> $GITHUB_ENV
+          echo ASA_RESOURCE_CDG_PASSWORD=${{ secrets.ASA_RESOURCE_CDG_PASSWORD }} >> $GITHUB_ENV
       - env:
           TF_ACC: "1"
           ACC_TEST_CISCO_CDO_API_TOKEN: ${{ secrets.ACC_TEST_CISCO_CDO_API_TOKEN }}

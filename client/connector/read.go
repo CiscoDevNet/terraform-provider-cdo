@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/status"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
@@ -24,6 +25,7 @@ type ReadOutput struct {
 	Cdg              bool            `json:"cdg"`
 	TenantUid        string          `json:"tenantUid"`
 	PublicKey        model.PublicKey `json:"larPublicKey"`
+	ConnectorStatus  status.Type     `json:"larStatus"`
 }
 
 func NewReadByUidInput(connectorUid string) *ReadByUidInput {
@@ -49,9 +51,10 @@ func newReadByUidRequest(ctx context.Context, client http.Client, readInp ReadBy
 
 func newReadByNameRequest(ctx context.Context, client http.Client, readInp ReadByNameInput) *http.Request {
 
-	url := url.ReadConnectorByName(client.BaseUrl(), readInp.ConnectorName)
+	url := url.ReadConnectorByName(client.BaseUrl())
 
 	req := client.NewGet(ctx, url)
+	req.QueryParams.Add("q", fmt.Sprintf("name:%s", readInp.ConnectorName))
 
 	return req
 }

@@ -6,6 +6,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/connector/connectoronboarding"
 	"os"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/cdfmc"
@@ -160,6 +161,7 @@ func (p *CdoProvider) Resources(ctx context.Context) []func() resource.Resource 
 		user.NewResource,
 		user_api_token.NewResource,
 		ftdonboarding.NewResource,
+		connectoronboarding.NewResource,
 	}
 }
 

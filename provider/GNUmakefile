@@ -1,7 +1,8 @@
 default: testacc
 
 # https://unix.stackexchange.com/questions/235223/makefile-include-env-file
-include	.github-action.env
+include	.github-action.env  # common variables
+include .github-action.local.env  # secret variables
 export
 
 # Run acceptance tests

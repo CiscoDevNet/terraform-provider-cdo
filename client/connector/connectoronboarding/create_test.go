@@ -64,7 +64,7 @@ func TestCreate(t *testing.T) {
 			},
 		},
 		{
-			testName: "should ends on connector Active status after an Onboarding state",
+			testName: "should retry until SDC activation status is ACTIVE",
 			input:    connectoronboarding.NewCreateInput(activeConnector.Name),
 			setupFunc: func() {
 				httpmock.RegisterResponder(

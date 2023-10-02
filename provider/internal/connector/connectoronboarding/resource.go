@@ -36,18 +36,18 @@ func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, r
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Provides an SDC connector resource. This allows SDC to be onboarded, updated, and deleted on CDO.",
+		MarkdownDescription: "Use this resource to wait for an SDC to finish onboarding. When an SDC is onboarded, either manually or using the CDO Terraform Modules for [AWS](linkhere) and [vSphere](linkhere), it can take a few minutes before the SDC is active and capable of proxying communications between CDO and the device. This resource allows you to wait until this is done.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "The unique identifier of this SDC onboarding resource.",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Specify the name of the SDC.",
 				Required:            true,
 			},
 		},

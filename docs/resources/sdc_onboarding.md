@@ -3,12 +3,12 @@
 page_title: "cdo_sdc_onboarding Resource - cdo"
 subcategory: ""
 description: |-
-  Provides an SDC connector resource. This allows SDC to be onboarded, updated, and deleted on CDO.
+  Use this resource to wait for an SDC to finish onboarding. When an SDC is onboarded, either manually or using the CDO Terraform Modules for AWS linkhere and vSphere linkhere, it can take a few minutes before the SDC is active and capable of proxying communications between CDO and the device. This resource allows you to wait until this is done.
 ---
 
 # cdo_sdc_onboarding (Resource)
 
-Provides an SDC connector resource. This allows SDC to be onboarded, updated, and deleted on CDO.
+Use this resource to wait for an SDC to finish onboarding. When an SDC is onboarded, either manually or using the CDO Terraform Modules for [AWS](linkhere) and [vSphere](linkhere), it can take a few minutes before the SDC is active and capable of proxying communications between CDO and the device. This resource allows you to wait until this is done.
 
 
 
@@ -17,8 +17,8 @@ Provides an SDC connector resource. This allows SDC to be onboarded, updated, an
 
 ### Required
 
-- `name` (String) TODO
+- `name` (String) Specify the name of the SDC.
 
 ### Read-Only
 
-- `id` (String) TODO
+- `id` (String) The unique identifier of this SDC onboarding resource.

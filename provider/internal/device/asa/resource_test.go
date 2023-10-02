@@ -1,3 +1,4 @@
+// Package asa_test does not contain CDG test as we do not want to be using ASAs accessible from the public subnet for our tests
 package asa_test
 
 import (
@@ -37,6 +38,17 @@ resource "cdo_asa_device" "test" {
 	labels = {{.Labels}}
 }`
 
+const asaResourceTemplateNoLabels = `
+resource "cdo_asa_device" "test" {
+	name = "{{.Name}}"
+	socket_address = "{{.SocketAddress}}"
+	connector_name = "{{.ConnectorName}}"
+	connector_type = "{{.ConnectorType}}"
+	username = "{{.Username}}"
+	password = "{{.Password}}"
+	ignore_certificate = "{{.IgnoreCertificate}}"
+}`
+
 // SDC configs.
 
 // default config.
@@ -55,6 +67,7 @@ var testAsaResource_SDC = testAsaResourceType{
 }
 
 var testAsaResourceConfig_SDC = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC)
+var testAsaResourceConfig_SDC_NoLabels = acctest.MustParseTemplate(asaResourceTemplateNoLabels, testAsaResource_SDC)
 
 // new name config.
 var testAsaResource_SDC_NewName = acctest.MustOverrideFields(testAsaResource_SDC, map[string]any{
@@ -126,4 +139,19 @@ func TestAccAsaDeviceResource_SDC(t *testing.T) {
 	})
 }
 
-// removed CDG test as we do not want to be using ASAs accessible from the public subnet for our tests
+func TestAccAsaDeviceResource_SDC_NoLabels(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 acctest.PreCheckFunc(t),
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create and Read testing
+			{
+				Config: acctest.ProviderConfig() + testAsaResourceConfig_SDC_NoLabels,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "labels.#", strconv.Itoa(0)),
+				),
+			},
+			// Delete testing automatically occurs in TestCase
+		},
+	})
+}

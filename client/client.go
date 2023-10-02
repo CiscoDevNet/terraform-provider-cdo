@@ -4,6 +4,7 @@ package client
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/connectoronboarding"
 	"net/http"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
@@ -201,4 +202,20 @@ func (c *Client) ReadCloudFmcDevice(ctx context.Context) (*device.ReadOutput, er
 
 func (c *Client) ReadCloudFmcSpecificDevice(ctx context.Context, inp cloudfmc.ReadSpecificInput) (*cloudfmc.ReadSpecificOutput, error) {
 	return cloudfmc.ReadSpecific(ctx, c.client, inp)
+}
+
+func (c *Client) CreateConnectorOnboarding(ctx context.Context, inp connectoronboarding.CreateInput) (*connectoronboarding.CreateOutput, error) {
+	return connectoronboarding.Create(ctx, c.client, inp)
+}
+
+func (c *Client) UpdateConnectorOnboarding(ctx context.Context, inp connectoronboarding.UpdateInput) (*connectoronboarding.UpdateOutput, error) {
+	return connectoronboarding.Update(ctx, c.client, inp)
+}
+
+func (c *Client) ReadConnectorOnboarding(ctx context.Context, inp connectoronboarding.ReadInput) (*connectoronboarding.ReadOutput, error) {
+	return connectoronboarding.Read(ctx, c.client, inp)
+}
+
+func (c *Client) DeleteConnectorOnboarding(ctx context.Context, inp connectoronboarding.DeleteInput) (*connectoronboarding.DeleteOutput, error) {
+	return connectoronboarding.Delete(ctx, c.client, inp)
 }

@@ -3,6 +3,7 @@ package cloudftdonboarding
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
@@ -49,6 +50,38 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	}
 	fmcDomainUid := readFmcDomainRes.Items[0].Uuid
 
+	// 1.5 check device already registered
+	// 1.5.1 read FTD name
+	readFtdOutp, err := cloudftd.ReadByUid(ctx, client, cloudftd.NewReadByUidInput(createInp.FtdUid))
+	if err != nil {
+		return nil, err
+	}
+	// 1.5.2 read all device records
+	allDeviceRecords, err := fmcconfig.ReadAllDeviceRecords(ctx, client, fmcconfig.NewReadAllDeviceRecordsInput(fmcDomainUid, fmcRes.Host))
+	if err != nil {
+		return nil, err
+	}
+	// 1.5.3 check if FTD name is present in device records, logic: same name + model is ftd == duplicate
+	client.Logger.Printf("checking if FTD with id=%s and name=%s is already registered\n", createInp.FtdUid, fmcRes.Name)
+	for _, record := range allDeviceRecords.Items {
+		if record.Name != readFtdOutp.Name {
+			// different name, ignore
+			continue
+		}
+		// potentially we will be making a lot of network calls and cause this loop to run for long time if
+		// we have many device records with the same name, I suppose that rarely happens
+		deviceRecord, err := fmcconfig.ReadDeviceRecord(ctx, client, fmcconfig.NewReadDeviceRecordInput(fmcDomainUid, fmcRes.Host, record.Id))
+		if err != nil {
+			return nil, err
+		}
+		if strings.Contains(deviceRecord.Model, "Firepower Threat Defense") { // Question: is there a better way to check? Or does this check cover all cases?
+			return nil, fmt.Errorf("FTD with id=%s and name=%s is already registered", createInp.FtdUid, fmcRes.Name)
+		} else {
+			// not a FTD, just some other device with the same name, ignore
+		}
+	}
+	client.Logger.Println("FTD with id=%s and name=%s is not registered, proceeding", createInp.FtdUid, fmcRes.Name)
+
 	// 2. get a system token for creating FTD device record in FMC
 	// CDO token does not work, we will get a 405 method not allowed if we do that
 	client.Logger.Println("getting a system token for creating FTD device record in FMC")
@@ -69,10 +102,6 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	client.Logger.Println("creating FTD device record in FMC")
 
 	// 3.1 read ftd metadata
-	readFtdOutp, err := cloudftd.ReadByUid(ctx, client, cloudftd.NewReadByUidInput(createInp.FtdUid))
-	if err != nil {
-		return nil, err
-	}
 	// 3.1.5 handle license
 	licenseCaps, err := license.DeserializeAllFromCdo(readFtdOutp.Metadata.LicenseCaps)
 	if err != nil {

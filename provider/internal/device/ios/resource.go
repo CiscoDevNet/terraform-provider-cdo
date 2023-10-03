@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
 	"strings"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
@@ -114,6 +116,8 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				MarkdownDescription: "Set a list of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
 				Optional:            true,
 				ElementType:         types.StringType,
+				Computed:            true,
+				Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})), // default to empty list
 				Validators: []validator.List{
 					listvalidator.UniqueValues(),
 				},

@@ -134,6 +134,14 @@ func CreateFmcDeviceRecord(baseUrl string, fmcDomainId string) string {
 	return fmt.Sprintf("%s/fmc/api/fmc_config/v1/domain/%s/devices/devicerecords", baseUrl, fmcDomainId)
 }
 
+func ReadFmcDeviceRecord(baseUrl string, fmcDomainId string, deviceUid string) string {
+	return fmt.Sprintf("%s/fmc/api/fmc_config/v1/domain/%s/devices/devicerecords/%s", baseUrl, fmcDomainId, deviceUid)
+}
+
+func ReadFmcAllDeviceRecords(baseUrl string, fmcDomainId string) string {
+	return fmt.Sprintf("%s/fmc/api/fmc_config/v1/domain/%s/devices/devicerecords", baseUrl, fmcDomainId)
+}
+
 func ReadFmcTaskStatus(baseUrl string, fmcDomainUid string, taskId string) string {
 	return fmt.Sprintf("%s/fmc/api/fmc_config/v1/domain/%s/job/taskstatuses/%s", baseUrl, fmcDomainUid, taskId)
 }

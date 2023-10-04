@@ -88,7 +88,7 @@ var (
 		}).
 		Build()
 
-	validReadAccessPoliciesOutput = accesspolicies.NewAccessPoliciesBuilder().
+	validReadAccessPoliciesOutput = accesspolicies.Builder().
 					Links(accesspolicies.NewLinks(fmcLink)).
 					Paging(accesspolicies.NewPaging(
 			fmcAccessPolicyPages,

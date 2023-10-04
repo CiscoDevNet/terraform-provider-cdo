@@ -4,11 +4,13 @@ import "github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/i
 
 type AccessPolicies = internal.Response
 
-var NewAccessPoliciesBuilder = internal.NewResponseBuilder
+var Builder = internal.NewResponseBuilder
+var New = internal.NewResponse
 
 type Links = internal.Links
 type Paging = internal.Paging
 type Item = internal.Item
 
+var NewItem = internal.NewItem
 var NewLinks = internal.NewLinks
 var NewPaging = internal.NewPaging

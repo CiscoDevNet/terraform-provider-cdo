@@ -61,26 +61,27 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	if err != nil {
 		return nil, err
 	}
-	// 1.5.3 check if FTD name is present in device records, logic: same name + model is ftd == duplicate
-	client.Logger.Printf("checking if FTD with id=%s and name=%s is already registered\n", createInp.FtdUid, fmcRes.Name)
+	// 1.5.3 check if FTD name is present in device records, logic: same name + both are FTDs = duplicate
+	client.Logger.Printf("checking if FTD already exists with id=%s and name=%s\n", createInp.FtdUid, fmcRes.Name)
 	for _, record := range allDeviceRecords.Items {
 		if record.Name != readFtdOutp.Name {
 			// different name, ignore
 			continue
 		}
+		// the allDeviceRecords only contains the name, so we need to make another call to retrieve the details of the device to check whether this is a FTD
 		// potentially we will be making a lot of network calls and cause this loop to run for long time if
 		// we have many device records with the same name, I suppose that rarely happens
 		deviceRecord, err := fmcconfig.ReadDeviceRecord(ctx, client, fmcconfig.NewReadDeviceRecordInput(fmcDomainUid, fmcRes.Host, record.Id))
 		if err != nil {
 			return nil, err
 		}
-		if strings.Contains(deviceRecord.Model, "Firepower Threat Defense") { // Question: is there a better way to check? Or does this check cover all cases?
+		if strings.Contains(deviceRecord.Model, "Firepower Threat Defense") { // Question: is there a better way to check? Does this check cover all cases?
 			return nil, fmt.Errorf("FTD with id=%s and name=%s is already registered", createInp.FtdUid, fmcRes.Name)
 		} else {
 			// not a FTD, just some other device with the same name, ignore
 		}
 	}
-	client.Logger.Println("FTD with id=%s and name=%s is not registered, proceeding", createInp.FtdUid, fmcRes.Name)
+	client.Logger.Printf("FTD with id=%s and name=%s is not registered, proceeding\n", createInp.FtdUid, fmcRes.Name)
 
 	// 2. get a system token for creating FTD device record in FMC
 	// CDO token does not work, we will get a 405 method not allowed if we do that

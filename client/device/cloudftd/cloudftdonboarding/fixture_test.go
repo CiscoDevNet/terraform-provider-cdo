@@ -1,8 +1,6 @@
 package cloudftdonboarding_test
 
 import (
-	"encoding/json"
-	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc/fmcconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc/fmcplatform"
@@ -149,10 +147,31 @@ var (
 		Principle:     "",
 		Name:          "",
 	}}
-)
 
-func init() {
-	fmt.Println("json.Marshal(validReadApiTokenInfo)")
-	t, _ := json.Marshal(validReadApiTokenInfo)
-	fmt.Println(string(t))
-}
+	deviceRecordItemId            = "unit-test-deviceRecordItemId"
+	deviceRecordItemSameName      = ftdName
+	deviceRecordItemDifferentName = "unit-test-not-ftd-name"
+	deviceRecordItemType          = "unit-test-deviceRecordItemType"
+	deviceRecordItemLinks         = fmcconfig.NewLinks("unit-test-deviceRecordItemLinks")
+
+	allDeviceRecords_NoExistingRecords = fmcconfig.NewReadAllDeviceRecordsOutputBuilder().
+						Items([]fmcconfig.Item{}).
+						Build()
+	allDeviceRecords_ExistingRecords_DifferentName = fmcconfig.NewReadAllDeviceRecordsOutputBuilder().
+							Items([]fmcconfig.Item{
+			fmcconfig.NewItem(deviceRecordItemId, deviceRecordItemDifferentName, deviceRecordItemType, deviceRecordItemLinks),
+		}).
+		Build()
+	allDeviceRecords_ExistingRecords_SameName = fmcconfig.NewReadAllDeviceRecordsOutputBuilder().
+							Items([]fmcconfig.Item{
+			fmcconfig.NewItem(deviceRecordItemId, deviceRecordItemSameName, deviceRecordItemType, deviceRecordItemLinks),
+		}).
+		Build()
+
+	deviceRecord_IsFtd = fmcconfig.ReadDeviceRecordOutput{
+		Model: "Firepower Threat Defense",
+	}
+	deviceRecord_NotFtd = fmcconfig.ReadDeviceRecordOutput{
+		Model: "ASA",
+	}
+)

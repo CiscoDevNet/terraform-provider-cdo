@@ -24,11 +24,12 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 		assertFunc func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T)
 	}{
 		{
-			testName: "successful ftd onboarding",
+			testName: "successful ftd onboarding, with no existing records",
 			input:    cloudftdonboarding.NewCreateInput(ftdUid),
 			setupFunc: func(t *testing.T) {
 				ReadFmcIsSuccessful(true)
 				ReadFmcDomainInfoIsSuccessful(true)
+				CheckFtdDuplicateIsSuccessful_NoExistingRecords(true)
 				ReadApiTokenInfoIsSuccessful(true)
 				CreateSystemApiTokenIsSuccessful(true)
 				ReadFtdMetadataIsSuccessful(true)
@@ -45,11 +46,78 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 			},
 		},
 		{
+			testName: "successful ftd onboarding, with existing records of different name",
+			input:    cloudftdonboarding.NewCreateInput(ftdUid),
+			setupFunc: func(t *testing.T) {
+				ReadFmcIsSuccessful(true)
+				ReadFmcDomainInfoIsSuccessful(true)
+				CheckFtdDuplicateIsSuccessful_ExistingRecordsWithDifferentName(true)
+				ReadApiTokenInfoIsSuccessful(true)
+				CreateSystemApiTokenIsSuccessful(true)
+				ReadFtdMetadataIsSuccessful(true)
+				CreateFmcDeviceRecordIsSuccessful(true)
+				ReadTaskStatusIsSuccessful(true)
+				ReadFtdSpecificDeviceIsSuccessful(true)
+				TriggerRegisterFmcStateMachineSuccess(true)
+				TriggerRegisterFmcStateMachineEndsInDone(true)
+			},
+			assertFunc: func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T) {
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+				assert.Equal(t, *output, validCreateFmcDeviceRecordOutput)
+			},
+		},
+		{
+			testName: "successful ftd onboarding, with existing records of same name and different type",
+			input:    cloudftdonboarding.NewCreateInput(ftdUid),
+			setupFunc: func(t *testing.T) {
+				ReadFmcIsSuccessful(true)
+				ReadFmcDomainInfoIsSuccessful(true)
+				CheckFtdDuplicateIsSuccessful_ExistingRecordsWithSameNameButDifferentType(true)
+				ReadApiTokenInfoIsSuccessful(true)
+				CreateSystemApiTokenIsSuccessful(true)
+				ReadFtdMetadataIsSuccessful(true)
+				CreateFmcDeviceRecordIsSuccessful(true)
+				ReadTaskStatusIsSuccessful(true)
+				ReadFtdSpecificDeviceIsSuccessful(true)
+				TriggerRegisterFmcStateMachineSuccess(true)
+				TriggerRegisterFmcStateMachineEndsInDone(true)
+			},
+			assertFunc: func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T) {
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+				assert.Equal(t, *output, validCreateFmcDeviceRecordOutput)
+			},
+		},
+		{
+			testName: "error when there is existing record of same name and same type",
+			input:    cloudftdonboarding.NewCreateInput(ftdUid),
+			setupFunc: func(t *testing.T) {
+				ReadFmcIsSuccessful(true)
+				ReadFmcDomainInfoIsSuccessful(true)
+				CheckFtdDuplicateIsFail_ExistingRecordsWithSameNameAndSameType()
+				ReadApiTokenInfoIsSuccessful(true)
+				CreateSystemApiTokenIsSuccessful(true)
+				ReadFtdMetadataIsSuccessful(true)
+				CreateFmcDeviceRecordIsSuccessful(true)
+				ReadTaskStatusIsSuccessful(true)
+				ReadFtdSpecificDeviceIsSuccessful(true)
+				TriggerRegisterFmcStateMachineSuccess(true)
+				TriggerRegisterFmcStateMachineEndsInDone(true)
+			},
+			assertFunc: func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+				assert.True(t, strings.Contains(err.Error(), "is already registered"))
+			},
+		},
+		{
 			testName: "error when read fmc failed",
 			input:    cloudftdonboarding.NewCreateInput(ftdUid),
 			setupFunc: func(t *testing.T) {
 				ReadFmcIsSuccessful(false)
 				ReadFmcDomainInfoIsSuccessful(true)
+				CheckFtdDuplicateIsSuccessful_NoExistingRecords(true)
 				ReadApiTokenInfoIsSuccessful(true)
 				CreateSystemApiTokenIsSuccessful(true)
 				ReadFtdMetadataIsSuccessful(true)
@@ -71,6 +139,7 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 			setupFunc: func(t *testing.T) {
 				ReadFmcIsSuccessful(true)
 				ReadFmcDomainInfoIsSuccessful(false)
+				CheckFtdDuplicateIsSuccessful_NoExistingRecords(true)
 				ReadApiTokenInfoIsSuccessful(true)
 				CreateSystemApiTokenIsSuccessful(true)
 				ReadFtdMetadataIsSuccessful(true)
@@ -87,11 +156,34 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 			},
 		},
 		{
+			testName: "error when read all fmc device records failed",
+			input:    cloudftdonboarding.NewCreateInput(ftdUid),
+			setupFunc: func(t *testing.T) {
+				ReadFmcIsSuccessful(true)
+				ReadFmcDomainInfoIsSuccessful(true)
+				CheckFtdDuplicateIsSuccessful_NoExistingRecords(false)
+				ReadApiTokenInfoIsSuccessful(true)
+				CreateSystemApiTokenIsSuccessful(true)
+				ReadFtdMetadataIsSuccessful(true)
+				CreateFmcDeviceRecordIsSuccessful(true)
+				ReadTaskStatusIsSuccessful(true)
+				ReadFtdSpecificDeviceIsSuccessful(true)
+				TriggerRegisterFmcStateMachineSuccess(true)
+				TriggerRegisterFmcStateMachineEndsInDone(true)
+			},
+			assertFunc: func(output *cloudftdonboarding.CreateOutput, err error, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+				assert.True(t, strings.Contains(err.Error(), url.ReadFmcAllDeviceRecords(baseUrl, fmcDomainUid)))
+			},
+		},
+		{
 			testName: "error when read api token info failed",
 			input:    cloudftdonboarding.NewCreateInput(ftdUid),
 			setupFunc: func(t *testing.T) {
 				ReadFmcIsSuccessful(true)
 				ReadFmcDomainInfoIsSuccessful(true)
+				CheckFtdDuplicateIsSuccessful_NoExistingRecords(true)
 				ReadApiTokenInfoIsSuccessful(false)
 				CreateSystemApiTokenIsSuccessful(true)
 				ReadFtdMetadataIsSuccessful(true)
@@ -113,6 +205,7 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 			setupFunc: func(t *testing.T) {
 				ReadFmcIsSuccessful(true)
 				ReadFmcDomainInfoIsSuccessful(true)
+				CheckFtdDuplicateIsSuccessful_NoExistingRecords(true)
 				ReadApiTokenInfoIsSuccessful(true)
 				CreateSystemApiTokenIsSuccessful(false)
 				ReadFtdMetadataIsSuccessful(true)
@@ -134,6 +227,7 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 			setupFunc: func(t *testing.T) {
 				ReadFmcIsSuccessful(true)
 				ReadFmcDomainInfoIsSuccessful(true)
+				CheckFtdDuplicateIsSuccessful_NoExistingRecords(true)
 				ReadApiTokenInfoIsSuccessful(true)
 				CreateSystemApiTokenIsSuccessful(true)
 				ReadFtdMetadataIsSuccessful(false)
@@ -156,6 +250,7 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 				t.Skip("requires override inner retry config support")
 				ReadFmcIsSuccessful(true)
 				ReadFmcDomainInfoIsSuccessful(true)
+				CheckFtdDuplicateIsSuccessful_NoExistingRecords(true)
 				ReadApiTokenInfoIsSuccessful(true)
 				CreateSystemApiTokenIsSuccessful(true)
 				ReadFtdMetadataIsSuccessful(true)
@@ -178,6 +273,7 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 				t.Skip("requires override inner retry config support")
 				ReadFmcIsSuccessful(true)
 				ReadFmcDomainInfoIsSuccessful(true)
+				CheckFtdDuplicateIsSuccessful_NoExistingRecords(true)
 				ReadApiTokenInfoIsSuccessful(true)
 				CreateSystemApiTokenIsSuccessful(true)
 				ReadFtdMetadataIsSuccessful(true)
@@ -200,6 +296,7 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 			setupFunc: func(t *testing.T) {
 				ReadFmcIsSuccessful(true)
 				ReadFmcDomainInfoIsSuccessful(true)
+				CheckFtdDuplicateIsSuccessful_NoExistingRecords(true)
 				ReadApiTokenInfoIsSuccessful(true)
 				CreateSystemApiTokenIsSuccessful(true)
 				ReadFtdMetadataIsSuccessful(true)
@@ -221,6 +318,7 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 			setupFunc: func(t *testing.T) {
 				ReadFmcIsSuccessful(true)
 				ReadFmcDomainInfoIsSuccessful(true)
+				CheckFtdDuplicateIsSuccessful_NoExistingRecords(true)
 				ReadApiTokenInfoIsSuccessful(true)
 				CreateSystemApiTokenIsSuccessful(true)
 				ReadFtdMetadataIsSuccessful(true)
@@ -243,6 +341,7 @@ func TestCloudFtdOnboardingCreate(t *testing.T) {
 				t.Skip("requires override inner retry config support")
 				ReadFmcIsSuccessful(true)
 				ReadFmcDomainInfoIsSuccessful(true)
+				CheckFtdDuplicateIsSuccessful_NoExistingRecords(true)
 				ReadApiTokenInfoIsSuccessful(true)
 				CreateSystemApiTokenIsSuccessful(true)
 				ReadFtdMetadataIsSuccessful(true)
@@ -323,6 +422,77 @@ func ReadApiTokenInfoIsSuccessful(success bool) {
 			httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, "internal server error"),
 		)
 	}
+}
+
+func CheckFtdDuplicateIsSuccessful_NoExistingRecords(success bool) {
+	if success {
+		httpmock.RegisterResponder(
+			http.MethodGet,
+			url.ReadFmcAllDeviceRecords(baseUrl, fmcDomainUid),
+			httpmock.NewJsonResponderOrPanic(http.StatusOK, allDeviceRecords_NoExistingRecords),
+		)
+	} else {
+		httpmock.RegisterResponder(
+			http.MethodGet,
+			url.ReadFmcAllDeviceRecords(baseUrl, fmcDomainUid),
+			httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, "internal server error"),
+		)
+	}
+}
+
+func CheckFtdDuplicateIsSuccessful_ExistingRecordsWithDifferentName(success bool) {
+	if success {
+		httpmock.RegisterResponder(
+			http.MethodGet,
+			url.ReadFmcAllDeviceRecords(baseUrl, fmcDomainUid),
+			httpmock.NewJsonResponderOrPanic(http.StatusOK, allDeviceRecords_ExistingRecords_DifferentName),
+		)
+	} else {
+		httpmock.RegisterResponder(
+			http.MethodGet,
+			url.ReadFmcAllDeviceRecords(baseUrl, fmcDomainUid),
+			httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, "internal server error"),
+		)
+	}
+}
+
+func CheckFtdDuplicateIsSuccessful_ExistingRecordsWithSameNameButDifferentType(success bool) {
+	if success {
+		httpmock.RegisterResponder(
+			http.MethodGet,
+			url.ReadFmcAllDeviceRecords(baseUrl, fmcDomainUid),
+			httpmock.NewJsonResponderOrPanic(http.StatusOK, allDeviceRecords_ExistingRecords_SameName),
+		)
+		httpmock.RegisterResponder(
+			http.MethodGet,
+			url.ReadFmcDeviceRecord(baseUrl, fmcDomainUid, allDeviceRecords_ExistingRecords_SameName.Items[0].Id),
+			httpmock.NewJsonResponderOrPanic(http.StatusOK, deviceRecord_NotFtd),
+		)
+	} else {
+		httpmock.RegisterResponder(
+			http.MethodGet,
+			url.ReadFmcAllDeviceRecords(baseUrl, fmcDomainUid),
+			httpmock.NewJsonResponderOrPanic(http.StatusOK, allDeviceRecords_ExistingRecords_SameName),
+		)
+		httpmock.RegisterResponder(
+			http.MethodGet,
+			url.ReadFmcDeviceRecord(baseUrl, fmcDomainUid, allDeviceRecords_ExistingRecords_SameName.Items[0].Id),
+			httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, "internal server error"),
+		)
+	}
+}
+
+func CheckFtdDuplicateIsFail_ExistingRecordsWithSameNameAndSameType() {
+	httpmock.RegisterResponder(
+		http.MethodGet,
+		url.ReadFmcAllDeviceRecords(baseUrl, fmcDomainUid),
+		httpmock.NewJsonResponderOrPanic(http.StatusOK, allDeviceRecords_ExistingRecords_SameName),
+	)
+	httpmock.RegisterResponder(
+		http.MethodGet,
+		url.ReadFmcDeviceRecord(baseUrl, fmcDomainUid, allDeviceRecords_ExistingRecords_SameName.Items[0].Id),
+		httpmock.NewJsonResponderOrPanic(http.StatusOK, deviceRecord_IsFtd),
+	)
 }
 
 func CreateSystemApiTokenIsSuccessful(success bool) {

@@ -21,6 +21,8 @@ func NewReadAllDeviceRecordsInput(fmcDomainUid string, fmcHostname string) ReadA
 
 type ReadAllDeviceRecordsOutput = fmcconfig.AllDeviceRecords
 
+var NewReadAllDeviceRecordsOutputBuilder = fmcconfig.NewAllDeviceRecordsBuilder
+
 func ReadAllDeviceRecords(ctx context.Context, client http.Client, readInp ReadAllDeviceRecordsInput) (*ReadAllDeviceRecordsOutput, error) {
 
 	readUrl := url.ReadFmcAllDeviceRecords(client.BaseUrl(), readInp.FmcDomainUid)

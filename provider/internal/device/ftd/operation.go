@@ -11,31 +11,6 @@ import (
 	"strings"
 )
 
-func ReadDataSource(ctx context.Context, resource *DataSource, stateData *DataSourceModel) error {
-
-	// do read
-	inp := cloudftd.NewReadByNameInput(stateData.Name.ValueString())
-	res, err := resource.client.ReadCloudFtdByName(ctx, inp)
-	if err != nil {
-		return err
-	}
-
-	// map return struct to model
-	stateData.ID = types.StringValue(res.Uid)
-	stateData.Name = types.StringValue(res.Name)
-	stateData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
-	stateData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUid)
-	stateData.Virtual = types.BoolValue(res.Metadata.PerformanceTier != nil)
-	stateData.Licenses = util.GoStringSliceToTFStringList(strings.Split(res.Metadata.LicenseCaps, ","))
-	if res.Metadata.PerformanceTier != nil { // nil means physical ftd
-		stateData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))
-	}
-	stateData.Hostname = types.StringValue(res.Metadata.CloudManagerDomain)
-	stateData.Labels = util.GoStringSliceToTFStringList(res.Tags.Labels)
-
-	return nil
-}
-
 func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) error {
 
 	// do read

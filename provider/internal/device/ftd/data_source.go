@@ -44,7 +44,7 @@ type DataSourceModel struct {
 
 // Metadata is primarily used to define the name for this data source.
 func (d *DataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_ios_device"
+	resp.TypeName = req.ProviderTypeName + "_ftd_device"
 }
 
 // Schema is primarily used to define the terraform schema for this data source.

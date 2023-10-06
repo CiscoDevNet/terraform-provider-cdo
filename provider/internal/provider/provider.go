@@ -170,6 +170,7 @@ func (p *CdoProvider) DataSources(ctx context.Context) []func() datasource.DataS
 		connector.NewDataSource,
 		asa.NewAsaDataSource,
 		ios.NewIosDataSource,
+		ftd.NewDataSource,
 		user.NewDataSource,
 		tenant.NewDataSource,
 		cdfmc.NewDataSource,

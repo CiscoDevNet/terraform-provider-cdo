@@ -2,7 +2,7 @@ resource "aws_route_table" "private_route_table" {
   vpc_id = aws_vpc.vpc.id
 
   tags = {
-    Name : "${local.vpc_resource_prefix}-private-route-table"
+    Name : "${var.resource_prefix}-private-route-table"
   }
 }
 
@@ -19,7 +19,7 @@ resource "aws_subnet" "private_subnet" {
   availability_zone = data.aws_availability_zones.all.names[0]
 
   tags = {
-    Name : "${local.vpc_resource_prefix}-private-subnet"
+    Name : "${var.resource_prefix}-private-subnet"
   }
 }
 

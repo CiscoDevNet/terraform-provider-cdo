@@ -22,3 +22,8 @@ variable "private_subnet_cidr" {
   description = "Specify the CIDR block for the private subnet."
   default     = "172.200.32.0/20"
 }
+
+variable "resource_prefix" {
+  description = "Prefix applied to name of the resources created."
+  type        = string
+}

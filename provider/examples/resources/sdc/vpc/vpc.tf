@@ -4,6 +4,6 @@ resource "aws_vpc" "vpc" {
   enable_dns_hostnames = true
   enable_dns_support   = true
   tags = {
-    Name : "${local.vpc_resource_prefix}-vpc"
+    Name : "${var.resource_prefix}-vpc"
   }
 }

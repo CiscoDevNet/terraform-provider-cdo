@@ -7,7 +7,7 @@ import (
 
 // Type should be used with json:"tags"
 type Type struct {
-	Labels []string `json:"labels"`
+	Labels []string `json:"labels,omitempty"`
 }
 
 func Empty() Type {

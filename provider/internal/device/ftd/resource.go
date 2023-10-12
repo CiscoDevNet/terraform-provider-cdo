@@ -3,29 +3,32 @@ package ftd
 import (
 	"context"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
-
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
 	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"strings"
 )
 
 var _ resource.Resource = &Resource{}
 var _ resource.ResourceWithImportState = &Resource{}
+var _ resource.ResourceWithModifyPlan = &Resource{}
 
 func NewResource() resource.Resource {
 	return &Resource{}
@@ -251,4 +254,42 @@ func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, res *
 
 func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequest, res *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, res)
+}
+
+func (r *Resource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, res *resource.ModifyPlanResponse) {
+	// we want to tell terraform license of `BASE` is equal to `ESSENTIALS` during update here
+	// this is because FMC will modify the FTD's license from `BASE` to `ESSENTIALS` outside terraform,
+	// and they are the same thing
+	if req.Plan.Raw.IsNull() {
+		// destroy: not update, return
+		return
+	}
+	if req.State.Raw.IsNull() {
+		// create: not update, return
+		return
+	}
+	// update
+
+	// read plan data
+	var planData *ResourceModel
+	res.Diagnostics.Append(req.Plan.Get(ctx, &planData)...)
+	if res.Diagnostics.HasError() {
+		return
+	}
+
+	// convert license from terraform type to Golang type
+	licensesGoList := util.TFStringListToGoStringList(planData.Licenses)
+	licenses, err := license.DeserializeAllFromCdo(strings.Join(licensesGoList, ","))
+	if err != nil {
+		res.Diagnostics.Append(diag.NewErrorDiagnostic("failed to convert licenses", err.Error()))
+	}
+
+	// find the Base license and convert it to Essentials
+	for i, l := range licenses {
+		if l == license.Base {
+			planData.Licenses[i] = types.StringValue(string(license.Essentials))
+		}
+	}
+
+	res.Diagnostics.Append(res.Plan.Set(ctx, &planData)...)
 }

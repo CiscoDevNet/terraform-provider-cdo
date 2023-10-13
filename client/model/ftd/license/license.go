@@ -55,6 +55,18 @@ func (t *Type) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// ReplaceEssentialsWithBase is used to tell terraform license of `BASE` is equal to `ESSENTIALS` during read.
+// This is because FMC will modify the FTD's license from `BASE` to `ESSENTIALS` outside terraform,
+// and they are the same thing, so when reading it back, we need the conversion
+func ReplaceEssentialsWithBase(licenses []string) []string {
+	for i, l := range licenses {
+		if l == string(Essentials) {
+			licenses[i] = string(Base)
+		}
+	}
+	return licenses
+}
+
 func MustParse(name string) Type {
 	l, ok := nameToTypeMap[name]
 	if !ok {

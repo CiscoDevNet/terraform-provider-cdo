@@ -26,7 +26,7 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 	stateData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
 	stateData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUid)
 	stateData.Virtual = types.BoolValue(res.Metadata.PerformanceTier != nil)
-	stateData.Licenses = util.GoStringSliceToTFStringList(strings.Split(res.Metadata.LicenseCaps, ","))
+	stateData.Licenses = util.GoStringSliceToTFStringList(license.ReplaceEssentialsWithBase(strings.Split(res.Metadata.LicenseCaps, ",")))
 	if res.Metadata.PerformanceTier != nil { // nil means physical cloudftd
 		stateData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))
 	}

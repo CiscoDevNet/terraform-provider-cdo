@@ -128,22 +128,37 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"generated_command": schema.StringAttribute{
 				MarkdownDescription: "The command to run in the FTD CLI to register it with the cloud-delivered FMC (cdFMC).",
 				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"access_policy_id": schema.StringAttribute{
 				MarkdownDescription: "The ID of the cloud-delivered FMC (cdFMC) access policy applied to this FTD.",
 				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"hostname": schema.StringAttribute{
 				MarkdownDescription: "The Hostname of the cloud-delivered FMC (cdFMC) manages this FTD.",
 				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"nat_id": schema.StringAttribute{
 				MarkdownDescription: "The Network Address Translation (NAT) ID of this FTD.",
 				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"reg_key": schema.StringAttribute{
 				MarkdownDescription: "The Registration Key of this FTD.",
 				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 		},
 	}

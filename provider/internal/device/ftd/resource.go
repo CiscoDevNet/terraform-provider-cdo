@@ -6,7 +6,7 @@ import (
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
-	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
+	"github.com/CiscoDevnet/terraform-provider-cdo/planmodifiers"
 	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -22,12 +22,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"sort"
 )
 
 var _ resource.Resource = &Resource{}
 var _ resource.ResourceWithImportState = &Resource{}
-var _ resource.ResourceWithModifyPlan = &Resource{}
 
 func NewResource() resource.Resource {
 	return &Resource{}
@@ -114,7 +112,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					validators.ValueStringsAtLeast(stringvalidator.OneOf(string(license.Base))),
 				},
 			},
-			"labels": schema.ListAttribute{
+			"labels": schema.ListAttribute{ // TODO: use set when we go to 1.0.0
 				MarkdownDescription: "Set a list of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
 				Optional:            true,
 				ElementType:         types.StringType,
@@ -122,6 +120,9 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})), // default to empty list
 				Validators: []validator.List{
 					listvalidator.UniqueValues(),
+				},
+				PlanModifiers: []planmodifier.List{
+					planmodifiers.UseStateForUnorderedStringList(),
 				},
 			},
 			"generated_command": schema.StringAttribute{
@@ -268,27 +269,4 @@ func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, res *
 
 func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequest, res *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, res)
-}
-
-func (r *Resource) ModifyPlan(ctx context.Context, request resource.ModifyPlanRequest, response *resource.ModifyPlanResponse) {
-	// we want to sort the tag labels during update and create so that it will be consistent
-	if request.Plan.Raw.IsNull() {
-		// destroy
-		return
-	}
-	// create or update
-
-	// read the plan going to be applied
-	var model ResourceModel
-	response.Diagnostics.Append(request.Plan.Get(ctx, &model)...)
-	if response.Diagnostics.HasError() {
-		return
-	}
-	// sort the labels
-	labels := util.TFStringListToGoStringList(model.Labels)
-	sort.Strings(labels)
-	model.Labels = util.GoStringSliceToTFStringList(labels)
-
-	// set labels back
-	response.Diagnostics.Append(response.Plan.Set(ctx, model)...)
 }

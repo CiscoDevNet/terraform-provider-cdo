@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
+	"github.com/CiscoDevnet/terraform-provider-cdo/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
@@ -124,6 +126,9 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				Validators: []validator.List{
 					listvalidator.UniqueValues(),
 				},
+				PlanModifiers: []planmodifier.List{ // TODO: use set when we go to 1.0.0
+					planmodifiers.UseStateForUnorderedStringList(),
+				},
 			},
 			"username": schema.StringAttribute{
 				MarkdownDescription: "The username used to authenticate with the device.",
@@ -201,7 +206,10 @@ func (r *AsaDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 	stateData.SocketAddress = types.StringValue(asaReadOutp.SocketAddress)
 	stateData.Host = types.StringValue(asaReadOutp.Host)
 	stateData.IgnoreCertificate = types.BoolValue(asaReadOutp.IgnoreCertificate)
-	stateData.Labels = util.GoStringSliceToTFStringList(asaReadOutp.Tags.Labels)
+	// only set labels if it is different
+	if !sliceutil.StringsEqualUnordered(util.TFStringListToGoStringList(stateData.Labels), asaReadOutp.Tags.Labels) {
+		stateData.Labels = util.GoStringSliceToTFStringList(asaReadOutp.Tags.Labels)
+	}
 
 	tflog.Trace(ctx, "done read ASA device resource")
 
@@ -269,7 +277,6 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 	planData.ConnectorName = getConnectorName(&planData)
 	planData.Name = types.StringValue(createOutp.Name)
 	planData.Host = types.StringValue(createOutp.Host)
-	planData.Labels = util.GoStringSliceToTFStringList(createOutp.Tags.Labels)
 
 	port, err := strconv.ParseInt(createOutp.Port, 10, 16)
 	if err != nil {
@@ -347,7 +354,10 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 	stateData.SocketAddress = planData.SocketAddress
 	stateData.Host = types.StringValue(updateOutp.Host)
 	stateData.Port = types.Int64Value(port)
-	stateData.Labels = util.GoStringSliceToTFStringList(updateOutp.Tags.Labels)
+	// only set labels if it is different
+	if !sliceutil.StringsEqualUnordered(util.TFStringListToGoStringList(stateData.Labels), updateOutp.Tags.Labels) {
+		stateData.Labels = planData.Labels
+	}
 
 	stateData.IgnoreCertificate = planData.IgnoreCertificate
 

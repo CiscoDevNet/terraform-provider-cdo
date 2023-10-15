@@ -1,6 +1,9 @@
 package sliceutil
 
-import "sort"
+import (
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/goutil"
+	"sort"
+)
 
 // Map takes a slice and a function, apply the function to each element in the slice, and return the mapped slice.
 func Map[T any, V any](sliceT []T, mapFunc func(T) V) []V {
@@ -32,4 +35,37 @@ func SortStrings(toSort []string) []string {
 	copy(temp, toSort)
 	sort.Strings(temp)
 	return temp
+}
+
+func StringsEqual(s1 []string, s2 []string) bool {
+	if s1 == nil && s2 == nil {
+		return true
+	}
+	if s1 == nil || s2 == nil {
+		return false
+	}
+	if len(s1) != len(s2) {
+		return false
+	}
+	for i := range s1 {
+		if s1[i] != s2[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func StringsEqualUnordered(s1 []string, s2 []string) bool {
+	if s1 == nil && s2 == nil {
+		return true
+	}
+	if s1 == nil || s2 == nil {
+		return false
+	}
+	if len(s1) != len(s2) {
+		return false
+	}
+	s1Copy := goutil.SortStrings(s1)
+	s2Copy := goutil.SortStrings(s2)
+	return StringsEqual(s1Copy, s2Copy)
 }

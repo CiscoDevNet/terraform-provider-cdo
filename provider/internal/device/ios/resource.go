@@ -3,6 +3,7 @@ package ios
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
@@ -127,6 +128,9 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})), // default to empty list
 				Validators: []validator.List{
 					listvalidator.UniqueValues(),
+				},
+				PlanModifiers: []planmodifier.List{ // TODO: use set when we go to 1.0.0
+					planmodifiers.UseStateForUnorderedStringList(),
 				},
 			},
 		},

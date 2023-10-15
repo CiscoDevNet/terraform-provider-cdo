@@ -5,7 +5,7 @@ terraform {
     }
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.20.1"
+      version = ">= 5.20.1"
     }
   }
 }
@@ -21,8 +21,5 @@ resource "cdo_ftd_device" "test" {
   performance_tier   = "FTDv5"
   virtual            = true
   licenses           = ["BASE"]
-}
-
-resource "cdo_ftd_device_onboarding" "test" {
-  ftd_uid = cdo_ftd_device.test.id
+  labels             = ["24123", "204", "22", "24", "d", "1", "c", "2", "b", "a", "zzzz", "aaaa", "dddd", "bbbb", "2222", "11111"]
 }

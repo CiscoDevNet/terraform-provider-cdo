@@ -21,8 +21,10 @@ resource "cdo_ftd_device" "test" {
   performance_tier   = "FTDv5"
   virtual            = true
   licenses           = ["BASE"]
+  labels             = ["11111", "dddd", "zzzz", "bbbb", "2222","aaaa"]
 }
 
 resource "cdo_ftd_device_onboarding" "test" {
-  ftd_uid = cdo_ftd_device.test.id
+  ftd_uid    = cdo_ftd_device.test.id
+  depends_on = [aws_instance.ftdv]
 }

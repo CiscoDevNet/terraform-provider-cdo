@@ -12,7 +12,7 @@ func UseStateForUnorderedStringList() planmodifier.List {
 	return useStateForUnorderedStringList{}
 }
 
-// useStateForUnorderedStringList
+// useStateForUnorderedStringList.
 type useStateForUnorderedStringList struct{}
 
 // Description returns a human-readable description of the plan modifier.
@@ -33,7 +33,7 @@ func (m useStateForUnorderedStringList) PlanModifyList(ctx context.Context, req 
 		return
 	}
 
-	// no need to compare on resource creation
+	// no need to compare on resource creation.
 	if req.State.Raw.IsNull() {
 		return
 	}
@@ -56,9 +56,9 @@ func (m useStateForUnorderedStringList) PlanModifyList(ctx context.Context, req 
 	}
 	stateList := util.TFStringListToGoStringList(stateElements)
 
-	// compare and ignore plan if they are equal, just maybe in unordered value
+	// compare and ignore plan if they are equal, just maybe in unordered value.
 	if sliceutil.StringsEqualUnordered(planList, stateList) {
-		// discard changes in plan by overwriting it with state value
+		// discard changes in plan by overwriting it with state value.
 		resp.PlanValue = req.StateValue
 	}
 }

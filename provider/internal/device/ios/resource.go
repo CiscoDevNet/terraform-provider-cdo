@@ -120,7 +120,7 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				MarkdownDescription: "Set this attribute to true if you do not want CDO to validate the certificate of this device before onboarding.",
 				Required:            true,
 			},
-			"labels": schema.ListAttribute{
+			"labels": schema.ListAttribute{ // TODO: use set when we go to 1.0.0, https://jira-eng-rtp3.cisco.com/jira/browse/LH-71968
 				MarkdownDescription: "Set a list of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
 				Optional:            true,
 				ElementType:         types.StringType,
@@ -129,7 +129,7 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				Validators: []validator.List{
 					listvalidator.UniqueValues(),
 				},
-				PlanModifiers: []planmodifier.List{ // TODO: use set when we go to 1.0.0
+				PlanModifiers: []planmodifier.List{
 					planmodifiers.UseStateForUnorderedStringList(),
 				},
 			},

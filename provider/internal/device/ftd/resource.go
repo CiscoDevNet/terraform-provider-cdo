@@ -112,7 +112,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					validators.ValueStringsAtLeast(stringvalidator.OneOf(string(license.Base))),
 				},
 			},
-			"labels": schema.ListAttribute{ // TODO: use set when we go to 1.0.0
+			"labels": schema.ListAttribute{ // TODO: use set when we go to 1.0.0, https://jira-eng-rtp3.cisco.com/jira/browse/LH-71968
 				MarkdownDescription: "Set a list of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
 				Optional:            true,
 				ElementType:         types.StringType,

@@ -29,12 +29,6 @@ func MapWithError[T any, V any](sliceT []T, mapFunc func(T) (V, error)) ([]V, er
 }
 
 func StringsEqual(s1 []string, s2 []string) bool {
-	if s1 == nil && s2 == nil {
-		return true
-	}
-	if s1 == nil || s2 == nil {
-		return false
-	}
 	if len(s1) != len(s2) {
 		return false
 	}
@@ -47,12 +41,6 @@ func StringsEqual(s1 []string, s2 []string) bool {
 }
 
 func StringsEqualUnordered(s1 []string, s2 []string) bool {
-	if s1 == nil && s2 == nil {
-		return true
-	}
-	if s1 == nil || s2 == nil {
-		return false
-	}
 	if len(s1) != len(s2) {
 		return false
 	}

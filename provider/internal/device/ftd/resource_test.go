@@ -12,7 +12,6 @@ import (
 )
 
 type ResourceType struct {
-	ID               string
 	Name             string
 	AccessPolicyName string
 	PerformanceTier  string

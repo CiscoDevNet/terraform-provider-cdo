@@ -110,6 +110,23 @@ func (e *env) IosDataSourceTags() tags.Type {
 	return tags.New(strings.Split(tagsEnv, ",")...)
 }
 
+func (e *env) FtdDataSourceName() string {
+	return e.mustGetString("FTD_DATA_SOURCE_NAME")
+}
+
+func (e *env) FtdDataSourceAccessPolicyName() string {
+	return e.mustGetString("FTD_DATA_SOURCE_ACCESS_POLICY_NAME")
+}
+func (e *env) FtdDataSourcePerformanceTier() string {
+	return e.mustGetString("FTD_DATA_SOURCE_PERFORMANCE_TIER")
+}
+func (e *env) FtdDataSourceVirtual() string {
+	return e.mustGetString("FTD_DATA_SOURCE_VIRTUAL")
+}
+func (e *env) FtdDataSourceLicenses() string {
+	return e.mustGetString("FTD_DATA_SOURCE_LICENSES")
+}
+
 func (e *env) FtdResourceName() string {
 	return e.mustGetString("FTD_RESOURCE_NAME")
 }

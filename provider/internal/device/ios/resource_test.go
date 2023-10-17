@@ -1,6 +1,8 @@
 package ios_test
 
 import (
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/testutil"
 	"strconv"
 	"testing"
@@ -49,6 +51,13 @@ var testIosResource = testIosResourceType{
 }
 var testIosResourceConfig = acctest.MustParseTemplate(testIosResourceTemplate, testIosResource)
 
+var reorderedLabels = tags.New(sliceutil.Reverse[string](tags.MustParseJsonArrayString(testIosResource.Labels))...).GetLabelsJsonArrayString()
+
+var testIosResource_ReorderedLabels = acctest.MustOverrideFields(testIosResource, map[string]any{
+	"Labels": reorderedLabels,
+})
+var testIosResourceConfig_ReorderedLabels = acctest.MustParseTemplate(testIosResourceTemplate, testIosResource_ReorderedLabels)
+
 var testIosResource_NewName = acctest.MustOverrideFields(testIosResource, map[string]any{
 	"Name": acctest.Env.IosResourceNewName(),
 })
@@ -75,6 +84,11 @@ func TestAccIosDeviceResource_SDC(t *testing.T) {
 					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "tags.1", testutil.CheckEqual(acctest.Env.IosResourceTags().Labels[1])),
 					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "tags.2", testutil.CheckEqual(acctest.Env.IosResourceTags().Labels[2])),
 				),
+			},
+			// Update order of label testing
+			{
+				Config:   acctest.ProviderConfig() + testIosResourceConfig_ReorderedLabels,
+				PlanOnly: true, // this will check the plan is empty
 			},
 			// Update and Read testing
 			{

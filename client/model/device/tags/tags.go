@@ -24,3 +24,12 @@ func (tags Type) GetLabelsJsonArrayString() string {
 	b, _ := json.Marshal(tags.Labels)
 	return fmt.Sprintf("%v", string(b))
 }
+
+func MustParseJsonArrayString(s string) []string {
+	var labels []string
+	err := json.Unmarshal([]byte(s), &labels)
+	if err != nil {
+		panic(err)
+	}
+	return labels
+}

@@ -48,3 +48,16 @@ func StringsEqualUnordered(s1 []string, s2 []string) bool {
 	s2Copy := goutil.SortStrings(s2)
 	return StringsEqual(s1Copy, s2Copy)
 }
+
+func Reverse[T any](s []T) []T {
+	reversed := make([]T, len(s))
+	if len(s) == 0 {
+		return reversed
+	}
+	for i, j := len(s)-1, 0; i >= 0; {
+		reversed[i] = s[j]
+		i--
+		j++
+	}
+	return reversed
+}

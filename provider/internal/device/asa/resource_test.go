@@ -2,6 +2,8 @@
 package asa_test
 
 import (
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
 	"regexp"
 	"strconv"
 	"testing"
@@ -69,6 +71,14 @@ var testAsaResource_SDC = testAsaResourceType{
 var testAsaResourceConfig_SDC = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC)
 var testAsaResourceConfig_SDC_NoLabels = acctest.MustParseTemplate(asaResourceTemplateNoLabels, testAsaResource_SDC)
 
+// new label order config.
+var reorderedLabels = tags.New(sliceutil.Reverse[string](tags.MustParseJsonArrayString(testAsaResource_SDC.Labels))...).GetLabelsJsonArrayString()
+
+var testAsaResource_SDC_ReorderedLabels = acctest.MustOverrideFields(testAsaResource_SDC, map[string]any{
+	"Labels": reorderedLabels,
+})
+var testAsaResourceConfig_SDC_ReorderedLabels = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC_ReorderedLabels)
+
 // new name config.
 var testAsaResource_SDC_NewName = acctest.MustOverrideFields(testAsaResource_SDC, map[string]any{
 	"Name": acctest.Env.AsaResourceSdcNewName(),
@@ -109,6 +119,11 @@ func TestAccAsaDeviceResource_SDC(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_SDC_NewName.Name),
 				),
+			},
+			// Update order of label testing
+			{
+				Config:   acctest.ProviderConfig() + testAsaResourceConfig_SDC_ReorderedLabels,
+				PlanOnly: true, // this will check the plan is empty
 			},
 			// bad credential tests
 			{

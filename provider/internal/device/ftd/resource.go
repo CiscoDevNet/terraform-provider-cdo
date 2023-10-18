@@ -6,6 +6,7 @@ import (
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
+	"github.com/CiscoDevnet/terraform-provider-cdo/planmodifiers"
 	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -111,7 +112,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					validators.ValueStringsAtLeast(stringvalidator.OneOf(string(license.Base))),
 				},
 			},
-			"labels": schema.ListAttribute{
+			"labels": schema.ListAttribute{ // TODO: use set when we go to 1.0.0, https://jira-eng-rtp3.cisco.com/jira/browse/LH-71968
 				MarkdownDescription: "Set a list of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
 				Optional:            true,
 				ElementType:         types.StringType,
@@ -119,6 +120,9 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})), // default to empty list
 				Validators: []validator.List{
 					listvalidator.UniqueValues(),
+				},
+				PlanModifiers: []planmodifier.List{
+					planmodifiers.UseStateForUnorderedStringList(),
 				},
 			},
 			"generated_command": schema.StringAttribute{

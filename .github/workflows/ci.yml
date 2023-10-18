@@ -10,11 +10,10 @@ on:
   push:
     branches:
       - 'main'
+      - 'fix-asa-ci'
     tags:
       - 'v*'
-    pull_requests:
-      - 'fix-asa-ci'
-env:
+env:g
   AWS_REGION: "us-west-2"
 
 permissions:

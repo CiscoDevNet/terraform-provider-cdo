@@ -103,13 +103,6 @@ func TestAccAsaDeviceResource_SDC(t *testing.T) {
 					resource.TestCheckResourceAttrWith("cdo_asa_device.test", "labels.2", testutil.CheckEqual(acctest.Env.AsaResourceSdcTags().Labels[2])),
 				),
 			},
-			// Update and Read testing
-			{
-				Config: acctest.ProviderConfig() + testAsaResourceConfig_SDC_NewName,
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_SDC_NewName.Name),
-				),
-			},
 			// bad credential tests
 			{
 				Config: acctest.ProviderConfig() + testAsaResourceConfig_SDC_NewCreds,
@@ -125,6 +118,13 @@ func TestAccAsaDeviceResource_SDC(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_SDC.Name),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_SDC.Password),
+				),
+			},
+			// Update and Read testing
+			{
+				Config: acctest.ProviderConfig() + testAsaResourceConfig_SDC_NewName,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_SDC_NewName.Name),
 				),
 			},
 			// change location test - disabled until we create another asa

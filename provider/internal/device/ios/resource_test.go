@@ -1,6 +1,8 @@
 package ios_test
 
 import (
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/testutil"
 	"strconv"
 	"testing"
@@ -31,13 +33,12 @@ resource "cdo_ios_device" "test" {
 	password = "{{.Password}}"
 	connector_name = "{{.ConnectorName}}"
 	ignore_certificate = "{{.IgnoreCertificate}}"
-	tags = {{.Labels}}
+	labels = {{.Labels}}
 }`
 
 var testIosResource = testIosResourceType{
 	Name:              acctest.Env.IosResourceName(),
 	SocketAddress:     acctest.Env.IosResourceSocketAddress(),
-	ConnectorType:     acctest.Env.IosResourceConnectorType(),
 	Username:          acctest.Env.IosResourceUsername(),
 	Password:          acctest.Env.IosResourcePassword(),
 	ConnectorName:     acctest.Env.IosResourceConnectorName(),
@@ -49,13 +50,19 @@ var testIosResource = testIosResourceType{
 }
 var testIosResourceConfig = acctest.MustParseTemplate(testIosResourceTemplate, testIosResource)
 
+var reorderedLabels = tags.New(sliceutil.Reverse[string](tags.MustParseJsonArrayString(testIosResource.Labels))...).GetLabelsJsonArrayString()
+
+var testIosResource_ReorderedLabels = acctest.MustOverrideFields(testIosResource, map[string]any{
+	"Labels": reorderedLabels,
+})
+var testIosResourceConfig_ReorderedLabels = acctest.MustParseTemplate(testIosResourceTemplate, testIosResource_ReorderedLabels)
+
 var testIosResource_NewName = acctest.MustOverrideFields(testIosResource, map[string]any{
 	"Name": acctest.Env.IosResourceNewName(),
 })
 var testIosResourceConfig_NewName = acctest.MustParseTemplate(testIosResourceTemplate, testIosResource_NewName)
 
 func TestAccIosDeviceResource_SDC(t *testing.T) {
-	t.Skip("require new ios device in ci")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 acctest.PreCheckFunc(t),
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
@@ -68,13 +75,18 @@ func TestAccIosDeviceResource_SDC(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "socket_address", testIosResource.SocketAddress),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "host", testIosResource.Host),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "port", strconv.FormatInt(testIosResource.Port, 10)),
-					resource.TestCheckResourceAttr("cdo_ios_device.test", "connector_type", testIosResource.ConnectorType),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "username", testIosResource.Username),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "password", testIosResource.Password),
-					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "tags.0", testutil.CheckEqual(acctest.Env.IosResourceTags().Labels[0])),
-					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "tags.1", testutil.CheckEqual(acctest.Env.IosResourceTags().Labels[1])),
-					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "tags.2", testutil.CheckEqual(acctest.Env.IosResourceTags().Labels[2])),
+					resource.TestCheckResourceAttr("cdo_ios_device.test", "labels.#", strconv.Itoa(len(acctest.Env.FtdResourceTags().Labels))),
+					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "labels.0", testutil.CheckEqual(acctest.Env.IosResourceTags().Labels[0])),
+					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "labels.1", testutil.CheckEqual(acctest.Env.IosResourceTags().Labels[1])),
+					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "labels.2", testutil.CheckEqual(acctest.Env.IosResourceTags().Labels[2])),
 				),
+			},
+			// Update order of label testing
+			{
+				Config:   acctest.ProviderConfig() + testIosResourceConfig_ReorderedLabels,
+				PlanOnly: true, // this will check the plan is empty
 			},
 			// Update and Read testing
 			{

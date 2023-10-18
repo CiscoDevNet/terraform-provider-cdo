@@ -6,6 +6,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
 	"strconv"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios"
@@ -35,7 +36,10 @@ func Read(ctx context.Context, resource *IosDeviceResource, stateData *IosDevice
 	stateData.Ipv4 = types.StringValue(readOutp.SocketAddress)
 	stateData.Host = types.StringValue(readOutp.Host)
 	stateData.IgnoreCertificate = types.BoolValue(readOutp.IgnoreCertificate)
-	stateData.Labels = util.GoStringSliceToTFStringList(readOutp.Tags.Labels)
+	// only set labels if it is different
+	if !sliceutil.StringsEqualUnordered(util.TFStringListToGoStringList(stateData.Labels), readOutp.Tags.Labels) {
+		stateData.Labels = util.GoStringSliceToTFStringList(readOutp.Tags.Labels)
+	}
 
 	return nil
 }
@@ -103,7 +107,10 @@ func Update(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 		return err
 	}
 	stateData.Name = types.StringValue(updateOutp.Name)
-	stateData.Labels = util.GoStringSliceToTFStringList(updateOutp.Tags.Labels)
+	// only set labels if it is different
+	if !sliceutil.StringsEqualUnordered(util.TFStringListToGoStringList(stateData.Labels), updateOutp.Tags.Labels) {
+		stateData.Labels = planData.Labels
+	}
 
 	return nil
 }

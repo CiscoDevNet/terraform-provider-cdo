@@ -60,10 +60,6 @@ func (e *env) IosResourceSocketAddress() string {
 	return e.mustGetString("IOS_RESOURCE_SOCKET_ADDRESS")
 }
 
-func (e *env) IosResourceConnectorType() string {
-	return e.mustGetString("IOS_RESOURCE_CONNECTOR_TYPE")
-}
-
 func (e *env) IosResourceUsername() string {
 	return e.mustGetString("IOS_RESOURCE_USERNAME")
 }

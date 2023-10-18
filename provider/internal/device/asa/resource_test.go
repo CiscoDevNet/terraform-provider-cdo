@@ -130,7 +130,7 @@ func TestAccAsaDeviceResource_SDC(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_SDC.Password),
 				),
 			},
-      // Update order of label testing
+			// Update order of label testing
 			{
 				Config:   acctest.ProviderConfig() + testAsaResourceConfig_SDC_ReorderedLabels,
 				PlanOnly: true, // this will check the plan is empty
@@ -142,7 +142,7 @@ func TestAccAsaDeviceResource_SDC(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_SDC_NewName.Name),
 				),
 			},
-      
+
 			// change location test - disabled until we create another asa
 			// {
 			// 	Config: acctest.ProviderConfig() + testAsaResourceConfig_SDC_NewLocation,

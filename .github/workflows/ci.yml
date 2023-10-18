@@ -12,6 +12,8 @@ on:
       - 'main'
     tags:
       - 'v*'
+    pull_requests:
+      - 'fix-asa-ci'
 env:
   AWS_REGION: "us-west-2"
 
@@ -95,7 +97,6 @@ jobs:
     name: Terraform Provider Acceptance Tests
     needs: unit-test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     defaults:
       run:
         working-directory: provider

@@ -27,7 +27,6 @@ var testResource_NewName = acctest.MustOverrideFields(testSdcResource, map[strin
 var testResourceConfig_NewName = acctest.MustParseTemplate(testResourceTemplate, testResource_NewName)
 
 func TestAccSdcResource(t *testing.T) {
-	t.Skip("this test does not clean up sqs and sns correctly, skip until LH-72127 is resolved")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 acctest.PreCheckFunc(t),
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,

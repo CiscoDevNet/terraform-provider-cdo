@@ -51,6 +51,12 @@ func (builder *sdcReadOutputBuilder) WithTenantUid(tenantUid string) *sdcReadOut
 	return builder
 }
 
+func (builder *sdcReadOutputBuilder) WithCommunicationReady(ready bool) *sdcReadOutputBuilder {
+	builder.readOutput.IsCommunicationQueueReady = ready
+
+	return builder
+}
+
 func mustGenerateBase64PublicKey() string {
 	key, err := rsa.GenerateKey(rand.Reader, 512)
 	if err != nil {

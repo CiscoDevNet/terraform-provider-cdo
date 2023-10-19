@@ -2,6 +2,7 @@ package connector_test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -40,6 +41,14 @@ func TestCreate(t *testing.T) {
 		TokenType(tokenType).
 		Build()
 
+	validQueueReadyOutput := connector.NewConnectorOutputBuilder().
+		AsOnPremConnector().
+		WithUid(validCreateRequestOutput.Uid).
+		WithName(validCreateRequestOutput.Name).
+		WithTenantUid(validCreateRequestOutput.TenantUid).
+		WithCommunicationReady(true).
+		Build()
+
 	testCases := []struct {
 		testName   string
 		sdcName    string
@@ -60,6 +69,11 @@ func TestCreate(t *testing.T) {
 					"POST",
 					"/anubis/rest/v1/oauth/token/external-compute",
 					httpmock.NewJsonResponderOrPanic(200, validUserToken),
+				)
+				httpmock.RegisterResponder(
+					"GET",
+					fmt.Sprintf("/aegis/rest/v1/services/targets/proxies/%s", validQueueReadyOutput.Uid),
+					httpmock.NewJsonResponderOrPanic(200, validQueueReadyOutput),
 				)
 			},
 

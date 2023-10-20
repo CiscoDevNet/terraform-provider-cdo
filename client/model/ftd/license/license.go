@@ -11,11 +11,12 @@ type Type string
 
 // https://www.cisco.com/c/en/us/td/docs/security/firepower/70/fdm/fptd-fdm-config-guide-700/fptd-fdm-license.html
 const (
-	Base      Type = "BASE"
-	Carrier   Type = "CARRIER"
-	Threat    Type = "THREAT"
-	Malware   Type = "MALWARE"
-	URLFilter Type = "URLFilter"
+	Base       Type = "BASE"
+	Carrier    Type = "CARRIER"
+	Threat     Type = "THREAT"
+	Malware    Type = "MALWARE"
+	URLFilter  Type = "URLFilter"
+	Essentials Type = "ESSENTIALS"
 )
 
 var All = []Type{
@@ -24,6 +25,7 @@ var All = []Type{
 	Threat,
 	Malware,
 	URLFilter,
+	Essentials,
 }
 
 var AllAsString = make([]string, len(All))
@@ -51,6 +53,18 @@ func (t *Type) UnmarshalJSON(b []byte) error {
 	}
 	*t = deserialized
 	return nil
+}
+
+// ReplaceEssentialsWithBase is used to tell terraform license of `BASE` is equal to `ESSENTIALS` during read.
+// This is because FMC will modify the FTD's license from `BASE` to `ESSENTIALS` outside terraform,
+// and they are the same thing, so when reading it back, we need the conversion
+func ReplaceEssentialsWithBase(licenses []string) []string {
+	for i, l := range licenses {
+		if l == string(Essentials) {
+			licenses[i] = string(Base)
+		}
+	}
+	return licenses
 }
 
 func MustParse(name string) Type {

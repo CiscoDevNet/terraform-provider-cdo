@@ -3,8 +3,10 @@ package ios
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
 	"strings"
 
@@ -88,10 +90,16 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 			"port": schema.Int64Attribute{
 				MarkdownDescription: "The port used to connect to the device.",
 				Computed:            true,
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
+				},
 			},
 			"host": schema.StringAttribute{
 				MarkdownDescription: "The host used to connect to the device.",
 				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"username": schema.StringAttribute{
 				MarkdownDescription: "The username used to authenticate with the device.",
@@ -112,7 +120,7 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				MarkdownDescription: "Set this attribute to true if you do not want CDO to validate the certificate of this device before onboarding.",
 				Required:            true,
 			},
-			"labels": schema.ListAttribute{
+			"labels": schema.ListAttribute{ // TODO: use set when we go to 1.0.0, https://jira-eng-rtp3.cisco.com/jira/browse/LH-71968
 				MarkdownDescription: "Set a list of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
 				Optional:            true,
 				ElementType:         types.StringType,
@@ -120,6 +128,9 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})), // default to empty list
 				Validators: []validator.List{
 					listvalidator.UniqueValues(),
+				},
+				PlanModifiers: []planmodifier.List{
+					planmodifiers.UseStateForUnorderedStringList(),
 				},
 			},
 		},

@@ -7,9 +7,35 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"strings"
 )
+
+func ReadDataSource(ctx context.Context, resource *DataSource, stateData *DataSourceModel) error {
+
+	// do read
+	inp := cloudftd.NewReadByNameInput(stateData.Name.ValueString())
+	res, err := resource.client.ReadCloudFtdByName(ctx, inp)
+	if err != nil {
+		return err
+	}
+
+	// map return struct to model
+	stateData.ID = types.StringValue(res.Uid)
+	stateData.Name = types.StringValue(res.Name)
+	stateData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
+	stateData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUid)
+	stateData.Virtual = types.BoolValue(res.Metadata.PerformanceTier != nil)
+	stateData.Licenses = util.GoStringSliceToTFStringList(strings.Split(res.Metadata.LicenseCaps, ","))
+	if res.Metadata.PerformanceTier != nil { // nil means physical ftd
+		stateData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))
+	}
+	stateData.Hostname = types.StringValue(res.Metadata.CloudManagerDomain)
+	stateData.Labels = util.GoStringSliceToTFStringList(res.Tags.Labels)
+
+	return nil
+}
 
 func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) error {
 
@@ -26,7 +52,7 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 	stateData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
 	stateData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUid)
 	stateData.Virtual = types.BoolValue(res.Metadata.PerformanceTier != nil)
-	stateData.Licenses = util.GoStringSliceToTFStringList(strings.Split(res.Metadata.LicenseCaps, ","))
+	stateData.Licenses = util.GoStringSliceToTFStringList(license.ReplaceEssentialsWithBase(strings.Split(res.Metadata.LicenseCaps, ",")))
 	if res.Metadata.PerformanceTier != nil { // nil means physical cloudftd
 		stateData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))
 	}
@@ -34,7 +60,11 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 	stateData.Hostname = types.StringValue(res.Metadata.CloudManagerDomain)
 	stateData.NatId = types.StringValue(res.Metadata.NatID)
 	stateData.RegKey = types.StringValue(res.Metadata.RegKey)
-	stateData.Labels = util.GoStringSliceToTFStringList(res.Tags.Labels)
+
+	// only set labels if it is different
+	if !sliceutil.StringsEqualUnordered(util.TFStringListToGoStringList(stateData.Labels), res.Tags.Labels) {
+		stateData.Labels = util.GoStringSliceToTFStringList(res.Tags.Labels)
+	}
 
 	return nil
 }
@@ -85,7 +115,6 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 	planData.Hostname = types.StringValue(res.Metadata.CloudManagerDomain)
 	planData.NatId = types.StringValue(res.Metadata.NatID)
 	planData.RegKey = types.StringValue(res.Metadata.RegKey)
-	planData.Labels = util.GoStringSliceToTFStringList(res.Tags.Labels)
 
 	return nil
 }
@@ -105,6 +134,10 @@ func Update(ctx context.Context, resource *Resource, planData *ResourceModel, st
 
 	// map return struct to model
 	stateData.Name = types.StringValue(res.Name)
+	// only set labels if it is different
+	if !sliceutil.StringsEqualUnordered(util.TFStringListToGoStringList(stateData.Labels), res.Tags.Labels) {
+		stateData.Labels = planData.Labels
+	}
 
 	return nil
 }

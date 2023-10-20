@@ -19,13 +19,14 @@ type ReadByNameInput struct {
 }
 
 type ReadOutput struct {
-	Uid              string          `json:"uid"`
-	Name             string          `json:"name"`
-	DefaultConnector bool            `json:"defaultLar"`
-	Cdg              bool            `json:"cdg"`
-	TenantUid        string          `json:"tenantUid"`
-	PublicKey        model.PublicKey `json:"larPublicKey"`
-	ConnectorStatus  status.Type     `json:"larStatus"`
+	Uid                       string          `json:"uid"`
+	Name                      string          `json:"name"`
+	DefaultConnector          bool            `json:"defaultLar"`
+	Cdg                       bool            `json:"cdg"`
+	TenantUid                 string          `json:"tenantUid"`
+	PublicKey                 model.PublicKey `json:"larPublicKey"`
+	ConnectorStatus           status.Type     `json:"larStatus"`
+	IsCommunicationQueueReady bool            `json:"snsSqs"`
 }
 
 func NewReadByUidInput(connectorUid string) *ReadByUidInput {

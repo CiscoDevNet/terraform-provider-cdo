@@ -8,18 +8,25 @@ import (
 )
 
 var dataSourceModel = struct {
-	Name string
+	Name             string
+	AccessPolicyName string
+	PerformanceTier  string
+	Virtual          string
+	Licenses         string
 }{
-	Name: "example name", // typically we get the actual value from the environment like this: acctest.Env.ExampleDataSourceName(), so that most parameters are configurable so that it can be run in different CDO environment
+	Name:             acctest.Env.FtdDataSourceName(), // typically we get the actual value from the environment like this: acctest.Env.ExampleDataSourceName(), so that most parameters are configurable so that it can be run in different CDO environment
+	AccessPolicyName: acctest.Env.FtdDataSourceAccessPolicyName(),
+	PerformanceTier:  acctest.Env.FtdDataSourcePerformanceTier(),
+	Virtual:          acctest.Env.FtdDataSourceVirtual(),
+	Licenses:         acctest.Env.FtdDataSourceLicenses(),
 }
 var dataSourceTemplate = `
-data "cdo_example" "test" {
+data "cdo_ftd_device" "test" {
 	name = "{{.Name}}"
 }`
 var dataSourceConfig = acctest.MustParseTemplate(dataSourceTemplate, dataSourceModel)
 
-func TestAccExampleDataSource(t *testing.T) {
-	t.Skip("This is an example data source test")
+func TestAccFtdDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 acctest.PreCheckFunc(t),
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
@@ -28,7 +35,11 @@ func TestAccExampleDataSource(t *testing.T) {
 			{
 				Config: acctest.ProviderConfig() + dataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.cdo_example.test", "name", dataSourceModel.Name),
+					resource.TestCheckResourceAttr("data.cdo_ftd_device.test", "name", dataSourceModel.Name),
+					resource.TestCheckResourceAttr("data.cdo_ftd_device.test", "access_policy_name", dataSourceModel.AccessPolicyName),
+					resource.TestCheckResourceAttr("data.cdo_ftd_device.test", "performance_tier", dataSourceModel.PerformanceTier),
+					resource.TestCheckResourceAttr("data.cdo_ftd_device.test", "virtual", dataSourceModel.Virtual),
+					resource.TestCheckResourceAttr("data.cdo_ftd_device.test", "licenses.#", "1"), // number of licenses = 1
 				),
 			},
 		},

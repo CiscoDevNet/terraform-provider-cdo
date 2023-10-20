@@ -2,9 +2,10 @@ package connector
 
 import (
 	"context"
-
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
+	"time"
 )
 
 type CreateInput struct {
@@ -53,6 +54,20 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		return &CreateOutput{}, err
 	}
 
+	// 1.5 poll until SDC has SQS/SNS setup properly to communicate with backend
+	err := retry.Do(
+		untilCommunicationQueueReady(ctx, client, *NewReadByUidInput(createOutp.Uid)),
+		retry.NewOptionsBuilder().Retries(10).
+			Logger(client.Logger).
+			Delay(2*time.Second).
+			EarlyExitOnError(true).
+			Timeout(time.Minute). // typically a few seconds should be enough
+			Build(),
+	)
+	if err != nil {
+		return &CreateOutput{}, err
+	}
+
 	// 2. generate bootstrap data
 	// get user data from authentication service
 	bootstrapData, err := generateBootstrapData(ctx, client, createInp.Name)
@@ -65,4 +80,14 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		CreateRequestOutput: &createOutp,
 		BootstrapData:       bootstrapData,
 	}, nil
+}
+
+func untilCommunicationQueueReady(ctx context.Context, client http.Client, input ReadByUidInput) retry.Func {
+	return func() (bool, error) {
+		readOutp, err := ReadByUid(ctx, client, input)
+		if err != nil {
+			return false, err
+		}
+		return readOutp.IsCommunicationQueueReady, nil
+	}
 }

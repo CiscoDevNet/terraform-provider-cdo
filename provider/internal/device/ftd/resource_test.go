@@ -2,6 +2,8 @@ package ftd_test
 
 import (
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/testutil"
 	"strconv"
 	"strings"
@@ -12,7 +14,6 @@ import (
 )
 
 type ResourceType struct {
-	ID               string
 	Name             string
 	AccessPolicyName string
 	PerformanceTier  string
@@ -48,6 +49,14 @@ var testResource_NewName = acctest.MustOverrideFields(testResource, map[string]a
 
 var testResourceConfig_NewName = acctest.MustParseTemplate(ResourceTemplate, testResource_NewName)
 
+var reorderedLabels = tags.New(sliceutil.Reverse[string](tags.MustParseJsonArrayString(testResource.Labels))...).GetLabelsJsonArrayString()
+
+var testResource_ReorderLabels = acctest.MustOverrideFields(testResource, map[string]any{
+	"Labels": reorderedLabels,
+})
+
+var testResourceConfig_ReorderLabels = acctest.MustParseTemplate(ResourceTemplate, testResource_ReorderLabels)
+
 func TestAccFtdResource(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
@@ -78,7 +87,12 @@ func TestAccFtdResource(t *testing.T) {
 					}),
 				),
 			},
-			// Update and Read testing
+			// Update order of label testing
+			{
+				Config:   acctest.ProviderConfig() + testResourceConfig_ReorderLabels,
+				PlanOnly: true, // this will check the plan is empty
+			},
+			// Update Name testing
 			{
 				Config: acctest.ProviderConfig() + testResourceConfig_NewName,
 				Check: resource.ComposeAggregateTestCheckFunc(

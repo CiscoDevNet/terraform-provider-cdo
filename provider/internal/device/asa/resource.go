@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
+	"github.com/CiscoDevnet/terraform-provider-cdo/planmodifiers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
 	"strconv"
 	"strings"
@@ -103,12 +106,18 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 			"port": schema.Int64Attribute{
 				MarkdownDescription: "The port used to connect to the device.",
 				Computed:            true,
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
+				},
 			},
 			"host": schema.StringAttribute{
 				MarkdownDescription: "The host used to connect to the device.",
 				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
-			"labels": schema.ListAttribute{
+			"labels": schema.ListAttribute{ // TODO: use set when we go to 1.0.0, https://jira-eng-rtp3.cisco.com/jira/browse/LH-71968
 				MarkdownDescription: "Set a list of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
 				Optional:            true,
 				Computed:            true,
@@ -116,6 +125,9 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})), // default to empty list
 				Validators: []validator.List{
 					listvalidator.UniqueValues(),
+				},
+				PlanModifiers: []planmodifier.List{
+					planmodifiers.UseStateForUnorderedStringList(),
 				},
 			},
 			"username": schema.StringAttribute{
@@ -194,7 +206,10 @@ func (r *AsaDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 	stateData.SocketAddress = types.StringValue(asaReadOutp.SocketAddress)
 	stateData.Host = types.StringValue(asaReadOutp.Host)
 	stateData.IgnoreCertificate = types.BoolValue(asaReadOutp.IgnoreCertificate)
-	stateData.Labels = util.GoStringSliceToTFStringList(asaReadOutp.Tags.Labels)
+	// only set labels if it is different
+	if !sliceutil.StringsEqualUnordered(util.TFStringListToGoStringList(stateData.Labels), asaReadOutp.Tags.Labels) {
+		stateData.Labels = util.GoStringSliceToTFStringList(asaReadOutp.Tags.Labels)
+	}
 
 	tflog.Trace(ctx, "done read ASA device resource")
 
@@ -262,7 +277,6 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 	planData.ConnectorName = getConnectorName(&planData)
 	planData.Name = types.StringValue(createOutp.Name)
 	planData.Host = types.StringValue(createOutp.Host)
-	planData.Labels = util.GoStringSliceToTFStringList(createOutp.Tags.Labels)
 
 	port, err := strconv.ParseInt(createOutp.Port, 10, 16)
 	if err != nil {
@@ -340,7 +354,10 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 	stateData.SocketAddress = planData.SocketAddress
 	stateData.Host = types.StringValue(updateOutp.Host)
 	stateData.Port = types.Int64Value(port)
-	stateData.Labels = util.GoStringSliceToTFStringList(updateOutp.Tags.Labels)
+	// only set labels if it is different
+	if !sliceutil.StringsEqualUnordered(util.TFStringListToGoStringList(stateData.Labels), updateOutp.Tags.Labels) {
+		stateData.Labels = planData.Labels
+	}
 
 	stateData.IgnoreCertificate = planData.IgnoreCertificate
 

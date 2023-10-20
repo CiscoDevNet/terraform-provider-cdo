@@ -30,7 +30,7 @@ func UntilState(ctx context.Context, client http.Client, specificUid string, exp
 			return true, nil
 		}
 		if strings.EqualFold(readOutp.State, state.ERROR) {
-			return false, fmt.Errorf("workflow ended in %s", state.ERROR)
+			return false, fmt.Errorf("workflow ended in ERROR") // TODO: add workflow error message
 		}
 		if strings.EqualFold(readOutp.State, state.BAD_CREDENTIALS) {
 			return false, fmt.Errorf("bad credentials")

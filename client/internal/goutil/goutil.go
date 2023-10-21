@@ -9,6 +9,7 @@ func AsPointer(obj interface{}) *interface{} {
 	return ptr
 }
 
+// NewBoolPointer return a pointer of the given boolean value, this function is needed because you cant do &true or &false in golang
 func NewBoolPointer(value bool) *bool {
 	return &value
 }

@@ -2,6 +2,8 @@ package ftd
 
 import (
 	"context"
+	"strings"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
@@ -9,7 +11,6 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"strings"
 )
 
 func ReadDataSource(ctx context.Context, resource *DataSource, stateData *DataSourceModel) error {
@@ -52,7 +53,7 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 	stateData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
 	stateData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUid)
 	stateData.Virtual = types.BoolValue(res.Metadata.PerformanceTier != nil)
-	stateData.Licenses = util.GoStringSliceToTFStringList(license.ReplaceEssentialsWithBase(strings.Split(res.Metadata.LicenseCaps, ",")))
+	stateData.Licenses = util.GoStringSliceToTFStringList(license.ReplaceFmcLicenseTermsWithCdoTerms(strings.Split(res.Metadata.LicenseCaps, ",")))
 	if res.Metadata.PerformanceTier != nil { // nil means physical cloudftd
 		stateData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))
 	}

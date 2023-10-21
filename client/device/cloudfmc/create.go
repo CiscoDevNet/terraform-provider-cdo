@@ -2,20 +2,23 @@ package cloudfmc
 
 import (
 	"context"
+	"errors"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/application"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/goutil"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/status"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/application/applicationstatus"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
+	"time"
 )
 
 type CreateInput struct {
 }
 
-func NewCreateInput() ReadInput {
-	return ReadInput{}
+func NewCreateInput() CreateInput {
+	return CreateInput{}
 }
 
 type createApplicationBody struct {
@@ -28,11 +31,13 @@ type applicationContent struct {
 	Type string `json:"@type"`
 }
 
-type CreateOutput = device.ReadOutput
+type CreateOutput = device.CreateOutput
 
-func Create(ctx context.Context, client http.Client, createInp CreateInput) (*ReadOutput, error) {
+func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, error) {
 
 	client.Logger.Println("creating cloud FMC")
+
+	client.Logger.Println("creating cloud FMC application")
 
 	// 1. POST /aegis/rest/v1/services/targets/applications
 	createApplicationUrl := url.CreateApplication(client.BaseUrl())
@@ -53,8 +58,10 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Re
 		return nil, err
 	}
 
+	client.Logger.Println("creating cloud FMC device")
+
 	// 2. POST /aegis/rest/v1/services/targets/devices
-	createDeviceRes, err := device.Create(ctx, client, device.NewCreateInputBuilder().
+	createOutp, err := device.Create(ctx, client, device.NewCreateInputBuilder().
 		Name("FMC").
 		DeviceType(devicetype.CloudFmc).
 		Model(false).
@@ -67,27 +74,48 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Re
 		return nil, err
 	}
 
-	// https://ci.dev.lockhart.io/aegis/rest/v1/services/targets/applications
-	err := retry.Do(func() (bool, error) {
-		readApplicationUrl := url.ReadApplication(client.BaseUrl())
-		readApplicationReq := client.NewGet(ctx, readApplicationUrl)
-		var readApplicationOutput []device.ReadOutput
-		err = readApplicationReq.Send(&readApplicationOutput)
-		if err != nil {
-			return false, err
-		}
-		if len(readApplicationOutput) < 1 {
-			return false, nil // fmc not yet present, should come up soon
-		}
-		fmc := readApplicationOutput[0]
-		if fmc.ApplicationStatus != status.Active {
-			return false, nil
-		}
-	},
-		*retry.NewOptionsWithLogger(client.Logger),
-	)
+	client.Logger.Println("waiting for fmce state machine to be done")
 
-	return nil, nil
+	err = retry.Do(untilApplicationActive(ctx, client),
+		retry.NewOptionsBuilder().
+			Retries(-1).
+			Timeout(time.Hour). // usually takes about 15-20 minutes
+			Delay(3*time.Second).
+			EarlyExitOnError(true).
+			Logger(client.Logger).
+			Build(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	client.Logger.Println("cloud FMC application successfully created")
+
+	return createOutp, nil
 }
 
-// {"name":"FMC","deviceType":"FMCE","larType":"CDG","ignoreCertificate":true,"model":false,"enableOobDetection":true}
+func untilApplicationActive(ctx context.Context, client http.Client) retry.Func {
+	var unreachable bool
+	var initialUnreachableTime time.Time
+	return func() (bool, error) {
+		fmc, err := application.Read(ctx, client, application.ReadInput{})
+		if err != nil && !errors.Is(err, application.NotFoundError) {
+			return false, err
+		}
+		if fmc.ApplicationStatus == applicationstatus.Unreachable {
+			// initial unreachable is possibly caused by https://jira-eng-rtp3.cisco.com/jira/browse/LH-71821
+			// wait for some time to confirm it is actually unreachable
+			if unreachable {
+				if initialUnreachableTime.Add(time.Minute * 5).After(time.Now()) {
+					// if long enough time has passed, and we are still unreachable, treat it as actual error
+					return false, err
+				}
+			} else {
+				unreachable = true
+				initialUnreachableTime = time.Now()
+				return false, nil
+			}
+		}
+		return fmc.ApplicationStatus == applicationstatus.Active, nil
+	}
+}

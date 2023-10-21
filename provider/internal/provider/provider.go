@@ -162,6 +162,7 @@ func (p *CdoProvider) Resources(ctx context.Context) []func() resource.Resource 
 		user_api_token.NewResource,
 		ftdonboarding.NewResource,
 		connectoronboarding.NewResource,
+		cdfmc.NewResource,
 	}
 }
 

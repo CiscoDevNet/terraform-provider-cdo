@@ -303,6 +303,10 @@ func (e *env) CloudFmcDataSourceSoftwareVersion() string {
 	return e.mustGetString("CLOUD_FMC_SOFTWARE_VERSION")
 }
 
+func (e *env) CloudFmcResourceName() string {
+	return e.mustGetString("CLOUD_FMC_RESOURCE_NAME")
+}
+
 func (e *env) mustGetString(envName string) string {
 	value, ok := os.LookupEnv(envName)
 	if ok {

@@ -10,23 +10,16 @@ import (
 var resourceModel = struct {
 	Name string
 }{
-	Name: "example name", // acctest.Env.ExampleResourceName(),
+	Name: acctest.Env.CloudFmcResourceName(),
 }
 
 const resourceTemplate = `
-resource "cdo_example" "test" {
-	name = "{{.Name}}"
+resource "cdo_cdfmc" "test" {
 }`
 
 var resourceConfig = acctest.MustParseTemplate(resourceTemplate, resourceModel)
 
-var resourceModel_NewName = acctest.MustOverrideFields(resourceModel, map[string]any{
-	"Name": "example new name", // acctest.Env.ExampleResourceNewName(),
-})
-var resourceConfig_NewName = acctest.MustParseTemplate(resourceTemplate, resourceModel_NewName)
-
-func TestAccExampleResource(t *testing.T) {
-	t.Skip("this is an example resource test")
+func TestAccCdFmcResource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 acctest.PreCheckFunc(t),
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
@@ -35,14 +28,7 @@ func TestAccExampleResource(t *testing.T) {
 			{
 				Config: acctest.ProviderConfig() + resourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("cdo_example.test", "name", resourceModel.Name),
-				),
-			},
-			// Update and Read testing
-			{
-				Config: acctest.ProviderConfig() + resourceConfig_NewName,
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("cdo_example.test", "name", resourceModel_NewName.Name),
+					resource.TestCheckResourceAttr("cdo_cdfmc.test", "name", resourceModel.Name),
 				),
 			},
 			// Delete testing automatically occurs in TestCase

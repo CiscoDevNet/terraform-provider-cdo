@@ -5,12 +5,9 @@ import (
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
-	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
-	"github.com/CiscoDevnet/terraform-provider-cdo/planmodifiers"
-	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"strconv"
 	"strings"
 
@@ -44,14 +41,14 @@ type AsaDeviceResource struct {
 }
 
 type AsaDeviceResourceModel struct {
-	ID            types.String   `tfsdk:"id"`
-	ConnectorType types.String   `tfsdk:"connector_type"`
-	ConnectorName types.String   `tfsdk:"connector_name"`
-	Name          types.String   `tfsdk:"name"`
-	SocketAddress types.String   `tfsdk:"socket_address"`
-	Host          types.String   `tfsdk:"host"`
-	Port          types.Int64    `tfsdk:"port"`
-	Labels        []types.String `tfsdk:"labels"`
+	ID            types.String `tfsdk:"id"`
+	ConnectorType types.String `tfsdk:"connector_type"`
+	ConnectorName types.String `tfsdk:"connector_name"`
+	Name          types.String `tfsdk:"name"`
+	SocketAddress types.String `tfsdk:"socket_address"`
+	Host          types.String `tfsdk:"host"`
+	Port          types.Int64  `tfsdk:"port"`
+	Labels        types.Set    `tfsdk:"labels"`
 
 	Username          types.String `tfsdk:"username"`
 	Password          types.String `tfsdk:"password"`
@@ -117,18 +114,12 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"labels": schema.ListAttribute{ // TODO: use set when we go to 1.0.0, https://jira-eng-rtp3.cisco.com/jira/browse/LH-71968
-				MarkdownDescription: "Set a list of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
+			"labels": schema.SetAttribute{
+				MarkdownDescription: "Set a set of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
 				Optional:            true,
 				Computed:            true,
 				ElementType:         types.StringType,
-				Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})), // default to empty list
-				Validators: []validator.List{
-					listvalidator.UniqueValues(),
-				},
-				PlanModifiers: []planmodifier.List{
-					planmodifiers.UseStateForUnorderedStringList(),
-				},
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})), // default to empty list
 			},
 			"username": schema.StringAttribute{
 				MarkdownDescription: "The username used to authenticate with the device.",
@@ -206,10 +197,7 @@ func (r *AsaDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 	stateData.SocketAddress = types.StringValue(asaReadOutp.SocketAddress)
 	stateData.Host = types.StringValue(asaReadOutp.Host)
 	stateData.IgnoreCertificate = types.BoolValue(asaReadOutp.IgnoreCertificate)
-	// only set labels if it is different
-	if !sliceutil.StringsEqualUnordered(util.TFStringListToGoStringList(stateData.Labels), asaReadOutp.Tags.Labels) {
-		stateData.Labels = util.GoStringSliceToTFStringList(asaReadOutp.Tags.Labels)
-	}
+	stateData.Labels = util.GoStringSliceToTFStringSet(asaReadOutp.Tags.Labels)
 
 	tflog.Trace(ctx, "done read ASA device resource")
 
@@ -244,7 +232,13 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 		specificSdcOutp = &connector.ReadOutput{}
 	}
 
-	tagsInp := tags.New(util.TFStringListToGoStringList(planData.Labels)...)
+	// convert tf tags to go tags
+	tagsGoList, err := util.TFStringSetToGoStringList(ctx, planData.Labels)
+	if err != nil {
+		res.Diagnostics.AddError("error while converting terraform tags to go tags", err.Error())
+		return
+	}
+	tags_ := tags.New(tagsGoList...)
 
 	createInp := asa.NewCreateRequestInput(
 		planData.Name.ValueString(),
@@ -254,7 +248,7 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 		planData.Username.ValueString(),
 		planData.Password.ValueString(),
 		planData.IgnoreCertificate.ValueBool(),
-		tagsInp,
+		tags_,
 	)
 
 	createOutp, createErr := r.client.CreateAsa(ctx, *createInp)
@@ -305,14 +299,20 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
-	tagsInp := tags.New(util.TFStringListToGoStringList(planData.Labels)...)
+	// convert tf tags to go tags
+	tagsGoList, err := util.TFStringSetToGoStringList(ctx, planData.Labels)
+	if err != nil {
+		res.Diagnostics.AddError("error while converting terraform tags to go tags", err.Error())
+		return
+	}
+	tags_ := tags.New(tagsGoList...)
 
 	updateInp := asa.NewUpdateInput(
 		stateData.ID.ValueString(),
 		stateData.Name.ValueString(),
 		"",
 		"",
-		tagsInp,
+		tags_,
 	)
 
 	if isNameUpdated(planData, stateData) {
@@ -354,10 +354,7 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 	stateData.SocketAddress = planData.SocketAddress
 	stateData.Host = types.StringValue(updateOutp.Host)
 	stateData.Port = types.Int64Value(port)
-	// only set labels if it is different
-	if !sliceutil.StringsEqualUnordered(util.TFStringListToGoStringList(stateData.Labels), updateOutp.Tags.Labels) {
-		stateData.Labels = planData.Labels
-	}
+	stateData.Labels = planData.Labels
 
 	stateData.IgnoreCertificate = planData.IgnoreCertificate
 

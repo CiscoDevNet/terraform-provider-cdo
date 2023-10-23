@@ -238,7 +238,6 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 		res.Diagnostics.AddError("error while converting terraform tags to go tags", err.Error())
 		return
 	}
-	tags_ := tags.New(tagsGoList...)
 
 	createInp := asa.NewCreateRequestInput(
 		planData.Name.ValueString(),
@@ -248,7 +247,7 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 		planData.Username.ValueString(),
 		planData.Password.ValueString(),
 		planData.IgnoreCertificate.ValueBool(),
-		tags_,
+		tags.New(tagsGoList...),
 	)
 
 	createOutp, createErr := r.client.CreateAsa(ctx, *createInp)
@@ -305,14 +304,13 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 		res.Diagnostics.AddError("error while converting terraform tags to go tags", err.Error())
 		return
 	}
-	tags_ := tags.New(tagsGoList...)
 
 	updateInp := asa.NewUpdateInput(
 		stateData.ID.ValueString(),
 		stateData.Name.ValueString(),
 		"",
 		"",
-		tags_,
+		tags.New(tagsGoList...),
 	)
 
 	if isNameUpdated(planData, stateData) {

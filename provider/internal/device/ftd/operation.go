@@ -92,7 +92,6 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 	if err != nil {
 		return err
 	}
-	tags_ := tags.New(tagsGoList...)
 
 	if err != nil {
 		return err
@@ -103,7 +102,7 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 		performanceTier,
 		planData.Virtual.ValueBool(),
 		&licenses,
-		tags_,
+		tags.New(tagsGoList...),
 	)
 	res, err := resource.client.CreateCloudFtd(ctx, createInp)
 	if err != nil {
@@ -137,12 +136,11 @@ func Update(ctx context.Context, resource *Resource, planData *ResourceModel, st
 	if err != nil {
 		return err
 	}
-	tags_ := tags.New(tagsGoList...)
 
 	inp := cloudftd.NewUpdateInput(
 		planData.ID.ValueString(),
 		planData.Name.ValueString(),
-		tags_,
+		tags.New(tagsGoList...),
 	)
 	res, err := resource.client.UpdateCloudFtd(ctx, inp)
 	if err != nil {

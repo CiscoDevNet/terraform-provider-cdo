@@ -56,7 +56,6 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 	if err != nil {
 		return err
 	}
-	tags_ := tags.New(tagsGoList...)
 
 	createInp := ios.NewCreateRequestInput(
 		planData.Name.ValueString(),
@@ -66,7 +65,7 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 		planData.Username.ValueString(),
 		planData.Password.ValueString(),
 		planData.IgnoreCertificate.ValueBool(),
-		tags_,
+		tags.New(tagsGoList...),
 	)
 
 	createOutp, createErr := resource.client.CreateIos(ctx, *createInp)
@@ -106,12 +105,11 @@ func Update(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 	if err != nil {
 		return err
 	}
-	tags_ := tags.New(tagsGoList...)
 
 	updateInp := *ios.NewUpdateInput(
 		stateData.ID.ValueString(),
 		planData.Name.ValueString(),
-		tags_,
+		tags.New(tagsGoList...),
 	)
 	updateOutp, err := resource.client.UpdateIos(ctx, updateInp)
 	if err != nil {

@@ -39,14 +39,14 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Unique identifier of the device. This is a UUID and is automatically generated when the device is created.",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Name of the Cloud-delivered FMC (cdFMC), it is automatically generated when the cdFMC is created and its value is always \"FMC\".",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
@@ -89,7 +89,7 @@ func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *res
 
 	// 2. do read
 	if err := Read(ctx, r, &stateData); err != nil {
-		resp.Diagnostics.AddError("failed to read Example resource", err.Error())
+		resp.Diagnostics.AddError("failed to read cdfmc resource", err.Error())
 	}
 
 	// 3. save data into terraform state
@@ -109,7 +109,7 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, res *
 
 	// 2. use plan data to create device and fill up rest of the model
 	if err := Create(ctx, r, &planData); err != nil {
-		res.Diagnostics.AddError("failed to create Example resource", err.Error())
+		res.Diagnostics.AddError("failed to create cdfmc resource", err.Error())
 		return
 	}
 
@@ -137,7 +137,7 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, res *
 
 	// 3. do update
 	if err := Update(ctx, r, &planData, &stateData); err != nil {
-		res.Diagnostics.AddError("failed to update Example resource", err.Error())
+		res.Diagnostics.AddError("failed to update cdfmc resource", err.Error())
 	}
 
 	// 4. set resulting state
@@ -155,6 +155,6 @@ func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, res *
 	}
 
 	if err := Delete(ctx, r, &stateData); err != nil {
-		res.Diagnostics.AddError("failed to delete Example resource", err.Error())
+		res.Diagnostics.AddError("failed to delete cdfmc resource", err.Error())
 	}
 }

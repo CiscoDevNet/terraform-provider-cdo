@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
 	"strconv"
 
@@ -52,7 +51,7 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 	}
 
 	// convert tf tags to go tags
-	tagsGoList, err := util.TFStringSetToGoStringList(ctx, planData.Labels)
+	planTags, err := util.TFStringSetToTagLabels(ctx, planData.Labels)
 	if err != nil {
 		return err
 	}
@@ -65,7 +64,7 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 		planData.Username.ValueString(),
 		planData.Password.ValueString(),
 		planData.IgnoreCertificate.ValueBool(),
-		tags.New(tagsGoList...),
+		planTags,
 	)
 
 	createOutp, createErr := resource.client.CreateIos(ctx, *createInp)
@@ -101,7 +100,7 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 func Update(ctx context.Context, resource *IosDeviceResource, planData *IosDeviceResourceModel, stateData *IosDeviceResourceModel) error {
 
 	// convert tf tags to go tags
-	tagsGoList, err := util.TFStringSetToGoStringList(ctx, planData.Labels)
+	planTags, err := util.TFStringSetToTagLabels(ctx, planData.Labels)
 	if err != nil {
 		return err
 	}
@@ -109,7 +108,7 @@ func Update(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 	updateInp := *ios.NewUpdateInput(
 		stateData.ID.ValueString(),
 		planData.Name.ValueString(),
-		tags.New(tagsGoList...),
+		planTags,
 	)
 	updateOutp, err := resource.client.UpdateIos(ctx, updateInp)
 	if err != nil {

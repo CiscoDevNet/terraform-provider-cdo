@@ -3,7 +3,6 @@ package asa
 import (
 	"context"
 	"fmt"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
@@ -115,7 +114,7 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				},
 			},
 			"labels": schema.SetAttribute{
-				MarkdownDescription: "Set a set of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
+				MarkdownDescription: "Specify a set of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
 				Optional:            true,
 				Computed:            true,
 				ElementType:         types.StringType,
@@ -233,7 +232,7 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 	}
 
 	// convert tf tags to go tags
-	tagsGoList, err := util.TFStringSetToGoStringList(ctx, planData.Labels)
+	planTags, err := util.TFStringSetToTagLabels(ctx, planData.Labels)
 	if err != nil {
 		res.Diagnostics.AddError("error while converting terraform tags to go tags", err.Error())
 		return
@@ -247,7 +246,7 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 		planData.Username.ValueString(),
 		planData.Password.ValueString(),
 		planData.IgnoreCertificate.ValueBool(),
-		tags.New(tagsGoList...),
+		planTags,
 	)
 
 	createOutp, createErr := r.client.CreateAsa(ctx, *createInp)
@@ -299,7 +298,7 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 	}
 
 	// convert tf tags to go tags
-	tagsGoList, err := util.TFStringSetToGoStringList(ctx, planData.Labels)
+	planTags, err := util.TFStringSetToTagLabels(ctx, planData.Labels)
 	if err != nil {
 		res.Diagnostics.AddError("error while converting terraform tags to go tags", err.Error())
 		return
@@ -310,7 +309,7 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 		stateData.Name.ValueString(),
 		"",
 		"",
-		tags.New(tagsGoList...),
+		planTags,
 	)
 
 	if isNameUpdated(planData, stateData) {

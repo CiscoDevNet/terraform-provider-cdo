@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
@@ -78,17 +77,13 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 	}
 
 	// convert tf licenses to go license
-	licensesGoList, err := util.TFStringSetToGoStringList(ctx, planData.Licenses)
-	if err != nil {
-		return err
-	}
-	licenses, err := license.DeserializeAllFromCdo(strings.Join(licensesGoList, ","))
+	licenses, err := util.TFStringSetToLicenses(ctx, planData.Licenses)
 	if err != nil {
 		return err
 	}
 
 	// convert tf tags to go tags
-	tagsGoList, err := util.TFStringSetToGoStringList(ctx, planData.Labels)
+	planTags, err := util.TFStringSetToTagLabels(ctx, planData.Labels)
 	if err != nil {
 		return err
 	}
@@ -102,7 +97,7 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 		performanceTier,
 		planData.Virtual.ValueBool(),
 		&licenses,
-		tags.New(tagsGoList...),
+		planTags,
 	)
 	res, err := resource.client.CreateCloudFtd(ctx, createInp)
 	if err != nil {
@@ -132,7 +127,7 @@ func Update(ctx context.Context, resource *Resource, planData *ResourceModel, st
 	// do update
 
 	// convert tf tags to go tags
-	tagsGoList, err := util.TFStringSetToGoStringList(ctx, planData.Labels)
+	planTags, err := util.TFStringSetToTagLabels(ctx, planData.Labels)
 	if err != nil {
 		return err
 	}
@@ -140,7 +135,7 @@ func Update(ctx context.Context, resource *Resource, planData *ResourceModel, st
 	inp := cloudftd.NewUpdateInput(
 		planData.ID.ValueString(),
 		planData.Name.ValueString(),
-		tags.New(tagsGoList...),
+		planTags,
 	)
 	res, err := resource.client.UpdateCloudFtd(ctx, inp)
 	if err != nil {

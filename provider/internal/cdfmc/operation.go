@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) error {
@@ -39,20 +38,6 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 	// e.g. planData.ID = types.StringValue(createOutp.Uid)
 	planData.Id = types.StringValue(createOut.Uid)
 	planData.Name = types.StringValue(createOut.Name)
-
-	return nil
-}
-
-func Update(ctx context.Context, resource *Resource, planData *ResourceModel, stateData *ResourceModel) error {
-
-	// empty because nothing to update
-
-	return nil
-}
-
-func Delete(ctx context.Context, resource *Resource, stateData *ResourceModel) error {
-
-	tflog.Warn(ctx, "Delete cdFMC is a noop, please reach out to CDO TAC if you really want to delete a cdFMC.")
 
 	return nil
 }

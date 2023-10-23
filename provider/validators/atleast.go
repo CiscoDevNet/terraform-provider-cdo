@@ -10,17 +10,17 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
-// ValueStringsAtLeast returns a validator which ensures that at least one configured
+// SetValueStringsAtLeast returns a validator which ensures that at least one configured
 // String values passes each String validator.
 //
 // Null (unconfigured) and unknown (known after apply) values are skipped.
-func ValueStringsAtLeast(elementValidators ...validator.String) validator.List {
+func SetValueStringsAtLeast(elementValidators ...validator.String) validator.Set {
 	return valueStringsAtLeastValidator{
 		elementValidators: elementValidators,
 	}
 }
 
-var _ validator.List = valueStringsAtLeastValidator{}
+var _ validator.Set = valueStringsAtLeastValidator{}
 
 // valueStringsAtLeastValidator validates that each List member validates against each of the value validators.
 type valueStringsAtLeastValidator struct {
@@ -43,8 +43,8 @@ func (v valueStringsAtLeastValidator) MarkdownDescription(ctx context.Context) s
 	return v.Description(ctx)
 }
 
-// ValidateList performs the validation.
-func (v valueStringsAtLeastValidator) ValidateList(ctx context.Context, req validator.ListRequest, resp *validator.ListResponse) {
+// ValidateSet performs the validation.
+func (v valueStringsAtLeastValidator) ValidateSet(ctx context.Context, req validator.SetRequest, resp *validator.SetResponse) {
 	if req.ConfigValue.IsNull() || req.ConfigValue.IsUnknown() {
 		return
 	}

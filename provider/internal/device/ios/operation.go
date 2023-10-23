@@ -4,9 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
-	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
 	"strconv"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios"
@@ -36,10 +34,7 @@ func Read(ctx context.Context, resource *IosDeviceResource, stateData *IosDevice
 	stateData.Ipv4 = types.StringValue(readOutp.SocketAddress)
 	stateData.Host = types.StringValue(readOutp.Host)
 	stateData.IgnoreCertificate = types.BoolValue(readOutp.IgnoreCertificate)
-	// only set labels if it is different
-	if !sliceutil.StringsEqualUnordered(util.TFStringListToGoStringList(stateData.Labels), readOutp.Tags.Labels) {
-		stateData.Labels = util.GoStringSliceToTFStringList(readOutp.Tags.Labels)
-	}
+	stateData.Labels = util.GoStringSliceToTFStringSet(readOutp.Tags.Labels)
 
 	return nil
 }
@@ -55,6 +50,12 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 		return err
 	}
 
+	// convert tf tags to go tags
+	planTags, err := util.TFStringSetToTagLabels(ctx, planData.Labels)
+	if err != nil {
+		return err
+	}
+
 	createInp := ios.NewCreateRequestInput(
 		planData.Name.ValueString(),
 		readSdcOutp.Uid,
@@ -63,7 +64,7 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 		planData.Username.ValueString(),
 		planData.Password.ValueString(),
 		planData.IgnoreCertificate.ValueBool(),
-		tags.New(util.TFStringListToGoStringList(planData.Labels)...),
+		planTags,
 	)
 
 	createOutp, createErr := resource.client.CreateIos(ctx, *createInp)
@@ -91,26 +92,30 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 		return fmt.Errorf("failed to parse IOS port, cause=%w", err)
 	}
 	planData.Port = types.Int64Value(port)
-	planData.Labels = util.GoStringSliceToTFStringList(createOutp.Tags.Labels)
+	planData.Labels = util.GoStringSliceToTFStringSet(createOutp.Tags.Labels)
 
 	return nil
 }
 
 func Update(ctx context.Context, resource *IosDeviceResource, planData *IosDeviceResourceModel, stateData *IosDeviceResourceModel) error {
+
+	// convert tf tags to go tags
+	planTags, err := util.TFStringSetToTagLabels(ctx, planData.Labels)
+	if err != nil {
+		return err
+	}
+
 	updateInp := *ios.NewUpdateInput(
 		stateData.ID.ValueString(),
 		planData.Name.ValueString(),
-		tags.New(util.TFStringListToGoStringList(planData.Labels)...),
+		planTags,
 	)
 	updateOutp, err := resource.client.UpdateIos(ctx, updateInp)
 	if err != nil {
 		return err
 	}
 	stateData.Name = types.StringValue(updateOutp.Name)
-	// only set labels if it is different
-	if !sliceutil.StringsEqualUnordered(util.TFStringListToGoStringList(stateData.Labels), updateOutp.Tags.Labels) {
-		stateData.Labels = planData.Labels
-	}
+	stateData.Labels = planData.Labels
 
 	return nil
 }

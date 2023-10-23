@@ -83,6 +83,9 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 		return err
 	}
 	licenses, err := license.DeserializeAllFromCdo(strings.Join(licensesGoList, ","))
+	if err != nil {
+		return err
+	}
 
 	// convert tf tags to go tags
 	tagsGoList, err := util.TFStringSetToGoStringList(ctx, planData.Labels)

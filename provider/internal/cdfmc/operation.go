@@ -45,19 +45,12 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 
 func Update(ctx context.Context, resource *Resource, planData *ResourceModel, stateData *ResourceModel) error {
 
-	// do update
-	// e.g. updateOutp, err := resource.client.UpdateExample(ctx, ...)
-
-	// map response to terraform types
-	// stateData.ID = types.StringValue(updateOutp.Uid)
+	// empty because nothing to update
 
 	return nil
 }
 
 func Delete(ctx context.Context, resource *Resource, stateData *ResourceModel) error {
-
-	// do delete
-	// _, err := resource.client.DeleteExample(ctx, ...)
 
 	tflog.Warn(ctx, "Delete cdFMC is a noop, please reach out to CDO TAC if you really want to delete a cdFMC.")
 

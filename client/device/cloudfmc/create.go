@@ -37,8 +37,6 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 
 	client.Logger.Println("creating cloud FMC")
 
-	client.Logger.Println("creating cloud FMC application")
-
 	// 1. POST /aegis/rest/v1/services/targets/applications
 	createApplicationUrl := url.CreateApplication(client.BaseUrl())
 	createApplicationReq := client.NewPost(
@@ -79,7 +77,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	err = retry.Do(untilApplicationActive(ctx, client),
 		retry.NewOptionsBuilder().
 			Retries(-1).
-			Timeout(time.Hour). // usually takes about 15-20 minutes
+			Timeout(30*time.Minute). // usually takes about 15-20 minutes
 			Delay(3*time.Second).
 			EarlyExitOnError(true).
 			Logger(client.Logger).

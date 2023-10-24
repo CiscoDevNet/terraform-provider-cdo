@@ -106,7 +106,7 @@ func Do(retryFunc Func, opt Options) error {
 	ok, err := retryFunc()
 	accumulatedErrs = append(accumulatedErrs, err)
 	if err != nil && opt.EarlyExitOnError {
-		return fmt.Errorf("error in initial retry, cause=%w", err)
+		return fmt.Errorf("error in retry func, cause=%w", err)
 	}
 	if ok {
 		return nil

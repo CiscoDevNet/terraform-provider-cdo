@@ -86,17 +86,22 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		metadata = &Metadata{IsNewPolicyObjectModel: "true"}
 	}
 	// 1.3 create the device
-	deviceCreateOutp, err := device.Create(ctx, client, *device.NewCreateRequestInput(
-		createInp.Name,
-		"ASA",
-		createInp.ConnectorUid,
-		createInp.ConnectorType,
-		createInp.SocketAddress,
-		false,
-		createInp.IgnoreCertificate,
-		metadata,
-		createInp.Tags,
-	))
+	deviceCreateOutp, err := device.Create(
+		ctx,
+		client,
+		device.NewCreateInputBuilder().
+			Name(createInp.Name).
+			DeviceType(devicetype.Asa).
+			ConnectorUid(createInp.ConnectorUid).
+			ConnectorType(createInp.ConnectorType).
+			SocketAddress(createInp.SocketAddress).
+			Model(false).
+			IgnoreCertificate(&createInp.IgnoreCertificate).
+			Metadata(metadata).
+			Tags(createInp.Tags).
+			Build(),
+	)
+
 	var createdResourceId *string = nil
 	if deviceCreateOutp != nil {
 		createdResourceId = &deviceCreateOutp.Uid

@@ -149,3 +149,11 @@ func ReadFmcTaskStatus(baseUrl string, fmcDomainUid string, taskId string) strin
 func ReadTenantDetails(baseUrl string) string {
 	return fmt.Sprintf("%s/anubis/rest/v1/oauth/check_token", baseUrl)
 }
+
+func CreateApplication(baseUrl string) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/applications", baseUrl)
+}
+
+func ReadApplication(baseUrl string) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/applications", baseUrl)
+}

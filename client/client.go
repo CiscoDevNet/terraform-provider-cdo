@@ -196,6 +196,10 @@ func (c *Client) ReadTenantDetails(ctx context.Context) (*tenant.ReadTenantDetai
 	return tenant.ReadTenantDetails(ctx, c.client)
 }
 
+func (c *Client) CreateCloudFmcDevice(ctx context.Context, inp cloudfmc.CreateInput) (*cloudfmc.CreateOutput, error) {
+	return cloudfmc.Create(ctx, c.client, inp)
+}
+
 func (c *Client) ReadCloudFmcDevice(ctx context.Context) (*device.ReadOutput, error) {
 	return cloudfmc.Read(ctx, c.client, cloudfmc.NewReadInput())
 }

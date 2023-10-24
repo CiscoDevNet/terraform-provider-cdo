@@ -35,7 +35,7 @@ type CreateOutput = device.CreateOutput
 
 func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, error) {
 
-	client.Logger.Println("creating cloud FMC")
+	client.Logger.Println("Creating application object for cdFMC")
 
 	// 1. POST /aegis/rest/v1/services/targets/applications
 	createApplicationUrl := url.CreateApplication(client.BaseUrl())

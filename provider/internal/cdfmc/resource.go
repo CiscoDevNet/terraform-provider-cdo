@@ -35,7 +35,7 @@ func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, r
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "Cloud-delivered FMC (cdfmc) resource description.",
+		MarkdownDescription: "Use this resource to create a Cloud-delivered FMC (cdFMC) in your tenant. You can have only one cdFMC in your tenant. In addition, you cannot delete a created cdFMC using this resource; to delete your cdFMC, please contact Cisco support.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{

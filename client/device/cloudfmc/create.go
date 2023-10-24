@@ -97,7 +97,11 @@ func untilApplicationActive(ctx context.Context, client http.Client) retry.Func 
 	var initialUnreachableTime time.Time
 	return func() (bool, error) {
 		fmc, err := application.Read(ctx, client, application.ReadInput{})
-		if err != nil && !errors.Is(err, application.NotFoundError) {
+		if err != nil {
+			if !errors.Is(err, application.NotFoundError) {
+				// maybe the application is not created yet, and hopefully this is temporarily, ignoring
+				return false, nil
+			}
 			return false, err
 		}
 		if fmc.ApplicationStatus == applicationstatus.Unreachable {

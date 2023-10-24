@@ -85,7 +85,7 @@ func NewOptions(logger *log.Logger, timeout time.Duration, delay time.Duration, 
 }
 
 // Do run retry function until response of request satisfy check function, or ends early according to configuration.
-func Do(ctx context.Context, retryFunc Func, opt Options) error {
+func Do(retryFunc Func, opt Options) error {
 
 	startTime := time.Now()
 	endTime := startTime.Add(opt.Timeout)

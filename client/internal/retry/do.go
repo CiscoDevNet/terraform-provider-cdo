@@ -165,9 +165,7 @@ type retryInfo struct {
 	timeout bool
 }
 
-// retry sends a number to the given channel according to given delay and retries,
-// it will send retries+1 numbers to the channel, the number sent is the current retry attempt,
-// 0 indicate the first attempt, -1 indicate an early timeout during future delay.
+// retry sends a retryInfo to the given channel according to given delay and retries,
 func retry(ctx context.Context, c chan<- retryInfo, delay time.Duration, retries int) {
 	c <- retryInfo{attempt: 0, timeout: false}
 	for attempt := 1; attempt <= retries || retries < 0; attempt++ {

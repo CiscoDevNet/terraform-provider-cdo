@@ -146,58 +146,84 @@ func Do(retryFunc Func, opt Options) error {
 }
 
 func Do2(ctx context.Context, retryFunc Func, opt Options) error {
+	// set up context
+	ctxToUse := ctx
 	if opt.Timeout > 0 {
-		ctx, cancel := context.WithTimeout(ctx, opt.Timeout)
+		var cancel context.CancelFunc
+		ctxToUse, cancel = context.WithTimeout(ctx, opt.Timeout)
 		defer cancel()
-		return doInternal(ctx, retryFunc, opt)
-	} else {
-		return doInternal(ctx, retryFunc, opt)
 	}
+
+	// set up channels
+	retryChan := make(chan retryInfo)
+	go retry(ctxToUse, retryChan, opt.Delay, opt.Retries)
+	return doInternal(ctxToUse, retryFunc, retryChan, opt)
 }
 
-func doInternal(ctx context.Context, retryFunc Func, opt Options) error {
-	// setup times
+type retryInfo struct {
+	attempt int
+	timeout bool
+}
+
+// retry sends a number to the given channel according to given delay and retries,
+// it will send retries+1 numbers to the channel, the number sent is the current retry attempt,
+// 0 indicate the first attempt, -1 indicate an early timeout during future delay.
+func retry(ctx context.Context, c chan<- retryInfo, delay time.Duration, retries int) {
+	c <- retryInfo{attempt: 0, timeout: false}
+	for attempt := 1; attempt <= retries || retries < 0; attempt++ {
+		if willTimeoutAfterDelay(ctx, delay) {
+			c <- retryInfo{attempt: attempt, timeout: true}
+		}
+		time.Sleep(delay)
+		c <- retryInfo{attempt: attempt, timeout: false}
+	}
+	close(c)
+}
+
+func doInternal(ctx context.Context, retryFunc Func, retryChan <-chan retryInfo, opt Options) error {
+	// setup time
 	startTime := time.Now()
 	// setup errors
-	accumulatedErrors := make([]error, goutil.Max(opt.Retries, 0)+1)
+	// retryErrors[i] = nil: no error occur at this attempt
+	// retryErrors[i] != nil: error occur at this attempt
+	retryErrors := make([]error, goutil.Max(opt.Retries, 0)+1)
 
-	for attempt := 0; opt.Retries < 0 || attempt <= opt.Retries; attempt++ {
+	// setup retry info
+	var retryInfo retryInfo
+	var retryOk = true
+
+	for {
 		select {
-		// handles timeout
 		case <-ctx.Done():
-			return fmt.Errorf("%w at attempt=%d/%d, after=%s", ctx.Err(), attempt, opt.Retries, time.Now().Sub(startTime))
-		default:
-			if attempt > 0 {
-				if willTimeoutAfterDelay(ctx, opt.Delay) {
-					return fmt.Errorf("timeout at attempt=%d/%d, after=%s", attempt, opt.Retries, time.Now().Sub(startTime))
-				}
+			// context timeout
+			return fmt.Errorf("%w at attempt=%d/%d, after=%s, retry errors=%w", ctx.Err(), retryInfo.attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
+		case retryInfo, retryOk = <-retryChan:
+			// retry signal received from retry channel
+			if !retryOk {
+				// max retry exceeded
+				return fmt.Errorf("failed after %d retries, time taken=%s, retry errors=%w", opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
 			}
+			if retryInfo.timeout {
+				// early timeout, indicates we foresee that it will time out during the delay,
+				return fmt.Errorf("timeout at attempt=%d/%d, after=%s, retry errors=%w", retryInfo.attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
+			}
+			// do attempt
 			ok, err := retryFunc()
-			accumulatedErrors = append(accumulatedErrors, err)
+			retryErrors = append(retryErrors, err)
 			if err != nil && opt.EarlyExitOnError {
-				return err
+				return fmt.Errorf("retry early exited on error=%w", err)
 			}
 			if ok {
 				return nil
 			}
 		}
 	}
-	return fmt.Errorf(
-		"failed after %d retries, time taken=%s, retry errors=%w",
-		opt.Retries,
-		time.Now().Sub(startTime),
-		errors.Join(accumulatedErrors...),
-	)
 }
 
 func willTimeoutAfterDelay(ctx context.Context, delay time.Duration) bool {
 	ddl, ok := ctx.Deadline()
 	if !ok {
-		return false // no deadline is set, will never time out
+		return false // no deadline is set, so we will never time out after delay
 	}
-	if delay > 0 {
-		return time.Now().Add(delay).After(ddl)
-	} else {
-		return time.Now().After(ddl)
-	}
+	return time.Now().Add(goutil.Max(delay, 0)).After(ddl)
 }

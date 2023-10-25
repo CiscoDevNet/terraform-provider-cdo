@@ -180,6 +180,14 @@ func retry(ctx context.Context, c chan<- retryInfo, delay time.Duration, retries
 	close(c)
 }
 
+func willTimeoutAfterDelay(ctx context.Context, delay time.Duration) bool {
+	ddl, ok := ctx.Deadline()
+	if !ok {
+		return false // no deadline is set, so we will never time out after delay
+	}
+	return time.Now().Add(goutil.Max(delay, 0)).After(ddl)
+}
+
 func doInternal(ctx context.Context, retryFunc Func, retryChan <-chan retryInfo, opt Options) error {
 	// setup time
 	startTime := time.Now()
@@ -205,11 +213,11 @@ func doInternal(ctx context.Context, retryFunc Func, retryChan <-chan retryInfo,
 			}
 			if retryInfo.timeout {
 				// early timeout, indicates we foresee that it will time out during the delay,
-				return fmt.Errorf("timeout at attempt=%d/%d, after=%s, retry errors=%w", retryInfo.attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
+				return fmt.Errorf("timeout at attempt=%d/%d, after=%s, retry errors:\n%w\n", retryInfo.attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
 			}
 			// do attempt
 			ok, err := retryFunc()
-			retryErrors = append(retryErrors, err)
+			retryErrors = append(retryErrors, fmt.Errorf("error at attempt %d/%d: %w", retryInfo.attempt, opt.Retries, err))
 			if err != nil && opt.EarlyExitOnError {
 				return fmt.Errorf("retry early exited on error=%w", err)
 			}
@@ -218,12 +226,4 @@ func doInternal(ctx context.Context, retryFunc Func, retryChan <-chan retryInfo,
 			}
 		}
 	}
-}
-
-func willTimeoutAfterDelay(ctx context.Context, delay time.Duration) bool {
-	ddl, ok := ctx.Deadline()
-	if !ok {
-		return false // no deadline is set, so we will never time out after delay
-	}
-	return time.Now().Add(goutil.Max(delay, 0)).After(ddl)
 }

@@ -172,11 +172,10 @@ func doInternal(ctx context.Context, retryFunc Func, opt Options) error {
 	// retryErrors[i] != nil: error occur at this attempt
 	retryErrors := make([]error, goutil.Max(opt.Retries, 0)+1)
 
-	// setup retry info
 	for attempt := 0; attempt < opt.Retries || opt.Retries < 0; attempt++ {
 		select {
 		case <-ctx.Done():
-			// context timeout
+			// context timeout/cancelled
 			return fmt.Errorf("%w at attempt=%d/%d, after=%s, retry errors=%w", ctx.Err(), attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
 		default:
 			if attempt > 0 {
@@ -190,6 +189,7 @@ func doInternal(ctx context.Context, retryFunc Func, opt Options) error {
 			ok, err := retryFunc()
 			retryErrors = append(retryErrors, fmt.Errorf("error at attempt %d/%d: %w", attempt, opt.Retries, err))
 			if err != nil && opt.EarlyExitOnError {
+				// usually we accumulate errors and return together, unless EarlyExitOnError is true
 				return fmt.Errorf("retry early exited on error=%w", err)
 			}
 			if ok {

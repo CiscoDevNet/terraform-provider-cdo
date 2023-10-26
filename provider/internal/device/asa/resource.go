@@ -179,6 +179,10 @@ func (r *AsaDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 	}
 	asaReadOutp, err := r.client.ReadAsa(ctx, readInp)
 	if err != nil {
+		if util.Is404Error(err) {
+			resp.State.RemoveResource(ctx)
+			return
+		}
 		resp.Diagnostics.AddError("unable to read ASA Device", err.Error())
 		return
 	}

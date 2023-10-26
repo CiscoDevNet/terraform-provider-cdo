@@ -25,12 +25,20 @@ type Options struct {
 
 	Logger *log.Logger
 
-	EarlyExitOnError bool // EarlyExitOnError will cause Retry to return immediately if error is returned from Func; if false, it will only return when max retries exceeded, which errors are combined and returned together.
+	// EarlyExitOnError will cause Retry to return immediately if error is returned from Func;
+	// if false, it will only return when max retries exceeded, which errors are combined and returned together.
+	// Note user can decide in the retry function whether to return error when error occur,
+	// so if someone does not want to return early, they can just not return the error.
+	// but often, if retry timeout, we want to see what caused the timeout, we want to see the error occurred,
+	// to do this, the retry function needs to manually accumulate the errors if there are any,
+	// but as most people would like to see the error when this happens, and this is troublesome to do in the retry function,
+	// we have a parameter to handle this.
+	EarlyExitOnError bool
 }
 
 // Func is the retryable function for retrying.
 // ok: whether ok to stop
-// err: if not nil, stop retrying and return that error
+// error: if not nil, stop retrying and return that error
 type Func func() (ok bool, err error)
 
 const (
@@ -172,32 +180,32 @@ func doInternal(ctx context.Context, retryFunc Func, opt Options) error {
 	// retryErrors[i] != nil: error occur at this attempt
 	retryErrors := make([]error, goutil.Max(opt.Retries, 0)+1)
 
-	for attempt := 0; attempt < opt.Retries || opt.Retries < 0; attempt++ {
+	for attempt := 0; attempt <= opt.Retries || opt.Retries < 0; attempt++ {
 		select {
 		case <-ctx.Done():
 			// context timeout/cancelled
-			return fmt.Errorf("%w at attempt=%d/%d, after=%s, retry errors=%w", ctx.Err(), attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
+			return newTimeoutErrorf("%s at attempt=%d/%d, after=%s, errors:\n%w\n", ctx.Err(), attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
 		default:
 			if attempt > 0 {
 				// not the first attempt, this is a retry, so we do delay
 				if willTimeoutAfterDelay(ctx, opt.Delay) {
-					return fmt.Errorf("timeout at attempt=%d/%d, after=%s, retry errors:\n%w\n", attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
+					return newTimeoutErrorf("timeout at attempt=%d/%d, after=%s, errors:\n%w\n", attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
 				}
 				time.Sleep(opt.Delay)
 			}
 			// do attempt
 			ok, err := retryFunc()
-			retryErrors = append(retryErrors, fmt.Errorf("error at attempt %d/%d: %w", attempt, opt.Retries, err))
+			opt.Logger.Printf("retry attempt=%d/%d, ok=%t, error=%s\n", attempt, opt.Retries, ok, err)
+			retryErrors = append(retryErrors, fmt.Errorf("attempt %d/%d: ok=%t, error=%w", attempt, opt.Retries, ok, err))
+
 			if err != nil && opt.EarlyExitOnError {
-				// usually we accumulate errors and return together, unless EarlyExitOnError is true
-				return fmt.Errorf("retry early exited on error=%w", err)
+				return newTimeoutErrorf("%s at attempt=%d/%d, after=%s, errors:\n%w\n", ctx.Err(), attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
 			}
 			if ok {
 				return nil
 			}
 		}
 	}
-
 	// max retry exceeded
-	return fmt.Errorf("failed after %d retries, time taken=%s, retry errors=%w", opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
+	return newRetriesExceededErrorf("failed after %d retries, time taken=%s, errors:\n%w\n", opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
 }

@@ -6,6 +6,7 @@ import (
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
 	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -187,6 +188,10 @@ func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *res
 
 	// 2. do read
 	if err := Read(ctx, r, &stateData); err != nil {
+		if util.Is404Error(err) {
+			resp.State.RemoveResource(ctx)
+			return
+		}
 		resp.Diagnostics.AddError("failed to read FTD resource", err.Error())
 		return
 	}

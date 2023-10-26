@@ -191,8 +191,6 @@ func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *res
 		return
 	}
 
-	resp.State.RemoveResource(ctx)
-
 	// 3. save data into terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &stateData)...)
 	tflog.Trace(ctx, "read FTD resource done")

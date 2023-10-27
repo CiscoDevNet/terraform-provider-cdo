@@ -59,7 +59,7 @@ func NewRequest(config cdo.Config, httpClient *http.Client, logger *log.Logger, 
 // output: if given, will unmarshal response body into this object, should be a pointer for it to be useful
 func (r *Request) Send(output any) error {
 	err := retry.Do(
-		context.Background(),
+		context.Background(), // internal retry is not cancellable
 		func() (bool, error) {
 
 			err := r.send(output)

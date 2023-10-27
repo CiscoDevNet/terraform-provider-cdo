@@ -46,6 +46,7 @@ func UntilCreateDeviceRecordSuccess(ctx context.Context, client http.Client, cre
 		}
 		readInp := NewReadTaskStatusInput(createDeviceRecordInput.FmcDomainUid, createDeviceOutp.Metadata.Task.Id, createDeviceRecordInput.FmcHostname)
 		err = retry.Do(
+			ctx,
 			UntilTaskStatusSuccess(ctx, client, readInp),
 			retry.NewOptionsBuilder().
 				Retries(-1).

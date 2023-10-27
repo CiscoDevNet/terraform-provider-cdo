@@ -154,7 +154,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 
 	// 8. wait for generate command available
 	var metadata Metadata
-	err = retry.Do(UntilGeneratedCommandAvailable(ctx, client, createOup.Uid, &metadata), *retry.NewOptionsWithLoggerAndRetries(client.Logger, 3))
+	err = retry.Do(ctx, UntilGeneratedCommandAvailable(ctx, client, createOup.Uid, &metadata), *retry.NewOptionsWithLoggerAndRetries(client.Logger, 3))
 	if err != nil {
 		return nil, err
 	}

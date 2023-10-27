@@ -74,7 +74,9 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 
 	client.Logger.Println("waiting for fmce state machine to be done")
 
-	err = retry.Do(untilApplicationActive(ctx, client),
+	err = retry.Do(
+		ctx,
+		untilApplicationActive(ctx, client),
 		retry.NewOptionsBuilder().
 			Retries(-1).
 			Timeout(30*time.Minute). // usually takes about 15-20 minutes

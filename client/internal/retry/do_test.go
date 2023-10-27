@@ -73,7 +73,7 @@ func TestRetryContextOrOptionsErrors(t *testing.T) {
 			retryCtx, cancel := context.WithTimeout(context.Background(), testCase.contextTimeout)
 			defer cancel()
 
-			err := retry.Do2(retryCtx, testCase.retryFunc, testCase.retryOptions)
+			err := retry.Do(retryCtx, testCase.retryFunc, testCase.retryOptions)
 
 			assert.ErrorIs(t, err, testCase.expectedError)
 		})
@@ -89,7 +89,7 @@ func TestRetryFunctionSuccess(t *testing.T) {
 			fmt.Sprintf("Should terminate correctly when it ends successfully after retrying %d times", expectedAttempts),
 			func(t *testing.T) {
 				var actualAttempt = 0
-				err := retry.Do2(context.Background(), func() (bool, error) {
+				err := retry.Do(context.Background(), func() (bool, error) {
 					actualAttempt++
 					return actualAttempt == expectedAttempts, nil
 				}, retry.Options{
@@ -115,7 +115,7 @@ func TestRetryFunctionError(t *testing.T) {
 			fmt.Sprintf("Should ends correctly when error occur after retrying %d times", errorAttempt),
 			func(t *testing.T) {
 				var actualAttempt = 0
-				err := retry.Do2(
+				err := retry.Do(
 					context.Background(),
 					func() (bool, error) {
 						actualAttempt++
@@ -154,7 +154,7 @@ func TestRetryEarlyExitOnError(t *testing.T) {
 		t.Run(
 			fmt.Sprintf("Should return accumulated errors after retrying %d times", attempts),
 			func(t *testing.T) {
-				err := retry.Do2(
+				err := retry.Do(
 					context.Background(),
 					func() (bool, error) {
 						defer func() { errorIndex++ }()
@@ -180,7 +180,7 @@ func TestRetryEarlyExitOnError(t *testing.T) {
 func TestRetryShouldAttemptOnceBeforeRetry(t *testing.T) {
 
 	attempts := 0
-	err := retry.Do2(
+	err := retry.Do(
 		context.Background(),
 		func() (bool, error) {
 			attempts++
@@ -202,7 +202,7 @@ func TestRetryShouldTimeoutIfWillTimeoutAfterDelay(t *testing.T) {
 
 	attempts := 0
 	startTime := time.Now()
-	err := retry.Do2(
+	err := retry.Do(
 		context.Background(),
 		func() (bool, error) {
 			attempts++
@@ -219,4 +219,30 @@ func TestRetryShouldTimeoutIfWillTimeoutAfterDelay(t *testing.T) {
 	assert.ErrorIs(t, err, retry.TimeoutError)
 	assert.Less(t, time.Since(startTime), 300*time.Millisecond) // time since start should be smaller than delay, to assure that no delay actually took place
 	assert.Equal(t, 1, attempts)
+}
+
+func TestRetryShouldTimeoutOnContextCancel(t *testing.T) {
+
+	attempts := 0
+	startTime := time.Now()
+	testContext, cancel := context.WithTimeout(context.Background(), 300*time.Millisecond)
+	err := retry.Do(
+		testContext,
+		func() (bool, error) {
+			// cancel on first attempt
+			cancel()
+			attempts++
+			return false, nil
+		},
+		retry.Options{
+			Timeout:          time.Second,
+			Delay:            time.Second,
+			Retries:          1,
+			Logger:           log.Default(),
+			EarlyExitOnError: false,
+		})
+
+	assert.ErrorIs(t, err, retry.TimeoutError)
+	assert.Less(t, time.Since(startTime), 300*time.Millisecond) // time since start should be smaller than delay and retry timeout, to assure that no delay actually took place.
+	assert.Equal(t, 1, attempts)                                // only one attempt occurred because context is cancelled during first attempt.
 }

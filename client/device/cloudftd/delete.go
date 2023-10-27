@@ -51,7 +51,7 @@ func Delete(ctx context.Context, client http.Client, deleteInp DeleteInput) (*De
 	}
 
 	// 4. wait until the delete cloud FTD state machine has started
-	err = retry.Do(statemachine.UntilStarted(ctx, client, fmcReadSpecificRes.SpecificUid, "fmceDeleteFtdcStateMachine"), retry.DefaultOpts)
+	err = retry.Do(ctx, statemachine.UntilStarted(ctx, client, fmcReadSpecificRes.SpecificUid, "fmceDeleteFtdcStateMachine"), retry.DefaultOpts)
 	if err != nil {
 		return nil, err
 	}

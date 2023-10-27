@@ -93,67 +93,7 @@ func NewOptions(logger *log.Logger, timeout time.Duration, delay time.Duration, 
 }
 
 // Do run retry function until response of request satisfy check function, or ends early according to configuration.
-func Do(retryFunc Func, opt Options) error {
-
-	startTime := time.Now()
-	endTime := startTime.Add(opt.Timeout)
-	timeout := func() bool {
-		return time.Now().After(endTime)
-	}
-	willTimeoutAfterDelay := func() bool {
-		return time.Now().Add(opt.Delay).After(endTime)
-	}
-	accumulatedErrs := make([]error, 0, opt.Retries+1)
-
-	// check if it is already timeout
-	if timeout() {
-		return fmt.Errorf("retry func timeout before any attempt")
-	}
-
-	// attempt once before starting retries
-	ok, err := retryFunc()
-	accumulatedErrs = append(accumulatedErrs, err)
-	if err != nil && opt.EarlyExitOnError {
-		return fmt.Errorf("error in retry func, cause=%w", err)
-	}
-	if ok {
-		return nil
-	}
-
-	// retry starts
-	for retries := 1; opt.Retries < 0 || retries <= opt.Retries; retries++ {
-
-		// if timeout now or will time out during delay between requests
-		if timeout() || willTimeoutAfterDelay() {
-			return fmt.Errorf("timeout at attempt %d/%d, after %s", retries, opt.Retries, time.Now().Sub(startTime))
-		}
-		time.Sleep(opt.Delay)
-
-		opt.Logger.Printf("[RETRY] attempt=%d/%d\n", retries, opt.Retries)
-
-		// attempt
-		ok, err = retryFunc()
-		accumulatedErrs = append(accumulatedErrs, err)
-		if err != nil && opt.EarlyExitOnError {
-			return fmt.Errorf("error in retry func, cause=%w", err)
-		}
-		if ok {
-			opt.Logger.Println("[RETRY] success")
-			return nil
-		}
-		opt.Logger.Println("[RETRY] failed")
-		opt.Logger.Printf("[RETRY] reason: ok=%t err=%+v", ok, err)
-	}
-
-	return fmt.Errorf(
-		"max retry reached, retries=%d, time taken=%s, accumulated errors=%w",
-		opt.Retries,
-		time.Now().Sub(startTime),
-		errors.Join(accumulatedErrs...),
-	)
-}
-
-func Do2(ctx context.Context, retryFunc Func, opt Options) error {
+func Do(ctx context.Context, retryFunc Func, opt Options) error {
 	// set up context
 	ctxToUse := ctx
 	if opt.Timeout > 0 {

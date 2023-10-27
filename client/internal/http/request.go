@@ -58,21 +58,23 @@ func NewRequest(config cdo.Config, httpClient *http.Client, logger *log.Logger, 
 // TODO: cancel retry when context done
 // output: if given, will unmarshal response body into this object, should be a pointer for it to be useful
 func (r *Request) Send(output any) error {
-	err := retry.Do(func() (bool, error) {
+	err := retry.Do(
+		context.Background(),
+		func() (bool, error) {
 
-		err := r.send(output)
-		if err != nil {
-			return false, err
-		}
-		return true, nil
+			err := r.send(output)
+			if err != nil {
+				return false, err
+			}
+			return true, nil
 
-	}, *retry.NewOptions(
-		r.logger,
-		r.config.Timeout,
-		r.config.Delay,
-		r.config.Retries,
-		false,
-	))
+		}, *retry.NewOptions(
+			r.logger,
+			r.config.Timeout,
+			r.config.Delay,
+			r.config.Retries,
+			false,
+		))
 
 	return err
 }

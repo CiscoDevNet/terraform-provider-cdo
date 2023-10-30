@@ -137,12 +137,18 @@ jobs:
     steps:
       - name: Checkout repository code
         uses: actions/checkout@v2
-      - name: Create and push tag
+      - name: Generate tag
+        id: generate_tag
         uses: mathieudutour/github-tag-action@v6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           dry_run: true
-          append_to_pre_release_tag: ""
+      - name: Create tag
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          dry_run: true
+          custom_tag: ${{ steps.generate_tag.outputs.new_version }}
 #  release:
 #    if: github.ref_type == 'tag'
 #    runs-on: ubuntu-latest

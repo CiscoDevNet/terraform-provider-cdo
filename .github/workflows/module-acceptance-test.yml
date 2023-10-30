@@ -1,3 +1,4 @@
+# needs module-build.yml
 name: Acceptance Test
 
 on:

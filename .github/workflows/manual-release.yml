@@ -1,0 +1,9 @@
+on:
+  push:
+    tags:
+      - 'v**'
+
+jobs:
+  release:
+    name: "Release"
+    uses: ./.github/workflows/module-release.yml

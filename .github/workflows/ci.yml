@@ -130,7 +130,7 @@ jobs:
         run: go test -v -cover ./...
         timeout-minutes: 10
   trigger-release:
-    needs: [acceptance-tests, unit-testi]
+    needs: [acceptance-tests, unit-test]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:

@@ -10,7 +10,7 @@ on:
   push:
     branches:
       - 'main'
-      - 'LH-70847-fix-release-trigger'
+      - 'refs/heads/LH-70847-fix-release-trigger'
     tags:
       - 'v*'
 env:
@@ -133,7 +133,7 @@ jobs:
   tag-release-version:
     name: "Tag Release Version"
     needs: [acceptance-test, unit-test]
-    if: github.ref == 'refs/heads/main'
+#    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository code

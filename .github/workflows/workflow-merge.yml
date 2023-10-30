@@ -31,7 +31,7 @@ jobs:
     secrets: inherit
 
   release:
-    needs: tag-release-version
+    needs: tag-version
     uses: ./.github/workflows/module-release.yml
     secrets: inherit
 

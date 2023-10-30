@@ -6,4 +6,4 @@ on:
 jobs:
   release:
     name: "Release"
-    uses: ./.github/workflows/modules/release.yml
+    uses: ./.github/workflows/module-release.yml

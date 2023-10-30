@@ -12,12 +12,12 @@ permissions:
 
 jobs:
   build:
-    uses: ./.github/workflow/module-build.yml
+    uses: ./.github/workflows/module-build.yml
     secrets: inherit
 
   unit-test:
     needs: build
-    uses: ./.github/workflow/module-unit-test.yml
+    uses: ./.github/workflows/module-unit-test.yml
     secrets: inherit
 
   acceptance-test:
@@ -36,11 +36,11 @@ jobs:
     secrets: inherit
 
   scan-for-hardcoded-secrets:
-    uses: ./.github/workflow/module-scan-secrets.yml
+    uses: ./.github/workflows/module-scan-secrets.yml
     secrets: inherit
 
   generate:
-    uses: ./.github/workflow/module-generate.yml
+    uses: ./.github/workflows/module-generate.yml
     secrets: inherit
 
 

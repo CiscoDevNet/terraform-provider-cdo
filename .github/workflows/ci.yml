@@ -131,7 +131,7 @@ jobs:
         run: go test -v -cover ./...
         timeout-minutes: 10
   trigger-release:
-    needs: [acceptance-tests, unit-test]
+    needs: [unit-test]
     if: github.ref == 'LH-70847-ci-release'
     runs-on: ubuntu-latest
     steps:

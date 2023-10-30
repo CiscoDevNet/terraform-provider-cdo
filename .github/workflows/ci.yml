@@ -129,6 +129,17 @@ jobs:
           ASA_RESOURCE_SDC_PASSWORD: ${{ secrets.ASA_RESOURCE_SDC_PASSWORD }}
         run: go test -v -cover ./...
         timeout-minutes: 10
+  trigger-release:
+    needs: [acceptance-tests, unit-test]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v2
+      - name: Create and push tag
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
   release:
     if: github.ref_type == 'tag'
     runs-on: ubuntu-latest

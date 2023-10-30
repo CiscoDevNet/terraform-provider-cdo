@@ -129,9 +129,10 @@ If you make any changes to the resources and data sources provided by this provi
 go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --provider-name cdo --rendered-provider-name "CDO Provider" --rendered-website-dir ../docs
 ```
 
-## Releasing
+## Releasing Manually
+> **Note**: Tags and releases are automatically done in GitHub action when pushed/merged PR into main branch and checks passed, there is no need for releasing manually in normal scenario.
 
-To release a new version of the Terraform CDO Provider, perform the following steps.
+To release a new version of the Terraform CDO Provider manually, perform the following steps.
 
 - Checkout main branch.
 - List current available tags: `git tag`.

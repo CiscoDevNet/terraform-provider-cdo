@@ -86,7 +86,7 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 				return nil, err
 			}
 
-			if err := retry.Do(asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), retry.DefaultOpts); err != nil {
+			if err := retry.Do(ctx, asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), retry.DefaultOpts); err != nil {
 				return nil, err
 			}
 		}
@@ -100,7 +100,7 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 				return nil, err
 			}
 
-			if err := retry.Do(asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), retry.DefaultOpts); err != nil {
+			if err := retry.Do(ctx, asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), retry.DefaultOpts); err != nil {
 				return nil, err
 			}
 		}
@@ -115,7 +115,7 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 		return nil, err
 	}
 
-	if err := retry.Do(UntilStateDoneAndConnectivityOk(ctx, client, outp.Uid), retry.DefaultOpts); err != nil {
+	if err := retry.Do(ctx, UntilStateDoneAndConnectivityOk(ctx, client, outp.Uid), retry.DefaultOpts); err != nil {
 		return nil, err
 	}
 

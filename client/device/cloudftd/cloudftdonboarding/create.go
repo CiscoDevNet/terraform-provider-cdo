@@ -123,6 +123,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		Build()
 	var createOutp fmcconfig.CreateDeviceRecordOutput
 	err = retry.Do(
+		ctx,
 		fmcconfig.UntilCreateDeviceRecordSuccess(ctx, client, createDeviceInp, &createOutp),
 		retry.NewOptionsBuilder().
 			Retries(-1).
@@ -156,6 +157,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	}
 	// 4.3 wait until state machine done
 	err = retry.Do(
+		ctx,
 		cloudftd.UntilSpecificStateDone(
 			ctx,
 			client,

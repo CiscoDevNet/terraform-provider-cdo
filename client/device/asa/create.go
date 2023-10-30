@@ -129,7 +129,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	client.Logger.Println("waiting for asa config state done")
 
 	// poll until asa config state done
-	err = retry.Do(asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), *retry.NewOptionsWithLogger(client.Logger))
+	err = retry.Do(ctx, asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), *retry.NewOptionsWithLogger(client.Logger))
 
 	// error during polling, but we maybe able to handle it
 	if err != nil {
@@ -206,7 +206,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	// poll until asa config state done
 	client.Logger.Println("waiting for device to reach state done")
 
-	err = retry.Do(asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), *retry.NewOptionsWithLogger(client.Logger))
+	err = retry.Do(ctx, asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), *retry.NewOptionsWithLogger(client.Logger))
 	if err != nil {
 		return nil, &CreateError{
 			CreatedResourceId: createdResourceId,

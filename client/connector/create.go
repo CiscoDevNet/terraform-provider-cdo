@@ -56,6 +56,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 
 	// 1.5 poll until SDC has SQS/SNS setup properly to communicate with backend
 	err := retry.Do(
+		ctx,
 		untilCommunicationQueueReady(ctx, client, *NewReadByUidInput(createOutp.Uid)),
 		retry.NewOptionsBuilder().Retries(10).
 			Logger(client.Logger).

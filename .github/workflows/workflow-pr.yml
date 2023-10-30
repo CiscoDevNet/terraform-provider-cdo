@@ -1,0 +1,30 @@
+name: Pull Request
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'README.md'
+
+env:
+  AWS_REGION: "us-west-2"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    uses: ./.github/workflow/module-build.yml
+    secrets: inherit
+
+  unit-test:
+    needs: build
+    uses: ./.github/workflow/module-unit-test.yml
+    secrets: inherit
+
+  scan-for-hardcoded-secrets:
+    uses: ./.github/workflow/module-scan-secrets.yml
+    secrets: inherit
+
+  generate:
+    uses: ./.github/workflow/module-generate.yml
+    secrets: inherit

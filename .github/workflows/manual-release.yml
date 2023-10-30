@@ -7,3 +7,4 @@ jobs:
   release:
     name: "Release"
     uses: ./.github/workflows/module-release.yml
+    secrets: inherit

@@ -147,3 +147,4 @@ jobs:
     name: "Release"
     needs: [tag-release-version]
     uses: ./.github/workflows/module-release.yml
+    secrets: inherit

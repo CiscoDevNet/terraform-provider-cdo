@@ -28,11 +28,11 @@ type Options struct {
 	// EarlyExitOnError will cause Retry to return immediately if error is returned from Func;
 	// if false, it will only return when max retries exceeded, which errors are combined and returned together.
 	// Note user can decide in the retry function whether to return error when error occur,
-	// so if someone does not want to return early, they can just not return the error.
-	// but often, if retry timeout, we want to see what caused the timeout, we want to see the error occurred,
-	// to do this, the retry function needs to manually accumulate the errors if there are any,
-	// but as most people would like to see the error when this happens, and this is troublesome to do in the retry function,
-	// we have a parameter to handle this.
+	// so if someone does not want to return early, they can just not return the error, so in theory there is no need for this parameter to ignore error returned.
+	// But often, if retry times out, we want to see what caused the timeout, we want to see the error that occurred,
+	// to do this without this parameter, the retry function needs to manually accumulate the errors if there are any,
+	// this is troublesome to implement in the retry function, and most of the time we would like to see the error when this happens.
+	// So we have a parameter to handle this.
 	EarlyExitOnError bool
 }
 
@@ -145,7 +145,7 @@ func doInternal(ctx context.Context, retryFunc Func, opt Options) error {
 			retryErrors = append(retryErrors, fmt.Errorf("attempt %d/%d: ok=%t, error=%w", attempt, opt.Retries, ok, err))
 
 			if err != nil && opt.EarlyExitOnError {
-				return newTimeoutErrorf("%s at attempt=%d/%d, after=%s, errors:\n%w\n", ctx.Err(), attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
+				return newFuncErrorf("errored at attempt=%d/%d, after=%s, errors:\n%w\n", attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
 			}
 			if ok {
 				return nil

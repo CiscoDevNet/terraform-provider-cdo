@@ -59,7 +59,11 @@ func NewRequest(config cdo.Config, httpClient *http.Client, logger *log.Logger, 
 // output: if given, will unmarshal response body into this object, should be a pointer for it to be useful
 func (r *Request) Send(output any) error {
 	err := retry.Do(
-		context.Background(), // internal retry is not cancellable
+		// context.Background() will never cancel according to documentation
+		// we do not want to cancel here because this retry mechanism is intended to overcome
+		// the flaky CDO api, built into every request, and we probably do not want to cancel
+		// and fail due to flaky-ness, but if we want to cancel, there is no obvious bad side effect.
+		context.Background(),
 		func() (bool, error) {
 
 			err := r.send(output)

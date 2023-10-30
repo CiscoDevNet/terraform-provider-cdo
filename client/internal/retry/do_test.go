@@ -81,6 +81,21 @@ func TestRetryContextOrOptionsErrors(t *testing.T) {
 			},
 			expectedError: retry.TimeoutError,
 		},
+		{
+			testName:       "Should error if retry func errored",
+			contextTimeout: time.Second,
+			retryOptions: retry.Options{
+				Timeout:          time.Second,
+				Delay:            0,
+				Retries:          0,
+				Logger:           log.Default(),
+				EarlyExitOnError: true,
+			},
+			retryFunc: func() (bool, error) {
+				return false, fmt.Errorf("intentional test error occurred")
+			},
+			expectedError: retry.FuncError,
+		},
 	}
 
 	for _, testCase := range testCases {

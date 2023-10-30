@@ -35,10 +35,18 @@ func newRetriesExceededErrorf(format string, a ...any) ErrorType {
 	return fmt.Errorf("%w: %w", RetriesExceededError, fmt.Errorf(format, a...))
 }
 
-// ContextCancelledError facilitates `errors.Is(err, retry.RetriesExceededError)`.
+// ContextCancelledError facilitates `errors.Is(err, retry.ContextCancelledError)`.
 var ContextCancelledError = fmt.Errorf("%w: context cancelled", Error)
 
-// newContextCancelledErrorf is used within this package to create new RetriesExceededError.
+// newContextCancelledErrorf is used within this package to create new ContextCancelledError.
 func newContextCancelledErrorf(format string, a ...any) ErrorType {
 	return fmt.Errorf("%w: %w", ContextCancelledError, fmt.Errorf(format, a...))
+}
+
+// FuncError facilitates `errors.Is(err, retry.FuncError)`.
+var FuncError = fmt.Errorf("%w: retry function errored", Error)
+
+// newFuncErrorf is used within this package to create new FuncError.
+func newFuncErrorf(format string, a ...any) ErrorType {
+	return fmt.Errorf("%w: %w", FuncError, fmt.Errorf(format, a...))
 }

@@ -96,7 +96,7 @@ func NewOptions(logger *log.Logger, timeout time.Duration, delay time.Duration, 
 func Do(ctx context.Context, retryFunc Func, opt Options) error {
 	// set up context
 	ctxToUse := ctx
-	if opt.Timeout > 0 {
+	if opt.Timeout >= 0 {
 		var cancel context.CancelFunc
 		ctxToUse, cancel = context.WithTimeout(ctx, opt.Timeout)
 		defer cancel()
@@ -118,7 +118,7 @@ func doInternal(ctx context.Context, retryFunc Func, opt Options) error {
 	// setup errors
 	// retryErrors[i] = nil: no error occur at this attempt
 	// retryErrors[i] != nil: error occur at this attempt
-	retryErrors := make([]error, goutil.Max(opt.Retries, 0)+1)
+	retryErrors := make([]error, goutil.Max(opt.Retries, 0)+1) // +1 because total attempts = retries + 1 initial attempt
 
 	for attempt := 0; attempt <= opt.Retries || opt.Retries < 0; attempt++ {
 		select {

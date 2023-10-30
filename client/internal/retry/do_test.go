@@ -66,6 +66,21 @@ func TestRetryContextOrOptionsErrors(t *testing.T) {
 			// retryOptions.Timeout is less than retries * delay or context.Timeout
 			expectedError: retry.TimeoutError,
 		},
+		{
+			testName:       "Should timeout immediately without any attempt when retry options timeout is 0",
+			contextTimeout: time.Second,
+			retryOptions: retry.Options{
+				Timeout:          0,
+				Delay:            time.Second,
+				Retries:          100,
+				Logger:           log.Default(),
+				EarlyExitOnError: false,
+			},
+			retryFunc: func() (bool, error) {
+				return true, nil // return true so that no error will occur if attempt occurred
+			},
+			expectedError: retry.TimeoutError,
+		},
 	}
 
 	for _, testCase := range testCases {

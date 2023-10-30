@@ -124,7 +124,13 @@ func doInternal(ctx context.Context, retryFunc Func, opt Options) error {
 		select {
 		case <-ctx.Done():
 			// context timeout/cancelled
-			return newTimeoutErrorf("%s at attempt=%d/%d, after=%s, errors:\n%w\n", ctx.Err(), attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
+			if errors.Is(ctx.Err(), context.Canceled) {
+				return newContextCancelledErrorf("%s at attempt=%d/%d, after=%s, errors:\n%w\n", ctx.Err(), attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
+			} else if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+				return newTimeoutErrorf("%s at attempt=%d/%d, after=%s, errors:\n%w\n", ctx.Err(), attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
+			} else {
+				// channel not yet closed, not possible, if it happens, ignore and continue...
+			}
 		default:
 			if attempt > 0 {
 				// not the first attempt, this is a retry, so we do delay

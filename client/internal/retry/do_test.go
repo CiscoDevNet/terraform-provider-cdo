@@ -122,7 +122,7 @@ func TestRetryFunctionError(t *testing.T) {
 						if actualAttempt < errorAttempt {
 							return false, nil
 						} else {
-							return false, fmt.Errorf("error occured")
+							return false, fmt.Errorf("intentional test error occured")
 						}
 					},
 					retry.Options{
@@ -146,7 +146,7 @@ func TestRetryEarlyExitOnError(t *testing.T) {
 	// setup errors so that every time the retry func will return different error
 	testErrors := make([]error, 100)
 	for i := 0; i < cap(testErrors); i++ {
-		testErrors[i] = fmt.Errorf("error %d", i)
+		testErrors[i] = fmt.Errorf("intentional test error %d", i)
 	}
 
 	for _, attempts := range testCases {
@@ -221,11 +221,11 @@ func TestRetryShouldTimeoutIfWillTimeoutAfterDelay(t *testing.T) {
 	assert.Equal(t, 1, attempts)
 }
 
-func TestRetryShouldTimeoutOnContextCancel(t *testing.T) {
+func TestRetryShouldReturnContextCancelledErrorOnContextCancel(t *testing.T) {
 
 	attempts := 0
 	startTime := time.Now()
-	testContext, cancel := context.WithTimeout(context.Background(), 300*time.Millisecond)
+	testContext, cancel := context.WithTimeout(context.Background(), time.Second)
 	err := retry.Do(
 		testContext,
 		func() (bool, error) {
@@ -242,7 +242,7 @@ func TestRetryShouldTimeoutOnContextCancel(t *testing.T) {
 			EarlyExitOnError: false,
 		})
 
-	assert.ErrorIs(t, err, retry.TimeoutError)
-	assert.Less(t, time.Since(startTime), 300*time.Millisecond) // time since start should be smaller than delay and retry timeout, to assure that no delay actually took place.
+	assert.ErrorIs(t, err, retry.ContextCancelledError)
+	assert.Less(t, time.Since(startTime), 300*time.Millisecond) // time since start should be smaller than delay, retry, and context timeout, to assure that no delay actually took place, and it is actually manually cancelled.
 	assert.Equal(t, 1, attempts)                                // only one attempt occurred because context is cancelled during first attempt.
 }

@@ -42,9 +42,3 @@ jobs:
   generate:
     uses: ./.github/workflows/module-generate.yml
     secrets: inherit
-
-
-
-
-
-

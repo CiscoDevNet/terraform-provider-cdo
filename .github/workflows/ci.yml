@@ -10,7 +10,6 @@ on:
   push:
     branches:
       - 'main'
-      - 'LH-70847-fix-release-trigger'
     tags:
       - 'v*'
 env:
@@ -96,7 +95,7 @@ jobs:
     name: Terraform Provider Acceptance Tests
     needs: unit-test
     runs-on: ubuntu-latest
-#    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     defaults:
       run:
         working-directory: provider
@@ -133,7 +132,7 @@ jobs:
   tag-release-version:
     name: "Tag Release Version"
     needs: [acceptance-test, unit-test]
-#    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository code
@@ -145,6 +144,7 @@ jobs:
   # we cannot trigger workflow using above's tagging, so we need to do it manually
   release:
     name: "Release"
+    if: github.ref == 'refs/heads/main'
     needs: [tag-release-version]
     uses: ./.github/workflows/module-release.yml
     secrets: inherit

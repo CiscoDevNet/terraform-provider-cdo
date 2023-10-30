@@ -10,7 +10,7 @@ on:
   push:
     branches:
       - 'main'
-      - 'refs/heads/LH-70847-fix-release-trigger'
+      - 'LH-70847-fix-release-trigger'
     tags:
       - 'v*'
 env:
@@ -146,4 +146,4 @@ jobs:
   release:
     name: "Release"
     needs: [tag-release-version]
-    uses: ./.github/workflows/modules/release.yml@main
+    uses: ./.github/workflows/modules/release.yml

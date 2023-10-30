@@ -132,7 +132,7 @@ jobs:
         timeout-minutes: 10
   trigger-release:
     needs: [unit-test]
-    if: github.ref == 'LH-70847-ci-release'
+    if: github.ref == 'refs/heads/LH-70847-ci-release'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository code

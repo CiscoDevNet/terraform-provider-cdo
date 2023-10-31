@@ -127,7 +127,7 @@ func doInternal(ctx context.Context, retryFunc Func, opt Options) error {
 			if err == nil {
 				retryErrors = append(retryErrors, nil)
 			} else {
-				retryErrors = append(retryErrors, newAttemptErrorf("at attempt=%d/%d, ok=%t, error=%s\n", attempt, opt.Retries, ok, err))
+				retryErrors = append(retryErrors, newAttemptErrorf("at attempt=%d/%d, ok=%t, error=%w\n", attempt, opt.Retries, ok, err))
 			}
 
 			if err != nil && opt.EarlyExitOnError {

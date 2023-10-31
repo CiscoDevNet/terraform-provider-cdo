@@ -2,7 +2,7 @@ package iosconfig
 
 import (
 	"context"
-	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/statemachine"
 	"strings"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
@@ -30,10 +30,10 @@ func UntilState(ctx context.Context, client http.Client, specificUid string, exp
 			return true, nil
 		}
 		if strings.EqualFold(readOutp.State, state.ERROR) {
-			return false, fmt.Errorf("workflow ended in ERROR") // TODO: add workflow error message
+			return false, statemachine.NewWorkflowErrorFromDetails(readOutp.StateMachineDetails)
 		}
 		if strings.EqualFold(readOutp.State, state.BAD_CREDENTIALS) {
-			return false, fmt.Errorf("bad credentials")
+			return false, statemachine.NewWorkflowErrorf("bad credentials")
 		}
 		return false, nil
 	}

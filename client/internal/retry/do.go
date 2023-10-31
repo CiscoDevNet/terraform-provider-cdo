@@ -6,7 +6,6 @@ package retry
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/goutil"
 	"log"
 	"time"
@@ -34,6 +33,9 @@ type Options struct {
 	// this is troublesome to implement in the retry function, and most of the time we would like to see the error when this happens.
 	// So we have a parameter to handle this.
 	EarlyExitOnError bool
+
+	// Title is added to error to tell user what this retry is doing when error occur.
+	Title string
 }
 
 // Func is the retryable function for retrying.
@@ -125,9 +127,9 @@ func doInternal(ctx context.Context, retryFunc Func, opt Options) error {
 		case <-ctx.Done():
 			// context timeout/cancelled
 			if errors.Is(ctx.Err(), context.Canceled) {
-				return newContextCancelledErrorf("%s at attempt=%d/%d, after=%s, errors:\n%w\n", ctx.Err(), attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
+				return newContextCancelledErrorf(opt.Title, "%s at attempt=%d/%d, after=%s, errors:\n%w\n", ctx.Err(), attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
 			} else if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-				return newTimeoutErrorf("%s at attempt=%d/%d, after=%s, errors:\n%w\n", ctx.Err(), attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
+				return newTimeoutErrorf(opt.Title, "%s at attempt=%d/%d, after=%s, errors:\n%w\n", ctx.Err(), attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
 			} else {
 				// channel not yet closed, not possible, if it happens, ignore and continue...
 			}
@@ -135,17 +137,21 @@ func doInternal(ctx context.Context, retryFunc Func, opt Options) error {
 			if attempt > 0 {
 				// not the first attempt, this is a retry, so we do delay
 				if willTimeoutAfterDelay(ctx, opt.Delay) {
-					return newTimeoutErrorf("timeout at attempt=%d/%d, after=%s, errors:\n%w\n", attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
+					return newTimeoutErrorf(opt.Title, "at attempt=%d/%d, after=%s, errors:\n%w\n", attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
 				}
 				time.Sleep(opt.Delay)
 			}
 			// do attempt
 			ok, err := retryFunc()
-			opt.Logger.Printf("retry attempt=%d/%d, ok=%t, error=%s\n", attempt, opt.Retries, ok, err)
-			retryErrors = append(retryErrors, fmt.Errorf("attempt %d/%d: ok=%t, error=%w", attempt, opt.Retries, ok, err))
+			opt.Logger.Printf("attempt=%d/%d, ok=%t, error=%s\n", attempt, opt.Retries, ok, err)
+			if err == nil {
+				retryErrors = append(retryErrors, nil)
+			} else {
+				retryErrors = append(retryErrors, newAttemptErrorf("at attempt=%d/%d, ok=%t, error=%s\n", attempt, opt.Retries, ok, err))
+			}
 
 			if err != nil && opt.EarlyExitOnError {
-				return newFuncErrorf("errored at attempt=%d/%d, after=%s, errors:\n%w\n", attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
+				return newFuncErrorf(opt.Title, "at attempt=%d/%d, after=%s, errors:\n%w\n", attempt, opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
 			}
 			if ok {
 				return nil
@@ -153,5 +159,5 @@ func doInternal(ctx context.Context, retryFunc Func, opt Options) error {
 		}
 	}
 	// max retry exceeded
-	return newRetriesExceededErrorf("failed after %d retries, time taken=%s, errors:\n%w\n", opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
+	return newRetriesExceededErrorf(opt.Title, "after %d retries, time taken=%s, errors:\n%w\n", opt.Retries, time.Since(startTime), errors.Join(retryErrors...))
 }

@@ -3,6 +3,7 @@ package asa
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/statemachine"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"strings"
 
@@ -29,10 +30,10 @@ func UntilStateDoneAndConnectivityOk(ctx context.Context, client http.Client, ui
 			return true, nil
 		}
 		if strings.EqualFold(readOutp.State, state.ERROR) {
-			return false, fmt.Errorf("workflow ended in ERROR")
+			return false, statemachine.NewWorkflowErrorFromDetails(readOutp.StateMachineDetails)
 		}
 		if strings.EqualFold(readOutp.State, state.BAD_CREDENTIALS) {
-			return false, fmt.Errorf("bad credentials")
+			return false, statemachine.NewWorkflowErrorf("bad credentials")
 		}
 		return false, nil
 	}

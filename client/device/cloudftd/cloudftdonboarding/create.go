@@ -126,6 +126,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		ctx,
 		fmcconfig.UntilCreateDeviceRecordSuccess(ctx, client, createDeviceInp, &createOutp),
 		retry.NewOptionsBuilder().
+			Title("waiting for create FMC device record to be done").
 			Retries(-1).
 			Delay(3*time.Second).
 			Timeout(1*time.Hour). // it can take 15-20 minutes for FTD to come up + 10 minutes to create device record
@@ -166,6 +167,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 				Build(),
 		),
 		retry.NewOptionsBuilder().
+			Title("waiting for Cloud FTD onboarding to be done").
 			Retries(-1).
 			Delay(1*time.Second).
 			Timeout(20*time.Minute). // usually done in less than 5 minutes because we already registered in FTDc

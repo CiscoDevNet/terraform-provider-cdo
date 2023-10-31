@@ -40,6 +40,11 @@ func (b *OptionsBuilder) EarlyExitOnError(earlyExitOnError bool) *OptionsBuilder
 	return b
 }
 
+func (b *OptionsBuilder) Title(title string) *OptionsBuilder {
+	b.options.Title = title
+	return b
+}
+
 func (b *OptionsBuilder) Build() Options {
 	return *b.options
 }

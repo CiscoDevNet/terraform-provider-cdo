@@ -58,7 +58,9 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	err := retry.Do(
 		ctx,
 		untilCommunicationQueueReady(ctx, client, *NewReadByUidInput(createOutp.Uid)),
-		retry.NewOptionsBuilder().Retries(10).
+		retry.NewOptionsBuilder().
+			Title("waiting for SDC to be available").
+			Retries(10).
 			Logger(client.Logger).
 			Delay(2*time.Second).
 			EarlyExitOnError(true).

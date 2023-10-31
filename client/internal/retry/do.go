@@ -62,26 +62,6 @@ var (
 	}
 )
 
-func NewOptionsWithLogger(logger *log.Logger) *Options {
-	return NewOptions(
-		logger,
-		DefaultTimeout,
-		DefaultDelay,
-		DefaultRetries,
-		DefaultEarlyExitOnError,
-	)
-}
-
-func NewOptionsWithLoggerAndRetries(logger *log.Logger, retries int) *Options {
-	return NewOptions(
-		logger,
-		DefaultTimeout,
-		DefaultDelay,
-		retries,
-		DefaultEarlyExitOnError,
-	)
-}
-
 func NewOptions(logger *log.Logger, timeout time.Duration, delay time.Duration, retries int, earlyExitOnError bool) *Options {
 	return &Options{
 		Timeout: timeout,

@@ -40,6 +40,11 @@ func (b *OptionsBuilder) EarlyExitOnError(earlyExitOnError bool) *OptionsBuilder
 	return b
 }
 
+func (b *OptionsBuilder) Message(message string) *OptionsBuilder {
+	b.options.Message = message
+	return b
+}
+
 func (b *OptionsBuilder) Build() Options {
 	return *b.options
 }

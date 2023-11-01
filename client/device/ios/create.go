@@ -121,7 +121,18 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		publicKey = &connectorReadRes.PublicKey
 	}
 
-	err = retry.Do(ctx, iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, state.PRE_READ_METADATA), *retry.NewOptionsWithLogger(client.Logger))
+	err = retry.Do(
+		ctx,
+		iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, state.PRE_READ_METADATA),
+		retry.NewOptionsBuilder().
+			Message("Waiting for IOS device to be onboarded to CDO...").
+			Retries(retry.DefaultRetries).
+			Delay(retry.DefaultDelay).
+			Logger(client.Logger).
+			EarlyExitOnError(true).
+			Timeout(retry.DefaultTimeout).
+			Build(),
+	)
 	if err != nil {
 		return nil, &CreateError{
 			Err:               err,
@@ -149,7 +160,18 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	// poll until ios config state done
 	client.Logger.Println("waiting for device to reach state done")
 
-	err = retry.Do(ctx, iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, state.DONE), *retry.NewOptionsWithLogger(client.Logger))
+	err = retry.Do(
+		ctx,
+		iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, state.DONE),
+		retry.NewOptionsBuilder().
+			Message("Waiting for IOS device to be onboarded to CDO...").
+			Retries(retry.DefaultRetries).
+			Delay(retry.DefaultDelay).
+			Logger(client.Logger).
+			EarlyExitOnError(true).
+			Timeout(retry.DefaultTimeout).
+			Build(),
+	)
 	if err != nil {
 		return nil, &CreateError{
 			Err:               err,

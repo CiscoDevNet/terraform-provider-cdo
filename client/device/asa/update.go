@@ -86,7 +86,17 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 				return nil, err
 			}
 
-			if err := retry.Do(ctx, asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), retry.DefaultOpts); err != nil {
+			if err := retry.Do(
+				ctx,
+				asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid),
+				retry.NewOptionsBuilder().
+					Message("Waiting for ASA credentials to be updated on CDO...").
+					Retries(retry.DefaultRetries).
+					Delay(retry.DefaultDelay).
+					Timeout(retry.DefaultTimeout).
+					EarlyExitOnError(true).
+					Build(),
+			); err != nil {
 				return nil, err
 			}
 		}
@@ -100,7 +110,17 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 				return nil, err
 			}
 
-			if err := retry.Do(ctx, asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), retry.DefaultOpts); err != nil {
+			if err := retry.Do(
+				ctx,
+				asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid),
+				retry.NewOptionsBuilder().
+					Message("Waiting for ASA location to be updated on CDO...").
+					Retries(retry.DefaultRetries).
+					Delay(retry.DefaultDelay).
+					Timeout(retry.DefaultTimeout).
+					EarlyExitOnError(true).
+					Build(),
+			); err != nil {
 				return nil, err
 			}
 		}
@@ -115,7 +135,17 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 		return nil, err
 	}
 
-	if err := retry.Do(ctx, UntilStateDoneAndConnectivityOk(ctx, client, outp.Uid), retry.DefaultOpts); err != nil {
+	if err := retry.Do(
+		ctx,
+		UntilStateDoneAndConnectivityOk(ctx, client, outp.Uid),
+		retry.NewOptionsBuilder().
+			Message("Waiting for ASA to reach connectivity state ONLINE").
+			Retries(retry.DefaultRetries).
+			Delay(retry.DefaultDelay).
+			Timeout(retry.DefaultTimeout).
+			EarlyExitOnError(true).
+			Build(),
+	); err != nil {
 		return nil, err
 	}
 

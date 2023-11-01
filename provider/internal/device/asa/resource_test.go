@@ -120,7 +120,7 @@ func TestAccAsaDeviceResource_SDC(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_SDC_BadCreds.Name),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_SDC_BadCreds.Password),
 				),
-				ExpectError: regexp.MustCompile(`.*bad credentials.*`),
+				ExpectError: regexp.MustCompile(`.*Bad Credentials.*`),
 			},
 			// fix correct credentials test
 			{

@@ -78,7 +78,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		ctx,
 		untilApplicationActive(ctx, client),
 		retry.NewOptionsBuilder().
-			Title("waiting for CdFMC creation to be done").
+			Message("waiting for CdFMC creation to be done").
 			Retries(-1).
 			Timeout(30*time.Minute). // usually takes about 15-20 minutes
 			Delay(3*time.Second).

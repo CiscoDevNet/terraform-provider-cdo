@@ -49,7 +49,7 @@ func UntilCreateDeviceRecordSuccess(ctx context.Context, client http.Client, cre
 			ctx,
 			UntilTaskStatusSuccess(ctx, client, readInp),
 			retry.NewOptionsBuilder().
-				Title("waiting for create device record task to finish").
+				Message("waiting for create device record task to finish").
 				Retries(-1).
 				Logger(client.Logger).
 				Timeout(30*time.Minute). // usually takes ~5 minutes

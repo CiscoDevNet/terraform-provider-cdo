@@ -125,7 +125,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		ctx,
 		iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, state.PRE_READ_METADATA),
 		retry.NewOptionsBuilder().
-			Title("waiting for IOS device creation to be done").
+			Message("waiting for IOS device creation to be done").
 			Retries(retry.DefaultRetries).
 			Delay(retry.DefaultDelay).
 			Logger(client.Logger).
@@ -164,7 +164,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		ctx,
 		iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, state.DONE),
 		retry.NewOptionsBuilder().
-			Title("waiting for IOS device configuration to be done").
+			Message("waiting for IOS device configuration to be done").
 			Retries(retry.DefaultRetries).
 			Delay(retry.DefaultDelay).
 			Logger(client.Logger).

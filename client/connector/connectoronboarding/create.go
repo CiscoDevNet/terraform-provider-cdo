@@ -28,7 +28,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		ctx,
 		UntilConnectorStatusIsActive(ctx, client, *connector.NewReadByNameInput(createInp.Name), &readOutp),
 		retry.NewOptionsBuilder().
-			Title("until connector active").
+			Message("until connector active").
 			Timeout(15*time.Minute). // usually takes ~3 minutes
 			Retries(-1).
 			Delay(2*time.Second).

@@ -14,6 +14,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/featureflag"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
 	"strings"
+	"time"
 )
 
 type CreateInput struct {
@@ -129,7 +130,18 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	client.Logger.Println("waiting for asa config state done")
 
 	// poll until asa config state done
-	err = retry.Do(ctx, asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), *retry.NewOptionsWithLogger(client.Logger))
+	err = retry.Do(
+		ctx,
+		asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid),
+		retry.NewOptionsBuilder().
+			Message("Waiting for ASA to be created...").
+			Retries(-1).
+			Delay(3*time.Second).
+			EarlyExitOnError(true).
+			Logger(client.Logger).
+			Timeout(3*time.Minute).
+			Build(),
+	)
 
 	// error during polling, but we maybe able to handle it
 	if err != nil {
@@ -206,7 +218,18 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	// poll until asa config state done
 	client.Logger.Println("waiting for device to reach state done")
 
-	err = retry.Do(ctx, asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid), *retry.NewOptionsWithLogger(client.Logger))
+	err = retry.Do(
+		ctx,
+		asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid),
+		retry.NewOptionsBuilder().
+			Message("Waiting for ASA to be onboarded to CDO...").
+			Retries(-1).
+			Delay(3*time.Second).
+			EarlyExitOnError(true).
+			Logger(client.Logger).
+			Timeout(3*time.Minute).
+			Build(),
+	)
 	if err != nil {
 		return nil, &CreateError{
 			CreatedResourceId: createdResourceId,

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
@@ -24,11 +25,12 @@ type ReadOutput struct {
 	Host            string          `json:"host"`
 	Tags            tags.Type       `json:"tags"`
 
-	IgnoreCertificate bool   `json:"ignoreCertificate"`
-	ConnectivityState int    `json:"connectivityState,omitempty"`
-	ConnectivityError string `json:"connectivityError,omitempty"`
-	State             string `json:"state"`
-	Status            string `json:"status"`
+	IgnoreCertificate   bool                 `json:"ignoreCertificate"`
+	ConnectivityState   int                  `json:"connectivityState,omitempty"`
+	ConnectivityError   string               `json:"connectivityError,omitempty"`
+	State               string               `json:"state"`
+	Status              string               `json:"status"`
+	StateMachineDetails statemachine.Details `json:"stateMachineDetails"`
 }
 
 func NewReadInput(uid string) *ReadInput {

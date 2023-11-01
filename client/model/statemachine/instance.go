@@ -1,5 +1,6 @@
 package statemachine
 
+// see also: https://github.com/cisco-lockhart/cdo-jvm-modules/blob/master/libs/lh-model/lh-model/src/main/java/com/cisco/lockhart/model/statemachine/model/StateMachineInstance.java
 type Instance struct {
 	Actions                       []Action          `json:"actions"`
 	ActiveStateMachineContext     map[string]string `json:"activeStateMachineContext"`

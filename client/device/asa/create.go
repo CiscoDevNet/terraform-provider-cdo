@@ -134,7 +134,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		ctx,
 		asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid),
 		retry.NewOptionsBuilder().
-			Message("waiting for ASA configuration to set up").
+			Message("Waiting for ASA to be created...").
 			Retries(-1).
 			Delay(3*time.Second).
 			EarlyExitOnError(true).
@@ -222,7 +222,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		ctx,
 		asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid),
 		retry.NewOptionsBuilder().
-			Message("waiting for ASA configuration update to be done").
+			Message("Waiting for ASA to be onboarded to CDO...").
 			Retries(-1).
 			Delay(3*time.Second).
 			EarlyExitOnError(true).

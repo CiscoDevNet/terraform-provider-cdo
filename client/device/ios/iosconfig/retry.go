@@ -33,7 +33,7 @@ func UntilState(ctx context.Context, client http.Client, specificUid string, exp
 			return false, statemachine.NewWorkflowErrorFromDetails(readOutp.StateMachineDetails)
 		}
 		if strings.EqualFold(readOutp.State, state.BAD_CREDENTIALS) {
-			return false, statemachine.NewWorkflowErrorf("bad credentials")
+			return false, statemachine.NewWorkflowErrorf("Bad Credentials")
 		}
 		return false, nil
 	}

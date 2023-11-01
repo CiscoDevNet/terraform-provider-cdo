@@ -158,7 +158,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		ctx,
 		UntilGeneratedCommandAvailable(ctx, client, createOup.Uid, &metadata),
 		retry.NewOptionsBuilder().
-			Message("waiting for Cloud FTD onboarding to be done").
+			Message("Waiting for FTD record to be created in CDO...").
 			Retries(3).
 			Timeout(retry.DefaultTimeout).
 			Delay(retry.DefaultDelay).

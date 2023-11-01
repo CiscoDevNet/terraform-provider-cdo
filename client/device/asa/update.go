@@ -90,7 +90,7 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 				ctx,
 				asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid),
 				retry.NewOptionsBuilder().
-					Message("waiting for update ASA credentials to be done").
+					Message("Waiting for ASA credentials to be updated on CDO...").
 					Retries(retry.DefaultRetries).
 					Delay(retry.DefaultDelay).
 					Timeout(retry.DefaultTimeout).
@@ -114,7 +114,7 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 				ctx,
 				asaconfig.UntilStateDone(ctx, client, asaReadSpecOutp.SpecificUid),
 				retry.NewOptionsBuilder().
-					Message("waiting for update ASA location to be done").
+					Message("Waiting for ASA location to be updated on CDO...").
 					Retries(retry.DefaultRetries).
 					Delay(retry.DefaultDelay).
 					Timeout(retry.DefaultTimeout).
@@ -139,7 +139,7 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 		ctx,
 		UntilStateDoneAndConnectivityOk(ctx, client, outp.Uid),
 		retry.NewOptionsBuilder().
-			Message("waiting for ASA to be done with connectivity status OK").
+			Message("Waiting for ASA to reach connectivity state ONLINE").
 			Retries(retry.DefaultRetries).
 			Delay(retry.DefaultDelay).
 			Timeout(retry.DefaultTimeout).

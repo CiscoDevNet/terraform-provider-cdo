@@ -1,0 +1,34 @@
+!
+interface Management0/0
+    management-only
+    nameif management
+    ip address dhcp setroute
+    no shutdown
+!
+interface GigabitEthernet0/0
+    nameif outside
+    ip address dhcp setroute
+    no shutdown
+!
+interfaceGigabitEthernet0/1
+    nameif inside
+    ip address dhcp
+    no shutdown
+!
+crypto key generate rsa mod 4096
+ssh timeout 60
+ssh 0.0.0.0 0.0.0.0 inside
+ssh 0.0.0.0 0.0.0.0 management
+ssh 0.0.0.0 0.0.0.0 outside
+hostname ${asa_hostname}
+http server enable
+http 0.0.0.0 0.0.0.0 inside
+http 0.0.0.0 0.0.0.0 management
+http 0.0.0.0 0.0.0.0 outside
+enable password ${enable_password}
+username ${asa_username} password ${asa_password} privilege 15
+aaa authentication ssh console LOCAL
+aaa authentication http console LOCAL 
+! required config end
+dns domain-lookup management
+dns server-group DefaultDNS

@@ -1,3 +1,5 @@
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/8023/badge)](https://www.bestpractices.dev/projects/8023)
+
 # CDO Terraform Provider
 
 This repo provides a terraform provider to provision resources on the Cisco CDO platform.

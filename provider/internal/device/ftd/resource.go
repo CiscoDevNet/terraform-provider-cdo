@@ -6,18 +6,18 @@ import (
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
-	"github.com/CiscoDevnet/terraform-provider-cdo/planmodifiers"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
 	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
-	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -36,13 +36,13 @@ type Resource struct {
 }
 
 type ResourceModel struct {
-	ID               types.String   `tfsdk:"id"`
-	Name             types.String   `tfsdk:"name"`
-	AccessPolicyName types.String   `tfsdk:"access_policy_name"`
-	PerformanceTier  types.String   `tfsdk:"performance_tier"`
-	Virtual          types.Bool     `tfsdk:"virtual"`
-	Licenses         []types.String `tfsdk:"licenses"`
-	Labels           []types.String `tfsdk:"labels"`
+	ID               types.String `tfsdk:"id"`
+	Name             types.String `tfsdk:"name"`
+	AccessPolicyName types.String `tfsdk:"access_policy_name"`
+	PerformanceTier  types.String `tfsdk:"performance_tier"`
+	Virtual          types.Bool   `tfsdk:"virtual"`
+	Licenses         types.Set    `tfsdk:"licenses"`
+	Labels           types.Set    `tfsdk:"labels"`
 
 	AccessPolicyUid  types.String `tfsdk:"access_policy_id"`
 	GeneratedCommand types.String `tfsdk:"generated_command"`
@@ -98,32 +98,25 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 					boolplanmodifier.RequiresReplace(),
 				},
 			},
-			"licenses": schema.ListAttribute{
+			"licenses": schema.SetAttribute{
 				ElementType:         types.StringType,
 				MarkdownDescription: "Comma-separated list of licenses to apply to this FTD. You must enable at least the \"BASE\" license. Allowed values are: [\"BASE\", \"CARRIER\", \"THREAT\", \"MALWARE\", \"URLFilter\",].",
 				Required:            true,
-				PlanModifiers: []planmodifier.List{
-					listplanmodifier.RequiresReplace(),
+				PlanModifiers: []planmodifier.Set{
+					setplanmodifier.RequiresReplace(),
 				},
-				Validators: []validator.List{
-					listvalidator.SizeAtLeast(1),
-					listvalidator.UniqueValues(),
-					listvalidator.ValueStringsAre(stringvalidator.OneOf(license.AllAsString...)),
-					validators.ValueStringsAtLeast(stringvalidator.OneOf(string(license.Base))),
+				Validators: []validator.Set{
+					setvalidator.SizeAtLeast(1),
+					setvalidator.ValueStringsAre(stringvalidator.OneOf(license.AllAsString...)),
+					validators.SetValueStringsAtLeast(stringvalidator.OneOf(string(license.Base), string(license.Essentials))),
 				},
 			},
-			"labels": schema.ListAttribute{ // TODO: use set when we go to 1.0.0, https://jira-eng-rtp3.cisco.com/jira/browse/LH-71968
-				MarkdownDescription: "Set a list of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
+			"labels": schema.SetAttribute{
+				MarkdownDescription: "Specify a set of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
 				Optional:            true,
 				ElementType:         types.StringType,
 				Computed:            true,
-				Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})), // default to empty list
-				Validators: []validator.List{
-					listvalidator.UniqueValues(),
-				},
-				PlanModifiers: []planmodifier.List{
-					planmodifiers.UseStateForUnorderedStringList(),
-				},
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})), // default to empty set
 			},
 			"generated_command": schema.StringAttribute{
 				MarkdownDescription: "The command to run in the FTD CLI to register it with the cloud-delivered FMC (cdFMC).",
@@ -195,6 +188,10 @@ func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *res
 
 	// 2. do read
 	if err := Read(ctx, r, &stateData); err != nil {
+		if util.Is404Error(err) {
+			resp.State.RemoveResource(ctx)
+			return
+		}
 		resp.Diagnostics.AddError("failed to read FTD resource", err.Error())
 		return
 	}

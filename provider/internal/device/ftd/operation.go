@@ -5,11 +5,9 @@ import (
 	"strings"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
-	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -53,7 +51,7 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 	stateData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
 	stateData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUid)
 	stateData.Virtual = types.BoolValue(res.Metadata.PerformanceTier != nil)
-	stateData.Licenses = util.GoStringSliceToTFStringList(license.ReplaceFmcLicenseTermsWithCdoTerms(strings.Split(res.Metadata.LicenseCaps, ",")))
+	stateData.Licenses = util.GoStringSliceToTFStringSet(license.ReplaceFmcLicenseTermsWithCdoTerms(strings.Split(res.Metadata.LicenseCaps, ",")))
 	if res.Metadata.PerformanceTier != nil { // nil means physical cloudftd
 		stateData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))
 	}
@@ -61,11 +59,7 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 	stateData.Hostname = types.StringValue(res.Metadata.CloudManagerDomain)
 	stateData.NatId = types.StringValue(res.Metadata.NatID)
 	stateData.RegKey = types.StringValue(res.Metadata.RegKey)
-
-	// only set labels if it is different
-	if !sliceutil.StringsEqualUnordered(util.TFStringListToGoStringList(stateData.Labels), res.Tags.Labels) {
-		stateData.Labels = util.GoStringSliceToTFStringList(res.Tags.Labels)
-	}
+	stateData.Labels = util.GoStringSliceToTFStringSet(res.Tags.Labels)
 
 	return nil
 }
@@ -82,10 +76,17 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 		}
 	}
 
-	licensesGoList := util.TFStringListToGoStringList(planData.Licenses)
-	licenses, err := license.DeserializeAllFromCdo(strings.Join(licensesGoList, ","))
+	// convert tf licenses to go license
+	licenses, err := util.TFStringSetToLicenses(ctx, planData.Licenses)
+	if err != nil {
+		return err
+	}
 
-	tagsGoList := tags.New(util.TFStringListToGoStringList(planData.Labels)...)
+	// convert tf tags to go tags
+	planTags, err := util.TFStringSetToTagLabels(ctx, planData.Labels)
+	if err != nil {
+		return err
+	}
 
 	if err != nil {
 		return err
@@ -96,7 +97,7 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 		performanceTier,
 		planData.Virtual.ValueBool(),
 		&licenses,
-		tagsGoList,
+		planTags,
 	)
 	res, err := resource.client.CreateCloudFtd(ctx, createInp)
 	if err != nil {
@@ -108,7 +109,8 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 	planData.Name = types.StringValue(res.Name)
 	planData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
 	planData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUid)
-	planData.Licenses = util.GoStringSliceToTFStringList(strings.Split(res.Metadata.LicenseCaps, ","))
+	planData.Licenses = util.GoStringSliceToTFStringSet(strings.Split(res.Metadata.LicenseCaps, ","))
+	planData.Labels = util.GoStringSliceToTFStringSet(res.Tags.Labels)
 	if res.Metadata.PerformanceTier != nil { // nil means physical cloud ftd
 		planData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))
 	}
@@ -123,10 +125,17 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 func Update(ctx context.Context, resource *Resource, planData *ResourceModel, stateData *ResourceModel) error {
 
 	// do update
+
+	// convert tf tags to go tags
+	planTags, err := util.TFStringSetToTagLabels(ctx, planData.Labels)
+	if err != nil {
+		return err
+	}
+
 	inp := cloudftd.NewUpdateInput(
 		planData.ID.ValueString(),
 		planData.Name.ValueString(),
-		tags.New(util.TFStringListToGoStringList(planData.Labels)...),
+		planTags,
 	)
 	res, err := resource.client.UpdateCloudFtd(ctx, inp)
 	if err != nil {
@@ -135,10 +144,7 @@ func Update(ctx context.Context, resource *Resource, planData *ResourceModel, st
 
 	// map return struct to model
 	stateData.Name = types.StringValue(res.Name)
-	// only set labels if it is different
-	if !sliceutil.StringsEqualUnordered(util.TFStringListToGoStringList(stateData.Labels), res.Tags.Labels) {
-		stateData.Labels = planData.Labels
-	}
+	stateData.Labels = planData.Labels
 
 	return nil
 }

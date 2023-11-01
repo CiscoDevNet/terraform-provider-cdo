@@ -123,8 +123,10 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		Build()
 	var createOutp fmcconfig.CreateDeviceRecordOutput
 	err = retry.Do(
+		ctx,
 		fmcconfig.UntilCreateDeviceRecordSuccess(ctx, client, createDeviceInp, &createOutp),
 		retry.NewOptionsBuilder().
+			Message("Waiting for FTD device record to be created on cdFMC...").
 			Retries(-1).
 			Delay(3*time.Second).
 			Timeout(1*time.Hour). // it can take 15-20 minutes for FTD to come up + 10 minutes to create device record
@@ -156,6 +158,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	}
 	// 4.3 wait until state machine done
 	err = retry.Do(
+		ctx,
 		cloudftd.UntilSpecificStateDone(
 			ctx,
 			client,
@@ -164,6 +167,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 				Build(),
 		),
 		retry.NewOptionsBuilder().
+			Message("Waiting for FTD to be onboarded to CDO...").
 			Retries(-1).
 			Delay(1*time.Second).
 			Timeout(20*time.Minute). // usually done in less than 5 minutes because we already registered in FTDc

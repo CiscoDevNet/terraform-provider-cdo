@@ -3,7 +3,9 @@ package genericssh
 import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/goutil"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 )
@@ -31,18 +33,19 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 
 	client.Logger.Println("creating generic ssh")
 
-	deviceInput := device.NewCreateRequestInput(
-		createInp.Name,
-		"GENERIC_SSH",
-		createInp.ConnectorUid,
-		createInp.ConnectorType,
-		createInp.SocketAddress,
-		false,
-		false,
-		nil,
-		createInp.Tags,
-	)
-	outp, err := device.Create(ctx, client, *deviceInput)
+	deviceInput := device.NewCreateInputBuilder().
+		Name(createInp.Name).
+		DeviceType(devicetype.GenericSSH).
+		ConnectorUid(createInp.ConnectorUid).
+		ConnectorType(createInp.ConnectorType).
+		SocketAddress(createInp.SocketAddress).
+		Model(false).
+		IgnoreCertificate(goutil.NewBoolPointer(false)).
+		Metadata(nil).
+		Tags(createInp.Tags).
+		Build()
+
+	outp, err := device.Create(ctx, client, deviceInput)
 	if err != nil {
 		return nil, err
 	}

@@ -80,6 +80,8 @@ jobs:
           echo "Build Terraform Provider CDO"
           cd provider
           go install .
+          cd ../client
+          export GOPATH="$GOPATH:$(pwd)"
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2

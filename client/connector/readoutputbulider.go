@@ -58,7 +58,7 @@ func (builder *sdcReadOutputBuilder) WithCommunicationReady(ready bool) *sdcRead
 }
 
 func mustGenerateBase64PublicKey() string {
-	key, err := rsa.GenerateKey(rand.Reader, 512)
+	key, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		panic(err)
 	}

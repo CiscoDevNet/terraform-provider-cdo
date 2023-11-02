@@ -37,7 +37,7 @@ func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, r
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Provides an SDC connector resource. This allows SDC to be onboarded, updated, and deleted on CDO.",
+		MarkdownDescription: "Provides an SDC connector resource. This allows SDC to be onboarded, updated, and deleted on CDO. **Note**: If you receive errors that read \"public key not found\", it is likely because you attempted to utilize the cdo_sdc resource before it has finished configuring itself, which is an asynchronous processor. To fix this, use the cdo_sdc_onboarding resource before utilizing the cdo_sdc to onboard any devices.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{

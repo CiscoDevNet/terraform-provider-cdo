@@ -3,12 +3,12 @@
 page_title: "cdo_sdc Resource - cdo"
 subcategory: ""
 description: |-
-  Provides an SDC connector resource. This allows SDC to be onboarded, updated, and deleted on CDO.
+  Provides an SDC connector resource. This allows SDC to be onboarded, updated, and deleted on CDO. Note: If you receive errors that read "public key not found", it is likely because you attempted to utilize the cdosdc resource before it has finished configuring itself, which is an asynchronous processor. To fix this, use the cdosdconboarding resource before utilizing the cdosdc to onboard any devices.
 ---
 
 # cdo_sdc (Resource)
 
-Provides an SDC connector resource. This allows SDC to be onboarded, updated, and deleted on CDO.
+Provides an SDC connector resource. This allows SDC to be onboarded, updated, and deleted on CDO. **Note**: If you receive errors that read "public key not found", it is likely because you attempted to utilize the cdo_sdc resource before it has finished configuring itself, which is an asynchronous processor. To fix this, use the cdo_sdc_onboarding resource before utilizing the cdo_sdc to onboard any devices.
 
 
 

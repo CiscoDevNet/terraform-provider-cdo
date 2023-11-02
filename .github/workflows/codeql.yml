@@ -13,7 +13,7 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "LH-72600-add-codeql-as-github-action" ]
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ "main" ]
@@ -79,8 +79,6 @@ jobs:
       - run: |
           echo "Build Terraform Provider CDO"
           cd provider
-          go install .
-          cd ../client
           go install .
 
       - name: Perform CodeQL Analysis

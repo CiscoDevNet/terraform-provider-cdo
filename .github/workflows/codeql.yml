@@ -12,13 +12,11 @@ on:
 
 jobs:
   provider-codeql:
-    name: CodeQL (Provider)
     uses: ./.github/workflows/module-codeql.yml
     with:
       path: provider
     secrets: inherit
   client-codeql:
-    name: CodeQL (Client)
     uses: ./.github/workflows/module-codeql.yml
     with:
       path: client

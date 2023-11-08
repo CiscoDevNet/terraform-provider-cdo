@@ -157,3 +157,15 @@ func CreateApplication(baseUrl string) string {
 func ReadApplication(baseUrl string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/applications", baseUrl)
 }
+
+func CreateSec(baseUrl string) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/estreamers", baseUrl)
+}
+
+func ReadSec(baseUrl string, secUid string) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/estreamers/%s", baseUrl, secUid)
+}
+
+func DeleteSec(baseUrl string, secUid string) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/estreamers/%s", baseUrl, secUid)
+}

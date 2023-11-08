@@ -1,4 +1,4 @@
-package examples
+package sec
 
 import (
 	"context"
@@ -13,7 +13,7 @@ type UpdateOutput struct {
 
 func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*UpdateOutput, error) {
 
-	// TODO
+	// intentional empty, I don't know what update we can do on an SEC
 
-	return nil, nil
+	return &UpdateOutput{}, nil
 }

@@ -8,10 +8,6 @@ import (
 type ReadInput struct {
 }
 
-func NewReadInput() ReadInput {
-	return ReadInput{}
-}
-
 type ReadOutput struct {
 }
 

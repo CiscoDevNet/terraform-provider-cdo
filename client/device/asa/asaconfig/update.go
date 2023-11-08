@@ -4,11 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
-	"strings"
-
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 )
 
 type UpdateInput struct {
@@ -16,14 +15,14 @@ type UpdateInput struct {
 	Username    string
 	Password    string
 	PublicKey   *model.PublicKey
-	State       string
+	State       state.Type
 }
 
 type UpdateOutput struct {
 	Uid string `json:"uid"`
 }
 
-func NewUpdateInput(specificUid string, username string, password string, publicKey *model.PublicKey, state string) *UpdateInput {
+func NewUpdateInput(specificUid string, username string, password string, publicKey *model.PublicKey, state state.Type) *UpdateInput {
 	return &UpdateInput{
 		SpecificUid: specificUid,
 		Username:    username,
@@ -66,7 +65,7 @@ func UpdateCredentials(ctx context.Context, client http.Client, updateInput Upda
 		return nil, err
 	}
 
-	isWaitForUserToUpdateCreds := strings.EqualFold(updateInput.State, "WAIT_FOR_USER_TO_UPDATE_CREDS") || strings.EqualFold(updateInput.State, "$PRE_WAIT_FOR_USER_TO_UPDATE_CREDS")
+	isWaitForUserToUpdateCreds := updateInput.State == state.WAIT_FOR_USER_TO_UPDATE_CREDS || updateInput.State == state.PRE_WAIT_FOR_USER_TO_UPDATE_CREDS
 	req := client.NewPut(ctx, url, makeUpdateCredentialsReqBody(isWaitForUserToUpdateCreds, creds))
 
 	var outp UpdateOutput

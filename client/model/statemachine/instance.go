@@ -1,5 +1,7 @@
 package statemachine
 
+import "github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
+
 // see also: https://github.com/cisco-lockhart/cdo-jvm-modules/blob/master/libs/lh-model/lh-model/src/main/java/com/cisco/lockhart/model/statemachine/model/StateMachineInstance.java
 type Instance struct {
 	Actions                       []Action          `json:"actions"`
@@ -13,7 +15,7 @@ type Instance struct {
 	ObjectReference               ObjectReference   `json:"objectReference"`
 	StateMachineDetails           Details           `json:"stateMachineDetails"`
 	StateMachineIdentifier        string            `json:"stateMachineIdentifier"`
-	StateMachineInstanceCondition string            `json:"stateMachineInstanceCondition"`
+	StateMachineInstanceCondition state.Type        `json:"stateMachineInstanceCondition"`
 	StateMachinePriority          string            `json:"stateMachinePriority"`
 	StateMachineType              string            `json:"stateMachineType"`
 	Status                        string            `json:"status"`
@@ -85,7 +87,7 @@ func (b *InstanceBuilder) StateMachineIdentifier(stateMachineIdentifier string) 
 	return b
 }
 
-func (b *InstanceBuilder) StateMachineInstanceCondition(stateMachineInstanceCondition string) *InstanceBuilder {
+func (b *InstanceBuilder) StateMachineInstanceCondition(stateMachineInstanceCondition state.Type) *InstanceBuilder {
 	b.instance.StateMachineInstanceCondition = stateMachineInstanceCondition
 	return b
 }

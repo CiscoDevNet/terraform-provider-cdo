@@ -9,12 +9,6 @@ type CreateInput struct {
 	Uid string
 }
 
-func NewCreateInput(uid string) CreateInput {
-	return CreateInput{
-		Uid: uid,
-	}
-}
-
 type CreateOutput struct {
 }
 

@@ -1,5 +1,7 @@
 package device
 
+import "github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
+
 type ReadSpecificOutputBuilder struct {
 	readSpecificOutput *ReadSpecificOutput
 }
@@ -15,7 +17,7 @@ func (b *ReadSpecificOutputBuilder) SpecificUid(specificUid string) *ReadSpecifi
 	return b
 }
 
-func (b *ReadSpecificOutputBuilder) State(state string) *ReadSpecificOutputBuilder {
+func (b *ReadSpecificOutputBuilder) State(state state.Type) *ReadSpecificOutputBuilder {
 	b.readSpecificOutput.State = state
 	return b
 }

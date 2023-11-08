@@ -20,7 +20,7 @@ resource "cdo_cdfmc" "test" {
 var resourceConfig = acctest.MustParseTemplate(resourceTemplate, resourceModel)
 
 func TestAccCdFmcResource(t *testing.T) {
-	t.Skip("we cant delete a fmc so this test cannot be run, or we should find a way to spin up new environment, either seems uneasy, skipping for now.")
+	t.Skip("we cant delete a fmc so this test cannot be run, or we should find a way to spin up new environment, neither seems uneasy, skipping for now.")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 acctest.PreCheckFunc(t),
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,

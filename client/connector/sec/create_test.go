@@ -1,4 +1,4 @@
-package examples_test
+package sec_test
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func TestExampleCreate(t *testing.T) {
+func TestSECCreate(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 

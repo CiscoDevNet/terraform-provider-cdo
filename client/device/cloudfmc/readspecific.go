@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 )
 
 type ReadSpecificInput struct {
@@ -11,10 +12,10 @@ type ReadSpecificInput struct {
 }
 
 type ReadSpecificOutput struct {
-	SpecificUid string `json:"uid"`
-	DomainUid   string `json:"domainUid"`
-	State       string `json:"state"`
-	Status      string `json:"status"`
+	SpecificUid string     `json:"uid"`
+	DomainUid   string     `json:"domainUid"`
+	State       state.Type `json:"state"`
+	Status      string     `json:"status"`
 }
 
 func NewReadSpecificInput(fmcId string) ReadSpecificInput {

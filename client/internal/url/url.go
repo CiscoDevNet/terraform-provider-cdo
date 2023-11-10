@@ -169,3 +169,7 @@ func ReadSec(baseUrl string, secUid string) string {
 func DeleteSec(baseUrl string, secUid string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/estreamers/%s", baseUrl, secUid)
 }
+
+func ReadAllSecs(baseUrl string) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/estreamers", baseUrl)
+}

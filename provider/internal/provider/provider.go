@@ -9,6 +9,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/connector/connectoronboarding"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/connector/sec"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/connector/sec/seconboarding"
 	"os"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/cdfmc"
@@ -165,6 +166,7 @@ func (p *CdoProvider) Resources(ctx context.Context) []func() resource.Resource 
 		connectoronboarding.NewResource,
 		cdfmc.NewResource,
 		sec.NewResource,
+		seconboarding.NewResource,
 	}
 }
 

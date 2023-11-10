@@ -15,6 +15,7 @@ type ReadOutput struct {
 	Uid             string `json:"uid"`
 	BootStrapData   string `json:"bootstrapData"`
 	TokenExpiryTime int64  `json:"tokenExpiryTime"`
+	EsStatus        string `json:"esStatus"`
 }
 
 func Read(ctx context.Context, client http.Client, readInp ReadInput) (*ReadOutput, error) {

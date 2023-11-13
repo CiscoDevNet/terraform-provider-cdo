@@ -62,8 +62,27 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		return nil, err
 	}
 
-	// 5. re-read the sec for updated name
-	readOutp, err := Read(ctx, client, NewReadInputBuilder().Uid(createReqOutput.Uid).Build())
+	// 5. re-read the sec until its name is updated, no idea why the name is empty some time...
+	var readOut ReadOutput
+	err = retry.Do(
+		ctx,
+		func() (bool, error) {
+			out, err := Read(ctx, client, NewReadInputBuilder().Uid(createReqOutput.Uid).Build())
+			if err != nil {
+				return false, err
+			}
+			readOut = *out
+			return out.Name != "", nil
+		},
+		retry.NewOptionsBuilder().
+			Message("Waiting for SEC to finalize...").
+			Logger(client.Logger).
+			EarlyExitOnError(true).
+			Timeout(1*time.Minute).
+			Retries(-1).
+			Delay(500*time.Millisecond).
+			Build(),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +90,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	// done, create output
 	createOutput := CreateOutput{
 		Uid:              createReqOutput.Uid,
-		Name:             readOutp.Name,
+		Name:             readOut.Name,
 		SecBootstrapData: secBootstrapData,
 		CdoBoostrapData:  cdoBootstrapData,
 	}

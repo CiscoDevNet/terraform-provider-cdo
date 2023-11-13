@@ -36,25 +36,25 @@ func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, r
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "TODO",
+		MarkdownDescription: "Provides an SEC connector resource. This allows SEC to be onboarded, updated, and deleted on CDO.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Unique identifier of the device. This is a UUID and is automatically generated when the device is created.",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "A generated name for the Secure Event Connector (SEC). This name is unique.",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"cdo_bootstrap_data": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "CDO bootstrap data.",
 				Computed:            true,
 				Sensitive:           true, // bootstrap data contains user api token
 				PlanModifiers: []planmodifier.String{
@@ -62,7 +62,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"sec_bootstrap_data": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "SEC bootstrap data.",
 				Computed:            true,
 				Sensitive:           true, // bootstrap data contains user api token
 				PlanModifiers: []planmodifier.String{

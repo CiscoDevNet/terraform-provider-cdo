@@ -36,18 +36,18 @@ func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, r
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Use this resource to wait for an SDC to finish onboarding. When an SDC is onboarded, either manually or using the CDO Terraform Modules for [AWS](https://github.com/CiscoDevNet/terraform-aws-cdo-sdc) and [vSphere](https://github.com/CiscoDevNet/terraform-vsphere-cdo-sdc), it can take a few minutes before the SDC is active and capable of proxying communications between CDO and the device. This resource allows you to wait until this is done.",
+		MarkdownDescription: "Use this resource to wait for an SEC to finish onboarding. When an SDC is onboarded, either manually or using the CDO Terraform Modules for [AWS](https://github.com/CiscoDevNet/terraform-aws-cdo-sdc) and [vSphere](https://github.com/CiscoDevNet/terraform-vsphere-cdo-sdc), it can take a few minutes before the SDC is active and capable of proxying communications between CDO and the device. This resource allows you to wait until this is done.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "The unique identifier of this SDC onboarding resource.",
+				MarkdownDescription: "The unique identifier of this SEC onboarding resource.",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "Specify the name of the SDC.",
+				MarkdownDescription: "Specify the name of the SEC.",
 				Required:            true,
 			},
 		},

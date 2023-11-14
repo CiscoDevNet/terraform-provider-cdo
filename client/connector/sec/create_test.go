@@ -29,7 +29,7 @@ func TestSecCreate(t *testing.T) {
 		Uid("test-sec-uid").
 		SecBootstrapData("sec-test-bootstrap-data").
 		Name("test-sec-name").
-		CdoBoostrapData(sec.ComputeEventOnlyBootstrapData("test-sec-name", successTokenResponse.AccessToken, successTokenResponse.TenantName, baseUrl, domain)).
+		CdoBoostrapData(sec.ComputeEventOnlyBootstrapData(successTokenResponse.AccessToken, successTokenResponse.TenantName, baseUrl, domain)).
 		Build()
 	successReadOutput := sec.NewReadOutputBuilder().
 		Uid(successCreateOutput.Uid).

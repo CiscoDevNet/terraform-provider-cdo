@@ -2,6 +2,7 @@ package sec
 
 import (
 	"context"
+	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/statemachine"
@@ -53,6 +54,9 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	readOutput, err := Read(ctx, client, NewReadInputBuilder().Uid(createReqOutput.Uid).Build())
 	if err != nil {
 		return nil, err
+	}
+	if readOutput.BootStrapData == "" {
+		return nil, fmt.Errorf("SEC bootstrap data not found")
 	}
 	secBootstrapData := readOutput.BootStrapData
 

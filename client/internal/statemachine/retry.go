@@ -43,7 +43,6 @@ func UntilDone(ctx context.Context, client http.Client, deviceUid string, stateM
 				return false, nil
 			}
 			started = true
-			return false, nil
 		}
 		// then we check if it is done
 		res, err := ReadInstanceByDeviceUid(ctx, client, NewReadInstanceByDeviceUidInput(deviceUid))

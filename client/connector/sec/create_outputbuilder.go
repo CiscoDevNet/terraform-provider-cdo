@@ -1,0 +1,35 @@
+package sec
+
+type CreateOutputBuilder struct {
+	createOutput *CreateOutput
+}
+
+func NewCreateOutputBuilder() *CreateOutputBuilder {
+	createOutput := &CreateOutput{}
+	b := &CreateOutputBuilder{createOutput: createOutput}
+	return b
+}
+
+func (b *CreateOutputBuilder) Uid(uid string) *CreateOutputBuilder {
+	b.createOutput.Uid = uid
+	return b
+}
+
+func (b *CreateOutputBuilder) Name(name string) *CreateOutputBuilder {
+	b.createOutput.Name = name
+	return b
+}
+
+func (b *CreateOutputBuilder) SecBootstrapData(secBootstrapData string) *CreateOutputBuilder {
+	b.createOutput.SecBootstrapData = secBootstrapData
+	return b
+}
+
+func (b *CreateOutputBuilder) CdoBoostrapData(cdoBoostrapData string) *CreateOutputBuilder {
+	b.createOutput.CdoBoostrapData = cdoBoostrapData
+	return b
+}
+
+func (b *CreateOutputBuilder) Build() CreateOutput {
+	return *b.createOutput
+}

@@ -5,6 +5,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
@@ -28,7 +29,7 @@ type ReadOutput struct {
 	IgnoreCertificate   bool                 `json:"ignoreCertificate"`
 	ConnectivityState   int                  `json:"connectivityState,omitempty"`
 	ConnectivityError   string               `json:"connectivityError,omitempty"`
-	State               string               `json:"state"`
+	State               state.Type           `json:"state"`
 	Status              string               `json:"status"`
 	StateMachineDetails statemachine.Details `json:"stateMachineDetails"`
 }

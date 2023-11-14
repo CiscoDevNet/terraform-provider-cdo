@@ -8,10 +8,6 @@ import (
 type DeleteInput struct {
 }
 
-func NewDeleteInput() DeleteInput {
-	return DeleteInput{}
-}
-
 type DeleteOutput struct {
 }
 

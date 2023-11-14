@@ -5,6 +5,7 @@ package client
 import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/connectoronboarding"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sec"
 	"net/http"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
@@ -222,4 +223,20 @@ func (c *Client) ReadConnectorOnboarding(ctx context.Context, inp connectoronboa
 
 func (c *Client) DeleteConnectorOnboarding(ctx context.Context, inp connectoronboarding.DeleteInput) (*connectoronboarding.DeleteOutput, error) {
 	return connectoronboarding.Delete(ctx, c.client, inp)
+}
+
+func (c *Client) CreateSec(ctx context.Context, inp sec.CreateInput) (*sec.CreateOutput, error) {
+	return sec.Create(ctx, c.client, inp)
+}
+
+func (c *Client) UpdateSec(ctx context.Context, inp sec.UpdateInput) (*sec.UpdateOutput, error) {
+	return sec.Update(ctx, c.client, inp)
+}
+
+func (c *Client) DeleteSec(ctx context.Context, inp sec.DeleteInput) (*sec.DeleteOutput, error) {
+	return sec.Delete(ctx, c.client, inp)
+}
+
+func (c *Client) ReadSec(ctx context.Context, inp sec.ReadInput) (*sec.ReadOutput, error) {
+	return sec.Read(ctx, c.client, inp)
 }

@@ -21,7 +21,7 @@ func UntilStateDoneAndConnectivityOk(ctx context.Context, client http.Client, ui
 
 		client.Logger.Printf("device state=%s\n", readOutp.State)
 
-		if strings.EqualFold(readOutp.State, state.DONE) && strings.EqualFold(readOutp.Status, "IDLE") {
+		if readOutp.State == state.DONE && strings.EqualFold(readOutp.Status, "IDLE") {
 
 			if readOutp.ConnectivityState <= 0 {
 				return false, fmt.Errorf("connectivity error: %s", readOutp.ConnectivityError)
@@ -29,10 +29,10 @@ func UntilStateDoneAndConnectivityOk(ctx context.Context, client http.Client, ui
 
 			return true, nil
 		}
-		if strings.EqualFold(readOutp.State, state.ERROR) {
+		if readOutp.State == state.ERROR {
 			return false, statemachine.NewWorkflowErrorFromDetails(readOutp.StateMachineDetails)
 		}
-		if strings.EqualFold(readOutp.State, state.BAD_CREDENTIALS) {
+		if readOutp.State == state.BAD_CREDENTIALS {
 			return false, statemachine.NewWorkflowErrorf("Bad Credentials")
 		}
 		return false, nil

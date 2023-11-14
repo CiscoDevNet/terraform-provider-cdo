@@ -2,6 +2,7 @@ package ios
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
@@ -12,10 +13,10 @@ type ReadSpecificInput struct {
 }
 
 type ReadSpecificOutput struct {
-	SpecificUid string `json:"uid"`
-	State       string `json:"state"`
-	Namespace   string `json:"namespace"`
-	Type        string `json:"type"`
+	SpecificUid string     `json:"uid"`
+	State       state.Type `json:"state"`
+	Namespace   string     `json:"namespace"`
+	Type        string     `json:"type"`
 }
 
 func NewReadSpecificInput(uid string) *ReadSpecificInput {

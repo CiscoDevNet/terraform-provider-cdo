@@ -2,12 +2,10 @@ package asaconfig
 
 import (
 	"context"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/statemachine"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
-	"strings"
-
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/statemachine"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 )
 
 func UntilStateDone(ctx context.Context, client http.Client, specificUid string) retry.Func {
@@ -26,16 +24,16 @@ func UntilStateDone(ctx context.Context, client http.Client, specificUid string)
 		}
 
 		client.Logger.Printf("asa config state=%s\n", readOutp.State)
-		if strings.EqualFold(readOutp.State, state.DONE) {
+		if readOutp.State == state.DONE {
 			return true, nil
 		}
-		if strings.EqualFold(readOutp.State, state.ERROR) {
+		if readOutp.State == state.ERROR {
 			return false, statemachine.NewWorkflowErrorFromDetails(readOutp.StateMachineDetails)
 		}
-		if strings.EqualFold(readOutp.State, state.BAD_CREDENTIALS) {
+		if readOutp.State == state.BAD_CREDENTIALS {
 			return false, statemachine.NewWorkflowErrorf("Bad Credentials")
 		}
-		if strings.EqualFold(readOutp.State, state.PRE_WAIT_FOR_USER_TO_UPDATE_CREDS) {
+		if readOutp.State == state.PRE_WAIT_FOR_USER_TO_UPDATE_CREDS {
 			return false, statemachine.NewWorkflowErrorf("Bad Credentials")
 		}
 		return false, nil

@@ -23,7 +23,7 @@ func TestExampleCreate(t *testing.T) {
 	}{
 		{
 			testName: "example test",
-			input:    examples.NewCreateInput("unittest-device-uid"),
+			input:    examples.NewCreateInputBuilder().Uid("unittest-device-uid").Build(),
 			setupFunc: func() {
 				httpmock.RegisterResponder(
 					http.MethodGet,

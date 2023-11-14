@@ -3,6 +3,7 @@ package asaconfig
 import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
@@ -14,7 +15,7 @@ type ReadInput struct {
 
 type ReadOutput struct {
 	Uid                 string               `json:"uid"`
-	State               string               `json:"state"`
+	State               state.Type           `json:"state"`
 	StateMachineDetails statemachine.Details `json:"stateMachineDetails"`
 }
 

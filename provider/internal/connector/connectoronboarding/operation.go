@@ -8,9 +8,7 @@ import (
 
 func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) error {
 
-	// do read
-
-	// map return struct to sdc model
+	// intentional empty, nothing to read
 
 	return nil
 }
@@ -33,16 +31,14 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 
 func Update(ctx context.Context, resource *Resource, planData *ResourceModel, stateData *ResourceModel) error {
 
-	// do update
-
-	// map return struct to sdc model
+	// intentional empty, nothing to update
 
 	return nil
 }
 
 func Delete(ctx context.Context, resource *Resource, stateData *ResourceModel) error {
 
-	// do delete
+	// intentional empty, nothing to delete
 
 	return nil
 }

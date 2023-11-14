@@ -2,6 +2,7 @@ package sec
 
 import (
 	"context"
+	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/statemachine"
@@ -49,19 +50,21 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	if err != nil {
 		return nil, err
 	}
-
-	// 3. generate CDO bootstrap data
-	cdoBootstrapData, err := generateBootstrapData(ctx, client)
-	if err != nil {
-		return nil, err
-	}
-
-	// 4. get sec bootstrap data
+	// 3. get sec bootstrap data
 	readOutput, err := Read(ctx, client, NewReadInputBuilder().Uid(createReqOutput.Uid).Build())
 	if err != nil {
 		return nil, err
 	}
+	if readOutput.BootStrapData == "" {
+		return nil, fmt.Errorf("SEC bootstrap data not found")
+	}
 	secBootstrapData := readOutput.BootStrapData
+
+	// 4. generate cdo bootstrap data
+	cdoBootstrapData, err := generateBootstrapData(ctx, client, readOutput.Name)
+	if err != nil {
+		return nil, err
+	}
 
 	// 5. re-read the sec until its name is updated, no idea why the name is empty some time...
 	var readOut ReadOutput

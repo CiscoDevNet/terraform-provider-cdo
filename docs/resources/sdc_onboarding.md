@@ -3,12 +3,12 @@
 page_title: "cdo_sdc_onboarding Resource - cdo"
 subcategory: ""
 description: |-
-  Use this resource to wait for an SEC to finish onboarding. When an SEC is onboarded, either manually or using the CDO Terraform Modules for AWS https://github.com/CiscoDevNet/terraform-aws-cdo-sec, it can take a few minutes before the SEC is active and capable of proxying communications between CDO and the device. This resource allows you to wait until this is done.
+  Use this resource to wait for an SDC to finish onboarding. When an SEC is onboarded, either manually or using the CDO Terraform Modules for AWS https://github.com/CiscoDevNet/terraform-aws-cdo-sec, it can take a few minutes before the SEC is active and capable of proxying communications between CDO and the device. This resource allows you to wait until this is done.
 ---
 
 # cdo_sdc_onboarding (Resource)
 
-Use this resource to wait for an SEC to finish onboarding. When an SEC is onboarded, either manually or using the CDO Terraform Modules for [AWS](https://github.com/CiscoDevNet/terraform-aws-cdo-sec), it can take a few minutes before the SEC is active and capable of proxying communications between CDO and the device. This resource allows you to wait until this is done.
+Use this resource to wait for an SDC to finish onboarding. When an SEC is onboarded, either manually or using the CDO Terraform Modules for [AWS](https://github.com/CiscoDevNet/terraform-aws-cdo-sec), it can take a few minutes before the SEC is active and capable of proxying communications between CDO and the device. This resource allows you to wait until this is done.
 
 
 
@@ -17,8 +17,8 @@ Use this resource to wait for an SEC to finish onboarding. When an SEC is onboar
 
 ### Required
 
-- `name` (String) Specify the name of the SEC.
+- `name` (String) Specify the name of the SDC.
 
 ### Read-Only
 
-- `id` (String) The unique identifier of this SEC onboarding resource.
+- `id` (String) The unique identifier of this SDC onboarding resource.

@@ -12,8 +12,7 @@ import (
 var resourceModel = struct{}{}
 
 const resourceTemplate = `
-resource "cdo_sec" "test" {
-}`
+resource "cdo_sec" "test" {}`
 
 var resourceConfig = acctest.MustParseTemplate(resourceTemplate, resourceModel)
 

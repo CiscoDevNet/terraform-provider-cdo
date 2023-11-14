@@ -54,7 +54,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"cdo_bootstrap_data": schema.StringAttribute{
-				MarkdownDescription: "CDO bootstrap data. This can be passed as input to the SEC terraform module to bootstrap the connector with CDO.",
+				MarkdownDescription: "CDO bootstrap data. This should be passed as input to the SEC terraform module to bootstrap the connector with CDO.",
 				Computed:            true,
 				Sensitive:           true, // bootstrap data contains user api token
 				PlanModifiers: []planmodifier.String{
@@ -62,7 +62,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				},
 			},
 			"sec_bootstrap_data": schema.StringAttribute{
-				MarkdownDescription: "SEC bootstrap data. This can be passed as input to the SEC terraform module to bootstrap the connector with CDO.",
+				MarkdownDescription: "SEC bootstrap data. This should be passed as input to the SEC terraform module to bootstrap the connector with CDO.",
 				Computed:            true,
 				Sensitive:           true, // bootstrap data contains user api token
 				PlanModifiers: []planmodifier.String{

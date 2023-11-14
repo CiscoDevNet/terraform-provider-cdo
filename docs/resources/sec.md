@@ -17,7 +17,7 @@ Provides an SEC connector resource. This allows SEC to be onboarded, updated, an
 
 ### Read-Only
 
-- `cdo_bootstrap_data` (String, Sensitive) CDO bootstrap data. This can be passed as input to the SEC terraform module to bootstrap the connector with CDO.
+- `cdo_bootstrap_data` (String, Sensitive) CDO bootstrap data. This should be passed as input to the SEC terraform module to bootstrap the connector with CDO.
 - `id` (String) Unique identifier of the device. This is a UUID and is automatically generated when the device is created.
 - `name` (String) A generated name for the Secure Event Connector (SEC). This name is unique.
-- `sec_bootstrap_data` (String, Sensitive) SEC bootstrap data. This can be passed as input to the SEC terraform module to bootstrap the connector with CDO.
+- `sec_bootstrap_data` (String, Sensitive) SEC bootstrap data. This should be passed as input to the SEC terraform module to bootstrap the connector with CDO.

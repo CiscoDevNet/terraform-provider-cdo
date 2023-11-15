@@ -61,7 +61,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	secBootstrapData := readOutput.BootStrapData
 
 	// 4. generate cdo bootstrap data
-	cdoBootstrapData, err := generateBootstrapData(ctx, client, readOutput.Name)
+	cdoBootstrapData, err := generateBootstrapData(ctx, client)
 	if err != nil {
 		return nil, err
 	}

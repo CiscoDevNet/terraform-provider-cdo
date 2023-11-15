@@ -6,6 +6,7 @@ import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/connectoronboarding"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sec"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sec/seconboarding"
 	"net/http"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
@@ -239,4 +240,8 @@ func (c *Client) DeleteSec(ctx context.Context, inp sec.DeleteInput) (*sec.Delet
 
 func (c *Client) ReadSec(ctx context.Context, inp sec.ReadInput) (*sec.ReadOutput, error) {
 	return sec.Read(ctx, c.client, inp)
+}
+
+func (c *Client) CreateSecOnboarding(ctx context.Context, inp seconboarding.CreateInput) (*seconboarding.CreateOutput, error) {
+	return seconboarding.Create(ctx, c.client, inp)
 }

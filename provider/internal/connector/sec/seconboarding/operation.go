@@ -1,14 +1,14 @@
-package connectoronboarding
+package seconboarding
 
 import (
 	"context"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/connectoronboarding"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sec/seconboarding"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) error {
 
-	// intentional empty, nothing to read
+	// intentional empty: nothing to read
 
 	return nil
 }
@@ -16,29 +16,28 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 func Create(ctx context.Context, resource *Resource, planData *ResourceModel) error {
 
 	// do create
-
-	readOutp, err := resource.client.CreateConnectorOnboarding(ctx, connectoronboarding.NewCreateInput(planData.Name.ValueString()))
+	createOutp, err := resource.client.CreateSecOnboarding(ctx, seconboarding.NewCreateInputBuilder().Name(planData.Name.ValueString()).Build())
 	if err != nil {
 		return err
 	}
 
-	// map return struct to sdc model
-	planData.Id = types.StringValue(readOutp.Uid)
-	planData.Name = types.StringValue(readOutp.Name)
+	// map response to terraform types
+	planData.Id = types.StringValue(createOutp.Uid)
+	planData.Name = types.StringValue(createOutp.Name)
 
 	return nil
 }
 
 func Update(ctx context.Context, resource *Resource, planData *ResourceModel, stateData *ResourceModel) error {
 
-	// intentional empty, nothing to update
+	// intentional empty: nothing to update
 
 	return nil
 }
 
 func Delete(ctx context.Context, resource *Resource, stateData *ResourceModel) error {
 
-	// intentional empty, nothing to delete
+	// intentional empty: nothing to delete
 
 	return nil
 }

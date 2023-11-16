@@ -202,7 +202,7 @@ func (c *Client) CreateCloudFmcDevice(ctx context.Context, inp cloudfmc.CreateIn
 	return cloudfmc.Create(ctx, c.client, inp)
 }
 
-func (c *Client) ReadCloudFmcDevice(ctx context.Context) (*device.ReadOutput, error) {
+func (c *Client) ReadCloudFmcDevice(ctx context.Context) (*cloudfmc.ReadOutput, error) {
 	return cloudfmc.Read(ctx, c.client, cloudfmc.NewReadInput())
 }
 

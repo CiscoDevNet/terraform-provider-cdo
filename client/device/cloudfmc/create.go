@@ -59,7 +59,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	client.Logger.Println("creating cloud FMC device")
 
 	// 2. POST /aegis/rest/v1/services/targets/devices
-	createOutp, err := device.Create(ctx, client, device.NewCreateInputBuilder().
+	_, err = device.Create(ctx, client, device.NewCreateInputBuilder().
 		Name("FMC").
 		DeviceType(devicetype.CloudFmc).
 		Model(false).
@@ -90,9 +90,16 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		return nil, err
 	}
 
+	client.Logger.Println("re-reading cdFMC to get latest info")
+	// re-read the cdfmc so that we get updated output, e.g. updated hostname
+	readOutp, err := Read(ctx, client, NewReadInput())
+	if err != nil {
+		return nil, err
+	}
+
 	client.Logger.Println("cloud FMC application successfully created")
 
-	return createOutp, nil
+	return readOutp, nil
 }
 
 func untilApplicationActive(ctx context.Context, client http.Client) retry.Func {

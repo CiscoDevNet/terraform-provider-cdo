@@ -296,15 +296,19 @@ func (e *env) ConnectorResourceNewName() string {
 }
 
 func (e *env) CloudFmcDataSourceHostname() string {
-	return e.mustGetString("CLOUD_FMC_HOSTNAME")
+	return e.mustGetString("CLOUD_FMC_DATA_SOURCE_HOSTNAME")
 }
 
 func (e *env) CloudFmcDataSourceSoftwareVersion() string {
-	return e.mustGetString("CLOUD_FMC_SOFTWARE_VERSION")
+	return e.mustGetString("CLOUD_FMC_DATA_SOURCE_SOFTWARE_VERSION")
 }
 
 func (e *env) CloudFmcResourceName() string {
 	return e.mustGetString("CLOUD_FMC_RESOURCE_NAME")
+}
+
+func (e *env) CloudFmcResourceHostname() string {
+	return e.mustGetString("CLOUD_FMC_RESOURCE_HOSTNAME")
 }
 
 func (e *env) mustGetString(envName string) string {

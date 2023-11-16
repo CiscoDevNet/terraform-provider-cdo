@@ -8,9 +8,11 @@ import (
 )
 
 var resourceModel = struct {
-	Name string
+	Name     string
+	Hostname string
 }{
-	Name: acctest.Env.CloudFmcResourceName(),
+	Name:     acctest.Env.CloudFmcResourceName(),
+	Hostname: acctest.Env.CloudFmcResourceHostname(),
 }
 
 const resourceTemplate = `
@@ -30,6 +32,7 @@ func TestAccCdFmcResource(t *testing.T) {
 				Config: acctest.ProviderConfig() + resourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cdo_cdfmc.test", "name", resourceModel.Name),
+					resource.TestCheckResourceAttr("cdo_cdfmc.test", "hostname", resourceModel.Hostname),
 				),
 			},
 			// Delete testing automatically occurs in TestCase

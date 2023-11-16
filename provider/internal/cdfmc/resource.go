@@ -24,8 +24,9 @@ type Resource struct {
 }
 
 type ResourceModel struct {
-	Id   types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
+	Id       types.String `tfsdk:"id"`
+	Name     types.String `tfsdk:"name"`
+	Hostname types.String `tfsdk:"hostname"`
 }
 
 func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -47,6 +48,13 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			},
 			"name": schema.StringAttribute{
 				MarkdownDescription: "The name of the cdFMC. This is automatically generated from the tenant name by CDO.",
+				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
+			"hostname": schema.StringAttribute{
+				MarkdownDescription: "The hostname of the cdFMC.",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),

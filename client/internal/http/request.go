@@ -106,7 +106,15 @@ func (r *Request) send(output any) error {
 	// check status
 	if res.StatusCode >= 400 {
 		body, err := io.ReadAll(res.Body)
-		err = fmt.Errorf("failed: url=%s, code=%d, status=%s, body=%s, readBodyErr=%s, method=%s, header=%s", r.url, res.StatusCode, res.Status, string(body), err, r.method, r.Header)
+		errInfo := fmt.Sprintf("url=%s, code=%d, status=%s, body=%s, readBodyErr=%s, method=%s, header=%s", r.url, res.StatusCode, res.Status, string(body), err, r.method, r.Header)
+		interestedError := errorFromStatusCode(res.StatusCode)
+		if interestedError == nil {
+			err = fmt.Errorf("http error: %s", errInfo)
+		} else {
+			// we wrap the error here so that later we can check it with, e.g. `errors.Is(err, http.InterestedError)`
+			err = fmt.Errorf("http error: %w%s", interestedError, errInfo)
+		}
+
 		r.Error = err
 		return err
 	}

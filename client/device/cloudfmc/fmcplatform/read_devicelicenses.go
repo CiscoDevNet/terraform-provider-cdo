@@ -20,6 +20,8 @@ func NewReadDeviceLicensesInput(fmcHost string) ReadDeviceLicensesInput {
 
 type ReadDeviceLicensesOutput = devicelicense.Item
 
+var NewReadDeviceLicensesOutputBuilder = devicelicense.NewItemBuilder
+
 func ReadDeviceLicenses(ctx context.Context, client http.Client, readInp ReadDeviceLicensesInput) (*ReadDeviceLicensesOutput, error) {
 
 	client.Logger.Println("reading FMC device licenses")

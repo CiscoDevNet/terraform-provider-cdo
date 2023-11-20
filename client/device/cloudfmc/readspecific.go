@@ -28,6 +28,8 @@ func NewReadSpecificInput(fmcId string) ReadSpecificInput {
 
 func ReadSpecific(ctx context.Context, client http.Client, inp ReadSpecificInput) (*ReadSpecificOutput, error) {
 
+	client.Logger.Println("reading Cloud FMC specific")
+
 	req := device.NewReadSpecificRequest(ctx, client, *device.NewReadSpecificInput(inp.FmcId))
 
 	var readSpecificOutp ReadSpecificOutput

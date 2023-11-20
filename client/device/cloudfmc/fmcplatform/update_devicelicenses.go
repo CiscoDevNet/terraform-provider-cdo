@@ -15,6 +15,8 @@ type UpdateDeviceLicensesInput struct {
 
 type UpdateDeviceLicensesOutput = devicelicense.Item
 
+var NewUpdateDeviceLicensesOutputBuilder = devicelicense.NewItemBuilder
+
 type updateRequestBody struct {
 	Type         string         `json:"type"`
 	Id           string         `json:"id"`

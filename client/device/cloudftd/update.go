@@ -36,12 +36,15 @@ type updateRequestBody struct {
 
 type UpdateOutput = ReadOutput
 
+var NewUpdateOutputBuilder = NewReadOutputBuilder
+
 func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*UpdateOutput, error) {
 
 	client.Logger.Println("updating FTD")
 
 	client.Logger.Println("updating CDO settings")
-	// update CDO related stuff
+
+	// update CDO settings
 	updateUrl := url.UpdateDevice(client.BaseUrl(), updateInp.Uid)
 	updateBody := updateRequestBody{
 		Name: updateInp.Name,
@@ -53,17 +56,23 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 		return nil, err
 	}
 
+	// read FMC host
 	client.Logger.Println("reading FMC host")
-	// read fmc host
 	fmcRes, err := cloudfmc.Read(ctx, client, cloudfmc.NewReadInput())
 	if err != nil {
 		return nil, err
 	}
 
-	client.Logger.Println("updating FTD licenses")
-
 	// update FTD license through FMC api
-	_, err = fmcplatform.UpdateDeviceLicenses(ctx, client, fmcplatform.NewUpdateDeviceLicensesInputBuilder().FmcHost(fmcRes.Host).LicenseTypes(updateInp.Licenses).Build())
+	client.Logger.Println("updating FTD licenses")
+	_, err = fmcplatform.UpdateDeviceLicenses(
+		ctx,
+		client,
+		fmcplatform.NewUpdateDeviceLicensesInputBuilder().
+			FmcHost(fmcRes.Host).
+			LicenseTypes(updateInp.Licenses).
+			Build(),
+	)
 	if err != nil {
 		return nil, err
 	}

@@ -146,6 +146,9 @@ func Update(ctx context.Context, resource *Resource, planData *ResourceModel, st
 
 	// convert tf license to go license
 	licenses, err := util.TFStringSetToLicenses(ctx, planData.Licenses)
+	if err != nil {
+		return err
+	}
 
 	inp := cloudftd.NewUpdateInput(
 		planData.ID.ValueString(),

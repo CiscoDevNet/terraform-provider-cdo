@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     cdo = {
-      source = "hashicorp.com/CiscoDevnet/cdo"
+      source = "CiscoDevnet/cdo"
     }
     aws = {
       source  = "hashicorp/aws"
@@ -20,7 +20,7 @@ resource "cdo_ftd_device" "test" {
   access_policy_name = "Default Access Control Policy"
   performance_tier   = "FTDv5"
   virtual            = true
-  licenses           = ["BASE"]
+  licenses           = ["BASE", "URLFilter", "CARRIER"]
 }
 
 resource "cdo_ftd_device_onboarding" "test" {

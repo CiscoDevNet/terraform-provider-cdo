@@ -2,10 +2,10 @@ package ftd
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"strings"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -45,13 +45,19 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 		return err
 	}
 
+	// handle licenses
+	licenseStrings, err := license.StringToCdoStrings(res.Metadata.LicenseCaps)
+	if err != nil {
+		return err
+	}
+
 	// map return struct to model
 	stateData.ID = types.StringValue(res.Uid)
 	stateData.Name = types.StringValue(res.Name)
 	stateData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
 	stateData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUid)
 	stateData.Virtual = types.BoolValue(res.Metadata.PerformanceTier != nil)
-	stateData.Licenses = util.GoStringSliceToTFStringSet(license.ReplaceFmcLicenseTermsWithCdoTerms(strings.Split(res.Metadata.LicenseCaps, ",")))
+	stateData.Licenses = util.GoStringSliceToTFStringSet(licenseStrings)
 	if res.Metadata.PerformanceTier != nil { // nil means physical cloudftd
 		stateData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))
 	}
@@ -104,12 +110,18 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 		return err
 	}
 
+	// convert licenses
+	licenseStrings, err := license.StringToCdoStrings(res.Metadata.LicenseCaps)
+	if err != nil {
+		return err
+	}
+
 	// map return struct to model
 	planData.ID = types.StringValue(res.Uid)
 	planData.Name = types.StringValue(res.Name)
 	planData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
 	planData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUid)
-	planData.Licenses = util.GoStringSliceToTFStringSet(strings.Split(res.Metadata.LicenseCaps, ","))
+	planData.Licenses = util.GoStringSliceToTFStringSet(licenseStrings)
 	planData.Labels = util.GoStringSliceToTFStringSet(res.Tags.Labels)
 	if res.Metadata.PerformanceTier != nil { // nil means physical cloud ftd
 		planData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))
@@ -132,10 +144,14 @@ func Update(ctx context.Context, resource *Resource, planData *ResourceModel, st
 		return err
 	}
 
+	// convert tf license to go license
+	licenses, err := util.TFStringSetToLicenses(ctx, planData.Licenses)
+
 	inp := cloudftd.NewUpdateInput(
 		planData.ID.ValueString(),
 		planData.Name.ValueString(),
 		planTags,
+		licenses,
 	)
 	res, err := resource.client.UpdateCloudFtd(ctx, inp)
 	if err != nil {
@@ -145,6 +161,7 @@ func Update(ctx context.Context, resource *Resource, planData *ResourceModel, st
 	// map return struct to model
 	stateData.Name = types.StringValue(res.Name)
 	stateData.Labels = planData.Labels
+	stateData.Licenses = planData.Licenses
 
 	return nil
 }

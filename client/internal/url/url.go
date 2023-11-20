@@ -98,6 +98,14 @@ func ReadFmcDomainInfo(fmcHost string) string {
 	return fmt.Sprintf("https://%s/api/fmc_platform/v1/info/domain", fmcHost)
 }
 
+func ReadFmcDeviceLicenses(baseUrl string) string {
+	return fmt.Sprintf("%s/fmc/api/fmc_platform/v1/license/devicelicenses", baseUrl)
+}
+
+func UpdateFmcDeviceLicenses(baseUrl string, objectId string) string {
+	return fmt.Sprintf("%s/fmc/api/fmc_platform/v1/license/devicelicenses/%s", baseUrl, objectId)
+}
+
 func CreateUser(baseUrl string, username string) string {
 	return fmt.Sprintf("%s/anubis/rest/v1/users/%s", baseUrl, username)
 }

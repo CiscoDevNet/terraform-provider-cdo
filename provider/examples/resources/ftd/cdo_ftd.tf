@@ -20,7 +20,7 @@ resource "cdo_ftd_device" "test" {
   access_policy_name = "Default Access Control Policy"
   performance_tier   = "FTDv5"
   virtual            = true
-  licenses           = ["BASE", "URLFilter", "CARRIER"]
+  licenses           = ["BASE"]
 }
 
 resource "cdo_ftd_device_onboarding" "test" {

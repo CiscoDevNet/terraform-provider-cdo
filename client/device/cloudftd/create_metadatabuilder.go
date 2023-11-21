@@ -36,7 +36,7 @@ func (b *MetadataBuilder) GeneratedCommand(generatedCommand string) *MetadataBui
 }
 
 func (b *MetadataBuilder) LicenseCaps(licenseCaps *[]license.Type) *MetadataBuilder {
-	b.metadata.LicenseCaps = license.LicensesToString(*licenseCaps)
+	b.metadata.LicenseCaps = license.SerializeAllAsCdo(*licenseCaps)
 	return b
 }
 

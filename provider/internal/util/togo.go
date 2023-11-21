@@ -39,7 +39,7 @@ func TFStringSetToLicenses(ctx context.Context, s types.Set) ([]license.Type, er
 	if err != nil {
 		return nil, err
 	}
-	licenses, err := license.StringToCdoLicenses(strings.Join(licensesGoList, ","))
+	licenses, err := license.DeserializeAllFromCdo(strings.Join(licensesGoList, ","))
 	if err != nil {
 		return nil, err
 	}

@@ -44,13 +44,8 @@ func (b *updateRequestBodyBuilder) QueueTriggerState(queueTriggerState string) *
 	return b
 }
 
-func (b *updateRequestBodyBuilder) StateMachineContext(stateMachineContext *map[string]string) *updateRequestBodyBuilder {
+func (b *updateRequestBodyBuilder) StateMachineContext(stateMachineContext map[string]string) *updateRequestBodyBuilder {
 	b.updateRequestBody.StateMachineContext = stateMachineContext
-	return b
-}
-
-func (b *updateRequestBodyBuilder) Uid(uid string) *updateRequestBodyBuilder {
-	b.updateRequestBody.Uid = uid
 	return b
 }
 

@@ -20,7 +20,7 @@ func (b *UpdateInputBuilder) QueueTriggerState(queueTriggerState string) *Update
 	return b
 }
 
-func (b *UpdateInputBuilder) StateMachineContext(stateMachineContext *map[string]string) *UpdateInputBuilder {
+func (b *UpdateInputBuilder) StateMachineContext(stateMachineContext map[string]string) *UpdateInputBuilder {
 	b.updateInput.StateMachineContext = stateMachineContext
 	return b
 }

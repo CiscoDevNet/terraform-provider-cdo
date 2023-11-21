@@ -9,10 +9,10 @@ import (
 type UpdateInput struct {
 	FmcApplianceUid     string
 	QueueTriggerState   string
-	StateMachineContext *map[string]string
+	StateMachineContext map[string]string
 }
 
-func NewUpdateInput(FmcApplianceUid, queueTriggerState string, stateMachineContext *map[string]string) UpdateInput {
+func NewUpdateInput(FmcApplianceUid, queueTriggerState string, stateMachineContext map[string]string) UpdateInput {
 	return UpdateInput{
 		FmcApplianceUid:     FmcApplianceUid,
 		QueueTriggerState:   queueTriggerState,
@@ -27,9 +27,8 @@ type UpdateOutput struct {
 }
 
 type updateRequestBody struct {
-	QueueTriggerState   string             `json:"queueTriggerState"`
-	StateMachineContext *map[string]string `json:"stateMachineContext,omitempty"`
-	Uid                 string             `json:"uid,omitempty"`
+	QueueTriggerState   string            `json:"queueTriggerState"`
+	StateMachineContext map[string]string `json:"stateMachineContext"`
 }
 
 func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*UpdateOutput, error) {
@@ -37,7 +36,6 @@ func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*Up
 	updateBody := newUpdateRequestBodyBuilder().
 		QueueTriggerState(updateInp.QueueTriggerState).
 		StateMachineContext(updateInp.StateMachineContext).
-		Uid(updateInp.FmcApplianceUid).
 		Build()
 	req := client.NewPut(ctx, updateUrl, updateBody)
 	var updateOup UpdateOutput

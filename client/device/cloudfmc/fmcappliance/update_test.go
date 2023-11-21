@@ -31,7 +31,7 @@ func TestUpdate(t *testing.T) {
 	}{
 		{
 			testName: "successfully updates FMC Appliance name",
-			input:    fmcappliance.NewUpdateInput(fmcApplianceUid, queueTriggerState, &stateMachineContext),
+			input:    fmcappliance.NewUpdateInput(fmcApplianceUid, queueTriggerState, stateMachineContext),
 
 			setupFunc: func() {
 				httpmock.RegisterResponder(
@@ -50,7 +50,7 @@ func TestUpdate(t *testing.T) {
 
 		{
 			testName: "error when update FMC Appliance name error",
-			input:    fmcappliance.NewUpdateInput(fmcApplianceUid, queueTriggerState, &stateMachineContext),
+			input:    fmcappliance.NewUpdateInput(fmcApplianceUid, queueTriggerState, stateMachineContext),
 
 			setupFunc: func() {
 				httpmock.RegisterResponder(

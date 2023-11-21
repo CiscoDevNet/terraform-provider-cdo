@@ -119,7 +119,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		Metadata: &Metadata{
 			AccessPolicyName: selectedPolicy.Name,
 			AccessPolicyUid:  selectedPolicy.Id,
-			LicenseCaps:      license.LicensesToString(*createInp.Licenses),
+			LicenseCaps:      license.SerializeAllAsCdo(*createInp.Licenses),
 			PerformanceTier:  performanceTier,
 		},
 		State: "NEW",

@@ -19,8 +19,6 @@ func NewReadInput() ReadInput {
 
 type ReadOutput = device.ReadOutput
 
-var NewReadOutputBuilder = device.NewReadOutputBuilder
-
 func Read(ctx context.Context, client http.Client, readInp ReadInput) (*ReadOutput, error) {
 
 	client.Logger.Println("reading cloud FMC")

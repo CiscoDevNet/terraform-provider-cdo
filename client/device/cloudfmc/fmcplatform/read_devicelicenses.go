@@ -36,7 +36,7 @@ func ReadDeviceLicenses(ctx context.Context, client http.Client, readInp ReadDev
 	}
 
 	if len(outp.Items) != 1 {
-		return nil, fmt.Errorf("failed to get device license")
+		return nil, fmt.Errorf("failed to get device licenses")
 	}
 
 	return &outp.Items[0], nil

@@ -64,7 +64,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 			Logger(client.Logger).
 			Delay(2*time.Second).
 			EarlyExitOnError(true).
-			Timeout(time.Minute). // typically a few seconds should be enough
+			Timeout(3*time.Minute). // typically a few seconds should be enough, but it can go over 1 minute
 			Build(),
 	)
 	if err != nil {

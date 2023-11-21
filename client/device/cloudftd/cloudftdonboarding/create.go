@@ -104,7 +104,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 
 	// 3.1 read ftd metadata
 	// 3.1.5 handle license
-	licenseCaps, err := license.DeserializeAllFromCdo(readFtdOutp.Metadata.LicenseCaps)
+	licenseCaps, err := license.StringToCdoLicenses(readFtdOutp.Metadata.LicenseCaps)
 	if err != nil {
 		return nil, err
 	}

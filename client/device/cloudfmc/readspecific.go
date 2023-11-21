@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 )
 
@@ -12,10 +13,11 @@ type ReadSpecificInput struct {
 }
 
 type ReadSpecificOutput struct {
-	SpecificUid string     `json:"uid"`
-	DomainUid   string     `json:"domainUid"`
-	State       state.Type `json:"state"`
-	Status      string     `json:"status"`
+	SpecificUid         string               `json:"uid"`
+	DomainUid           string               `json:"domainUid"`
+	State               state.Type           `json:"state"`
+	Status              string               `json:"status"`
+	StateMachineDetails statemachine.Details `json:"stateMachineDetails"`
 }
 
 func NewReadSpecificInput(fmcId string) ReadSpecificInput {
@@ -25,6 +27,8 @@ func NewReadSpecificInput(fmcId string) ReadSpecificInput {
 }
 
 func ReadSpecific(ctx context.Context, client http.Client, inp ReadSpecificInput) (*ReadSpecificOutput, error) {
+
+	client.Logger.Println("reading Cloud FMC specific")
 
 	req := device.NewReadSpecificRequest(ctx, client, *device.NewReadSpecificInput(inp.FmcId))
 

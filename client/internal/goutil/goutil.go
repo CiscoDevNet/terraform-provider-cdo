@@ -1,6 +1,9 @@
 package goutil
 
-import "golang.org/x/exp/constraints"
+import (
+	"golang.org/x/exp/constraints"
+	"sort"
+)
 
 // AsPointer convert interface{} to *interface{}, if input is not nil
 func AsPointer(obj interface{}) *interface{} {
@@ -32,4 +35,12 @@ func Max[T constraints.Ordered](a, b T) T {
 		return a
 	}
 	return b
+}
+
+// SortStrings return a sorted copy of the input string array.
+func SortStrings(inp []string) []string {
+	temp := make([]string, len(inp))
+	copy(temp, inp)
+	sort.Strings(temp)
+	return temp
 }

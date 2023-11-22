@@ -120,7 +120,13 @@ func LicensesToStrings(licenses []Type) []string {
 // use this method to handle this special case by converting FMC representation to
 // CDO representation
 func StringToCdoLicenses(licenses string) ([]Type, error) {
-	return sliceutil.MapWithError(strings.Split(licenses, ","), func(l string) (Type, error) {
+	licensesArr := strings.Split(licenses, ",")
+
+	nonEmptyLicenses := sliceutil.Filter(licensesArr, func(s string) bool {
+		return s != ""
+	})
+
+	replacedLicenses, err := sliceutil.MapWithError(nonEmptyLicenses, func(l string) (Type, error) {
 		t, ok := nameToTypeMap[l]
 		if !ok {
 			return "", fmt.Errorf("cannot deserialize %s as license, should be one of %+v", l, All)
@@ -128,6 +134,8 @@ func StringToCdoLicenses(licenses string) ([]Type, error) {
 		t = replaceFmcTermWithCdoTerm(t)
 		return t, nil
 	})
+
+	return replacedLicenses, err
 }
 
 func LicensesToFmcLicenses(licenses []Type) []Type {

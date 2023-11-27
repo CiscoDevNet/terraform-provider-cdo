@@ -12,15 +12,18 @@ type Type string
 
 // https://www.cisco.com/c/en/us/td/docs/security/firepower/70/fdm/fptd-fdm-config-guide-700/fptd-fdm-license.html
 const (
-	Base           Type = "BASE"
+	// CDO terms
+	Base      Type = "BASE"
+	Carrier   Type = "CARRIER"
+	Threat    Type = "THREAT"
+	Malware   Type = "MALWARE"
+	URLFilter Type = "URLFilter"
+
+	// FMC terms
 	Essentials     Type = "ESSENTIALS"
-	Carrier        Type = "CARRIER"
-	Threat         Type = "THREAT"
-	IPS            Type = "IPS"
-	Malware        Type = "MALWARE"
-	MalwareDefense Type = "MALWARE_DEFENSE"
-	URLFilter      Type = "URLFilter"
 	URL            Type = "URL"
+	IPS            Type = "IPS"
+	MalwareDefense Type = "MALWARE_DEFENSE"
 )
 
 var All = []Type{
@@ -33,6 +36,20 @@ var All = []Type{
 	MalwareDefense,
 	URLFilter,
 	URL,
+}
+
+var fmcToCdoLicenseNameMap = map[Type]Type{
+	Essentials:     Base,
+	IPS:            Threat,
+	URL:            URLFilter,
+	MalwareDefense: Malware,
+}
+
+var cdoToFmcLicenseNameMap = map[Type]Type{
+	Base:      Essentials,
+	Threat:    IPS,
+	URLFilter: URL,
+	Malware:   MalwareDefense,
 }
 
 var AllAsString = make([]string, len(All))
@@ -54,7 +71,7 @@ func (t *Type) UnmarshalJSON(b []byte) error {
 	if len(b) <= 2 || b == nil {
 		return fmt.Errorf("cannot unmarshal empty tring as a license type, it should be one of valid roles: %+v", AllAsString)
 	}
-	deserialized, err := Deserialize(string(b[1 : len(b)-1])) // strip off quote
+	deserialized, err := stringToLicense(string(b[1 : len(b)-1])) // strip off quote
 	if err != nil {
 		return err
 	}
@@ -62,35 +79,27 @@ func (t *Type) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// ReplaceFmcLicenseTermsWithCdoTerms is used to tell terraform how the licenses returned by FMC map to licenses expected by CDO
+// replaceFmcLicenseTermsWithCdoTerms is used to tell terraform how the licenses returned by FMC map to licenses expected by CDO
 // We need to tell Terraform during read that they are the same thing, so when reading it back, we need the conversion
-func ReplaceFmcLicenseTermsWithCdoTerms(licenses []string) []string {
-	for i, l := range licenses {
-		if l == string(Essentials) {
-			licenses[i] = string(Base)
-		}
-		if l == string(IPS) {
-			licenses[i] = string(Threat)
-		}
-		if l == string(URL) {
-			licenses[i] = string(URLFilter)
-		}
-		if l == string(MalwareDefense) {
-			licenses[i] = string(Malware)
-		}
+func replaceFmcTermWithCdoTerm(fmcLicense Type) Type {
+	cdoLicense, ok := fmcToCdoLicenseNameMap[fmcLicense]
+	if ok {
+		return cdoLicense
+	} else {
+		return fmcLicense
 	}
-	return licenses
 }
 
-func MustParse(name string) Type {
-	l, ok := nameToTypeMap[name]
-	if !ok {
-		panic(fmt.Errorf("FTD License of name: \"%s\" not found, should be one of %+v", name, AllAsString))
+func replaceCdoTermWithFmcTerm(cdoLicense Type) Type {
+	fmcLicense, ok := cdoToFmcLicenseNameMap[cdoLicense]
+	if ok {
+		return fmcLicense
+	} else {
+		return cdoLicense
 	}
-	return l
 }
 
-func Deserialize(name string) (Type, error) {
+func stringToLicense(name string) (Type, error) {
 	l, ok := nameToTypeMap[name]
 	if !ok {
 		return "", fmt.Errorf("FTD License of name: \"%s\" not found, should be one of: %+v", name, AllAsString)
@@ -98,18 +107,47 @@ func Deserialize(name string) (Type, error) {
 	return l, nil
 }
 
-func SerializeAllAsCdo(licenses []Type) string {
-	return strings.Join(sliceutil.Map(licenses, func(l Type) string { return string(l) }), ",")
+func LicensesToString(licenses []Type) string {
+	return strings.Join(LicensesToStrings(licenses), ",")
 }
 
-// DeserializeAllFromCdo exists because CDO store license caps as one comma-sep string
-// but fmc store it as list of string, use this method to handle CDO's special case
-func DeserializeAllFromCdo(licenses string) ([]Type, error) {
-	return sliceutil.MapWithError(strings.Split(licenses, ","), func(l string) (Type, error) {
+func LicensesToStrings(licenses []Type) []string {
+	return sliceutil.Map(licenses, func(l Type) string { return string(l) })
+}
+
+// StringToCdoLicenses exists because CDO store license caps as one comma-sep string
+// but fmc store it as list of string, and they have different name for some licenses,
+// use this method to handle this special case by converting FMC representation to
+// CDO representation
+func StringToCdoLicenses(licenses string) ([]Type, error) {
+	licensesArr := strings.Split(licenses, ",")
+
+	nonEmptyLicenses := sliceutil.Filter(licensesArr, func(s string) bool {
+		return s != ""
+	})
+
+	replacedLicenses, err := sliceutil.MapWithError(nonEmptyLicenses, func(l string) (Type, error) {
 		t, ok := nameToTypeMap[l]
 		if !ok {
 			return "", fmt.Errorf("cannot deserialize %s as license, should be one of %+v", l, All)
 		}
+		t = replaceFmcTermWithCdoTerm(t)
 		return t, nil
 	})
+
+	return replacedLicenses, err
+}
+
+func LicensesToFmcLicenses(licenses []Type) []Type {
+	return sliceutil.Map(licenses, func(l Type) Type {
+		return replaceCdoTermWithFmcTerm(l)
+	})
+}
+
+func StringToCdoStrings(licenses string) ([]string, error) {
+	licenseTypes, err := StringToCdoLicenses(licenses)
+	if err != nil {
+		return nil, err
+	}
+	return LicensesToStrings(licenseTypes), nil
 }

@@ -30,7 +30,10 @@ func (c performanceTierConfigValidator) ValidateResource(ctx context.Context, re
 		// and performance tier is not set
 		if configData.PerformanceTier.IsNull() || configData.PerformanceTier.IsUnknown() {
 			// then we error
-			resp.Diagnostics.AddError("Performance Tier is required for virtual FTD.", "You need to select a performance tiers for virtual FTD. Allowed values are: [\"FTDv5\", \"FTDv10\", \"FTDv20\", \"FTDv30\", \"FTDv50\", \"FTDv100\", \"FTDv\"].")
+			resp.Diagnostics.AddError(
+				"Performance Tier must be specified for FTDvs",
+				"Please select a performance tier. Allowed values are: [\"FTDv5\", \"FTDv10\", \"FTDv20\", \"FTDv30\", \"FTDv50\", \"FTDv100\", \"FTDv\"].",
+			)
 		}
 	}
 }

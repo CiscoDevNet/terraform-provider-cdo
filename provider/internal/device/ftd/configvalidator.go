@@ -15,7 +15,7 @@ func (c performanceTierConfigValidator) Description(ctx context.Context) string 
 }
 
 func (c performanceTierConfigValidator) MarkdownDescription(ctx context.Context) string {
-	return fmt.Sprintf("Ensure performance tier is set for virtual FTD.")
+	return fmt.Sprintln("Ensure performance tier is set for virtual FTD.")
 }
 
 func (c performanceTierConfigValidator) ValidateResource(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {

@@ -25,6 +25,7 @@ import (
 
 var _ resource.Resource = &Resource{}
 var _ resource.ResourceWithImportState = &Resource{}
+var _ resource.ResourceWithConfigValidators = &Resource{}
 
 func NewResource() resource.Resource {
 	return &Resource{}
@@ -262,4 +263,10 @@ func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, res *
 
 func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequest, res *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, res)
+}
+
+func (r *Resource) ConfigValidators(ctx context.Context) []resource.ConfigValidator {
+	return []resource.ConfigValidator{
+		performanceTierConfigValidator{},
+	}
 }

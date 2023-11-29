@@ -32,6 +32,9 @@ func Update(ctx context.Context, resource *Resource, planData *ResourceModel, st
 
 	// intentional empty: nothing to update
 
+	// map response to terraform types
+	stateData.Name = planData.Name
+
 	return nil
 }
 

@@ -30,7 +30,7 @@ func ReadByName(ctx context.Context, client http.Client, readInp ReadByNameInput
 	}
 
 	if len(readOutp) == 0 {
-		return nil, fmt.Errorf("cloudftd with name: \"%s\" not found", readInp.Name)
+		return nil, fmt.Errorf("%w: cloudftd with name \"%s\" not found", http.NotFoundError, readInp.Name)
 	}
 
 	if len(readOutp) > 1 {

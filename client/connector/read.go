@@ -86,7 +86,7 @@ func ReadByName(ctx context.Context, client http.Client, readInp ReadByNameInput
 	}
 
 	if len(arrayOutp) == 0 {
-		return nil, fmt.Errorf("no connector found")
+		return nil, fmt.Errorf("%w: no connector found", http.NotFoundError)
 	}
 
 	if len(arrayOutp) > 1 {

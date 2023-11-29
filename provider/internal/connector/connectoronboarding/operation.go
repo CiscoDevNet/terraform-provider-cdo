@@ -31,7 +31,8 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 
 func Update(ctx context.Context, resource *Resource, planData *ResourceModel, stateData *ResourceModel) error {
 
-	// intentional empty, nothing to update
+	// map return struct to sdc model
+	stateData.Name = planData.Name
 
 	return nil
 }

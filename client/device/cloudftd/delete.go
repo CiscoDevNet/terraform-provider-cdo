@@ -84,9 +84,7 @@ func Delete(ctx context.Context, client http.Client, deleteInp DeleteInput) (*De
 		if strings.Contains(deviceRecord.Model, "Firepower Threat Defense") { // Question: is there a better way to check? Does this check cover all cases?
 			// found
 			ftdRecordId = record.Id
-		} else {
-			// not a FTD, just some other device with the same name, ignore
-		}
+		} // else not a FTD, just some other device with the same name, ignore
 	}
 
 	if ftdRecordId != "" {
@@ -123,10 +121,9 @@ func Delete(ctx context.Context, client http.Client, deleteInp DeleteInput) (*De
 			return nil, err
 		}
 
-	} else {
-		// the ftd device record is not found in cdFMC if reach here, this is unexpected,
-		// but since we are performing delete operation, it is going to be deleted anyway, so ignore it
-	}
+	} // else
+	// the ftd device record is not found in cdFMC if reach here, this is unexpected,
+	// but since we are performing delete operation, it is going to be deleted anyway, so ignore it
 
 	// now we checked the FTD is ready to be deleted
 

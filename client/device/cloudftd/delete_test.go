@@ -297,22 +297,6 @@ func readFtdIsSuccessful(success bool) {
 	}
 }
 
-//func readFmcDomainInfoIsSuccessful(success bool) {
-//	if success {
-//		httpmock.RegisterResponder(
-//			http.MethodGet,
-//			url.ReadFmcDomainInfo(fmcHost),
-//			httpmock.NewJsonResponderOrPanic(200, validReadFmcDomainInfoOutput),
-//		)
-//	} else {
-//		httpmock.RegisterResponder(
-//			http.MethodGet,
-//			url.ReadFmcDomainInfo(fmcHost),
-//			httpmock.NewJsonResponderOrPanic(500, "intentional error"),
-//		)
-//	}
-//}
-
 func waitForFtdDeleteStateMachineEndedSuccessful(success bool) {
 	if success {
 		httpmock.RegisterResponder(

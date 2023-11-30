@@ -145,7 +145,7 @@ func Delete(ctx context.Context, client http.Client, deleteInp DeleteInput) (*De
 	}
 
 	// 4. wait until the delete cloud FTD state machine is done
-	cdFmcFtdDeleteErr := retry.Do(
+	err = retry.Do(
 		ctx,
 		statemachine.UntilDone(ctx, client, fmcReadSpecificRes.SpecificUid, "fmceDeleteFtdcStateMachine"),
 		retry.NewOptionsBuilder().
@@ -157,11 +157,20 @@ func Delete(ctx context.Context, client http.Client, deleteInp DeleteInput) (*De
 			Timeout(retry.DefaultTimeout).
 			Build(),
 	)
+	// skip 404 errors, we are doing deletion anyway
+	if err != nil {
+		if !errors.Is(err, http.NotFoundError) {
+			return nil, err
+		}
+	}
 
-	// 5. delete FTD in CDO as well, before checking any error from above, because it maybe because it is already deleted or something
+	// 5. delete FTD in CDO as well,
 	ftdDeleteOutput, err := device.Delete(ctx, client, *device.NewDeleteInput(deleteInp.Uid))
-	if err != nil || cdFmcFtdDeleteErr != nil {
-		return nil, errors.Join(cdFmcFtdDeleteErr, err)
+	// similarly, skip 404 errors, we are doing deletion anyway
+	if err != nil {
+		if !errors.Is(err, http.NotFoundError) {
+			return nil, err
+		}
 	}
 
 	// done!

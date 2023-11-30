@@ -32,7 +32,7 @@ func Read(ctx context.Context, client http.Client, readInp ReadInput) (*ReadOutp
 	}
 
 	if len(cloudFmcDevices) == 0 {
-		return nil, fmt.Errorf("firewall management center (FMC) not found")
+		return nil, fmt.Errorf("%w: firewall management center (FMC) not found", http.NotFoundError)
 	}
 
 	if len(cloudFmcDevices) > 1 {

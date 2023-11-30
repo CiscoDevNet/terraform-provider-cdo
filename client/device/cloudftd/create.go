@@ -80,7 +80,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		return nil, err
 	}
 	if len(readFmcDomainRes.Items) == 0 {
-		return nil, fmt.Errorf("fmc domain info not found")
+		return nil, fmt.Errorf("%w: fmc domain info not found", http.NotFoundError)
 	}
 
 	// 3. get access policies using Cloud FMC domain uid

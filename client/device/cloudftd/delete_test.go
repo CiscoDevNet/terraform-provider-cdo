@@ -24,31 +24,18 @@ func TestDeleteCloudFtd(t *testing.T) {
 		assertFunc func(output *cloudftd.DeleteOutput, err error, t *testing.T)
 	}{
 		{
-			testName: "successfully create Cloud FTD",
+			testName: "successfully delete Cloud FTD, and waited for delete state machine",
 			input:    cloudftd.NewDeleteInput(ftdUid),
 			setupFunc: func() {
 				readFmcIsSuccessful(true)
 				readFmcSpecificIsSuccessful(true)
+				readFmcDomainInfoIsSuccessful(true)
+				readFtdIsSuccessful(true)
+				readFmcDeviceRecordsIsSuccessful(true)
+				readFtdDeviceRecordIsSuccessful(true)
 				triggerFtdDeleteOnFmcIsSuccessful(true)
-				waitForFtdDeleteStateMachineTriggeredIsSuccessful(true)
-			},
-			assertFunc: func(output *cloudftd.DeleteOutput, err error, t *testing.T) {
-				assert.Nil(t, err)
-				assert.NotNil(t, output)
-				assert.Equal(t, validDeleteOutput, *output)
-			},
-		},
-		{
-			testName: "successfully create Cloud FTD, and waited for delete state machine",
-			input:    cloudftd.NewDeleteInput(ftdUid),
-			setupFunc: func() {
-				readFmcIsSuccessful(true)
-				readFmcSpecificIsSuccessful(true)
-				triggerFtdDeleteOnFmcIsSuccessful(true)
-				waitForFtdDeleteStateMachineTriggeredReturnedNotFound()
-				waitForFtdDeleteStateMachineTriggeredReturnedNotFound()
-				waitForFtdDeleteStateMachineTriggeredReturnedNotFound()
-				waitForFtdDeleteStateMachineTriggeredIsSuccessful(true)
+				waitForFtdDeleteStateMachineEndedSuccessful(true)
+				deleteFtdIsSuccessful(true)
 			},
 			assertFunc: func(output *cloudftd.DeleteOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
@@ -62,8 +49,13 @@ func TestDeleteCloudFtd(t *testing.T) {
 			setupFunc: func() {
 				readFmcIsSuccessful(false)
 				readFmcSpecificIsSuccessful(true)
+				readFmcDomainInfoIsSuccessful(true)
+				readFtdIsSuccessful(true)
+				readFmcDeviceRecordsIsSuccessful(true)
+				readFtdDeviceRecordIsSuccessful(true)
 				triggerFtdDeleteOnFmcIsSuccessful(true)
-				waitForFtdDeleteStateMachineTriggeredIsSuccessful(true)
+				waitForFtdDeleteStateMachineEndedSuccessful(true)
+				deleteFtdIsSuccessful(true)
 			},
 			assertFunc: func(output *cloudftd.DeleteOutput, err error, t *testing.T) {
 				assert.NotNil(t, err)
@@ -76,8 +68,13 @@ func TestDeleteCloudFtd(t *testing.T) {
 			setupFunc: func() {
 				readFmcIsSuccessful(true)
 				readFmcSpecificIsSuccessful(false)
+				readFmcDomainInfoIsSuccessful(true)
+				readFtdIsSuccessful(true)
+				readFmcDeviceRecordsIsSuccessful(true)
+				readFtdDeviceRecordIsSuccessful(true)
 				triggerFtdDeleteOnFmcIsSuccessful(true)
-				waitForFtdDeleteStateMachineTriggeredIsSuccessful(true)
+				waitForFtdDeleteStateMachineEndedSuccessful(true)
+				deleteFtdIsSuccessful(true)
 			},
 			assertFunc: func(output *cloudftd.DeleteOutput, err error, t *testing.T) {
 				assert.NotNil(t, err)
@@ -90,8 +87,13 @@ func TestDeleteCloudFtd(t *testing.T) {
 			setupFunc: func() {
 				readFmcIsSuccessful(true)
 				readFmcSpecificIsSuccessful(true)
+				readFmcDomainInfoIsSuccessful(true)
+				readFtdIsSuccessful(true)
+				readFmcDeviceRecordsIsSuccessful(true)
+				readFtdDeviceRecordIsSuccessful(true)
 				triggerFtdDeleteOnFmcIsSuccessful(false)
-				waitForFtdDeleteStateMachineTriggeredIsSuccessful(true)
+				waitForFtdDeleteStateMachineEndedSuccessful(true)
+				deleteFtdIsSuccessful(true)
 			},
 			assertFunc: func(output *cloudftd.DeleteOutput, err error, t *testing.T) {
 				assert.NotNil(t, err)
@@ -104,8 +106,13 @@ func TestDeleteCloudFtd(t *testing.T) {
 			setupFunc: func() {
 				readFmcIsSuccessful(true)
 				readFmcSpecificIsSuccessful(true)
+				readFmcDomainInfoIsSuccessful(true)
+				readFtdIsSuccessful(true)
+				readFmcDeviceRecordsIsSuccessful(true)
+				readFtdDeviceRecordIsSuccessful(true)
 				triggerFtdDeleteOnFmcIsSuccessful(true)
-				waitForFtdDeleteStateMachineTriggeredIsSuccessful(false)
+				waitForFtdDeleteStateMachineEndedSuccessful(false)
+				deleteFtdIsSuccessful(true)
 			},
 			assertFunc: func(output *cloudftd.DeleteOutput, err error, t *testing.T) {
 				assert.NotNil(t, err)
@@ -113,16 +120,94 @@ func TestDeleteCloudFtd(t *testing.T) {
 			},
 		},
 		{
-			testName: "error when failed to wait for FTD delete state machine starts, and waited before error",
+			testName: "error when failed to read FMC domain info",
 			input:    cloudftd.NewDeleteInput(ftdUid),
 			setupFunc: func() {
 				readFmcIsSuccessful(true)
 				readFmcSpecificIsSuccessful(true)
+				readFmcDomainInfoIsSuccessful(false)
+				readFtdIsSuccessful(true)
+				readFmcDeviceRecordsIsSuccessful(true)
+				readFtdDeviceRecordIsSuccessful(true)
 				triggerFtdDeleteOnFmcIsSuccessful(true)
-				waitForFtdDeleteStateMachineTriggeredReturnedNotFound()
-				waitForFtdDeleteStateMachineTriggeredReturnedNotFound()
-				waitForFtdDeleteStateMachineTriggeredReturnedNotFound()
-				waitForFtdDeleteStateMachineTriggeredIsSuccessful(false)
+				waitForFtdDeleteStateMachineEndedSuccessful(true)
+				deleteFtdIsSuccessful(true)
+			},
+			assertFunc: func(output *cloudftd.DeleteOutput, err error, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+			},
+		},
+		{
+			testName: "error when failed to read FTD",
+			input:    cloudftd.NewDeleteInput(ftdUid),
+			setupFunc: func() {
+				readFmcIsSuccessful(true)
+				readFmcSpecificIsSuccessful(true)
+				readFmcDomainInfoIsSuccessful(true)
+				readFtdIsSuccessful(false)
+				readFmcDeviceRecordsIsSuccessful(true)
+				readFtdDeviceRecordIsSuccessful(true)
+				triggerFtdDeleteOnFmcIsSuccessful(true)
+				waitForFtdDeleteStateMachineEndedSuccessful(true)
+				deleteFtdIsSuccessful(true)
+			},
+			assertFunc: func(output *cloudftd.DeleteOutput, err error, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+			},
+		},
+		{
+			testName: "error when failed to read FMC device records",
+			input:    cloudftd.NewDeleteInput(ftdUid),
+			setupFunc: func() {
+				readFmcIsSuccessful(true)
+				readFmcSpecificIsSuccessful(true)
+				readFmcDomainInfoIsSuccessful(true)
+				readFtdIsSuccessful(true)
+				readFmcDeviceRecordsIsSuccessful(false)
+				readFtdDeviceRecordIsSuccessful(true)
+				triggerFtdDeleteOnFmcIsSuccessful(true)
+				waitForFtdDeleteStateMachineEndedSuccessful(true)
+				deleteFtdIsSuccessful(true)
+			},
+			assertFunc: func(output *cloudftd.DeleteOutput, err error, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+			},
+		},
+		{
+			testName: "error when failed to read FTD device record in FMC",
+			input:    cloudftd.NewDeleteInput(ftdUid),
+			setupFunc: func() {
+				readFmcIsSuccessful(true)
+				readFmcSpecificIsSuccessful(true)
+				readFmcDomainInfoIsSuccessful(true)
+				readFtdIsSuccessful(true)
+				readFmcDeviceRecordsIsSuccessful(true)
+				readFtdDeviceRecordIsSuccessful(false)
+				triggerFtdDeleteOnFmcIsSuccessful(true)
+				waitForFtdDeleteStateMachineEndedSuccessful(true)
+				deleteFtdIsSuccessful(true)
+			},
+			assertFunc: func(output *cloudftd.DeleteOutput, err error, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+			},
+		},
+		{
+			testName: "error when failed to delete FTD in CDO",
+			input:    cloudftd.NewDeleteInput(ftdUid),
+			setupFunc: func() {
+				readFmcIsSuccessful(true)
+				readFmcSpecificIsSuccessful(true)
+				readFmcDomainInfoIsSuccessful(true)
+				readFtdIsSuccessful(true)
+				readFmcDeviceRecordsIsSuccessful(true)
+				readFtdDeviceRecordIsSuccessful(true)
+				triggerFtdDeleteOnFmcIsSuccessful(true)
+				waitForFtdDeleteStateMachineEndedSuccessful(true)
+				deleteFtdIsSuccessful(false)
 			},
 			assertFunc: func(output *cloudftd.DeleteOutput, err error, t *testing.T) {
 				assert.NotNil(t, err)
@@ -148,7 +233,71 @@ func TestDeleteCloudFtd(t *testing.T) {
 	}
 }
 
-func waitForFtdDeleteStateMachineTriggeredIsSuccessful(success bool) {
+func deleteFtdIsSuccessful(success bool) {
+	if success {
+		httpmock.RegisterResponder(
+			http.MethodDelete,
+			url.DeleteDevice(baseUrl, ftdUid),
+			httpmock.NewJsonResponderOrPanic(200, validDeleteOutput),
+		)
+	} else {
+		httpmock.RegisterResponder(
+			http.MethodDelete,
+			url.DeleteDevice(baseUrl, ftdUid),
+			httpmock.NewJsonResponderOrPanic(500, "intentional error"),
+		)
+	}
+}
+
+func readFtdDeviceRecordIsSuccessful(success bool) {
+	if success {
+		httpmock.RegisterResponder(
+			http.MethodGet,
+			url.ReadFmcDeviceRecord(baseUrl, fmcDomainUid, ftdDeviceRecordId),
+			httpmock.NewJsonResponderOrPanic(200, validReadFtdDeviceRecordOutput),
+		)
+	} else {
+		httpmock.RegisterResponder(
+			http.MethodGet,
+			url.ReadFmcDeviceRecord(baseUrl, fmcDomainUid, ftdDeviceRecordId),
+			httpmock.NewJsonResponderOrPanic(500, "intentional error"),
+		)
+	}
+}
+
+func readFmcDeviceRecordsIsSuccessful(success bool) {
+	if success {
+		httpmock.RegisterResponder(
+			http.MethodGet,
+			url.ReadFmcAllDeviceRecords(baseUrl, fmcDomainUid),
+			httpmock.NewJsonResponderOrPanic(200, validReadDeviceRecordsOutput),
+		)
+	} else {
+		httpmock.RegisterResponder(
+			http.MethodGet,
+			url.ReadFmcAllDeviceRecords(baseUrl, fmcDomainUid),
+			httpmock.NewJsonResponderOrPanic(500, "intentional error"),
+		)
+	}
+}
+
+func readFtdIsSuccessful(success bool) {
+	if success {
+		httpmock.RegisterResponder(
+			http.MethodGet,
+			url.ReadDevice(baseUrl, ftdUid),
+			httpmock.NewJsonResponderOrPanic(200, validReadFtdOutput),
+		)
+	} else {
+		httpmock.RegisterResponder(
+			http.MethodGet,
+			url.ReadDevice(baseUrl, ftdUid),
+			httpmock.NewJsonResponderOrPanic(500, "intentional error"),
+		)
+	}
+}
+
+func waitForFtdDeleteStateMachineEndedSuccessful(success bool) {
 	if success {
 		httpmock.RegisterResponder(
 			http.MethodGet,

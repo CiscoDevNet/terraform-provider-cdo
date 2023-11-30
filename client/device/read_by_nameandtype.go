@@ -34,7 +34,7 @@ func ReadByNameAndType(ctx context.Context, client http.Client, readInp ReadByNa
 	}
 
 	if len(arrayOutp) == 0 {
-		return nil, fmt.Errorf("no Device by name %s and device type %s found", readInp.Name, readInp.DeviceType)
+		return nil, fmt.Errorf("%w: no Device by name %s and device type %s found", http.NotFoundError, readInp.Name, readInp.DeviceType)
 	}
 
 	if len(arrayOutp) > 1 {

@@ -9,6 +9,10 @@ module "sdc_in_aws" {
   subnet_id = module.vpc.private_subnet_id
 }
 
+resource "cdo_sdc_onboarding" "sdc" {
+  name = module.sdc_in_aws.sdc_name
+}
+
 
 output "sdc_name" {
   value = module.sdc_in_aws.sdc_name

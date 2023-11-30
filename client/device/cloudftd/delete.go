@@ -44,13 +44,8 @@ func Delete(ctx context.Context, client http.Client, deleteInp DeleteInput) (*De
 
 	// 2.5 wait for any FTD deployment to finish, otherwise backend fmceDeleteFtdcStateMachine will fail
 	// in order to check for FTD deployment status, we need to read FMC host and domainUid
-	// 2.5.1 read fmc, host is in the response
-	fmcRes, err := cloudfmc.Read(ctx, client, cloudfmc.NewReadInput())
-	if err != nil {
-		return nil, err
-	}
 	// 2.5.2 read fmc domain info in its specific/appliance device, fmcDomainUid is in the domain info
-	readFmcDomainRes, err := fmcplatform.ReadFmcDomainInfo(ctx, client, fmcplatform.NewReadDomainInfoInput(fmcRes.Host))
+	readFmcDomainRes, err := fmcplatform.ReadFmcDomainInfo(ctx, client, fmcplatform.NewReadDomainInfoInput(fmcReadRes.Host))
 	if err != nil {
 		return nil, err
 	}
@@ -67,13 +62,13 @@ func Delete(ctx context.Context, client http.Client, deleteInp DeleteInput) (*De
 		return nil, err
 	}
 	// 2.5.2 read all device records
-	allDeviceRecords, err := fmcconfig.ReadAllDeviceRecords(ctx, client, fmcconfig.NewReadAllDeviceRecordsInput(fmcDomainUid, fmcRes.Host))
+	allDeviceRecords, err := fmcconfig.ReadAllDeviceRecords(ctx, client, fmcconfig.NewReadAllDeviceRecordsInput(fmcDomainUid, fmcReadRes.Host))
 	if err != nil {
 		return nil, err
 	}
 	var ftdRecordId string
 	// 2.5.3 check if FTD name is present in device records, logic: same name + both are FTDs = found
-	client.Logger.Printf("checking if FTD already exists with id=%s and name=%s\n", deleteInp.Uid, fmcRes.Name)
+	client.Logger.Printf("looking for existing FTD with id=%s and name=%s\n", deleteInp.Uid, fmcReadRes.Name)
 	for _, record := range allDeviceRecords.Items {
 		if record.Name != readFtdOutp.Name {
 			// different name, ignore
@@ -82,7 +77,7 @@ func Delete(ctx context.Context, client http.Client, deleteInp DeleteInput) (*De
 		// the allDeviceRecords only contains the name, so we need to make another call to retrieve the details of the device to check whether this is a FTD
 		// potentially we will be making a lot of network calls and cause this loop to run for long time if
 		// we have many device records with the same name, I suppose that rarely happens
-		deviceRecord, err := fmcconfig.ReadDeviceRecord(ctx, client, fmcconfig.NewReadDeviceRecordInput(fmcDomainUid, fmcRes.Host, record.Id))
+		deviceRecord, err := fmcconfig.ReadDeviceRecord(ctx, client, fmcconfig.NewReadDeviceRecordInput(fmcDomainUid, fmcReadRes.Host, record.Id))
 		if err != nil {
 			return nil, err
 		}
@@ -102,10 +97,11 @@ func Delete(ctx context.Context, client http.Client, deleteInp DeleteInput) (*De
 		err = retry.Do(
 			ctx,
 			func() (bool, error) {
-				ftdDeviceRecord, err := fmcconfig.ReadDeviceRecord(ctx, client, fmcconfig.NewReadDeviceRecordInput(fmcDomainUid, fmcRes.Host, ftdRecordId))
+				ftdDeviceRecord, err := fmcconfig.ReadDeviceRecord(ctx, client, fmcconfig.NewReadDeviceRecordInput(fmcDomainUid, fmcReadRes.Host, ftdRecordId))
 				if err != nil {
 					return false, err
 				}
+				client.Logger.Printf("current deployment status=%s\n", ftdDeviceRecord.DeploymentStatus)
 				if ftdDeviceRecord.DeploymentStatus == "DEPLOYED" { // no idea what this deployment status could be, so it is a string
 					return true, nil
 					// TODO: check for error here: like if ftdDeviceRecord.DeploymentStatus == "DEPLOY_ERROR" {, not sure what is the error deployment status so I did not do it for now
@@ -164,7 +160,6 @@ func Delete(ctx context.Context, client http.Client, deleteInp DeleteInput) (*De
 
 	// 5. delete FTD in CDO as well, before checking any error from above, because it maybe because it is already deleted or something
 	ftdDeleteOutput, err := device.Delete(ctx, client, *device.NewDeleteInput(deleteInp.Uid))
-
 	if err != nil || cdFmcFtdDeleteErr != nil {
 		return nil, errors.Join(cdFmcFtdDeleteErr, err)
 	}

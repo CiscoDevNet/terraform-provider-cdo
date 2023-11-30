@@ -7,6 +7,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/statemachine"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/accesspolicies"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/fmcconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/fmcdomain"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
@@ -58,6 +59,8 @@ const (
 	ftdSpecificType      = "unit-test-ftd-specific-type"
 	ftdSpecificState     = "unit-test-ftd-specific-state"
 	ftdSpecificNamespace = "unit-test-ftd-specific-namespace"
+
+	ftdDeviceRecordId = "unit-test-ftd-device-record-id"
 )
 
 var (
@@ -76,17 +79,17 @@ var (
 			Build(),
 	}
 
+	validFmcDomainItem = fmcdomain.NewItem(
+		fmcDomainItemUid,
+		fmcDomainItemName,
+		fmcDomainItemType,
+	)
+
 	validReadFmcDomainInfoOutput = fmcdomain.NewInfoBuilder().
 					Links(fmcdomain.NewLinks(fmcLink)).
 					Paging(fmcdomain.NewPaging(fmcDomainCount, fmcDomainOffset, fmcDomainLimit, fmcDomainPages)).
-					Items([]fmcdomain.Item{
-			fmcdomain.NewItem(
-				fmcDomainItemUid,
-				fmcDomainItemName,
-				fmcDomainItemType,
-			),
-		}).
-		Build()
+					Items([]fmcdomain.Item{validFmcDomainItem}).
+					Build()
 
 	validReadAccessPoliciesOutput = accesspolicies.Builder().
 					Links(accesspolicies.NewLinks(fmcLink)).
@@ -104,16 +107,34 @@ var (
 		)}).
 		Build()
 
+	validFtdMetadata = cloudftd.NewMetadataBuilder().
+				LicenseCaps(ftdLicenseCaps).
+				AccessPolicyName(ftdAccessPolicyName).
+				PerformanceTier(&ftdPerformanceTier).
+				CloudManagerDomain(ftdCloudManagerDomain).
+				Build()
+
 	validCreateFtdOutput = cloudftd.NewCreateOutputBuilder().
 				Name(ftdName).
 				Uid(ftdUid).
-				Metadata(cloudftd.NewMetadataBuilder().
-					LicenseCaps(ftdLicenseCaps).
-					AccessPolicyName(ftdAccessPolicyName).
-					PerformanceTier(&ftdPerformanceTier).
-					CloudManagerDomain(ftdCloudManagerDomain).
-					Build()).
+				Metadata(validFtdMetadata).
 				Build()
+
+	validReadDeviceRecordsOutput = fmcconfig.NewAllDeviceRecordsBuilder().
+					Items([]fmcconfig.Item{fmcconfig.NewItem(ftdDeviceRecordId, ftdName, fmcDomainItemType, fmcconfig.NewLinks(""))}).
+					Build()
+
+	validReadFtdOutput = cloudftd.NewReadOutputBuilder().
+				Name(ftdName).
+				Uid(ftdUid).
+				Metadata(validFtdMetadata).
+				Build()
+
+	validReadFtdDeviceRecordOutput = fmcconfig.DeviceRecord{
+		Id:               ftdDeviceRecordId,
+		Model:            "Firepower Threat Defense",
+		DeploymentStatus: "DEPLOYED",
+	}
 
 	validUpdateSpecificFtdOutput = cloudftd.NewUpdateSpecificFtdOutputBuilder().
 					SpecificUid(ftdSpecificUid).
@@ -155,6 +176,7 @@ var (
 
 	validReadStateMachineOutput = statemachine.NewReadInstanceByDeviceUidOutputBuilder().
 					StateMachineIdentifier("fmceDeleteFtdcStateMachine").
+					StateMachineInstanceCondition(state.DONE).
 					Build()
 
 	validDeleteOutput = cloudftd.DeleteOutput{}

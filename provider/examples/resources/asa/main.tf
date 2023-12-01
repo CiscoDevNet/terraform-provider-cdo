@@ -31,7 +31,7 @@ resource "random_password" "asa_enable_password" {
   override_special = "@!"
 }
 
-module "asav_01_in_cdo" {
+module "asav" {
   source              = "github.com/CiscoDevNet/cdo-automation//modules/cdo/asa"
   bastion_ip          = module.bastion.bastion_ip
   bastion_private_key = module.bastion.bastion_private_key
@@ -41,7 +41,9 @@ module "asav_01_in_cdo" {
   private_subnet_id   = module.vpc.private_subnet_id
   sdc_name            = module.sdc_in_aws.sdc_name
   asa_username        = var.asa_username
-  asa_password        = random_password.asa_password
-  asa_enable_password = random_password.asa_enable_password
   asa_hostname        = var.asa_hostname
+  asa_password        = random_password.asa_password.result
+  asa_enable_password = random_password.asa_enable_password.result
+
+  depends_on = [cdo_sdc_onboarding.sdc]
 }

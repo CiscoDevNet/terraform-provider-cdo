@@ -144,6 +144,12 @@ func LicensesToFmcLicenses(licenses []Type) []Type {
 	})
 }
 
+func LicensesToCdoLicenses(licenses []Type) []Type {
+	return sliceutil.Map(licenses, func(l Type) Type {
+		return replaceFmcTermWithCdoTerm(l)
+	})
+}
+
 func StringToCdoStrings(licenses string) ([]string, error) {
 	licenseTypes, err := StringToCdoLicenses(licenses)
 	if err != nil {

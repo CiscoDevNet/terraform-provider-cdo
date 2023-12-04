@@ -273,6 +273,11 @@ func (r *Resource) ConfigValidators(ctx context.Context) []resource.ConfigValida
 }
 
 func (r *Resource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	if req.Plan.Raw.IsNull() {
+		// destroying, ignore
+		return
+	}
+
 	var planData ResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &planData)...)
 	if resp.Diagnostics.HasError() {

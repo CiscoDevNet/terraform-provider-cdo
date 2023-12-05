@@ -161,10 +161,14 @@ func Update(ctx context.Context, resource *Resource, planData *ResourceModel, st
 		return err
 	}
 
+	licensesStrings, err := license.StringToCdoStrings(res.Metadata.LicenseCaps)
+	if err != nil {
+		return err
+	}
 	// map return struct to model
 	stateData.Name = types.StringValue(res.Name)
 	stateData.Labels = planData.Labels
-	stateData.Licenses = planData.Licenses
+	stateData.Licenses = util.GoStringSliceToTFStringSet(licensesStrings)
 
 	return nil
 }

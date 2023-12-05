@@ -1,1 +1,2 @@
-ftd_name = "weilluo"
+ftd_name = "test-ftd"
+create_igw = true

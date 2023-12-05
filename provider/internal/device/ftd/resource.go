@@ -26,6 +26,7 @@ import (
 var _ resource.Resource = &Resource{}
 var _ resource.ResourceWithImportState = &Resource{}
 var _ resource.ResourceWithConfigValidators = &Resource{}
+var _ resource.ResourceWithModifyPlan = &Resource{}
 
 func NewResource() resource.Resource {
 	return &Resource{}
@@ -269,4 +270,30 @@ func (r *Resource) ConfigValidators(ctx context.Context) []resource.ConfigValida
 	return []resource.ConfigValidator{
 		performanceTierConfigValidator{},
 	}
+}
+
+func (r *Resource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	if req.Plan.Raw.IsNull() {
+		// destroying, ignore
+		return
+	}
+
+	var planData ResourceModel
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &planData)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// convert input (possibly FMC licenses) to CDO licenses
+	licenses, err := util.TFStringSetToLicenses(ctx, planData.Licenses)
+	if err != nil {
+		resp.Diagnostics.AddError("failed to convert licenses", err.Error())
+		return
+	}
+	licenses = license.LicensesToCdoLicenses(licenses)
+	licenseStrings := license.LicensesToStrings(licenses)
+
+	planData.Licenses = util.GoStringSliceToTFStringSet(licenseStrings)
+
+	resp.Diagnostics.Append(resp.Plan.Set(ctx, &planData)...)
 }

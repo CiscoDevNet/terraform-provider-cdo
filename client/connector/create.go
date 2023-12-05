@@ -60,7 +60,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		untilCommunicationQueueReady(ctx, client, *NewReadByUidInput(createOutp.Uid)),
 		retry.NewOptionsBuilder().
 			Message("Waiting for connector to be created....").
-			Retries(10).
+			Retries(-1).
 			Logger(client.Logger).
 			Delay(2*time.Second).
 			EarlyExitOnError(true).

@@ -76,7 +76,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 			return nil, err
 		}
 		if strings.Contains(deviceRecord.Model, "Firepower Threat Defense") { // Question: is there a better way to check? Does this check cover all cases?
-			return nil, fmt.Errorf("FTD with id=%s and name=%s is already registered", createInp.FtdUid, fmcRes.Name)
+			return nil, fmt.Errorf("FTD with id=%s and name=%s is already registered", createInp.FtdUid, readFtdOutp.Name)
 		} else {
 			// not a FTD, just some other device with the same name, ignore
 		}

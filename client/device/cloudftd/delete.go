@@ -100,9 +100,8 @@ func Delete(ctx context.Context, client http.Client, deleteInp DeleteInput) (*De
 					return false, err
 				}
 				client.Logger.Printf("current deployment status=%s\n", ftdDeviceRecord.DeploymentStatus)
-				if ftdDeviceRecord.DeploymentStatus == "DEPLOYED" { // no idea what this deployment status could be, so it is a string
+				if ftdDeviceRecord.DeploymentStatus != "DEPLOYMENT_PENDING" { // no idea what this deployment status could be, so it is a string test, other known values: "DEPLOYED", ""
 					return true, nil
-					// TODO: check for error here: like if ftdDeviceRecord.DeploymentStatus == "DEPLOY_ERROR" {, not sure what is the error deployment status so I did not do it for now
 				} else {
 					return false, nil
 				}

@@ -8,8 +8,9 @@ import (
 )
 
 var resourceModel = struct {
-	Name     string
-	Hostname string
+	Name       string
+	Hostname   string
+	DomainUuid string
 }{
 	Name:     acctest.Env.CloudFmcResourceName(),
 	Hostname: acctest.Env.CloudFmcResourceHostname(),

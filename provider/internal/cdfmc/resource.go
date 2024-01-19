@@ -24,9 +24,10 @@ type Resource struct {
 }
 
 type ResourceModel struct {
-	Id       types.String `tfsdk:"id"`
-	Name     types.String `tfsdk:"name"`
-	Hostname types.String `tfsdk:"hostname"`
+	Id         types.String `tfsdk:"id"`
+	Name       types.String `tfsdk:"name"`
+	Hostname   types.String `tfsdk:"hostname"`
+	DomainUuid types.String `tfsdk:"domain_uuid"`
 }
 
 func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -59,6 +60,10 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
+			},
+			"domain_uuid": schema.StringAttribute{
+				MarkdownDescription: "The domain UUID of the cdFMC.",
+				Computed:            true,
 			},
 		},
 	}

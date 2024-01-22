@@ -10,6 +10,7 @@ on:
   push:
     branches:
       - 'main'
+      - 'LH-74651-fix-terraform-provider-cdo-ci'
     tags:
       - 'v*'
 env:

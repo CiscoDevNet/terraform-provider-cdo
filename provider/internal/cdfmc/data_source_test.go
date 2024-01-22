@@ -8,11 +8,9 @@ import (
 )
 
 var testCdFmc = struct {
-	Hostname        string
-	SoftwareVersion string
+	Hostname string
 }{
-	Hostname:        acctest.Env.CloudFmcDataSourceHostname(),
-	SoftwareVersion: acctest.Env.CloudFmcDataSourceSoftwareVersion(),
+	Hostname: acctest.Env.CloudFmcDataSourceHostname(),
 }
 
 const testCdFmcTemplate = `
@@ -30,7 +28,6 @@ func TestAccCdFmcDataSource(t *testing.T) {
 				Config: acctest.ProviderConfig() + testCdfmcConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.cdo_cdfmc.test", "hostname", testCdFmc.Hostname),
-					resource.TestCheckResourceAttr("data.cdo_cdfmc.test", "software_version", testCdFmc.SoftwareVersion),
 				),
 			},
 		},

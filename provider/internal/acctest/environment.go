@@ -299,10 +299,6 @@ func (e *env) CloudFmcDataSourceHostname() string {
 	return e.mustGetString("CLOUD_FMC_DATA_SOURCE_HOSTNAME")
 }
 
-func (e *env) CloudFmcDataSourceSoftwareVersion() string {
-	return e.mustGetString("CLOUD_FMC_DATA_SOURCE_SOFTWARE_VERSION")
-}
-
 func (e *env) CloudFmcResourceName() string {
 	return e.mustGetString("CLOUD_FMC_RESOURCE_NAME")
 }

@@ -10,7 +10,6 @@ on:
   push:
     branches:
       - 'main'
-      - 'LH-74651-fix-terraform-provider-cdo-ci'
     tags:
       - 'v*'
 env:
@@ -96,6 +95,7 @@ jobs:
     name: Terraform Provider Acceptance Tests
     needs: unit-test
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     defaults:
       run:
         working-directory: provider

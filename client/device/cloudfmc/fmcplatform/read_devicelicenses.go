@@ -25,6 +25,7 @@ var NewReadDeviceLicensesOutputBuilder = devicelicense.NewItemBuilder
 func ReadDeviceLicenses(ctx context.Context, client http.Client, readInp ReadDeviceLicensesInput) (*ReadDeviceLicensesOutput, error) {
 
 	client.Logger.Println("reading FMC device licenses")
+	client.Logger.Println(readInp.FmcHost)
 
 	readUrl := url.ReadFmcDeviceLicenses(client.BaseUrl())
 	req := client.NewGet(ctx, readUrl)

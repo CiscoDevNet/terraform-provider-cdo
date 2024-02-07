@@ -89,7 +89,6 @@ func (r *Request) send(output any) error {
 	r.Error = nil
 
 	// build net/http.Request
-	fmt.Printf("sending request=%s\n", r.url)
 	req, err := r.build()
 	if err != nil {
 		r.Error = err
@@ -122,7 +121,6 @@ func (r *Request) send(output any) error {
 
 	// request is all good, now parse body
 	resBody, err := io.ReadAll(res.Body)
-	fmt.Printf("resBody=%s\n", resBody)
 	if err != nil {
 		r.Error = err
 		return err

@@ -16,6 +16,9 @@ func PostForTransaction(ctx context.Context, client http.Client, url string, bod
 	if err != nil {
 		return t, err
 	}
+	if isDone(t) {
+		return t, nil
+	}
 
 	return poll(ctx, client, options, t.TransactionPollingUrl)
 }
@@ -36,17 +39,13 @@ func poll(ctx context.Context, client http.Client, options retry.Options, pollin
 func untilDoneOrError(ctx context.Context, client http.Client, transactionPollingUrl string, trans *transaction.Type) retry.Func {
 	return func() (bool, error) {
 		req := client.NewGet(ctx, transactionPollingUrl)
-		var out transaction.Type
-		if err := req.Send(&out); err != nil {
+		var t transaction.Type
+		if err := req.Send(&t); err != nil {
 			return false, err
 		}
-		*trans = out
-		client.Logger.Printf("status=%s\n", out.Status)
-		if out.Status == transactionstatus.DONE || out.Status == transactionstatus.ERROR {
-			return true, nil
-		} else {
-			return false, nil
-		}
+		*trans = t
+		client.Logger.Printf("status=%s\n", t.Status)
+		return isDoneOrError(t), nil
 	}
 }
 
@@ -69,4 +68,12 @@ func checkForError(transaction transaction.Type) error {
 	} else {
 		return nil
 	}
+}
+
+func isDoneOrError(transaction transaction.Type) bool {
+	return transaction.Status == transactionstatus.DONE || transaction.Status == transactionstatus.ERROR
+}
+
+func isDone(transaction transaction.Type) bool {
+	return transaction.Status == transactionstatus.DONE
 }

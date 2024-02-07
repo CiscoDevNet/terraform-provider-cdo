@@ -1,9 +1,11 @@
-package examples
+package duoadminpanel
 
 import (
 	"context"
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
@@ -25,12 +27,16 @@ type Resource struct {
 }
 
 type ResourceModel struct {
-	Id   types.String `tfsdk:"id"`
-	Name types.String `tfsdk:"name"`
+	Id             types.String `tfsdk:"id"`
+	Name           types.String `tfsdk:"name"`
+	IntegrationKey types.String `tfsdk:"integration_key"`
+	SecretKey      types.String `tfsdk:"secret_key"`
+	Host           types.String `tfsdk:"host"`
+	Labels         types.Set    `tfsdk:"labels"`
 }
 
 func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_example"
+	resp.TypeName = req.ProviderTypeName + "_duo_admin_panel"
 }
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
@@ -40,15 +46,36 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "Example Id description",
+				MarkdownDescription: "Unique identifier of the Duo Admin Panel. This is a UUID and is automatically generated when the Duo Admin Panel is created.",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "Example name description",
+				MarkdownDescription: "A human-readable name for the Duo Admin Panel.",
 				Required:            true,
+			},
+			"integration_key": schema.StringAttribute{
+				MarkdownDescription: "The integration key of Duo Admin Panel.",
+				Required:            true,
+				Sensitive:           true,
+			},
+			"secret_key": schema.StringAttribute{
+				MarkdownDescription: "The secret key of the Duo Admin Panel.",
+				Required:            true,
+				Sensitive:           true,
+			},
+			"host": schema.StringAttribute{
+				MarkdownDescription: "The host of the Duo Admin Panel.",
+				Required:            true,
+			},
+			"labels": schema.SetAttribute{
+				MarkdownDescription: "Specify a set of labels to identify the Duo Admin Panel as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
+				Optional:            true,
+				Computed:            true,
+				ElementType:         types.StringType,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})), // default to empty list
 			},
 		},
 	}
@@ -76,7 +103,7 @@ func (r *Resource) Configure(ctx context.Context, req resource.ConfigureRequest,
 
 func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 
-	tflog.Trace(ctx, "read Example resource")
+	tflog.Trace(ctx, "read Duo Admin Panel resource")
 
 	// 1. read state data
 	var stateData ResourceModel
@@ -91,7 +118,7 @@ func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *res
 			resp.State.RemoveResource(ctx)
 			return
 		}
-		resp.Diagnostics.AddError("failed to read Example resource", err.Error())
+		resp.Diagnostics.AddError("failed to read Duo Admin Panel device", err.Error())
 	}
 
 	// 3. save data into terraform state
@@ -100,7 +127,7 @@ func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *res
 
 func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, res *resource.CreateResponse) {
 
-	tflog.Trace(ctx, "create Example resource")
+	tflog.Trace(ctx, "create Duo Admin Panel resource")
 
 	// 1. read plan data into planData
 	var planData ResourceModel
@@ -111,7 +138,7 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, res *
 
 	// 2. use plan data to create device and fill up rest of the model
 	if err := Create(ctx, r, &planData); err != nil {
-		res.Diagnostics.AddError("failed to create Example resource", err.Error())
+		res.Diagnostics.AddError("failed to create Duo Admin Panel resource", err.Error())
 		return
 	}
 
@@ -121,7 +148,7 @@ func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, res *
 
 func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, res *resource.UpdateResponse) {
 
-	tflog.Trace(ctx, "update Example resource")
+	tflog.Trace(ctx, "update Duo Admin Panel resource")
 
 	// 1. read plan data
 	var planData ResourceModel
@@ -139,7 +166,7 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, res *
 
 	// 3. do update
 	if err := Update(ctx, r, &planData, &stateData); err != nil {
-		res.Diagnostics.AddError("failed to update Example resource", err.Error())
+		res.Diagnostics.AddError("failed to update Duo Admin Panel resource", err.Error())
 	}
 
 	// 4. set resulting state
@@ -148,7 +175,7 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, res *
 
 func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, res *resource.DeleteResponse) {
 
-	tflog.Trace(ctx, "delete Example resource")
+	tflog.Trace(ctx, "delete Duo Admin Panel resource")
 
 	var stateData ResourceModel
 	res.Diagnostics.Append(req.State.Get(ctx, &stateData)...)
@@ -157,6 +184,6 @@ func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, res *
 	}
 
 	if err := Delete(ctx, r, &stateData); err != nil {
-		res.Diagnostics.AddError("failed to delete Example resource", err.Error())
+		res.Diagnostics.AddError("failed to delete Duo Admin Panel resource", err.Error())
 	}
 }

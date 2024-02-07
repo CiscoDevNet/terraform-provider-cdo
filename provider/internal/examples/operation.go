@@ -15,7 +15,7 @@ func ReadDataSource(ctx context.Context, resource *ExampleDataSource, stateData 
 	return nil
 }
 
-func Read(ctx context.Context, resource *ExampleResource, stateData *ExampleResourceModel) error {
+func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) error {
 
 	// do read
 	// e.g. readOutp, err := resource.client.ReadExample(ctx, ...)
@@ -26,7 +26,7 @@ func Read(ctx context.Context, resource *ExampleResource, stateData *ExampleReso
 	return nil
 }
 
-func Create(ctx context.Context, resource *ExampleResource, planData *ExampleResourceModel) error {
+func Create(ctx context.Context, resource *Resource, planData *ResourceModel) error {
 
 	// do create
 	// e.g. createOutp, err := resource.client.CreateExample(ctx, ...)
@@ -37,7 +37,7 @@ func Create(ctx context.Context, resource *ExampleResource, planData *ExampleRes
 	return nil
 }
 
-func Update(ctx context.Context, resource *ExampleResource, planData *ExampleResourceModel, stateData *ExampleResourceModel) error {
+func Update(ctx context.Context, resource *Resource, planData *ResourceModel, stateData *ResourceModel) error {
 
 	// do update
 	// e.g. updateOutp, err := resource.client.UpdateExample(ctx, ...)
@@ -48,7 +48,7 @@ func Update(ctx context.Context, resource *ExampleResource, planData *ExampleRes
 	return nil
 }
 
-func Delete(ctx context.Context, resource *ExampleResource, stateData *ExampleResourceModel) error {
+func Delete(ctx context.Context, resource *Resource, stateData *ResourceModel) error {
 
 	// do delete
 	// _, err := resource.client.DeleteExample(ctx, ...)

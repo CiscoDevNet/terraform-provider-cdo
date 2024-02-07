@@ -307,6 +307,31 @@ func (e *env) CloudFmcResourceHostname() string {
 	return e.mustGetString("CLOUD_FMC_RESOURCE_HOSTNAME")
 }
 
+func (e *env) DuoAdminPanelResourceName() string {
+	return e.mustGetString("DUO_ADMIN_PANEL_RESOURCE_NAME")
+}
+
+func (e *env) DuoAdminPanelResourceNewName() string {
+	return e.mustGetString("DUO_ADMIN_PANEL_RESOURCE_NEW_NAME")
+}
+
+func (e *env) DuoAdminPanelResourceHost() string {
+	return e.mustGetString("DUO_ADMIN_PANEL_RESOURCE_HOST")
+}
+
+func (e *env) DuoAdminPanelResourceIntegrationKey() string {
+	return e.mustGetString("DUO_ADMIN_PANEL_RESOURCE_INTEGRATION_KEY")
+}
+
+func (e *env) DuoAdminPanelResourceSecretKey() string {
+	return e.mustGetString("DUO_ADMIN_PANEL_RESOURCE_SECRET_KEY")
+}
+
+func (e *env) DuoAdminPanelResourceTags() tags.Type {
+	tagsEnv := e.mustGetString("DUO_ADMIN_PANEL_RESOURCE_TAGS")
+	return tags.New(strings.Split(tagsEnv, ",")...)
+}
+
 func (e *env) mustGetString(envName string) string {
 	value, ok := os.LookupEnv(envName)
 	if ok {

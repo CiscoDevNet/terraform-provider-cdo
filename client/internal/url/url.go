@@ -181,3 +181,11 @@ func DeleteSec(baseUrl string, secUid string) string {
 func ReadAllSecs(baseUrl string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/estreamers", baseUrl)
 }
+
+func CreateDuoAdminPanel(baseUrl string) string {
+	return fmt.Sprintf("%s/api/rest/v1/inventory/devices/duoAdminPanels", baseUrl)
+}
+
+func UpdateDuoAdminPanel(baseUrl string, uid string) string {
+	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/devices/%s", baseUrl, uid)
+}

@@ -70,7 +70,7 @@ func TestDuoAdminPanelCreate(t *testing.T) {
 		Tags:  createdDevice.Tags,
 	}
 
-	baseUrl := "https://test.com"
+	baseUrl := "https://test.cisco.com"
 
 	testCases := []struct {
 		testName   string

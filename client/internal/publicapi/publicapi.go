@@ -8,24 +8,25 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 )
 
-func PostForTransaction(ctx context.Context, client http.Client, url string, body any, options retry.Options) (transaction.Type, error) {
-
+func TriggerTransaction(ctx context.Context, client http.Client, url string, body any) (transaction.Type, error) {
 	req := client.NewPost(ctx, url, body)
 
-	t, err := sendAndCheckForError(req)
-	if err != nil {
-		return t, err
-	}
-	if isDone(t) {
-		return t, nil
-	}
-
-	return poll(ctx, client, options, t.TransactionPollingUrl)
+	return sendAndCheckForError(req)
 }
 
-func poll(ctx context.Context, client http.Client, options retry.Options, pollingUrl string) (transaction.Type, error) {
+func PollTransaction(ctx context.Context, client http.Client, t transaction.Type, options retry.Options) (transaction.Type, error) {
+	if isDone(t) {
+		return t, nil
+	} else if err := checkForError(t); err != nil {
+		return t, err
+	} else {
+		return pollTransaction(ctx, client, t, options)
+	}
+}
+
+func pollTransaction(ctx context.Context, client http.Client, t transaction.Type, options retry.Options) (transaction.Type, error) {
 	var output transaction.Type
-	err := retry.Do(ctx, untilDoneOrError(ctx, client, pollingUrl, &output), options)
+	err := retry.Do(ctx, untilDoneOrError(ctx, client, t.PollingUrl, &output), options)
 	if err != nil {
 		return transaction.Type{}, err
 	}

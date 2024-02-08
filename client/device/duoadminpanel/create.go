@@ -25,11 +25,19 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 
 	createUrl := url.CreateDuoAdminPanel(client.BaseUrl())
 
-	transaction, err := publicapi.PostForTransaction(
+	transaction, err := publicapi.TriggerTransaction(
 		ctx,
 		client,
 		createUrl,
 		createInp,
+	)
+	if err != nil {
+		return nil, err
+	}
+	transaction, err = publicapi.PollTransaction(
+		ctx,
+		client,
+		transaction,
 		retry.NewOptionsBuilder().
 			Logger(client.Logger).
 			Timeout(5*time.Minute).

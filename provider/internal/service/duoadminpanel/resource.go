@@ -42,7 +42,7 @@ func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, r
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "Example resource description.",
+		MarkdownDescription: "Provides an Duo Admin Panel resource. This allows Duo Admin Panels to be onboarded, updated, and deleted on CDO.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
@@ -57,17 +57,17 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Required:            true,
 			},
 			"integration_key": schema.StringAttribute{
-				MarkdownDescription: "The integration key of Duo Admin Panel.",
+				MarkdownDescription: "The integration key for an Admin API application in the Duo Admin Panel. Refer to the CDO documentation for details on how to create an Admin API application to onboard your Duo Admin Panel in CDO.",
 				Required:            true,
 				Sensitive:           true,
 			},
 			"secret_key": schema.StringAttribute{
-				MarkdownDescription: "The secret key of the Duo Admin Panel.",
+				MarkdownDescription: "The integration key for an Admin API application in the Duo Admin Panel. Refer to the CDO documentation for details on how to create an Admin API application to onboard your Duo Admin Panel in CDO.",
 				Required:            true,
 				Sensitive:           true,
 			},
 			"host": schema.StringAttribute{
-				MarkdownDescription: "The host of the Duo Admin Panel.",
+				MarkdownDescription: "The API hostname for an Admin API application in the Duo Admin Panel. Refer to the CDO documentation for details on how to create an Admin API application to onboard your Duo Admin Panel in CDO.",
 				Required:            true,
 			},
 			"labels": schema.SetAttribute{

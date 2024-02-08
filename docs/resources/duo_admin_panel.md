@@ -3,12 +3,12 @@
 page_title: "cdo_duo_admin_panel Resource - cdo"
 subcategory: ""
 description: |-
-  Example resource description.
+  Provides an Duo Admin Panel resource. This allows Duo Admin Panels to be onboarded, updated, and deleted on CDO.
 ---
 
 # cdo_duo_admin_panel (Resource)
 
-Example resource description.
+Provides an Duo Admin Panel resource. This allows Duo Admin Panels to be onboarded, updated, and deleted on CDO.
 
 
 
@@ -17,10 +17,10 @@ Example resource description.
 
 ### Required
 
-- `host` (String) The host of the Duo Admin Panel.
-- `integration_key` (String, Sensitive) The integration key of Duo Admin Panel.
+- `host` (String) The API hostname for an Admin API application in the Duo Admin Panel. Refer to the CDO documentation for details on how to create an Admin API application to onboard your Duo Admin Panel in CDO.
+- `integration_key` (String, Sensitive) The integration key for an Admin API application in the Duo Admin Panel. Refer to the CDO documentation for details on how to create an Admin API application to onboard your Duo Admin Panel in CDO.
 - `name` (String) A human-readable name for the Duo Admin Panel.
-- `secret_key` (String, Sensitive) The secret key of the Duo Admin Panel.
+- `secret_key` (String, Sensitive) The integration key for an Admin API application in the Duo Admin Panel. Refer to the CDO documentation for details on how to create an Admin API application to onboard your Duo Admin Panel in CDO.
 
 ### Optional
 

@@ -34,7 +34,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	if err != nil {
 		return nil, err
 	}
-	transaction, err = publicapi.PollTransaction(
+	transaction, err = publicapi.WaitForTransactionToFinish(
 		ctx,
 		client,
 		transaction,

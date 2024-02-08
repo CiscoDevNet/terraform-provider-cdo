@@ -14,7 +14,7 @@ func TriggerTransaction(ctx context.Context, client http.Client, url string, bod
 	return sendAndCheckForError(req)
 }
 
-func PollTransaction(ctx context.Context, client http.Client, t transaction.Type, options retry.Options) (transaction.Type, error) {
+func WaitForTransactionToFinish(ctx context.Context, client http.Client, t transaction.Type, options retry.Options) (transaction.Type, error) {
 	if isDone(t) {
 		return t, nil
 	} else if err := checkForError(t); err != nil {

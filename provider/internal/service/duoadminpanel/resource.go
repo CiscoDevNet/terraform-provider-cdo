@@ -62,7 +62,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Sensitive:           true,
 			},
 			"secret_key": schema.StringAttribute{
-				MarkdownDescription: "The integration key for an Admin API application in the Duo Admin Panel. Refer to the CDO documentation for details on how to create an Admin API application to onboard your Duo Admin Panel in CDO.",
+				MarkdownDescription: "The secret key for an Admin API application in the Duo Admin Panel. Refer to the CDO documentation for details on how to create an Admin API application to onboard your Duo Admin Panel in CDO.",
 				Required:            true,
 				Sensitive:           true,
 			},

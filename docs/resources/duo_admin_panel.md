@@ -20,7 +20,7 @@ Provides an Duo Admin Panel resource. This allows Duo Admin Panels to be onboard
 - `host` (String) The API hostname for an Admin API application in the Duo Admin Panel. Refer to the CDO documentation for details on how to create an Admin API application to onboard your Duo Admin Panel in CDO.
 - `integration_key` (String, Sensitive) The integration key for an Admin API application in the Duo Admin Panel. Refer to the CDO documentation for details on how to create an Admin API application to onboard your Duo Admin Panel in CDO.
 - `name` (String) A human-readable name for the Duo Admin Panel.
-- `secret_key` (String, Sensitive) The integration key for an Admin API application in the Duo Admin Panel. Refer to the CDO documentation for details on how to create an Admin API application to onboard your Duo Admin Panel in CDO.
+- `secret_key` (String, Sensitive) The secret key for an Admin API application in the Duo Admin Panel. Refer to the CDO documentation for details on how to create an Admin API application to onboard your Duo Admin Panel in CDO.
 
 ### Optional
 

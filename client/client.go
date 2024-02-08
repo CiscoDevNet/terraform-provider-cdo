@@ -7,6 +7,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/connectoronboarding"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sec"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sec/seconboarding"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/duoadminpanel"
 	"net/http"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
@@ -244,4 +245,20 @@ func (c *Client) ReadSec(ctx context.Context, inp sec.ReadInput) (*sec.ReadOutpu
 
 func (c *Client) CreateSecOnboarding(ctx context.Context, inp seconboarding.CreateInput) (*seconboarding.CreateOutput, error) {
 	return seconboarding.Create(ctx, c.client, inp)
+}
+
+func (c *Client) CreateDuoAdminPanel(ctx context.Context, inp duoadminpanel.CreateInput) (*duoadminpanel.CreateOutput, error) {
+	return duoadminpanel.Create(ctx, c.client, inp)
+}
+
+func (c *Client) UpdateDuoAdminPanel(ctx context.Context, inp duoadminpanel.UpdateInput) (*duoadminpanel.UpdateOutput, error) {
+	return duoadminpanel.Update(ctx, c.client, inp)
+}
+
+func (c *Client) ReadDuoAdminPanel(ctx context.Context, inp duoadminpanel.ReadByUidInput) (*duoadminpanel.ReadOutput, error) {
+	return duoadminpanel.ReadByUid(ctx, c.client, inp)
+}
+
+func (c *Client) DeleteDuoAdminPanel(ctx context.Context, inp duoadminpanel.DeleteInput) (*duoadminpanel.DeleteOutput, error) {
+	return duoadminpanel.Delete(ctx, c.client, inp)
 }

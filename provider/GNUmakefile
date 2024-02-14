@@ -10,5 +10,3 @@ export
 testacc:
 	TF_ACC=1 \
 	go test ./... -v $(TESTARGS) -timeout 120m -count 1
-
-TESTARGS=-run TestAccDuoAdminPanelResource

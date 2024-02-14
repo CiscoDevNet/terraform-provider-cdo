@@ -2,10 +2,11 @@ package acctest
 
 import (
 	"fmt"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 )
 
 type env struct{}
@@ -330,6 +331,10 @@ func (e *env) DuoAdminPanelResourceSecretKey() string {
 func (e *env) DuoAdminPanelResourceTags() tags.Type {
 	tagsEnv := e.mustGetString("DUO_ADMIN_PANEL_RESOURCE_TAGS")
 	return tags.New(strings.Split(tagsEnv, ",")...)
+}
+
+func (e *env) TenantSettingsTenantUid() string {
+	return e.mustGetString("TENANT_SETTINGS_TENANT_UID")
 }
 
 func (e *env) mustGetString(envName string) string {

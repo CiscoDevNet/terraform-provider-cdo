@@ -83,19 +83,23 @@ func MustNew(
 }
 
 func (c *Client) NewGet(ctx context.Context, url string) *Request {
-	return NewRequest(c.config, c.httpClient, c.Logger, ctx, "GET", url, nil)
+	return NewRequest(c.config, c.httpClient, c.Logger, ctx, http.MethodGet, url, nil)
 }
 
 func (c *Client) NewDelete(ctx context.Context, url string) *Request {
-	return NewRequest(c.config, c.httpClient, c.Logger, ctx, "DELETE", url, nil)
+	return NewRequest(c.config, c.httpClient, c.Logger, ctx, http.MethodDelete, url, nil)
 }
 
 func (c *Client) NewPost(ctx context.Context, url string, body any) *Request {
-	return NewRequest(c.config, c.httpClient, c.Logger, ctx, "POST", url, body)
+	return NewRequest(c.config, c.httpClient, c.Logger, ctx, http.MethodPost, url, body)
 }
 
 func (c *Client) NewPut(ctx context.Context, url string, body any) *Request {
-	return NewRequest(c.config, c.httpClient, c.Logger, ctx, "PUT", url, body)
+	return NewRequest(c.config, c.httpClient, c.Logger, ctx, http.MethodPut, url, body)
+}
+
+func (c *Client) NewPatch(ctx context.Context, url string, body any) *Request {
+	return NewRequest(c.config, c.httpClient, c.Logger, ctx, http.MethodPatch, url, body)
 }
 
 func (c *Client) BaseUrl() string {

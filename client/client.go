@@ -4,11 +4,14 @@ package client
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/connectoronboarding"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sec"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/sec/seconboarding"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/duoadminpanel"
-	"net/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/settings"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/settings/tenantsettings"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
@@ -261,4 +264,12 @@ func (c *Client) ReadDuoAdminPanel(ctx context.Context, inp duoadminpanel.ReadBy
 
 func (c *Client) DeleteDuoAdminPanel(ctx context.Context, inp duoadminpanel.DeleteInput) (*duoadminpanel.DeleteOutput, error) {
 	return duoadminpanel.Delete(ctx, c.client, inp)
+}
+
+func (c *Client) ReadTenantSettings(ctx context.Context) (*settings.TenantSettings, error) {
+	return tenantsettings.Read(ctx, c.client)
+}
+
+func (c *Client) UpdateTenantSettings(ctx context.Context, updateTenantSettingsInput tenantsettings.UpdateTenantSettingsInput) (*settings.TenantSettings, error) {
+	return tenantsettings.Update(ctx, c.client, updateTenantSettingsInput)
 }

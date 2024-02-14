@@ -23,7 +23,7 @@ func (*TenantSettingsDataSource) Metadata(ctx context.Context, req datasource.Me
 
 func (*TenantSettingsDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, res *datasource.SchemaResponse) {
 	res.Schema = schema.Schema{
-		MarkdownDescription: "Tenant settings data source",
+		MarkdownDescription: "Tenant-wide settings",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{

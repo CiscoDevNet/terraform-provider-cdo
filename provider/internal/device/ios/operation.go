@@ -67,19 +67,10 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 		planTags,
 	)
 
-	createOutp, createErr := resource.client.CreateIos(ctx, *createInp)
-	tflog.Debug(ctx, fmt.Sprintf("Creation error: %v", createErr))
-	if createErr != nil {
-		if createErr.CreatedResourceId != nil {
-			deleteInp := ios.NewDeleteInput(*createErr.CreatedResourceId)
-			_, deletionErr := resource.client.DeleteIos(ctx, *deleteInp)
-			if deletionErr != nil {
-				tflog.Error(ctx, "Failed to delete iOS device that we failed to create")
-				return deletionErr
-			}
-		}
-
-		return createErr.Err
+	createOutp, err := resource.client.CreateIos(ctx, *createInp)
+	tflog.Debug(ctx, fmt.Sprintf("Creation error: %v", err))
+	if err != nil {
+		return err
 	}
 
 	planData.ID = types.StringValue(createOutp.Uid)

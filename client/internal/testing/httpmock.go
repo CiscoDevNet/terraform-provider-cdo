@@ -2,6 +2,7 @@ package testing
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
 
 	"github.com/jarcoal/httpmock"
@@ -25,4 +26,20 @@ func AssertEndpointCalledTimes(method, path string, times int, t *testing.T) {
 	if actualCount != times {
 		t.Errorf("expected %s %s to be called %d times, but was called: %d times", method, path, times, actualCount)
 	}
+}
+
+func MockPostAccepted(url string, body any) {
+	httpmock.RegisterResponder(http.MethodPost, url, httpmock.NewJsonResponderOrPanic(202, body))
+}
+
+func MockPostError(url string, body any) {
+	httpmock.RegisterResponder(http.MethodPost, url, httpmock.NewJsonResponderOrPanic(500, body))
+}
+
+func MockGetOk(url string, body any) {
+	httpmock.RegisterResponder(http.MethodGet, url, httpmock.NewJsonResponderOrPanic(200, body))
+}
+
+func MockGetError(url string, body any) {
+	httpmock.RegisterResponder(http.MethodGet, url, httpmock.NewJsonResponderOrPanic(500, body))
 }

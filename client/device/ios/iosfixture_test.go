@@ -1,4 +1,4 @@
-package ios
+package ios_test
 
 import (
 	"fmt"

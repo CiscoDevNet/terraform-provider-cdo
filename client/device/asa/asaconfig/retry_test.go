@@ -1,8 +1,9 @@
-package asaconfig
+package asaconfig_test
 
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/stretchr/testify/assert"
 	h "net/http"
@@ -23,12 +24,12 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	validAsaConfig := ReadOutput{
+	validAsaConfig := asaconfig.ReadOutput{
 		Uid:   asaConfigUid,
 		State: state.DONE,
 	}
 
-	inProgressAsaConfig := ReadOutput{
+	inProgressAsaConfig := asaconfig.ReadOutput{
 		Uid:   asaConfigUid,
 		State: "SOME_INTERMEDIATE_STATE",
 	}
@@ -79,7 +80,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 					httpmock.NewJsonResponderOrPanic(200, validAsaConfig),
 				)
 
-				errorAsaConfig := ReadOutput{
+				errorAsaConfig := asaconfig.ReadOutput{
 					Uid:   asaConfigUid,
 					State: state.ERROR,
 				}
@@ -113,7 +114,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 					httpmock.NewJsonResponderOrPanic(200, validAsaConfig),
 				)
 
-				badCredentialsAsaConfig := ReadOutput{
+				badCredentialsAsaConfig := asaconfig.ReadOutput{
 					Uid:   asaConfigUid,
 					State: state.BAD_CREDENTIALS,
 				}
@@ -147,7 +148,7 @@ func TestAsaConfigUntilStateDone(t *testing.T) {
 			retryOptions := retry.DefaultOpts
 			retryOptions.Delay = 1 * time.Millisecond
 
-			err := retry.Do(context.Background(), UntilStateDone(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.targetUid), retryOptions)
+			err := retry.Do(context.Background(), asaconfig.UntilStateDone(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.targetUid), retryOptions)
 
 			testCase.assertFunc(err, t)
 		})

@@ -86,7 +86,7 @@ func (c *Client) ReadIos(ctx context.Context, inp ios.ReadInput) (*ios.ReadOutpu
 	return ios.Read(ctx, c.client, inp)
 }
 
-func (c *Client) CreateIos(ctx context.Context, inp ios.CreateInput) (*ios.CreateOutput, *ios.CreateError) {
+func (c *Client) CreateIos(ctx context.Context, inp ios.CreateInput) (*ios.CreateOutput, error) {
 	return ios.Create(ctx, c.client, inp)
 }
 

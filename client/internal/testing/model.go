@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+// Model represents a CDO environment, all created devices/inputs/outputs are consistent within this environment.
+// consistent means e.g. read FTD's access policy output is contained in the read AccessPolicy output.
 type Model struct {
 	TransactionSubmissionTime time.Time
 	TransactionUid            uuid.UUID

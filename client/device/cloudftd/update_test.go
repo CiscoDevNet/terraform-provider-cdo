@@ -2,6 +2,10 @@ package cloudftd_test
 
 import (
 	"context"
+	"net/http"
+	"testing"
+	"time"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc/fmcplatform"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
@@ -13,9 +17,6 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"testing"
-	"time"
 )
 
 func TestUpdateCloudFtd(t *testing.T) {
@@ -29,7 +30,11 @@ func TestUpdateCloudFtd(t *testing.T) {
 		Uid("test-uid").
 		Licenses([]license.Type{license.Essentials}).
 		Name("test-name").
-		Tags(tags.Type{Labels: []string{"test-tag"}}).
+		Tags(
+			tags.New([]string{"test-tag"}, map[string][]string{
+				"grouped-tags": {"grouped-tags-1", "grouped-tags-2"},
+			}),
+		).
 		Build()
 
 	testMetadata := cloudftd.NewMetadataBuilder().

@@ -2,10 +2,13 @@ package ios
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
-	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
 	"strconv"
+
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -34,7 +37,8 @@ func Read(ctx context.Context, resource *IosDeviceResource, stateData *IosDevice
 	stateData.Ipv4 = types.StringValue(readOutp.SocketAddress)
 	stateData.Host = types.StringValue(readOutp.Host)
 	stateData.IgnoreCertificate = types.BoolValue(readOutp.IgnoreCertificate)
-	stateData.Labels = util.GoStringSliceToTFStringSet(readOutp.Tags.Labels)
+	stateData.Labels = util.GoStringSliceToTFStringSet(readOutp.Tags.UngroupedTags())
+	stateData.GroupedLabels = util.GoMapToStringSliceTFMap(readOutp.Tags.GroupedTags())
 
 	return nil
 }
@@ -51,7 +55,7 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 	}
 
 	// convert tf tags to go tags
-	planTags, err := util.TFStringSetToTagLabels(ctx, planData.Labels)
+	planTags, err := tagsFromIosDeviceResourceModel(ctx, planData)
 	if err != nil {
 		return err
 	}
@@ -92,7 +96,8 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 		return fmt.Errorf("failed to parse IOS port, cause=%w", err)
 	}
 	planData.Port = types.Int64Value(port)
-	planData.Labels = util.GoStringSliceToTFStringSet(createOutp.Tags.Labels)
+	planData.Labels = util.GoStringSliceToTFStringSet(createOutp.Tags.UngroupedTags())
+	planData.GroupedLabels = util.GoMapToStringSliceTFMap(createInp.Tags.GroupedTags())
 
 	return nil
 }
@@ -100,7 +105,7 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 func Update(ctx context.Context, resource *IosDeviceResource, planData *IosDeviceResourceModel, stateData *IosDeviceResourceModel) error {
 
 	// convert tf tags to go tags
-	planTags, err := util.TFStringSetToTagLabels(ctx, planData.Labels)
+	planTags, err := tagsFromIosDeviceResourceModel(ctx, planData)
 	if err != nil {
 		return err
 	}
@@ -116,6 +121,7 @@ func Update(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 	}
 	stateData.Name = types.StringValue(updateOutp.Name)
 	stateData.Labels = planData.Labels
+	stateData.GroupedLabels = planData.GroupedLabels
 
 	return nil
 }
@@ -124,4 +130,22 @@ func Delete(ctx context.Context, resource *IosDeviceResource, stateData *IosDevi
 	deleteInp := ios.NewDeleteInput(stateData.ID.ValueString())
 	_, err := resource.client.DeleteIos(ctx, *deleteInp)
 	return err
+}
+
+func tagsFromIosDeviceResourceModel(ctx context.Context, resourceModel *IosDeviceResourceModel) (tags.Type, error) {
+	if resourceModel == nil {
+		return nil, errors.New("resource model cannot be nil")
+	}
+
+	ungroupedLabels, err := util.TFStringSetToGoStringList(ctx, resourceModel.Labels)
+	if err != nil {
+		return nil, fmt.Errorf("error while converting terraform labels to go slice, %s", resourceModel.Labels)
+	}
+
+	groupedLabels, err := util.TFMapToGoMapOfStringSlices(ctx, resourceModel.GroupedLabels)
+	if err != nil {
+		return nil, fmt.Errorf("error while converting terraform grouped labels to go map, %v", resourceModel.GroupedLabels)
+	}
+
+	return tags.New(ungroupedLabels, groupedLabels), nil
 }

@@ -1,17 +1,16 @@
-package tags
+package publicapilabels
 
 import "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/maputil"
 
-const ungroupedLabelKeyName = "labels"
+const ungroupedLabelKeyName = "ungroupedLabels"
 
-// Type should be used with json:"tags"
 type Type map[string][]string
 
 func Empty() Type {
 	return Type{}
 }
 
-func NewUngrouped(tags ...string) Type {
+func NewUnlabelled(tags ...string) Type {
 	return Type{
 		ungroupedLabelKeyName: tags,
 	}

@@ -1,13 +1,19 @@
 package duoadminpanel_test
 
 import (
-	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/testutil"
 	"strconv"
 	"testing"
+
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/testutil"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/acctest"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
+
+var labels = []string{"testdevice", "acceptancetest", "terraformprovider"}
+var groupedLabels = map[string][]string{
+	"acceptancetest": labels,
+}
 
 var resourceModel = struct {
 	Name           string
@@ -15,12 +21,14 @@ var resourceModel = struct {
 	IntegrationKey string
 	SecretKey      string
 	Labels         string
+	GroupedLabels  string
 }{
 	Name:           acctest.Env.DuoAdminPanelResourceName(),
 	Host:           acctest.Env.DuoAdminPanelResourceHost(),
 	IntegrationKey: acctest.Env.DuoAdminPanelResourceIntegrationKey(),
 	SecretKey:      acctest.Env.DuoAdminPanelResourceSecretKey(),
-	Labels:         acctest.Env.DuoAdminPanelResourceTags().GetLabelsJsonArrayString(),
+	Labels:         testutil.MustJson(labels),
+	GroupedLabels:  testutil.MustJson(groupedLabels),
 }
 
 const resourceTemplate = `
@@ -30,6 +38,7 @@ resource "cdo_duo_admin_panel" "test" {
 	integration_key = "{{.IntegrationKey}}"
 	secret_key = "{{.SecretKey}}"
 	labels = {{.Labels}}
+	grouped_labels = {{.GroupedLabels}}
 }`
 
 var resourceConfig = acctest.MustParseTemplate(resourceTemplate, resourceModel)
@@ -52,10 +61,13 @@ func TestAccDuoAdminPanelResource(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_duo_admin_panel.test", "host", resourceModel.Host),
 					resource.TestCheckResourceAttr("cdo_duo_admin_panel.test", "integration_key", resourceModel.IntegrationKey),
 					resource.TestCheckResourceAttr("cdo_duo_admin_panel.test", "secret_key", resourceModel.SecretKey),
-					resource.TestCheckResourceAttr("cdo_duo_admin_panel.test", "labels.#", strconv.Itoa(len(acctest.Env.DuoAdminPanelResourceTags().Labels))),
-					resource.TestCheckResourceAttrWith("cdo_duo_admin_panel.test", "labels.0", testutil.CheckEqual(acctest.Env.DuoAdminPanelResourceTags().Labels[0])),
-					resource.TestCheckResourceAttrWith("cdo_duo_admin_panel.test", "labels.1", testutil.CheckEqual(acctest.Env.DuoAdminPanelResourceTags().Labels[1])),
-					resource.TestCheckResourceAttrWith("cdo_duo_admin_panel.test", "labels.2", testutil.CheckEqual(acctest.Env.DuoAdminPanelResourceTags().Labels[2])),
+					resource.TestCheckResourceAttr("cdo_duo_admin_panel.test", "labels.#", strconv.Itoa(len(labels))),
+					resource.TestCheckResourceAttrWith("cdo_duo_admin_panel.test", "labels.0", testutil.CheckEqual(labels[0])),
+					resource.TestCheckResourceAttrWith("cdo_duo_admin_panel.test", "labels.1", testutil.CheckEqual(labels[1])),
+					resource.TestCheckResourceAttrWith("cdo_duo_admin_panel.test", "labels.2", testutil.CheckEqual(labels[2])),
+					resource.TestCheckResourceAttrWith("cdo_duo_admin_panel.test", "grouped_labels.acceptancetest.0", testutil.CheckEqual(groupedLabels["acceptancetest"][0])),
+					resource.TestCheckResourceAttrWith("cdo_duo_admin_panel.test", "grouped_labels.acceptancetest.1", testutil.CheckEqual(groupedLabels["acceptancetest"][1])),
+					resource.TestCheckResourceAttrWith("cdo_duo_admin_panel.test", "grouped_labels.acceptancetest.2", testutil.CheckEqual(groupedLabels["acceptancetest"][2])),
 				),
 			},
 			// Update and Read testing

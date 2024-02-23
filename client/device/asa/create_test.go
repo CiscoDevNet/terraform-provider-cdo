@@ -3,6 +3,9 @@ package asa_test
 import (
 	"context"
 	"fmt"
+	"testing"
+	"time"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
@@ -12,8 +15,6 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/user/auth"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/user/auth/role"
 	"github.com/stretchr/testify/assert"
-	"testing"
-	"time"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
@@ -30,7 +31,9 @@ func TestAsaCreate(t *testing.T) {
 		WithName("my-asa").
 		OnboardedUsingCloudConnector("88888888-8888-8888-8888-888888888888").
 		WithLocation("10.10.0.1", 443).
-		WithTags(tags.New("tag1", "tag2")).
+		WithTags(tags.New([]string{"tag1", "tag2"}, map[string][]string{
+			"grouped-tags": {"grouped-tag-1", "grouped-tag-2"},
+		})).
 		Build()
 
 	asaDeviceUsingSdc := device.NewReadOutputBuilder().

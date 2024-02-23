@@ -2,19 +2,21 @@ package duoadminpanel
 
 import (
 	"context"
+	"time"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
-	"time"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/publicapilabels"
 )
 
 type CreateInput struct {
-	Name           string   `json:"name"`
-	Host           string   `json:"host"`
-	IntegrationKey string   `json:"integrationKey"`
-	SecretKey      string   `json:"secretKey"`
-	Labels         []string `json:"labels"`
+	Name           string               `json:"name"`
+	Host           string               `json:"host"`
+	IntegrationKey string               `json:"integrationKey"`
+	SecretKey      string               `json:"secretKey"`
+	Labels         publicapilabels.Type `json:"labels"`
 }
 
 type CreateOutput = ReadOutput

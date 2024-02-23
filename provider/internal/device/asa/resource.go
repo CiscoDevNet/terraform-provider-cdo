@@ -2,15 +2,19 @@ package asa
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"strconv"
 	"strings"
 
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -48,6 +52,7 @@ type AsaDeviceResourceModel struct {
 	Host          types.String `tfsdk:"host"`
 	Port          types.Int64  `tfsdk:"port"`
 	Labels        types.Set    `tfsdk:"labels"`
+	GroupedLabels types.Map    `tfsdk:"grouped_labels"`
 
 	Username          types.String `tfsdk:"username"`
 	Password          types.String `tfsdk:"password"`
@@ -119,6 +124,13 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				Computed:            true,
 				ElementType:         types.StringType,
 				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})), // default to empty list
+			},
+			"grouped_labels": schema.MapAttribute{
+				MarkdownDescription: "Specify a map of grouped labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
+				Optional:            true,
+				Computed:            true,
+				ElementType:         types.StringType,
+				Default:             mapdefault.StaticValue(types.MapValueMust(types.SetType{ElemType: types.StringType}, map[string]attr.Value{})), // default to empty list
 			},
 			"username": schema.StringAttribute{
 				MarkdownDescription: "The username used to authenticate with the device.",
@@ -200,7 +212,8 @@ func (r *AsaDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 	stateData.SocketAddress = types.StringValue(asaReadOutp.SocketAddress)
 	stateData.Host = types.StringValue(asaReadOutp.Host)
 	stateData.IgnoreCertificate = types.BoolValue(asaReadOutp.IgnoreCertificate)
-	stateData.Labels = util.GoStringSliceToTFStringSet(asaReadOutp.Tags.Labels)
+	stateData.Labels = util.GoStringSliceToTFStringSet(asaReadOutp.Tags.UngroupedTags())
+	stateData.GroupedLabels = util.GoMapToStringSliceTFMap(asaReadOutp.Tags.GroupedTags())
 
 	tflog.Trace(ctx, "done read ASA device resource")
 
@@ -236,7 +249,7 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 	}
 
 	// convert tf tags to go tags
-	planTags, err := util.TFStringSetToTagLabels(ctx, planData.Labels)
+	planTags, err := tagsFromAsaDeviceResourceModel(ctx, &planData)
 	if err != nil {
 		res.Diagnostics.AddError("error while converting terraform tags to go tags", err.Error())
 		return
@@ -302,7 +315,7 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 	}
 
 	// convert tf tags to go tags
-	planTags, err := util.TFStringSetToTagLabels(ctx, planData.Labels)
+	planTags, err := tagsFromAsaDeviceResourceModel(ctx, planData)
 	if err != nil {
 		res.Diagnostics.AddError("error while converting terraform tags to go tags", err.Error())
 		return
@@ -356,6 +369,7 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 	stateData.Host = types.StringValue(updateOutp.Host)
 	stateData.Port = types.Int64Value(port)
 	stateData.Labels = planData.Labels
+	stateData.GroupedLabels = planData.GroupedLabels
 
 	stateData.IgnoreCertificate = planData.IgnoreCertificate
 
@@ -434,4 +448,22 @@ func getConnectorName(planData *AsaDeviceResourceModel) basetypes.StringValue {
 	} else {
 		return types.StringNull()
 	}
+}
+
+func tagsFromAsaDeviceResourceModel(ctx context.Context, resourceModel *AsaDeviceResourceModel) (tags.Type, error) {
+	if resourceModel == nil {
+		return nil, errors.New("resource model cannot be nil")
+	}
+
+	ungroupedLabels, err := util.TFStringSetToGoStringList(ctx, resourceModel.Labels)
+	if err != nil {
+		return nil, fmt.Errorf("error while converting terraform labels to go slice, %s", resourceModel.Labels)
+	}
+
+	groupedLabels, err := util.TFMapToGoMapOfStringSlices(ctx, resourceModel.GroupedLabels)
+	if err != nil {
+		return nil, fmt.Errorf("error while converting terraform grouped labels to go map, %v", resourceModel.GroupedLabels)
+	}
+
+	return tags.New(ungroupedLabels, groupedLabels), nil
 }

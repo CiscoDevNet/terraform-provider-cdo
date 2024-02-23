@@ -2,12 +2,13 @@ package ios
 
 import (
 	"context"
+	"testing"
+	"time"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/stretchr/testify/assert"
-	"testing"
-	"time"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios/iosconfig"
@@ -32,7 +33,11 @@ func TestIosCreate(t *testing.T) {
 		WithName("my-ios").
 		OnboardedUsingOnPremConnector(validConnector.Uid).
 		WithLocation("10.10.0.1", 443).
-		WithTags(tags.New("tags1", "tags2", "tags3")).
+		WithTags(
+			tags.New([]string{"tags1", "tags2", "tags3"}, map[string][]string{
+				"grouped-tags": {"grouped-tags-1", "grouped-tags-2", "grouped-tags-3"},
+			}),
+		).
 		Build()
 
 	testCases := []struct {

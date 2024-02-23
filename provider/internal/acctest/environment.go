@@ -1,12 +1,11 @@
 package acctest
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
 	"strings"
-
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 )
 
 type env struct{}
@@ -77,9 +76,8 @@ func (e *env) IosResourceIgnoreCertificate() string {
 	return e.mustGetString("IOS_RESOURCE_IGNORE_CERTIFICATE")
 }
 
-func (e *env) IosResourceTags() tags.Type {
-	tagsEnv := e.mustGetString("IOS_RESOURCE_TAGS")
-	return tags.New(strings.Split(tagsEnv, ",")...)
+func (e *env) IosResourceTags() []string {
+	return e.mustGetCommaSeparatedSlice("IOS_RESOURCE_TAGS")
 }
 
 func (e *env) IosResourceHost() string {
@@ -102,9 +100,8 @@ func (e *env) IosDataSourceIgnoreCertificate() string {
 	return e.mustGetString("IOS_DATA_SOURCE_IGNORE_CERTIFICATE")
 }
 
-func (e *env) IosDataSourceTags() tags.Type {
-	tagsEnv := e.mustGetString("IOS_DATA_SOURCE_TAGS")
-	return tags.New(strings.Split(tagsEnv, ",")...)
+func (e *env) IosDataSourceTags() []string {
+	return e.mustGetCommaSeparatedSlice("IOS_DATA_SOURCE_TAGS")
 }
 
 func (e *env) FtdDataSourceName() string {
@@ -142,11 +139,6 @@ func (e *env) FtdResourceVirtual() string {
 
 func (e *env) FtdResourceLicenses() string {
 	return e.mustGetString("FTD_RESOURCE_LICENSES")
-}
-
-func (e *env) FtdResourceTags() tags.Type {
-	tagsEnv := e.mustGetString("FTD_RESOURCE_TAGS")
-	return tags.New(strings.Split(tagsEnv, ",")...)
 }
 
 func (e *env) FtdResourceNewName() string {
@@ -189,11 +181,6 @@ func (e *env) AsaResourceSdcIgnoreCertificate() bool {
 	return e.mustGetBool("ASA_RESOURCE_SDC_IGNORE_CERTIFICATE")
 }
 
-func (e *env) AsaResourceSdcTags() tags.Type {
-	tagsEnv := e.mustGetString("ASA_RESOURCE_SDC_TAGS")
-	return tags.New(strings.Split(tagsEnv, ",")...)
-}
-
 func (e *env) AsaResourceAlternativeDeviceLocation() string {
 	return e.mustGetString("ASA_RESOURCE_SDC_ALTERNATIVE_DEVICE_LOCATION")
 }
@@ -234,9 +221,8 @@ func (e *env) AsaResourceCdgIgnoreCertificate() bool {
 	return e.mustGetBool("ASA_RESOURCE_CDG_IGNORE_CERTIFICATE")
 }
 
-func (e *env) AsaResourceCdgTags() tags.Type {
-	tagsEnv := e.mustGetString("ASA_RESOURCE_CDG_TAGS")
-	return tags.New(strings.Split(tagsEnv, ",")...)
+func (e *env) AsaResourceCdgTags() []string {
+	return e.mustGetCommaSeparatedSlice("ASA_RESOURCE_CDG_TAGS")
 }
 
 func (e *env) AsaResourceCdgHost() string {
@@ -279,9 +265,8 @@ func (e *env) AsaDataSourceIgnoreCertificate() bool {
 	return e.mustGetBool("ASA_DATA_SOURCE_IGNORE_CERTIFICATE")
 }
 
-func (e *env) AsaDataSourceTags() tags.Type {
-	tagsEnv := e.mustGetString("ASA_DATA_SOURCE_TAGS")
-	return tags.New(strings.Split(tagsEnv, ",")...)
+func (e *env) AsaDataSourceTags() []string {
+	return e.mustGetCommaSeparatedSlice("ASA_DATA_SOURCE_TAGS")
 }
 
 func (e *env) ConnectorDataSourceName() string {
@@ -328,11 +313,6 @@ func (e *env) DuoAdminPanelResourceSecretKey() string {
 	return e.mustGetString("DUO_ADMIN_PANEL_RESOURCE_SECRET_KEY")
 }
 
-func (e *env) DuoAdminPanelResourceTags() tags.Type {
-	tagsEnv := e.mustGetString("DUO_ADMIN_PANEL_RESOURCE_TAGS")
-	return tags.New(strings.Split(tagsEnv, ",")...)
-}
-
 func (e *env) TenantSettingsTenantUid() string {
 	return e.mustGetString("TENANT_SETTINGS_TENANT_UID")
 }
@@ -343,6 +323,12 @@ func (e *env) mustGetString(envName string) string {
 		return value
 	}
 	panic(fmt.Sprintf("acceptance test requires environment variable: %s to be set.", envName))
+}
+
+func (e *env) mustGetCommaSeparatedSlice(envVarName string) []string {
+	str := e.mustGetString(envVarName)
+
+	return strings.Split(str, ",")
 }
 
 func (e *env) mustGetBool(envName string) bool {
@@ -369,4 +355,13 @@ func (e *env) mustGetInt(envName string) int64 {
 		return intValue
 	}
 	panic(fmt.Sprintf("acceptance test requires environment variable: %s to be set.", envName))
+}
+
+func parseGroupedTags(input string) map[string][]string {
+	var groupedTags map[string][]string
+	if err := json.Unmarshal([]byte(input), &groupedTags); err != nil {
+		panic("cannot parse DUO_ADMIN_PANEL_GROUPED_RESOURCE_TAGS")
+	}
+
+	return groupedTags
 }

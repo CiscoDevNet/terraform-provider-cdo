@@ -3,11 +3,13 @@ package ios
 import (
 	"context"
 	"fmt"
-	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
 	"strings"
+
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
@@ -42,6 +44,7 @@ type IosDeviceResourceModel struct {
 	Host          types.String `tfsdk:"host"`
 	Port          types.Int64  `tfsdk:"port"`
 	Labels        types.Set    `tfsdk:"labels"`
+	GroupedLabels types.Map    `tfsdk:"grouped_labels"`
 
 	Username types.String `tfsdk:"username"`
 	Password types.String `tfsdk:"password"`
@@ -126,6 +129,15 @@ func (r *IosDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				ElementType:         types.StringType,
 				Computed:            true,
 				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})), // default to empty list
+			},
+			"grouped_labels": schema.MapAttribute{
+				MarkdownDescription: "Specify a set of grouped labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
+				Optional:            true,
+				ElementType: types.SetType{
+					ElemType: types.StringType,
+				},
+				Computed: true,
+				Default:  mapdefault.StaticValue(types.MapValueMust(types.SetType{ElemType: types.StringType}, map[string]attr.Value{})), // default to empty list
 			},
 		},
 	}

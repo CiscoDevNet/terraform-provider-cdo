@@ -2,16 +2,18 @@ package duoadminpanel_test
 
 import (
 	"context"
+	"net/http"
+	"testing"
+	"time"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/duoadminpanel"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi/transaction"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi/transaction/transactionstatus"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi/transaction/transactiontype"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/publicapilabels"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"testing"
-	"time"
 
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
@@ -26,7 +28,7 @@ func TestDuoAdminPanelCreate(t *testing.T) {
 		Host:           "test-host",
 		IntegrationKey: "test-int-key",
 		SecretKey:      "test-secret-key",
-		Labels:         []string{"lab1", "lab2", "lab3"},
+		Labels:         publicapilabels.New([]string{"lab1", "lab2", "lab3"}, map[string][]string{"MyCoolGroup": {"groupedLabel1", "groupedLabel2"}}),
 	}
 
 	doneTransaction := transaction.Type{
@@ -60,7 +62,7 @@ func TestDuoAdminPanelCreate(t *testing.T) {
 	createdDevice := duoadminpanel.ReadOutput{
 		Uid:  doneTransaction.EntityUid,
 		Name: createInput.Name,
-		Tags: tags.New(createInput.Labels...),
+		Tags: tags.Type(createInput.Labels),
 	}
 
 	expectedCreateOutput := duoadminpanel.CreateOutput{

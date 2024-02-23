@@ -1,9 +1,10 @@
 package ios_test
 
 import (
-	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/testutil"
 	"strconv"
 	"testing"
+
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/testutil"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/acctest"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -18,7 +19,7 @@ var testIosDataSource = struct {
 }{
 	Name:              acctest.Env.IosDataSourceName(),
 	IgnoreCertificate: acctest.Env.IosDataSourceIgnoreCertificate(),
-	Labels:            asaDataSourceTags.GetLabelsJsonArrayString(),
+	Labels:            testutil.MustJson(asaDataSourceTags),
 }
 
 var testIosDataSourceTemplate = `
@@ -38,10 +39,10 @@ func TestAccIosDeviceDataSource(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "name", testIosDataSource.Name),
 					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "ignore_certificate", testIosDataSource.IgnoreCertificate),
-					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "labels.#", strconv.Itoa(len(asaDataSourceTags.Labels))),
-					resource.TestCheckResourceAttrWith("data.cdo_ios_device.test", "labels.0", testutil.CheckEqual(asaDataSourceTags.Labels[0])),
-					resource.TestCheckResourceAttrWith("data.cdo_ios_device.test", "labels.1", testutil.CheckEqual(asaDataSourceTags.Labels[1])),
-					resource.TestCheckResourceAttrWith("data.cdo_ios_device.test", "labels.2", testutil.CheckEqual(asaDataSourceTags.Labels[2])),
+					resource.TestCheckResourceAttr("data.cdo_ios_device.test", "labels.#", strconv.Itoa(len(asaDataSourceTags))),
+					resource.TestCheckResourceAttrWith("data.cdo_ios_device.test", "labels.0", testutil.CheckEqual(asaDataSourceTags[0])),
+					resource.TestCheckResourceAttrWith("data.cdo_ios_device.test", "labels.1", testutil.CheckEqual(asaDataSourceTags[1])),
+					resource.TestCheckResourceAttrWith("data.cdo_ios_device.test", "labels.2", testutil.CheckEqual(asaDataSourceTags[2])),
 				),
 			},
 		},

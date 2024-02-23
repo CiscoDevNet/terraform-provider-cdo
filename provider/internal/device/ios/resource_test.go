@@ -1,15 +1,18 @@
 package ios_test
 
 import (
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
-	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
-	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/testutil"
 	"strconv"
 	"testing"
+
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/testutil"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/acctest"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
+
+var labels = []string{"acceptancetest", "test-ios-device", "terraform"}
+var groupedLabels = map[string][]string{"acceptancetest": labels}
 
 type testIosResourceType struct {
 	Name              string
@@ -20,6 +23,7 @@ type testIosResourceType struct {
 	ConnectorName     string
 	IgnoreCertificate string
 	Labels            string
+	GroupedLabels     string
 
 	Host string
 	Port int64
@@ -43,14 +47,15 @@ var testIosResource = testIosResourceType{
 	Password:          acctest.Env.IosResourcePassword(),
 	ConnectorName:     acctest.Env.IosResourceConnectorName(),
 	IgnoreCertificate: acctest.Env.IosResourceIgnoreCertificate(),
-	Labels:            acctest.Env.IosResourceTags().GetLabelsJsonArrayString(),
+	Labels:            testutil.MustJson(labels),
+	GroupedLabels:     testutil.MustJson(groupedLabels),
 
 	Host: acctest.Env.IosResourceHost(),
 	Port: acctest.Env.IosResourcePort(),
 }
 var testIosResourceConfig = acctest.MustParseTemplate(testIosResourceTemplate, testIosResource)
 
-var reorderedLabels = tags.New(sliceutil.Reverse[string](tags.MustParseJsonArrayString(testIosResource.Labels))...).GetLabelsJsonArrayString()
+var reorderedLabels = testutil.MustJson(sliceutil.Reverse(labels))
 
 var testIosResource_ReorderedLabels = acctest.MustOverrideFields(testIosResource, map[string]any{
 	"Labels": reorderedLabels,
@@ -61,6 +66,13 @@ var testIosResource_NewName = acctest.MustOverrideFields(testIosResource, map[st
 	"Name": acctest.Env.IosResourceNewName(),
 })
 var testIosResourceConfig_NewName = acctest.MustParseTemplate(testIosResourceTemplate, testIosResource_NewName)
+
+var testIosResource_ReplaceGroupTags = acctest.MustOverrideFields(testIosResource, map[string]any{
+	"GroupedLabels": map[string][]string{
+		"my-cool-new-label-group": labels,
+	},
+})
+var testIosResourceConfig_ReplaceGroupTags = acctest.MustParseTemplate(testIosDataSourceTemplate, testIosResource_ReplaceGroupTags)
 
 func TestAccIosDeviceResource_SDC(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -77,10 +89,13 @@ func TestAccIosDeviceResource_SDC(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "port", strconv.FormatInt(testIosResource.Port, 10)),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "username", testIosResource.Username),
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "password", testIosResource.Password),
-					resource.TestCheckResourceAttr("cdo_ios_device.test", "labels.#", strconv.Itoa(len(acctest.Env.FtdResourceTags().Labels))),
-					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "labels.0", testutil.CheckEqual(acctest.Env.IosResourceTags().Labels[0])),
-					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "labels.1", testutil.CheckEqual(acctest.Env.IosResourceTags().Labels[1])),
-					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "labels.2", testutil.CheckEqual(acctest.Env.IosResourceTags().Labels[2])),
+					resource.TestCheckResourceAttr("cdo_ios_device.test", "labels.#", strconv.Itoa(len(labels))),
+					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "labels.0", testutil.CheckEqual(labels[0])),
+					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "labels.1", testutil.CheckEqual(labels[1])),
+					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "labels.2", testutil.CheckEqual(labels[2])),
+					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "grouped_labels.acceptancetest.0", testutil.CheckEqual(labels[0])),
+					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "grouped_labels.acceptancetest.1", testutil.CheckEqual(labels[1])),
+					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "grouped_labels.acceptancetest.2", testutil.CheckEqual(labels[2])),
 				),
 			},
 			// Update order of label testing
@@ -93,6 +108,17 @@ func TestAccIosDeviceResource_SDC(t *testing.T) {
 				Config: acctest.ProviderConfig() + testIosResourceConfig_NewName,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cdo_ios_device.test", "name", testIosResource_NewName.Name),
+				),
+			},
+
+			// Replace group labels test
+			{
+				Config: acctest.ProviderConfig() + testIosResourceConfig_ReplaceGroupTags,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("cdo_ios_device.test", "name", testIosResource_NewName.Name),
+					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "grouped_labels.my-cool-new-label-group.0", testutil.CheckEqual(labels[0])),
+					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "grouped_labels.my-cool-new-label-group.1", testutil.CheckEqual(labels[1])),
+					resource.TestCheckResourceAttrWith("cdo_ios_device.test", "grouped_labels.my-cool-new-label-group.2", testutil.CheckEqual(labels[2])),
 				),
 			},
 			// Delete testing automatically occurs in TestCase

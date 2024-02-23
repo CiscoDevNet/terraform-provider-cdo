@@ -3,6 +3,7 @@ package ftd
 import (
 	"context"
 	"fmt"
+
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -34,6 +35,7 @@ type DataSourceModel struct {
 	Virtual          types.Bool     `tfsdk:"virtual"`
 	Licenses         []types.String `tfsdk:"licenses"`
 	Labels           []types.String `tfsdk:"labels"`
+	GroupedLabels    types.Map      `tfsdk:"grouped_labels"`
 
 	AccessPolicyUid  types.String `tfsdk:"access_policy_id"`
 	GeneratedCommand types.String `tfsdk:"generated_command"`
@@ -80,10 +82,17 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				MarkdownDescription: "Comma-separated list of licenses to apply to this FTD. You must enable at least the \"BASE\" license. Allowed values are: [\"BASE\", \"CARRIER\", \"THREAT\", \"MALWARE\", \"URLFilter\",].",
 				Computed:            true,
 			},
-			"labels": schema.ListAttribute{
-				MarkdownDescription: "Set a list of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
+			"labels": schema.SetAttribute{
+				MarkdownDescription: "A list of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
 				Computed:            true,
 				ElementType:         types.StringType,
+			},
+			"grouped_labels": schema.MapAttribute{
+				MarkdownDescription: "A map of grouped labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
+				Computed:            true,
+				ElementType: types.SetType{
+					ElemType: types.StringType,
+				},
 			},
 			"generated_command": schema.StringAttribute{
 				MarkdownDescription: "The command to run in the FTD CLI to register it with the cloud-delivered FMC (cdFMC).",

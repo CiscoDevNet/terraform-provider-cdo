@@ -66,7 +66,11 @@ const (
 var (
 	ftdLicenseCaps     = &[]license.Type{license.Base, license.Carrier}
 	ftdPerformanceTier = tier.FTDv5
-	ftdTags            = tags.New("tags1", "tags2", "tags3")
+	ftdTags            = tags.New(
+		[]string{"tags1", "tags2", "tags3"},
+		map[string][]string{
+			"grouped-tags": {"grouped-tags-1", "grouped-tags-2"},
+		})
 )
 
 var (

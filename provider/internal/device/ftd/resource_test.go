@@ -2,16 +2,21 @@ package ftd_test
 
 import (
 	"fmt"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
-	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
-	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/testutil"
 	"strconv"
 	"strings"
 	"testing"
 
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/testutil"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/acctest"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
+
+var labels = []string{"acceptancetest", "terraform", "test_ftd"}
+var groupedLabels = map[string][]string{
+	"acceptancetest": labels,
+}
 
 type ResourceType struct {
 	Name             string
@@ -21,6 +26,7 @@ type ResourceType struct {
 	Licenses         string
 	AccessPolicyUid  string
 	Labels           string
+	GroupedLabels    string
 }
 
 const ResourceTemplate = `
@@ -31,6 +37,7 @@ resource "cdo_ftd_device" "test" {
 	virtual = "{{.Virtual}}"
 	licenses = {{.Licenses}}
 	labels = {{.Labels}}
+	grouped_labels = {{.GroupedLabels}}
 }`
 
 var testResource = ResourceType{
@@ -39,7 +46,8 @@ var testResource = ResourceType{
 	PerformanceTier:  acctest.Env.FtdResourcePerformanceTier(),
 	Virtual:          acctest.Env.FtdResourceVirtual(),
 	Licenses:         acctest.Env.FtdResourceLicenses(),
-	Labels:           acctest.Env.FtdResourceTags().GetLabelsJsonArrayString(),
+	Labels:           testutil.MustJson(labels),
+	GroupedLabels:    testutil.MustJson(groupedLabels),
 }
 var testResourceConfig = acctest.MustParseTemplate(ResourceTemplate, testResource)
 
@@ -49,13 +57,20 @@ var testResource_NewName = acctest.MustOverrideFields(testResource, map[string]a
 
 var testResourceConfig_NewName = acctest.MustParseTemplate(ResourceTemplate, testResource_NewName)
 
-var reorderedLabels = tags.New(sliceutil.Reverse[string](tags.MustParseJsonArrayString(testResource.Labels))...).GetLabelsJsonArrayString()
+var reorderedLabels = testutil.MustJson(sliceutil.Reverse(labels))
 
 var testResource_ReorderLabels = acctest.MustOverrideFields(testResource, map[string]any{
 	"Labels": reorderedLabels,
 })
 
 var testResourceConfig_ReorderLabels = acctest.MustParseTemplate(ResourceTemplate, testResource_ReorderLabels)
+
+var testResource_ReplaceGroupedLabels = acctest.MustOverrideFields(testResource, map[string]any{
+	"GroupedLabels": map[string][]string{
+		"my-new-label": labels,
+	},
+})
+var testResourceConfig_ReplaceGroupedLabels = acctest.MustParseTemplate(ResourceTemplate, testResource_ReplaceGroupedLabels)
 
 func TestAccFtdResource(t *testing.T) {
 
@@ -74,10 +89,13 @@ func TestAccFtdResource(t *testing.T) {
 					resource.TestCheckResourceAttrSet("cdo_ftd_device.test", "licenses.0"),   // there is something at position 0 of licenses array
 					resource.TestCheckResourceAttr("cdo_ftd_device.test", "licenses.#", "1"), // number of licenses = 1
 					resource.TestCheckResourceAttr("cdo_ftd_device.test", "access_policy_name", testResource.AccessPolicyName),
-					resource.TestCheckResourceAttr("cdo_ftd_device.test", "labels.#", strconv.Itoa(len(acctest.Env.FtdResourceTags().Labels))),
-					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "labels.0", testutil.CheckEqual(acctest.Env.FtdResourceTags().Labels[0])),
-					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "labels.1", testutil.CheckEqual(acctest.Env.FtdResourceTags().Labels[1])),
-					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "labels.2", testutil.CheckEqual(acctest.Env.FtdResourceTags().Labels[2])),
+					resource.TestCheckResourceAttr("cdo_ftd_device.test", "labels.#", strconv.Itoa(len(labels))),
+					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "labels.0", testutil.CheckEqual(labels[0])),
+					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "labels.1", testutil.CheckEqual(labels[1])),
+					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "labels.2", testutil.CheckEqual(labels[2])),
+					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "grouped_labels.acceptancetest.0", testutil.CheckEqual(labels[0])),
+					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "grouped_labels.acceptancetest.1", testutil.CheckEqual(labels[1])),
+					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "grouped_labels.acceptancetest.2", testutil.CheckEqual(labels[2])),
 					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "generated_command", func(value string) error {
 						ok := strings.HasPrefix(value, "configure manager add")
 						if !ok {
@@ -97,6 +115,15 @@ func TestAccFtdResource(t *testing.T) {
 				Config: acctest.ProviderConfig() + testResourceConfig_NewName,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cdo_ftd_device.test", "name", testResource_NewName.Name),
+				),
+			},
+			// Replace Grouped Labels
+			{
+				Config: acctest.ProviderConfig() + testResourceConfig_ReplaceGroupedLabels,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "grouped_labels.my-new-label.0", testutil.CheckEqual(labels[0])),
+					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "grouped_labels.my-new-label.1", testutil.CheckEqual(labels[1])),
+					resource.TestCheckResourceAttrWith("cdo_ftd_device.test", "grouped_labels.my-new-label.2", testutil.CheckEqual(labels[2])),
 				),
 			},
 			// Delete testing automatically occurs in TestCase

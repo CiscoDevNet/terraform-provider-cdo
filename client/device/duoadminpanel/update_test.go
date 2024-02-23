@@ -2,13 +2,14 @@ package duoadminpanel_test
 
 import (
 	"context"
+	"net/http"
+	"testing"
+	"time"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/duoadminpanel"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"testing"
-	"time"
 
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
@@ -21,7 +22,7 @@ func TestDuoAdminPanelUpdate(t *testing.T) {
 	updateInput := duoadminpanel.UpdateInput{
 		Uid:  "test-uid",
 		Name: "test-name",
-		Tags: tags.New([]string{"1", "2", "3"}...),
+		Tags: tags.NewUngrouped([]string{"1", "2", "3"}...),
 	}
 
 	updateOutput := duoadminpanel.UpdateOutput{

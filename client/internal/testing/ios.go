@@ -13,7 +13,7 @@ func (m Model) CreateIosInput() ios.CreateInput {
 		ConnectorUid:      m.CdgUid.String(),
 		ConnectorType:     "CDG",
 		SocketAddress:     m.IosHost,
-		Tags:              tags.Type{},
+		Labels:            []string{},
 		Username:          m.IosUsername,
 		Password:          m.IosPassword,
 		IgnoreCertificate: false,

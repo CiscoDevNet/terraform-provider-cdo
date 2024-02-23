@@ -1,10 +1,11 @@
-package asaconfig
+package asaconfig_test
 
 import (
 	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 	"github.com/stretchr/testify/assert"
@@ -30,46 +31,46 @@ func TestAsaConfigUpdate(t *testing.T) {
 
 	testCases := []struct {
 		testName   string
-		input      UpdateInput
-		setupFunc  func(input UpdateInput, t *testing.T)
-		assertFunc func(output *UpdateOutput, err error, t *testing.T)
+		input      asaconfig.UpdateInput
+		setupFunc  func(input asaconfig.UpdateInput, t *testing.T)
+		assertFunc func(output *asaconfig.UpdateOutput, err error, t *testing.T)
 	}{
 		{
 			testName: "successfully updates ASA config",
-			input: UpdateInput{
+			input: asaconfig.UpdateInput{
 				SpecificUid: asaConfigUid,
 				Username:    username,
 				Password:    password,
 			},
 
-			setupFunc: func(input UpdateInput, t *testing.T) {
+			setupFunc: func(input asaconfig.UpdateInput, t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *http.Request) (*http.Response, error) {
-						requestBody, err := internalHttp.ReadRequestBody[updateBody](r)
+						requestBody, err := internalHttp.ReadRequestBody[asaconfig.UpdateBody](r)
 						assert.Nil(t, err)
 
-						expectedBody := updateBody{
+						expectedBody := asaconfig.UpdateBody{
 							State:       "CERT_VALIDATED",
 							Credentials: fmt.Sprintf(`{"username":"%s","password":"%s"}`, input.Username, input.Password),
 						}
 						assert.Equal(t, expectedBody, *requestBody)
 
-						return httpmock.NewJsonResponse(200, UpdateOutput{Uid: asaConfigUid})
+						return httpmock.NewJsonResponse(200, asaconfig.UpdateOutput{Uid: asaConfigUid})
 					},
 				)
 			},
 
-			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asaconfig.UpdateOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
-				assert.Equal(t, UpdateOutput{Uid: asaConfigUid}, *output)
+				assert.Equal(t, asaconfig.UpdateOutput{Uid: asaConfigUid}, *output)
 			},
 		},
 		{
 			testName: "successfully updates ASA config when encrypting credentials",
-			input: UpdateInput{
+			input: asaconfig.UpdateInput{
 				SpecificUid: asaConfigUid,
 				Username:    username,
 				Password:    password,
@@ -80,12 +81,12 @@ func TestAsaConfigUpdate(t *testing.T) {
 				},
 			},
 
-			setupFunc: func(input UpdateInput, t *testing.T) {
+			setupFunc: func(input asaconfig.UpdateInput, t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *http.Request) (*http.Response, error) {
-						requestBody, err := internalHttp.ReadRequestBody[updateBody](r)
+						requestBody, err := internalHttp.ReadRequestBody[asaconfig.UpdateBody](r)
 						assert.Nil(t, err)
 						assert.Equal(t, requestBody.State, "CERT_VALIDATED", fmt.Sprintf("expected 'QueueTriggerState' to equal 'CERT_VALIDATED', got: %s", requestBody.State))
 
@@ -99,26 +100,26 @@ func TestAsaConfigUpdate(t *testing.T) {
 						assert.Equal(t, input.Password, decryptedPassword, fmt.Sprintf(`expected decrypted password to equal '%s', got: '%s'`, input.Password, decryptedPassword))
 						assert.Equal(t, input.PublicKey.KeyId, credentials.KeyId, fmt.Sprintf("expected keyId to equal '%s', got: '%s'", input.PublicKey.KeyId, credentials.KeyId))
 
-						return httpmock.NewJsonResponse(200, UpdateOutput{Uid: asaConfigUid})
+						return httpmock.NewJsonResponse(200, asaconfig.UpdateOutput{Uid: asaConfigUid})
 					},
 				)
 			},
 
-			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asaconfig.UpdateOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
-				assert.Equal(t, UpdateOutput{Uid: asaConfigUid}, *output)
+				assert.Equal(t, asaconfig.UpdateOutput{Uid: asaConfigUid}, *output)
 			},
 		},
 		{
 			testName: "returns error when updating ASA config that does not exist",
-			input: UpdateInput{
+			input: asaconfig.UpdateInput{
 				SpecificUid: asaConfigUid,
 				Username:    username,
 				Password:    password,
 			},
 
-			setupFunc: func(input UpdateInput, t *testing.T) {
+			setupFunc: func(input asaconfig.UpdateInput, t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildUpdateAsaConfigUrl(input.SpecificUid),
@@ -126,20 +127,20 @@ func TestAsaConfigUpdate(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asaconfig.UpdateOutput, err error, t *testing.T) {
 				assert.Nil(t, output)
 				assert.NotNil(t, err)
 			},
 		},
 		{
 			testName: "returns error when remote service updating ASA config experiences an issue",
-			input: UpdateInput{
+			input: asaconfig.UpdateInput{
 				SpecificUid: asaConfigUid,
 				Username:    username,
 				Password:    password,
 			},
 
-			setupFunc: func(input UpdateInput, t *testing.T) {
+			setupFunc: func(input asaconfig.UpdateInput, t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildUpdateAsaConfigUrl(input.SpecificUid),
@@ -147,7 +148,7 @@ func TestAsaConfigUpdate(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asaconfig.UpdateOutput, err error, t *testing.T) {
 				assert.Nil(t, output)
 				assert.NotNil(t, err)
 			},
@@ -160,7 +161,7 @@ func TestAsaConfigUpdate(t *testing.T) {
 
 			testCase.setupFunc(testCase.input, t)
 
-			output, err := Update(
+			output, err := asaconfig.Update(
 				context.Background(),
 				*internalHttp.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
 				testCase.input,
@@ -184,49 +185,49 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 
 	testCases := []struct {
 		testName   string
-		input      UpdateInput
-		setupFunc  func(input UpdateInput, t *testing.T)
-		assertFunc func(output *UpdateOutput, err error, t *testing.T)
+		input      asaconfig.UpdateInput
+		setupFunc  func(input asaconfig.UpdateInput, t *testing.T)
+		assertFunc func(output *asaconfig.UpdateOutput, err error, t *testing.T)
 	}{
 		{
 			testName: "successfully updates ASA config credentials",
-			input: UpdateInput{
+			input: asaconfig.UpdateInput{
 				SpecificUid: asaConfigUid,
 				Username:    username,
 				Password:    password,
 			},
 
-			setupFunc: func(input UpdateInput, t *testing.T) {
+			setupFunc: func(input asaconfig.UpdateInput, t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *http.Request) (*http.Response, error) {
-						requestBody, err := internalHttp.ReadRequestBody[updateCredentialsBodyWithState](r)
+						requestBody, err := internalHttp.ReadRequestBody[asaconfig.UpdateCredentialsBodyWithState](r)
 						assert.Nil(t, err)
 
-						expectedBody := updateCredentialsBodyWithState{
+						expectedBody := asaconfig.UpdateCredentialsBodyWithState{
 							QueueTriggerState: "WAIT_FOR_USER_TO_UPDATE_CREDS",
-							SmContext: SmContext{
+							SmContext: asaconfig.SmContext{
 								Credentials: fmt.Sprintf(`{"username":"%s","password":"%s"}`, input.Username, input.Password),
 							},
 						}
 						assert.Equal(t, expectedBody, *requestBody)
 
-						return httpmock.NewJsonResponse(200, UpdateOutput{Uid: asaConfigUid})
+						return httpmock.NewJsonResponse(200, asaconfig.UpdateOutput{Uid: asaConfigUid})
 					},
 				)
 			},
 
-			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asaconfig.UpdateOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
-				assert.Equal(t, UpdateOutput{Uid: asaConfigUid}, *output)
+				assert.Equal(t, asaconfig.UpdateOutput{Uid: asaConfigUid}, *output)
 			},
 		},
 
 		{
 			testName: "successfully updates ASA config credentials when encrypting credentials",
-			input: UpdateInput{
+			input: asaconfig.UpdateInput{
 				SpecificUid: asaConfigUid,
 				Username:    username,
 				Password:    password,
@@ -237,12 +238,12 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 				},
 			},
 
-			setupFunc: func(input UpdateInput, t *testing.T) {
+			setupFunc: func(input asaconfig.UpdateInput, t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *http.Request) (*http.Response, error) {
-						requestBody, err := internalHttp.ReadRequestBody[updateCredentialsBodyWithState](r)
+						requestBody, err := internalHttp.ReadRequestBody[asaconfig.UpdateCredentialsBodyWithState](r)
 						assert.Nil(t, err)
 
 						expectedState := "WAIT_FOR_USER_TO_UPDATE_CREDS"
@@ -258,55 +259,55 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 						assert.Equal(t, input.Password, decryptedPassword)
 						assert.Equal(t, input.PublicKey.KeyId, credentials.KeyId)
 
-						return httpmock.NewJsonResponse(200, UpdateOutput{Uid: asaConfigUid})
+						return httpmock.NewJsonResponse(200, asaconfig.UpdateOutput{Uid: asaConfigUid})
 					})
 			},
 
-			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asaconfig.UpdateOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
-				assert.Equal(t, UpdateOutput{Uid: asaConfigUid}, *output)
+				assert.Equal(t, asaconfig.UpdateOutput{Uid: asaConfigUid}, *output)
 			},
 		},
 
 		{
 			testName: "successfully updates ASA config credentials with flag to wait for user to update credentials",
-			input: UpdateInput{
+			input: asaconfig.UpdateInput{
 				SpecificUid: asaConfigUid,
 				Username:    username,
 				Password:    password,
 			},
 
-			setupFunc: func(input UpdateInput, t *testing.T) {
+			setupFunc: func(input asaconfig.UpdateInput, t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *http.Request) (*http.Response, error) {
-						requestBody, err := internalHttp.ReadRequestBody[updateCredentialsBody](r)
+						requestBody, err := internalHttp.ReadRequestBody[asaconfig.UpdateCredentialsBody](r)
 						assert.Nil(t, err)
 
-						expectedBody := updateCredentialsBody{
-							SmContext: SmContext{
+						expectedBody := asaconfig.UpdateCredentialsBody{
+							SmContext: asaconfig.SmContext{
 								Credentials: fmt.Sprintf(`{"username":"%s","password":"%s"}`, input.Username, input.Password),
 							},
 						}
 						assert.Equal(t, expectedBody, *requestBody)
 
-						return httpmock.NewJsonResponse(200, UpdateOutput{Uid: asaConfigUid})
+						return httpmock.NewJsonResponse(200, asaconfig.UpdateOutput{Uid: asaConfigUid})
 					},
 				)
 			},
 
-			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asaconfig.UpdateOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
-				assert.Equal(t, UpdateOutput{Uid: asaConfigUid}, *output)
+				assert.Equal(t, asaconfig.UpdateOutput{Uid: asaConfigUid}, *output)
 			},
 		},
 
 		{
 			testName: "successfully updates ASA config credentials when encrypting credentials with flag to wait for user to update credentials",
-			input: UpdateInput{
+			input: asaconfig.UpdateInput{
 				SpecificUid: asaConfigUid,
 				Username:    username,
 				Password:    password,
@@ -317,12 +318,12 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 				},
 			},
 
-			setupFunc: func(input UpdateInput, t *testing.T) {
+			setupFunc: func(input asaconfig.UpdateInput, t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildUpdateAsaConfigUrl(asaConfigUid),
 					func(r *http.Request) (*http.Response, error) {
-						requestBody, err := internalHttp.ReadRequestBody[updateCredentialsBody](r)
+						requestBody, err := internalHttp.ReadRequestBody[asaconfig.UpdateCredentialsBody](r)
 						assert.Nil(t, err)
 
 						credentials, err := jsonutil.UnmarshalStruct[model.Credentials]([]byte(requestBody.SmContext.Credentials))
@@ -335,26 +336,26 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 						assert.Equal(t, input.Password, decryptedPassword)
 						assert.Equal(t, input.PublicKey.KeyId, credentials.KeyId)
 
-						return httpmock.NewJsonResponse(200, UpdateOutput{Uid: asaConfigUid})
+						return httpmock.NewJsonResponse(200, asaconfig.UpdateOutput{Uid: asaConfigUid})
 					})
 			},
 
-			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asaconfig.UpdateOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
-				assert.Equal(t, UpdateOutput{Uid: asaConfigUid}, *output)
+				assert.Equal(t, asaconfig.UpdateOutput{Uid: asaConfigUid}, *output)
 			},
 		},
 
 		{
 			testName: "returns error when updating ASA config credentials that does not exist",
-			input: UpdateInput{
+			input: asaconfig.UpdateInput{
 				SpecificUid: asaConfigUid,
 				Username:    username,
 				Password:    password,
 			},
 
-			setupFunc: func(input UpdateInput, t *testing.T) {
+			setupFunc: func(input asaconfig.UpdateInput, t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildUpdateAsaConfigUrl(input.SpecificUid),
@@ -362,7 +363,7 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asaconfig.UpdateOutput, err error, t *testing.T) {
 				assert.Nil(t, output)
 				assert.NotNil(t, err)
 			},
@@ -370,13 +371,13 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 
 		{
 			testName: "returns error when remote service updating ASA config credentials experiences an issue",
-			input: UpdateInput{
+			input: asaconfig.UpdateInput{
 				SpecificUid: asaConfigUid,
 				Username:    username,
 				Password:    password,
 			},
 
-			setupFunc: func(input UpdateInput, t *testing.T) {
+			setupFunc: func(input asaconfig.UpdateInput, t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildUpdateAsaConfigUrl(input.SpecificUid),
@@ -384,7 +385,7 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
+			assertFunc: func(output *asaconfig.UpdateOutput, err error, t *testing.T) {
 				assert.Nil(t, output)
 				assert.NotNil(t, err)
 			},
@@ -397,7 +398,7 @@ func TestAsaConfigUpdateCredentials(t *testing.T) {
 
 			testCase.setupFunc(testCase.input, t)
 
-			output, err := UpdateCredentials(
+			output, err := asaconfig.UpdateCredentials(
 				context.Background(),
 				*internalHttp.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
 				testCase.input,

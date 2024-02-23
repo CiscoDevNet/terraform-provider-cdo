@@ -1,8 +1,9 @@
-package ios
+package ios_test
 
 import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -35,24 +36,24 @@ func TestIosUpdate(t *testing.T) {
 
 	testCases := []struct {
 		testName   string
-		input      UpdateInput
-		setupFunc  func(input UpdateInput)
-		assertFunc func(input UpdateInput, output *UpdateOutput, err error, t *testing.T)
+		input      ios.UpdateInput
+		setupFunc  func(input ios.UpdateInput)
+		assertFunc func(input ios.UpdateInput, output *ios.UpdateOutput, err error, t *testing.T)
 	}{
 		{
 			testName: "successfully updates iOS name",
-			input: UpdateInput{
+			input: ios.UpdateInput{
 				Uid:  iosDevice.Uid,
 				Name: "new-name",
 			},
 
-			setupFunc: func(input UpdateInput) {
+			setupFunc: func(input ios.UpdateInput) {
 				updatedDevice := iosDevice
 				updatedDevice.Name = input.Name
 				configureDeviceUpdateToRespondSuccessfully(updatedDevice)
 			},
 
-			assertFunc: func(input UpdateInput, output *UpdateOutput, err error, t *testing.T) {
+			assertFunc: func(input ios.UpdateInput, output *ios.UpdateOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
 
@@ -64,16 +65,16 @@ func TestIosUpdate(t *testing.T) {
 
 		{
 			testName: "returns error when device update call encounters an issue",
-			input: UpdateInput{
+			input: ios.UpdateInput{
 				Uid:  iosDevice.Uid,
 				Name: "new-name",
 			},
 
-			setupFunc: func(input UpdateInput) {
+			setupFunc: func(input ios.UpdateInput) {
 				configureDeviceUpdateToRespondWithError(iosDevice.Uid)
 			},
 
-			assertFunc: func(input UpdateInput, output *UpdateOutput, err error, t *testing.T) {
+			assertFunc: func(input ios.UpdateInput, output *ios.UpdateOutput, err error, t *testing.T) {
 				assert.Nil(t, output)
 				assert.NotNil(t, err)
 			},
@@ -86,7 +87,7 @@ func TestIosUpdate(t *testing.T) {
 
 			testCase.setupFunc(testCase.input)
 
-			output, err := Update(
+			output, err := ios.Update(
 				context.Background(),
 				*http.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
 				testCase.input,

@@ -6,13 +6,13 @@ package cloudftd
 import (
 	"context"
 	"fmt"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc/fmcplatform"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/cdo"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/accesspolicies"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
@@ -28,12 +28,7 @@ type CreateInput struct {
 	Tags             tags.Type
 }
 
-type CreateOutput struct {
-	Uid      string    `json:"uid"`
-	Name     string    `json:"name"`
-	Metadata *Metadata `json:"metadata"`
-	Tags     tags.Type `json:"tags"`
-}
+type CreateOutput = ReadOutput
 
 func NewCreateInput(
 	name string,
@@ -54,127 +49,88 @@ func NewCreateInput(
 }
 
 type createRequestBody struct {
-	FmcId      string          `json:"associatedDeviceUid"`
-	DeviceType devicetype.Type `json:"deviceType"`
-	Metadata   *Metadata       `json:"metadata"`
-	Name       string          `json:"name"`
-	State      string          `json:"state"` // TODO: use queueTriggerState?
-	Type       string          `json:"type"`
-	Model      bool            `json:"model"`
-	Tags       tags.Type       `json:"tags"`
+	Name               string          `json:"name"`
+	DeviceType         devicetype.Type `json:"deviceType"`
+	FmcAccessPolicyUid string          `json:"fmcAccessPolicyUid"`
+	PerformanceTier    *tier.Type      `json:"performanceTier"`
+	Virtual            bool            `json:"virtual"`
+	Licenses           *[]license.Type `json:"licenses"`
+	Labels             []string        `json:"labels"`
 }
 
 func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, error) {
 
 	client.Logger.Println("creating cloud ftd")
 
+	createUrl := url.CreateFtd(client.BaseUrl())
+
+	selectedPolicy, err := readPolicyUidFromPolicyName(ctx, client, createInp.AccessPolicyName)
+	if err != nil {
+		return nil, err
+	}
+
+	transaction, err := publicapi.TriggerTransaction(
+		ctx,
+		client,
+		createUrl,
+		createRequestBody{
+			DeviceType:         "CDFMC_MANAGED_FTD",
+			Name:               createInp.Name,
+			FmcAccessPolicyUid: selectedPolicy.Id,
+			PerformanceTier:    createInp.PerformanceTier,
+			Virtual:            createInp.Virtual,
+			Labels:             createInp.Tags.Labels,
+			Licenses:           createInp.Licenses,
+		},
+	)
+	if err != nil {
+		_, _ = Delete(ctx, client, DeleteInput{Uid: transaction.TransactionUid})
+		return nil, err
+	}
+
+	transaction, err = publicapi.WaitForTransactionToFinishWithDefaults(
+		ctx,
+		client,
+		transaction,
+		"Waiting for Cloud FTD to onboard...",
+	)
+	if err != nil {
+		_, _ = Delete(ctx, client, DeleteInput{Uid: transaction.TransactionUid})
+		return nil, err
+	}
+
+	return ReadByUid(ctx, client, NewReadByUidInput(transaction.EntityUid))
+}
+
+func readPolicyUidFromPolicyName(ctx context.Context, client http.Client, accessPolicyName string) (accesspolicies.Item, error) {
 	// 1. read Cloud FMC
 	fmcRes, err := cloudfmc.Read(ctx, client, cloudfmc.NewReadInput())
 	if err != nil {
-		return nil, err
+		return accesspolicies.Item{}, err
 	}
 
 	// 2. get FMC domain uid by reading Cloud FMC domain info
 	readFmcDomainRes, err := fmcplatform.ReadFmcDomainInfo(ctx, client, fmcplatform.NewReadDomainInfoInput(fmcRes.Host))
 	if err != nil {
-		return nil, err
+		return accesspolicies.Item{}, err
 	}
 	if len(readFmcDomainRes.Items) == 0 {
-		return nil, fmt.Errorf("%w: fmc domain info not found", http.NotFoundError)
+		return accesspolicies.Item{}, fmt.Errorf("%w: fmc domain info not found", http.NotFoundError)
 	}
 
-	// 3. get access policies using Cloud FMC domain uid
 	accessPoliciesRes, err := cloudfmc.ReadAccessPolicies(
 		ctx,
 		client,
 		cloudfmc.NewReadAccessPoliciesInput(fmcRes.Host, readFmcDomainRes.Items[0].Uuid, 1000), // 1000 is what CDO UI uses
 	)
-	if err != nil {
-		return nil, err
-	}
-	selectedPolicy, ok := accessPoliciesRes.Find(createInp.AccessPolicyName)
+	selectedPolicy, ok := accessPoliciesRes.Find(accessPolicyName)
 	if !ok {
-		return nil, fmt.Errorf(
+		return accesspolicies.Item{}, fmt.Errorf(
 			`access policy: "%s" not found, available policies: %s. In rare cases where you have more than 1000 access policies, please raise an issue at: %s`,
-			createInp.AccessPolicyName,
+			accessPolicyName,
 			accessPoliciesRes.Items,
 			cdo.TerraformProviderCDOIssuesUrl,
 		)
 	}
-
-	// handle performance tier
-	var performanceTier *tier.Type = nil // physical is nil
-	if createInp.Virtual {
-		performanceTier = createInp.PerformanceTier
-	}
-
-	client.Logger.Println("posting FTD device")
-
-	// 4. create the cloud ftd device
-	createUrl := url.CreateDevice(client.BaseUrl())
-	createBody := createRequestBody{
-		Name:       createInp.Name,
-		FmcId:      fmcRes.Uid,
-		DeviceType: devicetype.CloudFtd,
-		Metadata: &Metadata{
-			AccessPolicyName: selectedPolicy.Name,
-			AccessPolicyUid:  selectedPolicy.Id,
-			LicenseCaps:      license.LicensesToString(*createInp.Licenses),
-			PerformanceTier:  performanceTier,
-		},
-		State: "NEW",
-		Type:  "devices",
-		Model: false,
-		Tags:  createInp.Tags,
-	}
-	createReq := client.NewPost(ctx, createUrl, createBody)
-	var createOup CreateOutput
-	if err := createReq.Send(&createOup); err != nil {
-		return nil, err
-	}
-
-	client.Logger.Println("reading FTD specific device")
-
-	// 5. read created cloud ftd's specific device's uid
-	readSpecRes, err := device.ReadSpecific(ctx, client, *device.NewReadSpecificInput(createOup.Uid))
-	if err != nil {
-		return nil, err
-	}
-
-	// 6. initiate cloud ftd onboarding by triggering an endpoint at the specific device
-	_, err = UpdateSpecific(ctx, client,
-		NewUpdateSpecificFtdInput(
-			readSpecRes.SpecificUid,
-			"INITIATE_FTDC_ONBOARDING",
-		),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	// 8. wait for generate command available
-	var metadata Metadata
-	err = retry.Do(
-		ctx,
-		UntilGeneratedCommandAvailable(ctx, client, createOup.Uid, &metadata),
-		retry.NewOptionsBuilder().
-			Message("Waiting for FTD record to be created in CDO...").
-			Retries(3).
-			Timeout(retry.DefaultTimeout).
-			Delay(retry.DefaultDelay).
-			Logger(client.Logger).
-			EarlyExitOnError(true).
-			Build(),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	// done!
-	return &CreateOutput{
-		Uid:      createOup.Uid,
-		Name:     createOup.Name,
-		Metadata: &metadata,
-		Tags:     createOup.Tags,
-	}, nil
+	return selectedPolicy, nil
 }

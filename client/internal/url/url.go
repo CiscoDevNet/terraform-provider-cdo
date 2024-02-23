@@ -189,3 +189,19 @@ func CreateDuoAdminPanel(baseUrl string) string {
 func UpdateDuoAdminPanel(baseUrl string, uid string) string {
 	return fmt.Sprintf("%s/aegis/rest/v1/services/targets/devices/%s", baseUrl, uid)
 }
+
+func CreateAsa(baseUrl string) string {
+	return fmt.Sprintf("%s/api/rest/v1/inventory/devices/asas", baseUrl)
+}
+
+func CreateFtd(baseUrl string) string {
+	return fmt.Sprintf("%s/api/rest/v1/inventory/devices/ftds", baseUrl)
+}
+
+func RegisterFtd(baseUrl string) string {
+	return fmt.Sprintf("%s/api/rest/v1/inventory/devices/ftds/register", baseUrl)
+}
+
+func CreateIos(baseUrl string) string {
+	return fmt.Sprintf("%s/api/rest/v1/inventory/devices/ios", baseUrl)
+}

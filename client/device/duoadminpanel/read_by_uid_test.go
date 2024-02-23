@@ -3,9 +3,9 @@ package duoadminpanel_test
 import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/duoadminpanel"
+	internalTesting "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/testing"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 	"github.com/stretchr/testify/assert"
-	"net/http"
 	"testing"
 	"time"
 
@@ -39,7 +39,7 @@ func TestDuoAdminPanelReadByUid(t *testing.T) {
 			input:    readInput,
 
 			setupFunc: func(input duoadminpanel.ReadByUidInput) {
-				configureReadDeviceToReturn(url.ReadDevice(baseUrl, readDevice.Uid), readDevice)
+				internalTesting.MockGetOk(url.ReadDevice(baseUrl, readDevice.Uid), readDevice)
 			},
 
 			assertFunc: func(actualOutput *duoadminpanel.ReadOutput, err error, t *testing.T) {
@@ -53,7 +53,7 @@ func TestDuoAdminPanelReadByUid(t *testing.T) {
 			input:    readInput,
 
 			setupFunc: func(input duoadminpanel.ReadByUidInput) {
-				configureGetRequestToError(url.ReadDevice(baseUrl, readDevice.Uid), "intentional error")
+				internalTesting.MockGetError(url.ReadDevice(baseUrl, readDevice.Uid), "intentional error")
 			},
 
 			assertFunc: func(actualOutput *duoadminpanel.CreateOutput, err error, t *testing.T) {
@@ -79,8 +79,4 @@ func TestDuoAdminPanelReadByUid(t *testing.T) {
 			testCase.assertFunc(output, err, t)
 		})
 	}
-}
-
-func configureGetRequestToError(url string, errorBody any) {
-	httpmock.RegisterResponder(http.MethodGet, url, httpmock.NewJsonResponderOrPanic(500, errorBody))
 }

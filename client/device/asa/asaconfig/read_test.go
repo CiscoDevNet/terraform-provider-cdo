@@ -1,8 +1,9 @@
-package asaconfig
+package asaconfig_test
 
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"testing"
 	"time"
@@ -18,7 +19,7 @@ func TestAsaConfigReadByUid(t *testing.T) {
 
 	urlTemplate := "/aegis/rest/v1/services/asa/configs/%s"
 
-	validAsaConfig := ReadOutput{
+	validAsaConfig := asaconfig.ReadOutput{
 		Uid:   asaConfigUid,
 		State: state.DONE,
 	}
@@ -27,7 +28,7 @@ func TestAsaConfigReadByUid(t *testing.T) {
 		testName   string
 		targetUid  string
 		setupFunc  func()
-		assertFunc func(output *ReadOutput, err error, t *testing.T)
+		assertFunc func(output *asaconfig.ReadOutput, err error, t *testing.T)
 	}{
 		{
 			testName:  "successfully fetch ASA config",
@@ -41,7 +42,7 @@ func TestAsaConfigReadByUid(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *asaconfig.ReadOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
 				assert.Equal(t, validAsaConfig, *output)
@@ -59,7 +60,7 @@ func TestAsaConfigReadByUid(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *asaconfig.ReadOutput, err error, t *testing.T) {
 				assert.Nil(t, output)
 				assert.NotNil(t, err)
 			},
@@ -76,7 +77,7 @@ func TestAsaConfigReadByUid(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *asaconfig.ReadOutput, err error, t *testing.T) {
 				assert.Nil(t, output)
 				assert.NotNil(t, err)
 			},
@@ -89,10 +90,10 @@ func TestAsaConfigReadByUid(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := Read(
+			output, err := asaconfig.Read(
 				context.Background(),
 				*http.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
-				*NewReadInput(asaConfigUid),
+				*asaconfig.NewReadInput(asaConfigUid),
 			)
 
 			testCase.assertFunc(output, err, t)

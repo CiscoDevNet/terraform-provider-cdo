@@ -23,7 +23,7 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 		return err
 	}
 
-	planData.Id = types.StringValue(createOutp.RegKey)
+	planData.Id = types.StringValue(createOutp.Metadata.RegKey)
 
 	return nil
 }

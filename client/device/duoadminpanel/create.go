@@ -4,9 +4,7 @@ import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
-	"time"
 )
 
 type CreateInput struct {
@@ -32,22 +30,17 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		createInp,
 	)
 	if err != nil {
+		_, _ = Delete(ctx, client, DeleteInput{Uid: transaction.TransactionUid})
 		return nil, err
 	}
-	transaction, err = publicapi.WaitForTransactionToFinish(
+	transaction, err = publicapi.WaitForTransactionToFinishWithDefaults(
 		ctx,
 		client,
 		transaction,
-		retry.NewOptionsBuilder().
-			Logger(client.Logger).
-			Timeout(5*time.Minute).
-			Retries(-1).
-			EarlyExitOnError(true).
-			Message("Waiting for Duo Admin Panel to onboard...").
-			Delay(1*time.Second).
-			Build(),
+		"Waiting for Duo Admin Panel to onboard...",
 	)
 	if err != nil {
+		_, _ = Delete(ctx, client, DeleteInput{Uid: transaction.TransactionUid})
 		return nil, err
 	}
 

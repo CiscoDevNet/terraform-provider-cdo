@@ -1,7 +1,8 @@
-package ios
+package ios_test
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -25,13 +26,13 @@ func TestIosDelete(t *testing.T) {
 
 	testCases := []struct {
 		testName   string
-		input      DeleteInput
+		input      ios.DeleteInput
 		setupFunc  func()
-		assertFunc func(output *DeleteOutput, err error, t *testing.T)
+		assertFunc func(output *ios.DeleteOutput, err error, t *testing.T)
 	}{
 		{
 			testName: "successfully deletes iOS device",
-			input: DeleteInput{
+			input: ios.DeleteInput{
 				Uid: iosDevice.Uid,
 			},
 
@@ -39,18 +40,18 @@ func TestIosDelete(t *testing.T) {
 				configureDeviceDeleteToRespondSuccessfully(iosDevice.Uid)
 			},
 
-			assertFunc: func(output *DeleteOutput, err error, t *testing.T) {
+			assertFunc: func(output *ios.DeleteOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
 
-				expectedDeleteOutput := DeleteOutput{}
+				expectedDeleteOutput := ios.DeleteOutput{}
 				assert.Equal(t, expectedDeleteOutput, *output)
 			},
 		},
 
 		{
 			testName: "returns error when the remote service deleting the iOS device encounters an issue",
-			input: DeleteInput{
+			input: ios.DeleteInput{
 				Uid: iosDevice.Uid,
 			},
 
@@ -58,7 +59,7 @@ func TestIosDelete(t *testing.T) {
 				configureDeviceDeleteToRespondWithError(iosDevice.Uid)
 			},
 
-			assertFunc: func(output *DeleteOutput, err error, t *testing.T) {
+			assertFunc: func(output *ios.DeleteOutput, err error, t *testing.T) {
 				assert.NotNil(t, err)
 				assert.Nil(t, output)
 			},
@@ -71,7 +72,7 @@ func TestIosDelete(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := Delete(
+			output, err := ios.Delete(
 				context.Background(),
 				*http.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
 				testCase.input,

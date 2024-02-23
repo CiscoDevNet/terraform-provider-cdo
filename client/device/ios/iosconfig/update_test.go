@@ -1,10 +1,11 @@
-package iosconfig
+package iosconfig_test
 
 import (
 	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios/iosconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 	"github.com/stretchr/testify/assert"
@@ -30,49 +31,49 @@ func TestIosConfigUpdate(t *testing.T) {
 
 	testCases := []struct {
 		testName   string
-		input      UpdateInput
-		setupFunc  func(input UpdateInput, t *testing.T)
-		assertFunc func(output *UpdateOutput, err error, t *testing.T)
+		input      iosconfig.UpdateInput
+		setupFunc  func(input iosconfig.UpdateInput, t *testing.T)
+		assertFunc func(output *iosconfig.UpdateOutput, err error, t *testing.T)
 	}{
 		{
 			testName: "successfully updates iOS config",
-			input: UpdateInput{
+			input: iosconfig.UpdateInput{
 				SpecificUid: iosConfigUid,
 				Username:    username,
 				Password:    password,
 			},
 
-			setupFunc: func(input UpdateInput, t *testing.T) {
+			setupFunc: func(input iosconfig.UpdateInput, t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildIosConfigPath(iosConfigUid),
 					func(r *http.Request) (*http.Response, error) {
-						requestBody, err := internalHttp.ReadRequestBody[UpdateBody](r)
+						requestBody, err := internalHttp.ReadRequestBody[iosconfig.UpdateBody](r)
 						assert.Nil(t, err)
 
-						expectedBody := UpdateBody{
-							SmContext: SmContext{
+						expectedBody := iosconfig.UpdateBody{
+							SmContext: iosconfig.SmContext{
 								AcceptCert: true,
 							},
 							Credentials: fmt.Sprintf(`{"username":"%s","password":"%s"}`, input.Username, input.Password),
 						}
 						assert.Equal(t, expectedBody, *requestBody)
 
-						return httpmock.NewJsonResponse(200, UpdateOutput{Uid: iosConfigUid})
+						return httpmock.NewJsonResponse(200, iosconfig.UpdateOutput{Uid: iosConfigUid})
 					},
 				)
 			},
 
-			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
+			assertFunc: func(output *iosconfig.UpdateOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
-				assert.Equal(t, UpdateOutput{Uid: iosConfigUid}, *output)
+				assert.Equal(t, iosconfig.UpdateOutput{Uid: iosConfigUid}, *output)
 			},
 		},
 
 		{
 			testName: "successfully updates iOS config when encrypting credentials",
-			input: UpdateInput{
+			input: iosconfig.UpdateInput{
 				SpecificUid: iosConfigUid,
 				Username:    username,
 				Password:    password,
@@ -83,12 +84,12 @@ func TestIosConfigUpdate(t *testing.T) {
 				},
 			},
 
-			setupFunc: func(input UpdateInput, t *testing.T) {
+			setupFunc: func(input iosconfig.UpdateInput, t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildIosConfigPath(iosConfigUid),
 					func(r *http.Request) (*http.Response, error) {
-						requestBody, err := internalHttp.ReadRequestBody[UpdateBody](r)
+						requestBody, err := internalHttp.ReadRequestBody[iosconfig.UpdateBody](r)
 						assert.Nil(t, err)
 
 						if !requestBody.SmContext.AcceptCert {
@@ -106,27 +107,27 @@ func TestIosConfigUpdate(t *testing.T) {
 
 						assert.Equal(t, input.PublicKey.KeyId, credentials.KeyId, "expected keyId to equal '%s', got: '%s'", input.PublicKey.KeyId, credentials.KeyId)
 
-						return httpmock.NewJsonResponse(200, UpdateOutput{Uid: iosConfigUid})
+						return httpmock.NewJsonResponse(200, iosconfig.UpdateOutput{Uid: iosConfigUid})
 					},
 				)
 			},
 
-			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
+			assertFunc: func(output *iosconfig.UpdateOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
-				assert.Equal(t, UpdateOutput{Uid: iosConfigUid}, *output)
+				assert.Equal(t, iosconfig.UpdateOutput{Uid: iosConfigUid}, *output)
 			},
 		},
 
 		{
 			testName: "returns error when updating iOS config that does not exist",
-			input: UpdateInput{
+			input: iosconfig.UpdateInput{
 				SpecificUid: iosConfigUid,
 				Username:    username,
 				Password:    password,
 			},
 
-			setupFunc: func(input UpdateInput, t *testing.T) {
+			setupFunc: func(input iosconfig.UpdateInput, t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildIosConfigPath(input.SpecificUid),
@@ -134,7 +135,7 @@ func TestIosConfigUpdate(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
+			assertFunc: func(output *iosconfig.UpdateOutput, err error, t *testing.T) {
 				assert.Nil(t, output)
 				assert.NotNil(t, err)
 			},
@@ -142,13 +143,13 @@ func TestIosConfigUpdate(t *testing.T) {
 
 		{
 			testName: "returns error when remote service updating iOS config experiences an issue",
-			input: UpdateInput{
+			input: iosconfig.UpdateInput{
 				SpecificUid: iosConfigUid,
 				Username:    username,
 				Password:    password,
 			},
 
-			setupFunc: func(input UpdateInput, t *testing.T) {
+			setupFunc: func(input iosconfig.UpdateInput, t *testing.T) {
 				httpmock.RegisterResponder(
 					"PUT",
 					buildIosConfigPath(input.SpecificUid),
@@ -156,7 +157,7 @@ func TestIosConfigUpdate(t *testing.T) {
 				)
 			},
 
-			assertFunc: func(output *UpdateOutput, err error, t *testing.T) {
+			assertFunc: func(output *iosconfig.UpdateOutput, err error, t *testing.T) {
 				assert.Nil(t, output)
 				assert.NotNil(t, err)
 			},
@@ -169,7 +170,7 @@ func TestIosConfigUpdate(t *testing.T) {
 
 			testCase.setupFunc(testCase.input, t)
 
-			output, err := Update(
+			output, err := iosconfig.Update(
 				context.Background(),
 				*internalHttp.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
 				testCase.input,

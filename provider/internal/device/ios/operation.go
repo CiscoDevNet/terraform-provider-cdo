@@ -64,7 +64,7 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 		planData.Username.ValueString(),
 		planData.Password.ValueString(),
 		planData.IgnoreCertificate.ValueBool(),
-		planTags,
+		planTags.Labels,
 	)
 
 	createOutp, err := resource.client.CreateIos(ctx, *createInp)

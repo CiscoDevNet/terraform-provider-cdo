@@ -6,7 +6,6 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 )
 
 type CreateInput struct {
@@ -14,7 +13,7 @@ type CreateInput struct {
 	ConnectorUid  string
 	ConnectorType string
 	SocketAddress string
-	Tags          tags.Type
+	Labels        []string
 
 	Username string
 	Password string
@@ -42,11 +41,11 @@ type createBody struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 
-	IgnoreCertificate bool      `json:"ignoreCertificate"`
-	Tags              tags.Type `json:"tags"`
+	IgnoreCertificate bool     `json:"ignoreCertificate"`
+	Labels            []string `json:"labels"`
 }
 
-func NewCreateRequestInput(name, connectorUid, connectorType, socketAddress, username, password string, ignoreCertificate bool, tags tags.Type) *CreateInput {
+func NewCreateRequestInput(name, connectorUid, connectorType, socketAddress, username, password string, ignoreCertificate bool, labels []string) *CreateInput {
 	return &CreateInput{
 		Name:              name,
 		ConnectorUid:      connectorUid,
@@ -55,7 +54,7 @@ func NewCreateRequestInput(name, connectorUid, connectorType, socketAddress, use
 		Username:          username,
 		Password:          password,
 		IgnoreCertificate: ignoreCertificate,
-		Tags:              tags,
+		Labels:            labels,
 	}
 }
 
@@ -82,7 +81,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 			Username:          createInp.Username,
 			Password:          createInp.Password,
 			IgnoreCertificate: createInp.IgnoreCertificate,
-			Tags:              createInp.Tags,
+			Labels:            createInp.Labels,
 		},
 	)
 	if err != nil {

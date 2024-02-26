@@ -6,12 +6,25 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi/transaction"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi/transaction/transactionstatus"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
+	"time"
 )
 
 func TriggerTransaction(ctx context.Context, client http.Client, url string, body any) (transaction.Type, error) {
 	req := client.NewPost(ctx, url, body)
 
 	return sendAndCheckForError(req)
+}
+
+func WaitForTransactionToFinishWithDefaults(ctx context.Context, client http.Client, t transaction.Type, msg string) (transaction.Type, error) {
+	return WaitForTransactionToFinish(ctx, client, t, retry.NewOptionsBuilder().
+		Logger(client.Logger).
+		Timeout(5*time.Minute).
+		Retries(-1).
+		EarlyExitOnError(true).
+		Message(msg).
+		Delay(1*time.Second).
+		Build())
+
 }
 
 func WaitForTransactionToFinish(ctx context.Context, client http.Client, t transaction.Type, options retry.Options) (transaction.Type, error) {

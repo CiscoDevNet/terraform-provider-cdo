@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/publicapilabels"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
 
@@ -55,7 +56,7 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 	}
 
 	// convert tf tags to go tags
-	planTags, err := tagsFromIosDeviceResourceModel(ctx, planData)
+	planTags, err := labelsFromIosDeviceResourceModel(ctx, planData)
 	if err != nil {
 		return err
 	}
@@ -71,19 +72,10 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 		planTags,
 	)
 
-	createOutp, createErr := resource.client.CreateIos(ctx, *createInp)
-	tflog.Debug(ctx, fmt.Sprintf("Creation error: %v", createErr))
-	if createErr != nil {
-		if createErr.CreatedResourceId != nil {
-			deleteInp := ios.NewDeleteInput(*createErr.CreatedResourceId)
-			_, deletionErr := resource.client.DeleteIos(ctx, *deleteInp)
-			if deletionErr != nil {
-				tflog.Error(ctx, "Failed to delete iOS device that we failed to create")
-				return deletionErr
-			}
-		}
-
-		return createErr.Err
+	createOutp, err := resource.client.CreateIos(ctx, *createInp)
+	tflog.Debug(ctx, fmt.Sprintf("Creation error: %v", err))
+	if err != nil {
+		return err
 	}
 
 	planData.ID = types.StringValue(createOutp.Uid)
@@ -97,7 +89,7 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 	}
 	planData.Port = types.Int64Value(port)
 	planData.Labels = util.GoStringSliceToTFStringSet(createOutp.Tags.UngroupedTags())
-	planData.GroupedLabels = util.GoMapToStringSliceTFMap(createInp.Tags.GroupedTags())
+	planData.GroupedLabels = util.GoMapToStringSliceTFMap(createOutp.Tags.GroupedTags())
 
 	return nil
 }
@@ -132,20 +124,38 @@ func Delete(ctx context.Context, resource *IosDeviceResource, stateData *IosDevi
 	return err
 }
 
-func tagsFromIosDeviceResourceModel(ctx context.Context, resourceModel *IosDeviceResourceModel) (tags.Type, error) {
+func ungroupedAndGroupedLabelsFromIosDeviceResourceModel(ctx context.Context, resourceModel *IosDeviceResourceModel) ([]string, map[string][]string, error) {
 	if resourceModel == nil {
-		return nil, errors.New("resource model cannot be nil")
+		return nil, nil, errors.New("resource model cannot be nil")
 	}
 
 	ungroupedLabels, err := util.TFStringSetToGoStringList(ctx, resourceModel.Labels)
 	if err != nil {
-		return nil, fmt.Errorf("error while converting terraform labels to go slice, %s", resourceModel.Labels)
+		return nil, nil, fmt.Errorf("error while converting terraform labels to go slice, %s", resourceModel.Labels)
 	}
 
 	groupedLabels, err := util.TFMapToGoMapOfStringSlices(ctx, resourceModel.GroupedLabels)
 	if err != nil {
-		return nil, fmt.Errorf("error while converting terraform grouped labels to go map, %v", resourceModel.GroupedLabels)
+		return nil, nil, fmt.Errorf("error while converting terraform grouped labels to go map, %v", resourceModel.GroupedLabels)
+	}
+
+	return ungroupedLabels, groupedLabels, nil
+}
+
+func tagsFromIosDeviceResourceModel(ctx context.Context, resourceModel *IosDeviceResourceModel) (tags.Type, error) {
+	ungroupedLabels, groupedLabels, err := ungroupedAndGroupedLabelsFromIosDeviceResourceModel(ctx, resourceModel)
+	if err != nil {
+		return nil, err
 	}
 
 	return tags.New(ungroupedLabels, groupedLabels), nil
+}
+
+func labelsFromIosDeviceResourceModel(ctx context.Context, resourceModel *IosDeviceResourceModel) (publicapilabels.Type, error) {
+	ungroupedLabels, groupedLabels, err := ungroupedAndGroupedLabelsFromIosDeviceResourceModel(ctx, resourceModel)
+	if err != nil {
+		return nil, err
+	}
+
+	return publicapilabels.New(ungroupedLabels, groupedLabels), nil
 }

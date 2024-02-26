@@ -1,7 +1,8 @@
-package ios
+package ios_test
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -18,7 +19,7 @@ func TestIosReadSpecific(t *testing.T) {
 
 	deviceUid := "00000000-0000-0000-0000-000000000000"
 
-	specificDevice := ReadSpecificOutput{
+	specificDevice := ios.ReadSpecificOutput{
 		SpecificUid: "11111111-1111-1111-1111-111111111111",
 		State:       state.DONE,
 		Namespace:   "targets",
@@ -27,13 +28,13 @@ func TestIosReadSpecific(t *testing.T) {
 
 	testCases := []struct {
 		testName   string
-		input      ReadSpecificInput
+		input      ios.ReadSpecificInput
 		setupFunc  func()
-		assertFunc func(output *ReadSpecificOutput, err error, t *testing.T)
+		assertFunc func(output *ios.ReadSpecificOutput, err error, t *testing.T)
 	}{
 		{
 			testName: "successfully reads iOS specific device",
-			input: ReadSpecificInput{
+			input: ios.ReadSpecificInput{
 				Uid: deviceUid,
 			},
 
@@ -41,7 +42,7 @@ func TestIosReadSpecific(t *testing.T) {
 				configureDeviceReadSpecificToRespondSuccessfully(deviceUid, device.ReadSpecificOutput(specificDevice))
 			},
 
-			assertFunc: func(output *ReadSpecificOutput, err error, t *testing.T) {
+			assertFunc: func(output *ios.ReadSpecificOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
 				assert.Equal(t, specificDevice, *output)
@@ -50,7 +51,7 @@ func TestIosReadSpecific(t *testing.T) {
 
 		{
 			testName: "returns error when the remote service reading the iOS specific device encounters an issue",
-			input: ReadSpecificInput{
+			input: ios.ReadSpecificInput{
 				Uid: deviceUid,
 			},
 
@@ -58,7 +59,7 @@ func TestIosReadSpecific(t *testing.T) {
 				configureDeviceReadSpecificToRespondWithError(deviceUid)
 			},
 
-			assertFunc: func(output *ReadSpecificOutput, err error, t *testing.T) {
+			assertFunc: func(output *ios.ReadSpecificOutput, err error, t *testing.T) {
 				assert.NotNil(t, err)
 				assert.Nil(t, output)
 			},
@@ -71,7 +72,7 @@ func TestIosReadSpecific(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := ReadSpecific(
+			output, err := ios.ReadSpecific(
 				context.Background(),
 				*http.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
 				testCase.input,

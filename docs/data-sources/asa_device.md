@@ -22,6 +22,7 @@ ASA data source
 ### Read-Only
 
 - `connector_type` (String) The type of the connector that is used to communicate with the device. CDO can communicate with your device using either a Cloud Connector (CDG) or a Secure Device Connector (SDC); see [the CDO documentation](https://docs.defenseorchestrator.com/c-connect-cisco-defense-orchestratortor-the-secure-device-connector.html) to learn more (Valid values: [CDG, SDC]).
+- `grouped_labels` (Map of Set of String) The grouped labels applied to the device. Labels are used to group devices in CDO. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.
 - `host` (String) The host used to connect to the device.
 - `id` (String) Universally unique identifier of the device.
 - `ignore_certificate` (Boolean) This attribute indicates whether certificates were ignored when onboarding this device.

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/publicapilabels"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 
@@ -95,7 +96,7 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 	}
 
 	// convert tf tags to go tags
-	planTags, err := tagsFromResourceModel(ctx, planData)
+	planTags, err := labelsFromResourceModel(ctx, planData)
 	if err != nil {
 		return err
 	}
@@ -125,8 +126,8 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 	planData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
 	planData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUid)
 	planData.Licenses = util.GoStringSliceToTFStringSet(licenseStrings)
-	planData.Labels = util.GoStringSliceToTFStringSet(res.Tags.UngroupedTags())
-	planData.GroupedLabels = util.GoMapToStringSliceTFMap(res.Tags.GroupedTags())
+	planData.Labels = util.GoStringSliceToTFStringSet(res.Labels.UngroupedTags())
+	planData.GroupedLabels = util.GoMapToStringSliceTFMap(res.Labels.GroupedTags())
 	if res.Metadata.PerformanceTier != nil { // nil means physical cloud ftd
 		planData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))
 	}
@@ -187,20 +188,38 @@ func Delete(ctx context.Context, resource *Resource, stateData *ResourceModel) e
 	return err
 }
 
-func tagsFromResourceModel(ctx context.Context, resourceModel *ResourceModel) (tags.Type, error) {
+func ungroupedAndGroupedLabelsFromResourceModel(ctx context.Context, resourceModel *ResourceModel) ([]string, map[string][]string, error) {
 	if resourceModel == nil {
-		return nil, errors.New("resource model cannot be nil")
+		return nil, nil, errors.New("resource model cannot be nil")
 	}
 
 	ungroupedLabels, err := util.TFStringSetToGoStringList(ctx, resourceModel.Labels)
 	if err != nil {
-		return nil, fmt.Errorf("error while converting terraform labels to go slice, %s", resourceModel.Labels)
+		return nil, nil, fmt.Errorf("error while converting terraform labels to go slice, %s", resourceModel.Labels)
 	}
 
 	groupedLabels, err := util.TFMapToGoMapOfStringSlices(ctx, resourceModel.GroupedLabels)
 	if err != nil {
-		return nil, fmt.Errorf("error while converting terraform grouped labels to go map, %v", resourceModel.GroupedLabels)
+		return nil, nil, fmt.Errorf("error while converting terraform grouped labels to go map, %v", resourceModel.GroupedLabels)
+	}
+
+	return ungroupedLabels, groupedLabels, nil
+}
+
+func tagsFromResourceModel(ctx context.Context, resourceModel *ResourceModel) (tags.Type, error) {
+	ungroupedLabels, groupedLabels, err := ungroupedAndGroupedLabelsFromResourceModel(ctx, resourceModel)
+	if err != nil {
+		return nil, err
 	}
 
 	return tags.New(ungroupedLabels, groupedLabels), nil
+}
+
+func labelsFromResourceModel(ctx context.Context, resourceModel *ResourceModel) (publicapilabels.Type, error) {
+	ungroupedLabels, groupedLabels, err := ungroupedAndGroupedLabelsFromResourceModel(ctx, resourceModel)
+	if err != nil {
+		return nil, err
+	}
+
+	return publicapilabels.New(ungroupedLabels, groupedLabels), nil
 }

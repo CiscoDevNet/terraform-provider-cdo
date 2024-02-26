@@ -1,7 +1,6 @@
 package acctest
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
@@ -355,13 +354,4 @@ func (e *env) mustGetInt(envName string) int64 {
 		return intValue
 	}
 	panic(fmt.Sprintf("acceptance test requires environment variable: %s to be set.", envName))
-}
-
-func parseGroupedTags(input string) map[string][]string {
-	var groupedTags map[string][]string
-	if err := json.Unmarshal([]byte(input), &groupedTags); err != nil {
-		panic("cannot parse DUO_ADMIN_PANEL_GROUPED_RESOURCE_TAGS")
-	}
-
-	return groupedTags
 }

@@ -1,7 +1,8 @@
-package iosconfig
+package iosconfig_test
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios/iosconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -17,12 +18,12 @@ func TestIosConfigUntilState(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
-	validIosConfig := ReadOutput{
+	validIosConfig := iosconfig.ReadOutput{
 		Uid:   iosConfigUid,
 		State: state.DONE,
 	}
 
-	inProgressIosConfig := ReadOutput{
+	inProgressIosConfig := iosconfig.ReadOutput{
 		Uid:   iosConfigUid,
 		State: "SOME_INTERMEDIATE_STATE",
 	}
@@ -38,7 +39,7 @@ func TestIosConfigUntilState(t *testing.T) {
 			targetUid: iosConfigUid,
 
 			setupFunc: func() {
-				configureIosConfigReadToSucceedInSubsequentCalls(iosConfigUid, []ReadOutput{
+				configureIosConfigReadToSucceedInSubsequentCalls(iosConfigUid, []iosconfig.ReadOutput{
 					inProgressIosConfig,
 					inProgressIosConfig,
 					validIosConfig,
@@ -56,12 +57,12 @@ func TestIosConfigUntilState(t *testing.T) {
 			targetUid: iosConfigUid,
 
 			setupFunc: func() {
-				errorIosConfig := ReadOutput{
+				errorIosConfig := iosconfig.ReadOutput{
 					Uid:   iosConfigUid,
 					State: state.ERROR,
 				}
 
-				configureIosConfigReadToSucceedInSubsequentCalls(iosConfigUid, []ReadOutput{
+				configureIosConfigReadToSucceedInSubsequentCalls(iosConfigUid, []iosconfig.ReadOutput{
 					inProgressIosConfig,
 					inProgressIosConfig,
 					errorIosConfig,
@@ -79,12 +80,12 @@ func TestIosConfigUntilState(t *testing.T) {
 			targetUid: iosConfigUid,
 
 			setupFunc: func() {
-				badCredentialsIosConfig := ReadOutput{
+				badCredentialsIosConfig := iosconfig.ReadOutput{
 					Uid:   iosConfigUid,
 					State: state.BAD_CREDENTIALS,
 				}
 
-				configureIosConfigReadToSucceedInSubsequentCalls(iosConfigUid, []ReadOutput{
+				configureIosConfigReadToSucceedInSubsequentCalls(iosConfigUid, []iosconfig.ReadOutput{
 					inProgressIosConfig,
 					inProgressIosConfig,
 					badCredentialsIosConfig,
@@ -107,7 +108,7 @@ func TestIosConfigUntilState(t *testing.T) {
 			retryOptions := retry.DefaultOpts
 			retryOptions.Delay = 1 * time.Millisecond
 
-			err := retry.Do(context.Background(), UntilState(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.targetUid, state.DONE), retryOptions)
+			err := retry.Do(context.Background(), iosconfig.UntilState(context.Background(), *http.MustNewWithDefault("https://unittest.cdo.cisco.com", "a_valid_token"), testCase.targetUid, state.DONE), retryOptions)
 
 			testCase.assertFunc(err, t)
 		})

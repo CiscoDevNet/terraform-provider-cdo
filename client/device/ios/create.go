@@ -2,18 +2,12 @@ package ios
 
 import (
 	"context"
-	"fmt"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
-	"strings"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios/iosconfig"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/publicapilabels"
 )
 
 type CreateInput struct {
@@ -21,7 +15,7 @@ type CreateInput struct {
 	ConnectorUid  string
 	ConnectorType string
 	SocketAddress string
-	Tags          tags.Type
+	Labels        publicapilabels.Type
 
 	Username string
 	Password string
@@ -29,17 +23,7 @@ type CreateInput struct {
 	IgnoreCertificate bool
 }
 
-type CreateOutput struct {
-	Uid           string          `json:"uid"`
-	Name          string          `json:"Name"`
-	DeviceType    devicetype.Type `json:"deviceType"`
-	Host          string          `json:"host"`
-	Port          string          `json:"port"`
-	SocketAddress string          `json:"ipv4"`
-	ConnectorType string          `json:"larType"`
-	ConnectorUid  string          `json:"larUid"`
-	Tags          tags.Type       `json:"tags"`
-}
+type CreateOutput = ReadOutput
 
 type CreateError struct {
 	Err               error
@@ -50,7 +34,20 @@ func (r *CreateError) Error() string {
 	return r.Err.Error()
 }
 
-func NewCreateRequestInput(name, connectorUid, connectorType, socketAddress, username, password string, ignoreCertificate bool, tags tags.Type) *CreateInput {
+type createBody struct {
+	Name          string `json:"name"`
+	ConnectorName string `json:"connectorName"`
+	ConnectorType string `json:"connectorType"`
+	SocketAddress string `json:"deviceAddress"`
+
+	Username string `json:"username"`
+	Password string `json:"password"`
+
+	IgnoreCertificate bool                 `json:"ignoreCertificate"`
+	Labels            publicapilabels.Type `json:"labels"`
+}
+
+func NewCreateRequestInput(name, connectorUid, connectorType, socketAddress, username, password string, ignoreCertificate bool, labels publicapilabels.Type) *CreateInput {
 	return &CreateInput{
 		Name:              name,
 		ConnectorUid:      connectorUid,
@@ -59,137 +56,50 @@ func NewCreateRequestInput(name, connectorUid, connectorType, socketAddress, use
 		Username:          username,
 		Password:          password,
 		IgnoreCertificate: ignoreCertificate,
-		Tags:              tags,
+		Labels:            labels,
 	}
 }
 
-func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, *CreateError) {
+func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, error) {
 
 	client.Logger.Println("creating ios device")
 
-	deviceCreateOutp, err := device.Create(
+	createUrl := url.CreateIos(client.BaseUrl())
+
+	conn, err := connector.ReadByUid(ctx, client, *connector.NewReadByUidInput(createInp.ConnectorUid))
+	if err != nil {
+		return nil, err
+	}
+
+	transaction, err := publicapi.TriggerTransaction(
 		ctx,
 		client,
-		device.NewCreateInputBuilder().
-			Name(createInp.Name).
-			DeviceType(devicetype.Ios).
-			ConnectorUid(createInp.ConnectorUid).
-			ConnectorType(createInp.ConnectorType).
-			SocketAddress(createInp.SocketAddress).
-			Model(false).
-			IgnoreCertificate(&createInp.IgnoreCertificate).
-			Metadata(nil).
-			Tags(createInp.Tags).
-			Build(),
+		createUrl,
+		createBody{
+			Name:              createInp.Name,
+			ConnectorName:     conn.Name,
+			ConnectorType:     createInp.ConnectorType,
+			SocketAddress:     createInp.SocketAddress,
+			Username:          createInp.Username,
+			Password:          createInp.Password,
+			IgnoreCertificate: createInp.IgnoreCertificate,
+			Labels:            createInp.Labels,
+		},
 	)
-
-	var createdResourceId *string = nil
-	if deviceCreateOutp != nil {
-		createdResourceId = &deviceCreateOutp.Uid
-	}
-
 	if err != nil {
-		return nil, &CreateError{
-			Err:               err,
-			CreatedResourceId: createdResourceId,
-		}
+		_, _ = Delete(ctx, client, *NewDeleteInput(transaction.EntityUid))
+		return nil, err
 	}
-
-	// encrypt credentials on prem connector
-	var publicKey *model.PublicKey
-	if strings.EqualFold(deviceCreateOutp.ConnectorType, "SDC") {
-
-		// on-prem connector requires encryption
-		client.Logger.Println("decrypting public key from connector for encryption")
-
-		if deviceCreateOutp.ConnectorUid == "" {
-			return nil, &CreateError{
-				Err:               fmt.Errorf("connector uid not found"),
-				CreatedResourceId: createdResourceId,
-			}
-
-		}
-
-		// read connector public key
-		connectorReadRes, err := connector.ReadByUid(ctx, client, *connector.NewReadByUidInput(deviceCreateOutp.ConnectorUid))
-		if err != nil {
-			return nil, &CreateError{
-				Err:               err,
-				CreatedResourceId: createdResourceId,
-			}
-		}
-		publicKey = &connectorReadRes.PublicKey
-	}
-
-	err = retry.Do(
+	transaction, err = publicapi.WaitForTransactionToFinishWithDefaults(
 		ctx,
-		iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, state.PRE_READ_METADATA),
-		retry.NewOptionsBuilder().
-			Message("Waiting for IOS device to be onboarded to CDO...").
-			Retries(retry.DefaultRetries).
-			Delay(retry.DefaultDelay).
-			Logger(client.Logger).
-			EarlyExitOnError(true).
-			Timeout(retry.DefaultTimeout).
-			Build(),
+		client,
+		transaction,
+		"Waiting for IOS to onboard...",
 	)
 	if err != nil {
-		return nil, &CreateError{
-			Err:               err,
-			CreatedResourceId: createdResourceId,
-		}
+		_, _ = Delete(ctx, client, *NewDeleteInput(transaction.EntityUid))
+		return nil, err
 	}
 
-	// update ios config credentials
-	client.Logger.Println("updating ios config credentials")
-
-	iosConfigUpdateInp := iosconfig.NewUpdateInput(
-		deviceCreateOutp.Uid,
-		createInp.Username,
-		createInp.Password,
-		publicKey,
-	)
-	_, err = iosconfig.Update(ctx, client, *iosConfigUpdateInp)
-	if err != nil {
-		return nil, &CreateError{
-			Err:               err,
-			CreatedResourceId: createdResourceId,
-		}
-	}
-
-	// poll until ios config state done
-	client.Logger.Println("waiting for device to reach state done")
-
-	err = retry.Do(
-		ctx,
-		iosconfig.UntilState(ctx, client, deviceCreateOutp.Uid, state.DONE),
-		retry.NewOptionsBuilder().
-			Message("Waiting for IOS device to be onboarded to CDO...").
-			Retries(retry.DefaultRetries).
-			Delay(retry.DefaultDelay).
-			Logger(client.Logger).
-			EarlyExitOnError(true).
-			Timeout(retry.DefaultTimeout).
-			Build(),
-	)
-	if err != nil {
-		return nil, &CreateError{
-			Err:               err,
-			CreatedResourceId: createdResourceId,
-		}
-	}
-
-	// done!
-	createOutp := CreateOutput{
-		Uid:           deviceCreateOutp.Uid,
-		Name:          deviceCreateOutp.Name,
-		DeviceType:    deviceCreateOutp.DeviceType,
-		Host:          deviceCreateOutp.Host,
-		Port:          deviceCreateOutp.Port,
-		SocketAddress: deviceCreateOutp.SocketAddress,
-		ConnectorUid:  deviceCreateOutp.ConnectorUid,
-		ConnectorType: deviceCreateOutp.ConnectorType,
-		Tags:          deviceCreateOutp.Tags,
-	}
-	return &createOutp, nil
+	return Read(ctx, client, *NewReadInput(transaction.EntityUid))
 }

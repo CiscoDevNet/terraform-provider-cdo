@@ -14,6 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/publicapilabels"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
@@ -249,7 +250,7 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 	}
 
 	// convert tf tags to go tags
-	planTags, err := tagsFromAsaDeviceResourceModel(ctx, &planData)
+	planTags, err := labelsFromAsaDeviceResourceModel(ctx, &planData)
 	if err != nil {
 		res.Diagnostics.AddError("error while converting terraform tags to go tags", err.Error())
 		return
@@ -450,20 +451,38 @@ func getConnectorName(planData *AsaDeviceResourceModel) basetypes.StringValue {
 	}
 }
 
-func tagsFromAsaDeviceResourceModel(ctx context.Context, resourceModel *AsaDeviceResourceModel) (tags.Type, error) {
+func ungroupedAndGroupedLabelsFromResourceModel(ctx context.Context, resourceModel *AsaDeviceResourceModel) ([]string, map[string][]string, error) {
 	if resourceModel == nil {
-		return nil, errors.New("resource model cannot be nil")
+		return nil, nil, errors.New("resource model cannot be nil")
 	}
 
 	ungroupedLabels, err := util.TFStringSetToGoStringList(ctx, resourceModel.Labels)
 	if err != nil {
-		return nil, fmt.Errorf("error while converting terraform labels to go slice, %s", resourceModel.Labels)
+		return nil, nil, fmt.Errorf("error while converting terraform labels to go slice, %s", resourceModel.Labels)
 	}
 
 	groupedLabels, err := util.TFMapToGoMapOfStringSlices(ctx, resourceModel.GroupedLabels)
 	if err != nil {
-		return nil, fmt.Errorf("error while converting terraform grouped labels to go map, %v", resourceModel.GroupedLabels)
+		return nil, nil, fmt.Errorf("error while converting terraform grouped labels to go map, %v", resourceModel.GroupedLabels)
+	}
+
+	return ungroupedLabels, groupedLabels, nil
+}
+
+func tagsFromAsaDeviceResourceModel(ctx context.Context, resourceModel *AsaDeviceResourceModel) (tags.Type, error) {
+	ungroupedLabels, groupedLabels, err := ungroupedAndGroupedLabelsFromResourceModel(ctx, resourceModel)
+	if err != nil {
+		return nil, err
 	}
 
 	return tags.New(ungroupedLabels, groupedLabels), nil
+}
+
+func labelsFromAsaDeviceResourceModel(ctx context.Context, resourceModel *AsaDeviceResourceModel) (publicapilabels.Type, error) {
+	ungroupedLabels, groupedLabels, err := ungroupedAndGroupedLabelsFromResourceModel(ctx, resourceModel)
+	if err != nil {
+		return nil, err
+	}
+
+	return publicapilabels.New(ungroupedLabels, groupedLabels), nil
 }

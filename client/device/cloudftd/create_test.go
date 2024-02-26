@@ -2,211 +2,70 @@ package cloudftd_test
 
 import (
 	"context"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
-	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
-	"github.com/jarcoal/httpmock"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
+	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi/transaction/transactiontype"
+	internalTesting "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/testing"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
+	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateCloudFtd(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
 
+	testModel := internalTesting.NewRandomModel()
+
+	ftdCreateInput := testModel.FtdCreateInput()
+	ftdReadOutput := testModel.FtdReadOutput()
+	fmcReadOutput := testModel.FmcReadOutput()
+	fmcDomainInfo := testModel.FmcDomainInfo()
+	accessPolicy := testModel.ReadAccessPolicies()
+	doneTransaction := testModel.CreateDoneTransaction(ftdReadOutput.Uid, transactiontype.CREATE_FTD)
+	errorTransaction := testModel.CreateErrorTransaction(ftdReadOutput.Uid, transactiontype.CREATE_FTD)
+
 	testCases := []struct {
 		testName   string
 		input      cloudftd.CreateInput
-		setupFunc  func()
+		setupFunc  func(createInp cloudftd.CreateInput)
 		assertFunc func(output *cloudftd.CreateOutput, err error, t *testing.T)
 	}{
 		{
-			testName: "successfully create Cloud FTD",
-			input: cloudftd.NewCreateInput(
-				ftdName,
-				ftdAccessPolicyName,
-				&ftdPerformanceTier,
-				ftdVirtual,
-				ftdLicenseCaps,
-				ftdTags,
-			),
-			setupFunc: func() {
-				readFmcIsSuccessful(true)
-				readFmcDomainInfoIsSuccessful(true)
-				readFmcAccessPoliciesIsSuccessful(true)
-				createFtdIsSuccessful(true)
-				readFtdSpecificDeviceIsSuccessful(true)
-				triggerFtdOnboardingIsSuccessful(true)
-				generateFtdConfigureManagerCommandIsSuccessful(true)
+			testName: "successful ftd creation",
+			input:    ftdCreateInput,
+			setupFunc: func(createInp cloudftd.CreateInput) {
+				internalTesting.MockGetOk(url.ReadAllDevicesByType(testModel.BaseUrl), []cloudfmc.ReadOutput{fmcReadOutput})
+				internalTesting.MockGetOk(url.ReadFmcDomainInfo(testModel.FmcHost), fmcDomainInfo)
+				internalTesting.MockGetOk(url.ReadAccessPolicies(testModel.BaseUrl, testModel.FmcDomainUuid.String()), accessPolicy)
+				internalTesting.MockPostAccepted(url.CreateFtd(testModel.BaseUrl), doneTransaction)
+				internalTesting.MockGetOk(url.ReadDevice(testModel.BaseUrl, ftdReadOutput.Uid), ftdReadOutput)
 			},
 			assertFunc: func(output *cloudftd.CreateOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
-				assert.Equal(t, validReadFtdGeneratedCommandOutput, *output)
+				assert.Equal(t, output, cloudftd.FromDeviceReadOutput(&ftdReadOutput))
 			},
 		},
 		{
-			testName: "error when failed to read FMC",
-			input: cloudftd.NewCreateInput(
-				ftdName,
-				ftdAccessPolicyName,
-				&ftdPerformanceTier,
-				ftdVirtual,
-				ftdLicenseCaps,
-				ftdTags,
-			),
-			setupFunc: func() {
-				readFmcIsSuccessful(false)
+			testName: "fails ftd creation when transaction fails",
+			input:    ftdCreateInput,
+			setupFunc: func(createInp cloudftd.CreateInput) {
+				internalTesting.MockGetOk(url.ReadAllDevicesByType(testModel.BaseUrl), []cloudfmc.ReadOutput{fmcReadOutput})
+				internalTesting.MockGetOk(url.ReadFmcDomainInfo(testModel.FmcHost), fmcDomainInfo)
+				internalTesting.MockGetOk(url.ReadAccessPolicies(testModel.BaseUrl, testModel.FmcDomainUuid.String()), accessPolicy)
+				internalTesting.MockPostError(url.CreateFtd(testModel.BaseUrl), errorTransaction)
+				internalTesting.MockGetOk(url.ReadDevice(testModel.BaseUrl, ftdReadOutput.Uid), ftdReadOutput)
 			},
 			assertFunc: func(output *cloudftd.CreateOutput, err error, t *testing.T) {
 				assert.NotNil(t, err)
 				assert.Nil(t, output)
-			},
-		},
-		{
-			testName: "error when failed to read FMC domain info",
-			input: cloudftd.NewCreateInput(
-				ftdName,
-				ftdAccessPolicyName,
-				&ftdPerformanceTier,
-				ftdVirtual,
-				ftdLicenseCaps,
-				ftdTags,
-			),
-			setupFunc: func() {
-				readFmcIsSuccessful(true)
-				readFmcDomainInfoIsSuccessful(false)
-				readFmcAccessPoliciesIsSuccessful(true)
-				createFtdIsSuccessful(true)
-				readFtdSpecificDeviceIsSuccessful(true)
-				triggerFtdOnboardingIsSuccessful(true)
-				generateFtdConfigureManagerCommandIsSuccessful(true)
-			},
-			assertFunc: func(output *cloudftd.CreateOutput, err error, t *testing.T) {
-				assert.NotNil(t, err)
-				assert.Nil(t, output)
-			},
-		},
-		{
-			testName: "error when failed to read FMC Access Policy",
-			input: cloudftd.NewCreateInput(
-				ftdName,
-				ftdAccessPolicyName,
-				&ftdPerformanceTier,
-				ftdVirtual,
-				ftdLicenseCaps,
-				ftdTags,
-			),
-			setupFunc: func() {
-				readFmcIsSuccessful(true)
-				readFmcDomainInfoIsSuccessful(true)
-				readFmcAccessPoliciesIsSuccessful(false)
-				createFtdIsSuccessful(true)
-				readFtdSpecificDeviceIsSuccessful(true)
-				triggerFtdOnboardingIsSuccessful(true)
-				generateFtdConfigureManagerCommandIsSuccessful(true)
-			},
-			assertFunc: func(output *cloudftd.CreateOutput, err error, t *testing.T) {
-				assert.NotNil(t, err)
-				assert.Nil(t, output)
-			},
-		},
-		{
-			testName: "error when failed to create FTD",
-			input: cloudftd.NewCreateInput(
-				ftdName,
-				ftdAccessPolicyName,
-				&ftdPerformanceTier,
-				ftdVirtual,
-				ftdLicenseCaps,
-				ftdTags,
-			),
-			setupFunc: func() {
-				readFmcIsSuccessful(true)
-				readFmcDomainInfoIsSuccessful(true)
-				readFmcAccessPoliciesIsSuccessful(true)
-				createFtdIsSuccessful(false)
-				readFtdSpecificDeviceIsSuccessful(true)
-				triggerFtdOnboardingIsSuccessful(true)
-				generateFtdConfigureManagerCommandIsSuccessful(true)
-			},
-			assertFunc: func(output *cloudftd.CreateOutput, err error, t *testing.T) {
-				assert.NotNil(t, err)
-				assert.Nil(t, output)
-			},
-		},
-		{
-			testName: "error when failed to read FTD specific device",
-			input: cloudftd.NewCreateInput(
-				ftdName,
-				ftdAccessPolicyName,
-				&ftdPerformanceTier,
-				ftdVirtual,
-				ftdLicenseCaps,
-				ftdTags,
-			),
-			setupFunc: func() {
-				readFmcIsSuccessful(true)
-				readFmcDomainInfoIsSuccessful(true)
-				readFmcAccessPoliciesIsSuccessful(true)
-				createFtdIsSuccessful(true)
-				readFtdSpecificDeviceIsSuccessful(false)
-				triggerFtdOnboardingIsSuccessful(true)
-				generateFtdConfigureManagerCommandIsSuccessful(true)
-			},
-			assertFunc: func(output *cloudftd.CreateOutput, err error, t *testing.T) {
-				assert.NotNil(t, err)
-				assert.Nil(t, output)
-			},
-		},
-		{
-			testName: "error when failed to read trigger FTD onboarding",
-			input: cloudftd.NewCreateInput(
-				ftdName,
-				ftdAccessPolicyName,
-				&ftdPerformanceTier,
-				ftdVirtual,
-				ftdLicenseCaps,
-				ftdTags,
-			),
-			setupFunc: func() {
-				readFmcIsSuccessful(true)
-				readFmcDomainInfoIsSuccessful(true)
-				readFmcAccessPoliciesIsSuccessful(true)
-				createFtdIsSuccessful(true)
-				readFtdSpecificDeviceIsSuccessful(true)
-				triggerFtdOnboardingIsSuccessful(false)
-				generateFtdConfigureManagerCommandIsSuccessful(true)
-			},
-			assertFunc: func(output *cloudftd.CreateOutput, err error, t *testing.T) {
-				assert.NotNil(t, err)
-				assert.Nil(t, output)
-			},
-		},
-		{
-			testName: "error when failed to read retrieve FTD configure manager command",
-			input: cloudftd.NewCreateInput(
-				ftdName,
-				ftdAccessPolicyName,
-				&ftdPerformanceTier,
-				ftdVirtual,
-				ftdLicenseCaps,
-				ftdTags,
-			),
-			setupFunc: func() {
-				readFmcIsSuccessful(true)
-				readFmcDomainInfoIsSuccessful(true)
-				readFmcAccessPoliciesIsSuccessful(true)
-				createFtdIsSuccessful(true)
-				readFtdSpecificDeviceIsSuccessful(true)
-				triggerFtdOnboardingIsSuccessful(true)
-				generateFtdConfigureManagerCommandIsSuccessful(false)
-			},
-			assertFunc: func(output *cloudftd.CreateOutput, err error, t *testing.T) {
-				assert.NotNil(t, err)
-				assert.Nil(t, output)
+				assert.ErrorContains(t, err, errorTransaction.ErrorMessage)
 			},
 		},
 	}
@@ -215,11 +74,11 @@ func TestCreateCloudFtd(t *testing.T) {
 		t.Run(testCase.testName, func(t *testing.T) {
 			httpmock.Reset()
 
-			testCase.setupFunc()
+			testCase.setupFunc(testCase.input)
 
 			output, err := cloudftd.Create(
 				context.Background(),
-				*internalHttp.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
+				*internalHttp.MustNewWithConfig(testModel.BaseUrl, "a_valid_token", 0, 0, time.Minute),
 				testCase.input,
 			)
 
@@ -255,86 +114,6 @@ func readFmcDomainInfoIsSuccessful(success bool) {
 		httpmock.RegisterResponder(
 			http.MethodGet,
 			url.ReadFmcDomainInfo(fmcHost),
-			httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, "internal server error"),
-		)
-	}
-}
-
-func readFmcAccessPoliciesIsSuccessful(success bool) {
-	if success {
-		httpmock.RegisterResponder(
-			http.MethodGet,
-			url.ReadAccessPolicies(baseUrl, fmcDomainUid),
-			httpmock.NewJsonResponderOrPanic(http.StatusOK, validReadAccessPoliciesOutput),
-		)
-	} else {
-		httpmock.RegisterResponder(
-			http.MethodGet,
-			url.ReadAccessPolicies(baseUrl, fmcDomainUid),
-			httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, "internal server error"),
-		)
-	}
-}
-
-func createFtdIsSuccessful(success bool) {
-	if success {
-		httpmock.RegisterResponder(
-			http.MethodPost,
-			url.CreateDevice(baseUrl),
-			httpmock.NewJsonResponderOrPanic(http.StatusOK, validCreateFtdOutput),
-		)
-	} else {
-		httpmock.RegisterResponder(
-			http.MethodPost,
-			url.CreateDevice(baseUrl),
-			httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, "internal server error"),
-		)
-	}
-}
-
-func readFtdSpecificDeviceIsSuccessful(success bool) {
-	if success {
-		httpmock.RegisterResponder(
-			http.MethodGet,
-			url.ReadSpecificDevice(baseUrl, ftdUid),
-			httpmock.NewJsonResponderOrPanic(http.StatusOK, validReadFtdSpecificDeviceOutput),
-		)
-	} else {
-		httpmock.RegisterResponder(
-			http.MethodGet,
-			url.ReadSpecificDevice(baseUrl, ftdUid),
-			httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, "internal server error"),
-		)
-	}
-}
-
-func triggerFtdOnboardingIsSuccessful(success bool) {
-	if success {
-		httpmock.RegisterResponder(
-			http.MethodPut,
-			url.UpdateSpecificCloudFtd(baseUrl, ftdSpecificUid),
-			httpmock.NewJsonResponderOrPanic(http.StatusOK, validUpdateSpecificFtdOutput),
-		)
-	} else {
-		httpmock.RegisterResponder(
-			http.MethodPut,
-			url.UpdateSpecificCloudFtd(baseUrl, ftdSpecificUid),
-			httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, "internal server error"),
-		)
-	}
-}
-
-func generateFtdConfigureManagerCommandIsSuccessful(success bool) {
-	if success {
-		httpmock.RegisterResponder(
-			http.MethodGet,
-			url.ReadDevice(baseUrl, ftdUid),
-			httpmock.NewJsonResponderOrPanic(http.StatusOK, validReadFtdGeneratedCommandOutput),
-		)
-	} else {
-		httpmock.RegisterResponder(
-			http.MethodGet,
-			url.ReadDevice(baseUrl, ftdUid),
 			httpmock.NewJsonResponderOrPanic(http.StatusInternalServerError, "internal server error"),
 		)
 	}

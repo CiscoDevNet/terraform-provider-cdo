@@ -1,10 +1,11 @@
-package ios
+package ios_test
 
 import (
 	"context"
 	"testing"
 	"time"
 
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/stretchr/testify/assert"
 
@@ -33,13 +34,13 @@ func TestIosRead(t *testing.T) {
 
 	testCases := []struct {
 		testName   string
-		input      ReadInput
+		input      ios.ReadInput
 		setupFunc  func()
-		assertFunc func(output *ReadOutput, err error, t *testing.T)
+		assertFunc func(output *ios.ReadOutput, err error, t *testing.T)
 	}{
 		{
 			testName: "successfully reads iOS",
-			input: ReadInput{
+			input: ios.ReadInput{
 				Uid: iosDevice.Uid,
 			},
 
@@ -47,11 +48,11 @@ func TestIosRead(t *testing.T) {
 				configureDeviceReadToRespondSuccessfully(iosDevice)
 			},
 
-			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *ios.ReadOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
 
-				expectedReadOutput := ReadOutput{
+				expectedReadOutput := ios.ReadOutput{
 					Uid:             iosDevice.Uid,
 					Name:            iosDevice.Name,
 					CreatedDate:     iosDevice.CreatedDate,
@@ -70,7 +71,7 @@ func TestIosRead(t *testing.T) {
 
 		{
 			testName: "returns error when the remote service reading the iOS encounters an issue",
-			input: ReadInput{
+			input: ios.ReadInput{
 				Uid: iosDevice.Uid,
 			},
 
@@ -78,7 +79,7 @@ func TestIosRead(t *testing.T) {
 				configureDeviceReadToRespondWithError(iosDevice.Uid)
 			},
 
-			assertFunc: func(output *ReadOutput, err error, t *testing.T) {
+			assertFunc: func(output *ios.ReadOutput, err error, t *testing.T) {
 				assert.NotNil(t, err)
 				assert.Nil(t, output)
 			},
@@ -91,7 +92,7 @@ func TestIosRead(t *testing.T) {
 
 			testCase.setupFunc()
 
-			output, err := Read(
+			output, err := ios.Read(
 				context.Background(),
 				*http.MustNewWithConfig(baseUrl, "a_valid_token", 0, 0, time.Minute),
 				testCase.input,

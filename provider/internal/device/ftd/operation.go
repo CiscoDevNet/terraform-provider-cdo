@@ -37,7 +37,7 @@ func ReadDataSource(ctx context.Context, resource *DataSource, stateData *DataSo
 	}
 	stateData.Hostname = types.StringValue(res.Metadata.CloudManagerDomain)
 	stateData.Labels = util.GoStringSliceToTFStringList(res.Tags.UngroupedTags())
-	stateData.GroupedLabels = util.GoMapToStringSliceTFMap(res.Tags.GroupedTags())
+	stateData.GroupedLabels = util.GoMapToStringSetTFMap(res.Tags.GroupedTags())
 
 	return nil
 }
@@ -72,7 +72,7 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 	stateData.NatId = types.StringValue(res.Metadata.NatID)
 	stateData.RegKey = types.StringValue(res.Metadata.RegKey)
 	stateData.Labels = util.GoStringSliceToTFStringSet(res.Tags.UngroupedTags())
-	stateData.GroupedLabels = util.GoMapToStringSliceTFMap(res.Tags.GroupedTags())
+	stateData.GroupedLabels = util.GoMapToStringSetTFMap(res.Tags.GroupedTags())
 
 	return nil
 }
@@ -126,8 +126,8 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 	planData.AccessPolicyName = types.StringValue(res.Metadata.AccessPolicyName)
 	planData.AccessPolicyUid = types.StringValue(res.Metadata.AccessPolicyUid)
 	planData.Licenses = util.GoStringSliceToTFStringSet(licenseStrings)
-	planData.Labels = util.GoStringSliceToTFStringSet(res.Labels.UngroupedTags())
-	planData.GroupedLabels = util.GoMapToStringSliceTFMap(res.Labels.GroupedTags())
+	planData.Labels = util.GoStringSliceToTFStringSet(res.Labels.UngroupedLabels)
+	planData.GroupedLabels = util.GoMapToStringSetTFMap(res.Labels.GroupedLabels)
 	if res.Metadata.PerformanceTier != nil { // nil means physical cloud ftd
 		planData.PerformanceTier = types.StringValue(string(*res.Metadata.PerformanceTier))
 	}
@@ -218,7 +218,7 @@ func tagsFromResourceModel(ctx context.Context, resourceModel *ResourceModel) (t
 func labelsFromResourceModel(ctx context.Context, resourceModel *ResourceModel) (publicapilabels.Type, error) {
 	ungroupedLabels, groupedLabels, err := ungroupedAndGroupedLabelsFromResourceModel(ctx, resourceModel)
 	if err != nil {
-		return nil, err
+		return publicapilabels.Empty(), err
 	}
 
 	return publicapilabels.New(ungroupedLabels, groupedLabels), nil

@@ -47,7 +47,7 @@ func FromDeviceReadOutput(readOutput *ReadOutput) *CreateOutput {
 		Name:     readOutput.Name,
 		Metadata: readOutput.Metadata,
 		State:    readOutput.State,
-		Labels:   publicapilabels.Type(readOutput.Tags),
+		Labels:   publicapilabels.New(readOutput.Tags.UngroupedTags(), readOutput.Tags.GroupedTags()),
 	}
 }
 

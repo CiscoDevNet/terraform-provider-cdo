@@ -54,5 +54,7 @@ func Read(ctx context.Context, client http.Client, readInp ReadInput) (*ReadOutp
 		return nil, err
 	}
 
+	client.Logger.Printf("ASA READOUTPUT: %+v\n", outp)
+
 	return &outp, nil
 }

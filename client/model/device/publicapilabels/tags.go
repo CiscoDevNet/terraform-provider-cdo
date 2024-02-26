@@ -1,10 +1,9 @@
 package publicapilabels
 
-import "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/maputil"
-
-const ungroupedLabelKeyName = "ungroupedLabels"
-
-type Type map[string][]string
+type Type struct {
+	GroupedLabels   map[string][]string `json:"groupedLabels"`
+	UngroupedLabels []string            `json:"ungroupedLabels"`
+}
 
 func Empty() Type {
 	return Type{}
@@ -12,31 +11,20 @@ func Empty() Type {
 
 func NewUnlabelled(tags ...string) Type {
 	return Type{
-		ungroupedLabelKeyName: tags,
+		UngroupedLabels: tags,
+		GroupedLabels:   map[string][]string{},
 	}
 }
 
 func New(tags []string, groupedTags map[string][]string) Type {
-	outputTags := Type{}
+	groupedLabels := map[string][]string{}
 
 	for k, v := range groupedTags {
-		outputTags[k] = v
+		groupedLabels[k] = v
 	}
 
-	outputTags[ungroupedLabelKeyName] = tags
-
-	return outputTags
-}
-
-func (t Type) UngroupedTags() []string {
-	label, ok := t[ungroupedLabelKeyName]
-	if !ok {
-		return []string{}
+	return Type{
+		UngroupedLabels: tags,
+		GroupedLabels:   groupedLabels,
 	}
-
-	return label
-}
-
-func (t Type) GroupedTags() map[string][]string {
-	return maputil.FilterKeys(t, func(s string) bool { return s != ungroupedLabelKeyName })
 }

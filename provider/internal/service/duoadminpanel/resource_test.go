@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/testutil"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/acctest"
@@ -11,9 +12,7 @@ import (
 )
 
 var labels = []string{"testdevice", "acceptancetest", "terraformprovider"}
-var groupedLabels = map[string][]string{
-	"acceptancetest": labels,
-}
+var groupedLabels = map[string][]string{"acceptancetest": sliceutil.Map(labels, func(input string) string { return "grouped-" + input })}
 
 var resourceModel = struct {
 	Name           string
@@ -28,7 +27,7 @@ var resourceModel = struct {
 	IntegrationKey: acctest.Env.DuoAdminPanelResourceIntegrationKey(),
 	SecretKey:      acctest.Env.DuoAdminPanelResourceSecretKey(),
 	Labels:         testutil.MustJson(labels),
-	GroupedLabels:  testutil.MustJson(groupedLabels),
+	GroupedLabels:  acctest.MustGenerateLabelsTF(groupedLabels),
 }
 
 const resourceTemplate = `
@@ -62,12 +61,14 @@ func TestAccDuoAdminPanelResource(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_duo_admin_panel.test", "integration_key", resourceModel.IntegrationKey),
 					resource.TestCheckResourceAttr("cdo_duo_admin_panel.test", "secret_key", resourceModel.SecretKey),
 					resource.TestCheckResourceAttr("cdo_duo_admin_panel.test", "labels.#", strconv.Itoa(len(labels))),
-					resource.TestCheckResourceAttrWith("cdo_duo_admin_panel.test", "labels.0", testutil.CheckEqual(labels[0])),
-					resource.TestCheckResourceAttrWith("cdo_duo_admin_panel.test", "labels.1", testutil.CheckEqual(labels[1])),
-					resource.TestCheckResourceAttrWith("cdo_duo_admin_panel.test", "labels.2", testutil.CheckEqual(labels[2])),
-					resource.TestCheckResourceAttrWith("cdo_duo_admin_panel.test", "grouped_labels.acceptancetest.0", testutil.CheckEqual(groupedLabels["acceptancetest"][0])),
-					resource.TestCheckResourceAttrWith("cdo_duo_admin_panel.test", "grouped_labels.acceptancetest.1", testutil.CheckEqual(groupedLabels["acceptancetest"][1])),
-					resource.TestCheckResourceAttrWith("cdo_duo_admin_panel.test", "grouped_labels.acceptancetest.2", testutil.CheckEqual(groupedLabels["acceptancetest"][2])),
+					resource.TestCheckTypeSetElemAttr("cdo_duo_admin_panel.test", "labels.*", labels[0]),
+					resource.TestCheckTypeSetElemAttr("cdo_duo_admin_panel.test", "labels.*", labels[1]),
+					resource.TestCheckTypeSetElemAttr("cdo_duo_admin_panel.test", "labels.*", labels[2]),
+					resource.TestCheckResourceAttr("cdo_duo_admin_panel.test", "grouped_labels.%", "1"),
+					resource.TestCheckResourceAttr("cdo_duo_admin_panel.test", "grouped_labels.acceptancetest.#", strconv.Itoa(len(groupedLabels["acceptancetest"]))),
+					resource.TestCheckTypeSetElemAttr("cdo_duo_admin_panel.test", "grouped_labels.acceptancetest.*", groupedLabels["acceptancetest"][0]),
+					resource.TestCheckTypeSetElemAttr("cdo_duo_admin_panel.test", "grouped_labels.acceptancetest.*", groupedLabels["acceptancetest"][1]),
+					resource.TestCheckTypeSetElemAttr("cdo_duo_admin_panel.test", "grouped_labels.acceptancetest.*", groupedLabels["acceptancetest"][2]),
 				),
 			},
 			// Update and Read testing

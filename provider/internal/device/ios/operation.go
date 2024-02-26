@@ -39,7 +39,7 @@ func Read(ctx context.Context, resource *IosDeviceResource, stateData *IosDevice
 	stateData.Host = types.StringValue(readOutp.Host)
 	stateData.IgnoreCertificate = types.BoolValue(readOutp.IgnoreCertificate)
 	stateData.Labels = util.GoStringSliceToTFStringSet(readOutp.Tags.UngroupedTags())
-	stateData.GroupedLabels = util.GoMapToStringSliceTFMap(readOutp.Tags.GroupedTags())
+	stateData.GroupedLabels = util.GoMapToStringSetTFMap(readOutp.Tags.GroupedTags())
 
 	return nil
 }
@@ -89,7 +89,7 @@ func Create(ctx context.Context, resource *IosDeviceResource, planData *IosDevic
 	}
 	planData.Port = types.Int64Value(port)
 	planData.Labels = util.GoStringSliceToTFStringSet(createOutp.Tags.UngroupedTags())
-	planData.GroupedLabels = util.GoMapToStringSliceTFMap(createOutp.Tags.GroupedTags())
+	planData.GroupedLabels = util.GoMapToStringSetTFMap(createOutp.Tags.GroupedTags())
 
 	return nil
 }
@@ -154,7 +154,7 @@ func tagsFromIosDeviceResourceModel(ctx context.Context, resourceModel *IosDevic
 func labelsFromIosDeviceResourceModel(ctx context.Context, resourceModel *IosDeviceResourceModel) (publicapilabels.Type, error) {
 	ungroupedLabels, groupedLabels, err := ungroupedAndGroupedLabelsFromIosDeviceResourceModel(ctx, resourceModel)
 	if err != nil {
-		return nil, err
+		return publicapilabels.Empty(), err
 	}
 
 	return publicapilabels.New(ungroupedLabels, groupedLabels), nil

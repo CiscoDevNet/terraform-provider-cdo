@@ -30,8 +30,15 @@ func GoMapToTFMap[GoType any](m map[string]GoType, elementType attr.Type, conver
 	return types.MapValueMust(elementType, tfMap)
 }
 
-func GoMapToStringSliceTFMap(m map[string][]string) types.Map {
-	return GoMapToTFMap(m, basetypes.SetType{}, func(slice []string) attr.Value {
-		return GoStringSliceToTFStringSet(slice)
+func GoMapToStringSetTFMap(m map[string][]string) types.Map {
+	return GoMapToTFMap(m, basetypes.SetType{ElemType: types.StringType}, func(slice []string) attr.Value {
+		list := GoStringSliceToTFStringList(slice)
+
+		listOfValues := make([]attr.Value, len(list))
+		for i, v := range list {
+			listOfValues[i] = v
+		}
+
+		return types.SetValueMust(types.StringType, listOfValues)
 	})
 }

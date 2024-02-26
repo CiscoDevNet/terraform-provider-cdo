@@ -181,7 +181,7 @@ func (d *AsaDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	configData.Host = types.StringValue(readOutp.Host)
 	configData.IgnoreCertificate = types.BoolValue(readOutp.IgnoreCertificate)
 	configData.Labels = util.GoStringSliceToTFStringList(readOutp.Tags.UngroupedTags())
-	configData.GroupedLabels = util.GoMapToStringSliceTFMap(readOutp.Tags.GroupedTags())
+	configData.GroupedLabels = util.GoMapToStringSetTFMap(readOutp.Tags.GroupedTags())
 
 	tflog.Trace(ctx, "done read ASA device data source")
 

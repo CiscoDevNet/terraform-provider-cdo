@@ -21,7 +21,7 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 		return err
 	}
 	stateData.Labels = util.GoStringSliceToTFStringSet(output.Tags.UngroupedTags())
-	stateData.GroupedLabels = util.GoMapToStringSliceTFMap(output.Tags.GroupedTags())
+	stateData.GroupedLabels = util.GoMapToStringSetTFMap(output.Tags.GroupedTags())
 	stateData.Name = types.StringValue(output.Name)
 
 	return nil
@@ -49,7 +49,7 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 	// map response to terraform types, it should be unchanged for most parts
 	planData.Id = types.StringValue(output.Uid)
 	planData.Labels = util.GoStringSliceToTFStringSet(output.Tags.UngroupedTags())
-	planData.GroupedLabels = util.GoMapToStringSliceTFMap(output.Tags.GroupedTags())
+	planData.GroupedLabels = util.GoMapToStringSetTFMap(output.Tags.GroupedTags())
 
 	return nil
 }
@@ -71,7 +71,7 @@ func Update(ctx context.Context, resource *Resource, planData *ResourceModel, st
 		return err
 	}
 	stateData.Labels = util.GoStringSliceToTFStringSet(output.Tags.UngroupedTags())
-	stateData.GroupedLabels = util.GoMapToStringSliceTFMap(output.Tags.GroupedTags())
+	stateData.GroupedLabels = util.GoMapToStringSetTFMap(output.Tags.GroupedTags())
 	stateData.Name = types.StringValue(output.Name)
 
 	return nil
@@ -93,7 +93,7 @@ func Delete(ctx context.Context, resource *Resource, stateData *ResourceModel) e
 func publicapiLabelsFromResourceModel(ctx context.Context, resourceModel *ResourceModel) (publicapilabels.Type, error) {
 	ungroupedLabels, groupedLabels, err := extractLabelsFromResourceModel(ctx, resourceModel)
 	if err != nil {
-		return nil, err
+		return publicapilabels.Empty(), err
 	}
 
 	return publicapilabels.New(ungroupedLabels, groupedLabels), nil

@@ -87,7 +87,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				ElementType: types.SetType{
 					ElemType: types.StringType,
 				},
-				Default: mapdefault.StaticValue(types.MapValueMust(types.StringType, map[string]attr.Value{})), // default to empty map
+				Default: mapdefault.StaticValue(types.MapValueMust(types.SetType{ElemType: types.StringType}, map[string]attr.Value{})), // default to empty map
 			},
 		},
 	}

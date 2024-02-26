@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 
@@ -130,8 +131,10 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				MarkdownDescription: "Specify a map of grouped labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
 				Optional:            true,
 				Computed:            true,
-				ElementType:         types.StringType,
-				Default:             mapdefault.StaticValue(types.MapValueMust(types.SetType{ElemType: types.StringType}, map[string]attr.Value{})), // default to empty list
+				ElementType: types.SetType{
+					ElemType: types.StringType,
+				},
+				Default: mapdefault.StaticValue(types.MapValueMust(types.SetType{ElemType: types.StringType}, map[string]attr.Value{})), // default to empty list
 			},
 			"username": schema.StringAttribute{
 				MarkdownDescription: "The username used to authenticate with the device.",
@@ -200,6 +203,9 @@ func (r *AsaDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 
+	logger := log.Default()
+	logger.Printf("ASA READOUTPUT:\n%+v\n", asaReadOutp)
+
 	port, err := strconv.ParseInt(asaReadOutp.Port, 10, 16)
 	if err != nil {
 		resp.Diagnostics.AddError("unable to read ASA Device", err.Error())
@@ -214,7 +220,9 @@ func (r *AsaDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 	stateData.Host = types.StringValue(asaReadOutp.Host)
 	stateData.IgnoreCertificate = types.BoolValue(asaReadOutp.IgnoreCertificate)
 	stateData.Labels = util.GoStringSliceToTFStringSet(asaReadOutp.Tags.UngroupedTags())
-	stateData.GroupedLabels = util.GoMapToStringSliceTFMap(asaReadOutp.Tags.GroupedTags())
+	stateData.GroupedLabels = util.GoMapToStringSetTFMap(asaReadOutp.Tags.GroupedTags())
+
+	logger.Printf("STATE DATA:\n%+v\n", stateData)
 
 	tflog.Trace(ctx, "done read ASA device resource")
 
@@ -267,6 +275,9 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 		planTags,
 	)
 
+	logger := log.Default()
+	logger.Printf("CREATE INPUT: %+v\n", createInp)
+
 	createOutp, createErr := r.client.CreateAsa(ctx, *createInp)
 	if createErr != nil {
 		tflog.Error(ctx, "Failed to create ASA device")
@@ -282,6 +293,8 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 
+	logger.Printf("CREATE OUTPUT:\n%+v\n", createOutp)
+
 	planData.ID = types.StringValue(createOutp.Uid)
 	planData.ConnectorType = types.StringValue(createOutp.ConnectorType)
 	planData.ConnectorName = getConnectorName(&planData)
@@ -295,6 +308,8 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 
 	}
 	planData.Port = types.Int64Value(port)
+
+	log.Printf("PLAN TO BE SAVED:\n%+v\n", planData)
 
 	res.Diagnostics.Append(res.State.Set(ctx, &planData)...)
 }
@@ -481,7 +496,7 @@ func tagsFromAsaDeviceResourceModel(ctx context.Context, resourceModel *AsaDevic
 func labelsFromAsaDeviceResourceModel(ctx context.Context, resourceModel *AsaDeviceResourceModel) (publicapilabels.Type, error) {
 	ungroupedLabels, groupedLabels, err := ungroupedAndGroupedLabelsFromResourceModel(ctx, resourceModel)
 	if err != nil {
-		return nil, err
+		return publicapilabels.Empty(), err
 	}
 
 	return publicapilabels.New(ungroupedLabels, groupedLabels), nil

@@ -227,9 +227,6 @@ func toReader(v any) (io.Reader, error) {
 			return nil, err
 		}
 
-		logger := log.Default()
-		logger.Printf("BODY: %+v\n", string(b))
-
 		reader = bytes.NewReader(b)
 	}
 	return reader, nil

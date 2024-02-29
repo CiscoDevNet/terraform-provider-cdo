@@ -203,9 +203,6 @@ func (r *AsaDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 
-	logger := log.Default()
-	logger.Printf("ASA READOUTPUT:\n%+v\n", asaReadOutp)
-
 	port, err := strconv.ParseInt(asaReadOutp.Port, 10, 16)
 	if err != nil {
 		resp.Diagnostics.AddError("unable to read ASA Device", err.Error())
@@ -221,8 +218,6 @@ func (r *AsaDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 	stateData.IgnoreCertificate = types.BoolValue(asaReadOutp.IgnoreCertificate)
 	stateData.Labels = util.GoStringSliceToTFStringSet(asaReadOutp.Tags.UngroupedTags())
 	stateData.GroupedLabels = util.GoMapToStringSetTFMap(asaReadOutp.Tags.GroupedTags())
-
-	logger.Printf("STATE DATA:\n%+v\n", stateData)
 
 	tflog.Trace(ctx, "done read ASA device resource")
 

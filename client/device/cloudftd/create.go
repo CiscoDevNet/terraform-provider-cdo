@@ -6,6 +6,7 @@ package cloudftd
 import (
 	"context"
 	"fmt"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc/fmcplatform"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/cdo"
@@ -13,7 +14,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/accesspolicies"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/publicapilabels"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
@@ -25,10 +26,30 @@ type CreateInput struct {
 	PerformanceTier  *tier.Type // ignored if it is physical device
 	Virtual          bool
 	Licenses         *[]license.Type
-	Tags             tags.Type
+	Labels           publicapilabels.Type
 }
 
-type CreateOutput = ReadOutput
+type CreateOutput struct {
+	Uid      string               `json:"uid"`
+	Name     string               `json:"name"`
+	Metadata Metadata             `json:"metadata,omitempty"`
+	State    string               `json:"state"`
+	Labels   publicapilabels.Type `json:"labels"`
+}
+
+func FromDeviceReadOutput(readOutput *ReadOutput) *CreateOutput {
+	if readOutput == nil {
+		return nil
+	}
+
+	return &CreateOutput{
+		Uid:      readOutput.Uid,
+		Name:     readOutput.Name,
+		Metadata: readOutput.Metadata,
+		State:    readOutput.State,
+		Labels:   publicapilabels.New(readOutput.Tags.UngroupedTags(), readOutput.Tags.GroupedTags()),
+	}
+}
 
 func NewCreateInput(
 	name string,
@@ -36,7 +57,7 @@ func NewCreateInput(
 	performanceTier *tier.Type,
 	virtual bool,
 	licenses *[]license.Type,
-	tags tags.Type,
+	labels publicapilabels.Type,
 ) CreateInput {
 	return CreateInput{
 		Name:             name,
@@ -44,18 +65,18 @@ func NewCreateInput(
 		PerformanceTier:  performanceTier,
 		Virtual:          virtual,
 		Licenses:         licenses,
-		Tags:             tags,
+		Labels:           labels,
 	}
 }
 
 type createRequestBody struct {
-	Name               string          `json:"name"`
-	DeviceType         devicetype.Type `json:"deviceType"`
-	FmcAccessPolicyUid string          `json:"fmcAccessPolicyUid"`
-	PerformanceTier    *tier.Type      `json:"performanceTier"`
-	Virtual            bool            `json:"virtual"`
-	Licenses           *[]license.Type `json:"licenses"`
-	Labels             []string        `json:"labels"`
+	Name               string               `json:"name"`
+	DeviceType         devicetype.Type      `json:"deviceType"`
+	FmcAccessPolicyUid string               `json:"fmcAccessPolicyUid"`
+	PerformanceTier    *tier.Type           `json:"performanceTier"`
+	Virtual            bool                 `json:"virtual"`
+	Licenses           *[]license.Type      `json:"licenses"`
+	Labels             publicapilabels.Type `json:"labels"`
 }
 
 func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, error) {
@@ -79,7 +100,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 			FmcAccessPolicyUid: selectedPolicy.Id,
 			PerformanceTier:    createInp.PerformanceTier,
 			Virtual:            createInp.Virtual,
-			Labels:             createInp.Tags.Labels,
+			Labels:             createInp.Labels,
 			Licenses:           createInp.Licenses,
 		},
 	)
@@ -99,7 +120,12 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		return nil, err
 	}
 
-	return ReadByUid(ctx, client, NewReadByUidInput(transaction.EntityUid))
+	cloudFtdReadOutput, err := ReadByUid(ctx, client, NewReadByUidInput(transaction.EntityUid))
+	if err != nil {
+		return nil, err
+	}
+
+	return FromDeviceReadOutput(cloudFtdReadOutput), nil
 }
 
 func readPolicyUidFromPolicyName(ctx context.Context, client http.Client, accessPolicyName string) (accesspolicies.Item, error) {
@@ -123,6 +149,10 @@ func readPolicyUidFromPolicyName(ctx context.Context, client http.Client, access
 		client,
 		cloudfmc.NewReadAccessPoliciesInput(fmcRes.Host, readFmcDomainRes.Items[0].Uuid, 1000), // 1000 is what CDO UI uses
 	)
+	if err != nil {
+		return accesspolicies.Item{}, err
+	}
+
 	selectedPolicy, ok := accessPoliciesRes.Find(accessPolicyName)
 	if !ok {
 		return accesspolicies.Item{}, fmt.Errorf(

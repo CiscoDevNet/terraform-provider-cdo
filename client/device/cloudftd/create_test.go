@@ -2,6 +2,10 @@ package cloudftd_test
 
 import (
 	"context"
+	"net/http"
+	"testing"
+	"time"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
@@ -10,9 +14,6 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"testing"
-	"time"
 )
 
 func TestCreateCloudFtd(t *testing.T) {
@@ -48,7 +49,7 @@ func TestCreateCloudFtd(t *testing.T) {
 			assertFunc: func(output *cloudftd.CreateOutput, err error, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, output)
-				assert.Equal(t, *output, ftdReadOutput)
+				assert.Equal(t, output, cloudftd.FromDeviceReadOutput(&ftdReadOutput))
 			},
 		},
 		{

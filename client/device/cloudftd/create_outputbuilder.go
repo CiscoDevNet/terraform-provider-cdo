@@ -1,6 +1,8 @@
 package cloudftd
 
-import "github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
+import (
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/publicapilabels"
+)
 
 type CreateOutputBuilder struct {
 	createOutput *CreateOutput
@@ -27,8 +29,8 @@ func (b *CreateOutputBuilder) Metadata(metadata Metadata) *CreateOutputBuilder {
 	return b
 }
 
-func (b *CreateOutputBuilder) Tags(tags tags.Type) *CreateOutputBuilder {
-	b.createOutput.Tags = tags
+func (b *CreateOutputBuilder) Labels(labels publicapilabels.Type) *CreateOutputBuilder {
+	b.createOutput.Labels = labels
 	return b
 }
 

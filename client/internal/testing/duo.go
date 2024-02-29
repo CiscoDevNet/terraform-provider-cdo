@@ -12,7 +12,7 @@ func (m Model) DuoAdminPanelCreateInput() duoadminpanel.CreateInput {
 		Host:           m.DuoAdminPanelHost,
 		IntegrationKey: "test-int-key",
 		SecretKey:      "test-secret-key",
-		Labels:         []string{"lab1", "lab2", "lab3"},
+		Labels:         NewTestingLabels(),
 	}
 }
 
@@ -25,6 +25,6 @@ func (m Model) DuoAdminPanelReadOutput() duoadminpanel.ReadOutput {
 		Uid:   m.DuoAdminPanelUid.String(),
 		Name:  m.DuoAdminPanelName,
 		State: state.DONE,
-		Tags:  tags.New(m.DuoAdminPanelLabels...),
+		Tags:  tags.NewUngrouped(m.DuoAdminPanelLabels...),
 	}
 }

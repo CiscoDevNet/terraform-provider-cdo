@@ -2,16 +2,17 @@ package genericssh_test
 
 import (
 	"context"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/genericssh"
-	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
-	"github.com/jarcoal/httpmock"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/genericssh"
+	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	internalTesting "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/testing"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
+	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGenericSshCreate(t *testing.T) {
@@ -22,7 +23,7 @@ func TestGenericSshCreate(t *testing.T) {
 		Uid:   genericSshUid,
 		Name:  genericSshName,
 		State: state.DONE,
-		Tags:  tags.New("tags1", "tags2", "tags3"),
+		Tags:  internalTesting.NewTestingTags(),
 	}
 
 	testCases := []struct {

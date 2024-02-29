@@ -3,6 +3,7 @@ package ftd
 import (
 	"context"
 	"fmt"
+
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
@@ -15,6 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -44,6 +46,7 @@ type ResourceModel struct {
 	Virtual          types.Bool   `tfsdk:"virtual"`
 	Licenses         types.Set    `tfsdk:"licenses"`
 	Labels           types.Set    `tfsdk:"labels"`
+	GroupedLabels    types.Map    `tfsdk:"grouped_labels"`
 
 	AccessPolicyUid  types.String `tfsdk:"access_policy_id"`
 	GeneratedCommand types.String `tfsdk:"generated_command"`
@@ -115,6 +118,15 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				ElementType:         types.StringType,
 				Computed:            true,
 				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})), // default to empty set
+			},
+			"grouped_labels": schema.MapAttribute{
+				MarkdownDescription: "Specify a map of grouped labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
+				Optional:            true,
+				ElementType: types.SetType{
+					ElemType: types.StringType,
+				},
+				Computed: true,
+				Default:  mapdefault.StaticValue(types.MapValueMust(types.SetType{ElemType: types.StringType}, map[string]attr.Value{})), // default to empty set
 			},
 			"generated_command": schema.StringAttribute{
 				MarkdownDescription: "The command to run in the FTD CLI to register it with the cloud-delivered FMC (cdFMC).",

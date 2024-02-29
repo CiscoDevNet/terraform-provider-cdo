@@ -2,8 +2,12 @@ package duoadminpanel
 
 import (
 	"context"
+	"errors"
 	"fmt"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/duoadminpanel"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/publicapilabels"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -16,7 +20,8 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 	if err != nil {
 		return err
 	}
-	stateData.Labels = util.GoStringSliceToTFStringSet(output.Tags.Labels)
+	stateData.Labels = util.GoStringSliceToTFStringSet(output.Tags.UngroupedTags())
+	stateData.GroupedLabels = util.GoMapToStringSetTFMap(output.Tags.GroupedTags())
 	stateData.Name = types.StringValue(output.Name)
 
 	return nil
@@ -24,10 +29,9 @@ func Read(ctx context.Context, resource *Resource, stateData *ResourceModel) err
 
 func Create(ctx context.Context, resource *Resource, planData *ResourceModel) error {
 
-	// convert tf tags to go tags
-	planTags, err := util.TFStringSetToTagLabels(ctx, planData.Labels)
+	labels, err := publicapiLabelsFromResourceModel(ctx, planData)
 	if err != nil {
-		return fmt.Errorf("error while converting terraform tags to go tags, %s", planData.Labels)
+		return err
 	}
 
 	// do create
@@ -36,7 +40,7 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 		Host:           planData.Host.ValueString(),
 		IntegrationKey: planData.IntegrationKey.ValueString(),
 		SecretKey:      planData.SecretKey.ValueString(),
-		Labels:         planTags.Labels,
+		Labels:         labels,
 	})
 	if err != nil {
 		return err
@@ -44,7 +48,8 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 
 	// map response to terraform types, it should be unchanged for most parts
 	planData.Id = types.StringValue(output.Uid)
-	planData.Labels = util.GoStringSliceToTFStringSet(output.Tags.Labels)
+	planData.Labels = util.GoStringSliceToTFStringSet(output.Tags.UngroupedTags())
+	planData.GroupedLabels = util.GoMapToStringSetTFMap(output.Tags.GroupedTags())
 
 	return nil
 }
@@ -52,9 +57,9 @@ func Create(ctx context.Context, resource *Resource, planData *ResourceModel) er
 func Update(ctx context.Context, resource *Resource, planData *ResourceModel, stateData *ResourceModel) error {
 
 	// do update
-	planTags, err := util.TFStringSetToTagLabels(ctx, planData.Labels)
+	planTags, err := tagsFromResourceModel(ctx, stateData)
 	if err != nil {
-		return fmt.Errorf("error while converting terraform tags to go tags, %s", planData.Labels)
+		return err
 	}
 
 	output, err := resource.client.UpdateDuoAdminPanel(ctx, duoadminpanel.UpdateInput{
@@ -65,7 +70,8 @@ func Update(ctx context.Context, resource *Resource, planData *ResourceModel, st
 	if err != nil {
 		return err
 	}
-	stateData.Labels = util.GoStringSliceToTFStringSet(output.Tags.Labels)
+	stateData.Labels = util.GoStringSliceToTFStringSet(output.Tags.UngroupedTags())
+	stateData.GroupedLabels = util.GoMapToStringSetTFMap(output.Tags.GroupedTags())
 	stateData.Name = types.StringValue(output.Name)
 
 	return nil
@@ -82,4 +88,40 @@ func Delete(ctx context.Context, resource *Resource, stateData *ResourceModel) e
 	}
 
 	return nil
+}
+
+func publicapiLabelsFromResourceModel(ctx context.Context, resourceModel *ResourceModel) (publicapilabels.Type, error) {
+	ungroupedLabels, groupedLabels, err := extractLabelsFromResourceModel(ctx, resourceModel)
+	if err != nil {
+		return publicapilabels.Empty(), err
+	}
+
+	return publicapilabels.New(ungroupedLabels, groupedLabels), nil
+}
+
+func tagsFromResourceModel(ctx context.Context, resourceModel *ResourceModel) (tags.Type, error) {
+	ungroupedLabels, groupedLabels, err := extractLabelsFromResourceModel(ctx, resourceModel)
+	if err != nil {
+		return nil, err
+	}
+
+	return tags.New(ungroupedLabels, groupedLabels), nil
+}
+
+func extractLabelsFromResourceModel(ctx context.Context, resourceModel *ResourceModel) ([]string, map[string][]string, error) {
+	if resourceModel == nil {
+		return nil, nil, errors.New("resource model cannot be nil")
+	}
+
+	ungroupedLabels, err := util.TFStringSetToGoStringList(ctx, resourceModel.Labels)
+	if err != nil {
+		return nil, nil, fmt.Errorf("error while converting terraform labels to go slice, %s", resourceModel.Labels)
+	}
+
+	groupedLabels, err := util.TFMapToGoMapOfStringSlices(ctx, resourceModel.GroupedLabels)
+	if err != nil {
+		return nil, nil, fmt.Errorf("error while converting terraform grouped labels to go map, %v", resourceModel.GroupedLabels)
+	}
+
+	return ungroupedLabels, groupedLabels, nil
 }

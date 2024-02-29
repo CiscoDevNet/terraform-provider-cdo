@@ -2,6 +2,7 @@ package genericssh
 
 import (
 	"context"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/goutil"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"

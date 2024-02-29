@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"fmt"
 	"reflect"
+	"strings"
 	"text/template"
+
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/testutil"
 )
 
 // given a string template and an object,
@@ -30,4 +33,25 @@ func MustOverrideFields[K any](obj K, fields map[string]any) K {
 	}
 
 	return copyObj
+}
+
+func MustGenerateLabelsTF(labels map[string][]string) string {
+	type keyValue struct {
+		Key   string
+		Value string
+	}
+
+	fieldLines := []string{}
+	template := `"{{.Key}}" = toset({{.Value}})`
+
+	for k, v := range labels {
+		valueJsonArr := testutil.MustJson(v)
+		fieldLine := MustParseTemplate(template, keyValue{k, valueJsonArr})
+
+		fieldLines = append(fieldLines, fieldLine)
+	}
+
+	return fmt.Sprintf(`{
+		%s
+	}`, strings.Join(fieldLines, ",\n"))
 }

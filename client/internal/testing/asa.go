@@ -2,12 +2,14 @@ package testing
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/publicapilabels"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
-	"time"
 )
 
 func (m Model) AsaReadOutput() asa.ReadOutput {
@@ -38,7 +40,7 @@ func (m Model) AsaCreateInput() asa.CreateInput {
 		ConnectorUid:      m.CdgUid.String(),
 		ConnectorType:     "CDG",
 		SocketAddress:     fmt.Sprintf("%s:%s", m.AsaHost, m.AsaPort),
-		Tags:              tags.Type{},
+		Labels:            publicapilabels.Empty(),
 		Username:          m.AsaUsername,
 		Password:          m.AsaPassword,
 		IgnoreCertificate: false,

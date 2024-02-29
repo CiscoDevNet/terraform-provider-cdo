@@ -3,6 +3,7 @@ package testing
 import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd/cloudftdonboarding"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/publicapilabels"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 )
 
@@ -19,7 +20,7 @@ func (m Model) FtdCreateInput() cloudftd.CreateInput {
 		PerformanceTier:  &m.FtdPerformanceTier,
 		Virtual:          false,
 		Licenses:         nil,
-		Tags:             tags.Type{},
+		Labels:           publicapilabels.Empty(),
 	}
 }
 
@@ -38,6 +39,6 @@ func (m Model) FtdReadOutput() cloudftd.ReadOutput {
 			RegKey:             "",
 		},
 		State: "",
-		Tags:  tags.Type{},
+		Tags:  tags.Empty(),
 	}
 }

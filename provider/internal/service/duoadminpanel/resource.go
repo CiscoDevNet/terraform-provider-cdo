@@ -3,8 +3,10 @@ package duoadminpanel
 import (
 	"context"
 	"fmt"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
@@ -33,6 +35,7 @@ type ResourceModel struct {
 	SecretKey      types.String `tfsdk:"secret_key"`
 	Host           types.String `tfsdk:"host"`
 	Labels         types.Set    `tfsdk:"labels"`
+	GroupedLabels  types.Map    `tfsdk:"grouped_labels"`
 }
 
 func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -76,6 +79,15 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 				Computed:            true,
 				ElementType:         types.StringType,
 				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})), // default to empty list
+			},
+			"grouped_labels": schema.MapAttribute{
+				MarkdownDescription: "Specify a set of grouped labels to identify the Duo Admin Panel as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
+				Optional:            true,
+				Computed:            true,
+				ElementType: types.SetType{
+					ElemType: types.StringType,
+				},
+				Default: mapdefault.StaticValue(types.MapValueMust(types.SetType{ElemType: types.StringType}, map[string]attr.Value{})), // default to empty map
 			},
 		},
 	}

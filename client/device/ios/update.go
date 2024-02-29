@@ -2,6 +2,7 @@ package ios
 
 import (
 	"context"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"

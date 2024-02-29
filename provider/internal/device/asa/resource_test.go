@@ -2,17 +2,19 @@
 package asa_test
 
 import (
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
-	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
 	"regexp"
 	"strconv"
 	"testing"
 
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/sliceutil"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util/testutil"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/acctest"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
+
+var labels = []string{"acceptancetest", "testasa", "terraform"}
+var groupedLabels = map[string][]string{"acceptancetest": sliceutil.Map(labels, func(input string) string { return "grouped-" + input })}
 
 type testAsaResourceType struct {
 	Name              string
@@ -23,6 +25,7 @@ type testAsaResourceType struct {
 	Password          string
 	IgnoreCertificate bool
 	Labels            string
+	GroupedLabels     string
 
 	Host string
 	Port int64
@@ -38,6 +41,7 @@ resource "cdo_asa_device" "test" {
 	password = "{{.Password}}"
 	ignore_certificate = "{{.IgnoreCertificate}}"
 	labels = {{.Labels}}
+	grouped_labels = {{.GroupedLabels}}
 }`
 
 const asaResourceTemplateNoLabels = `
@@ -62,17 +66,19 @@ var testAsaResource_SDC = testAsaResourceType{
 	Username:          acctest.Env.AsaResourceSdcUsername(),
 	Password:          acctest.Env.AsaResourceSdcPassword(),
 	IgnoreCertificate: acctest.Env.AsaResourceSdcIgnoreCertificate(),
-	Labels:            acctest.Env.AsaResourceSdcTags().GetLabelsJsonArrayString(),
+	Labels:            testutil.MustJson(labels),
+	GroupedLabels:     acctest.MustGenerateLabelsTF(groupedLabels),
 
 	Host: acctest.Env.AsaResourceSdcHost(),
 	Port: acctest.Env.AsaResourceSdcPort(),
 }
 
 var testAsaResourceConfig_SDC = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC)
+
 var testAsaResourceConfig_SDC_NoLabels = acctest.MustParseTemplate(asaResourceTemplateNoLabels, testAsaResource_SDC)
 
 // new label order config.
-var reorderedLabels = tags.New(sliceutil.Reverse[string](tags.MustParseJsonArrayString(testAsaResource_SDC.Labels))...).GetLabelsJsonArrayString()
+var reorderedLabels = testutil.MustJson(sliceutil.Reverse(labels))
 
 var testAsaResource_SDC_ReorderedLabels = acctest.MustOverrideFields(testAsaResource_SDC, map[string]any{
 	"Labels": reorderedLabels,
@@ -91,6 +97,14 @@ var testAsaResource_SDC_BadCreds = acctest.MustOverrideFields(testAsaResource_SD
 })
 var testAsaResourceConfig_SDC_NewCreds = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC_BadCreds)
 
+var renamedGroupedLabels = map[string][]string{
+	"my-cool-new-label-group": groupedLabels["acceptancetest"],
+}
+var testAsaResource_SDC_ReplaceGroupedLabels = acctest.MustOverrideFields(testAsaResource_SDC, map[string]any{
+	"GroupedLabels": acctest.MustGenerateLabelsTF(renamedGroupedLabels),
+})
+var testAsaResourceConfig_SDC_ReplaceGroupedLabels = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC_ReplaceGroupedLabels)
+
 func TestAccAsaDeviceResource_SDC(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 acctest.PreCheckFunc(t),
@@ -107,10 +121,15 @@ func TestAccAsaDeviceResource_SDC(t *testing.T) {
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "connector_type", testAsaResource_SDC.ConnectorType),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "username", testAsaResource_SDC.Username),
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "password", testAsaResource_SDC.Password),
-					resource.TestCheckResourceAttr("cdo_asa_device.test", "labels.#", strconv.Itoa(len(acctest.Env.AsaResourceSdcTags().Labels))),
-					resource.TestCheckResourceAttrWith("cdo_asa_device.test", "labels.0", testutil.CheckEqual(acctest.Env.AsaResourceSdcTags().Labels[0])),
-					resource.TestCheckResourceAttrWith("cdo_asa_device.test", "labels.1", testutil.CheckEqual(acctest.Env.AsaResourceSdcTags().Labels[1])),
-					resource.TestCheckResourceAttrWith("cdo_asa_device.test", "labels.2", testutil.CheckEqual(acctest.Env.AsaResourceSdcTags().Labels[2])),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "labels.#", strconv.Itoa(len(labels))),
+					resource.TestCheckTypeSetElemAttr("cdo_asa_device.test", "labels.*", labels[0]),
+					resource.TestCheckTypeSetElemAttr("cdo_asa_device.test", "labels.*", labels[1]),
+					resource.TestCheckTypeSetElemAttr("cdo_asa_device.test", "labels.*", labels[2]),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "grouped_labels.%", "1"),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "grouped_labels.acceptancetest.#", strconv.Itoa(len(groupedLabels["acceptancetest"]))),
+					resource.TestCheckTypeSetElemAttr("cdo_asa_device.test", "grouped_labels.acceptancetest.*", groupedLabels["acceptancetest"][0]),
+					resource.TestCheckTypeSetElemAttr("cdo_asa_device.test", "grouped_labels.acceptancetest.*", groupedLabels["acceptancetest"][1]),
+					resource.TestCheckTypeSetElemAttr("cdo_asa_device.test", "grouped_labels.acceptancetest.*", groupedLabels["acceptancetest"][2]),
 				),
 			},
 			// bad credential tests
@@ -140,6 +159,17 @@ func TestAccAsaDeviceResource_SDC(t *testing.T) {
 				Config: acctest.ProviderConfig() + testAsaResourceConfig_SDC_NewName,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cdo_asa_device.test", "name", testAsaResource_SDC_NewName.Name),
+				),
+			},
+			// Replace grouped labels
+			{
+				Config: acctest.ProviderConfig() + testAsaResourceConfig_SDC_ReplaceGroupedLabels,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "grouped_labels.%", "1"),
+					resource.TestCheckResourceAttr("cdo_asa_device.test", "grouped_labels.my-cool-new-label-group.#", strconv.Itoa(len(renamedGroupedLabels["my-cool-new-label-group"]))),
+					resource.TestCheckTypeSetElemAttr("cdo_asa_device.test", "grouped_labels.my-cool-new-label-group.*", renamedGroupedLabels["my-cool-new-label-group"][0]),
+					resource.TestCheckTypeSetElemAttr("cdo_asa_device.test", "grouped_labels.my-cool-new-label-group.*", renamedGroupedLabels["my-cool-new-label-group"][1]),
+					resource.TestCheckTypeSetElemAttr("cdo_asa_device.test", "grouped_labels.my-cool-new-label-group.*", renamedGroupedLabels["my-cool-new-label-group"][2]),
 				),
 			},
 

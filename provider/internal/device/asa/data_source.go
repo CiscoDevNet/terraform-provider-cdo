@@ -6,9 +6,10 @@ package asa
 import (
 	"context"
 	"fmt"
+	"strconv"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
-	"strconv"
 
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
@@ -46,6 +47,7 @@ type AsaDataSourceModel struct {
 	Port              types.Int64    `tfsdk:"port"`
 	IgnoreCertificate types.Bool     `tfsdk:"ignore_certificate"`
 	Labels            []types.String `tfsdk:"labels"`
+	GroupedLabels     types.Map      `tfsdk:"grouped_labels"`
 }
 
 // define the name for this data source.
@@ -103,6 +105,13 @@ func (d *AsaDataSource) Schema(ctx context.Context, req datasource.SchemaRequest
 				Validators: []validator.List{
 					listvalidator.UniqueValues(),
 				},
+			},
+			"grouped_labels": schema.MapAttribute{
+				ElementType: types.SetType{
+					ElemType: types.StringType,
+				},
+				Computed:            true,
+				MarkdownDescription: "The grouped labels applied to the device. Labels are used to group devices in CDO. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.",
 			},
 		},
 	}
@@ -171,7 +180,8 @@ func (d *AsaDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	configData.Ipv4 = types.StringValue(readOutp.SocketAddress)
 	configData.Host = types.StringValue(readOutp.Host)
 	configData.IgnoreCertificate = types.BoolValue(readOutp.IgnoreCertificate)
-	configData.Labels = util.GoStringSliceToTFStringList(readOutp.Tags.Labels)
+	configData.Labels = util.GoStringSliceToTFStringList(readOutp.Tags.UngroupedTags())
+	configData.GroupedLabels = util.GoMapToStringSetTFMap(readOutp.Tags.GroupedTags())
 
 	tflog.Trace(ctx, "done read ASA device data source")
 

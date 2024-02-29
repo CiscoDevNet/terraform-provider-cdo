@@ -1,6 +1,9 @@
 package testutil
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 func CheckEqual(expected string) func(value string) error {
 	return func(value string) error {
@@ -9,4 +12,13 @@ func CheckEqual(expected string) func(value string) error {
 		}
 		return nil
 	}
+}
+
+func MustJson(input any) string {
+	output, err := json.Marshal(input)
+	if err != nil {
+		panic("unable to marshall json for")
+	}
+
+	return string(output)
 }

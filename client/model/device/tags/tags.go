@@ -1,35 +1,43 @@
 package tags
 
-import (
-	"encoding/json"
-	"fmt"
-)
+import "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/maputil"
+
+const ungroupedLabelKeyName = "labels"
 
 // Type should be used with json:"tags"
-type Type struct {
-	Labels []string `json:"labels,omitempty"`
-}
+type Type map[string][]string
 
 func Empty() Type {
-	return New()
+	return Type{}
 }
 
-func New(tags ...string) Type {
+func NewUngrouped(tags ...string) Type {
 	return Type{
-		Labels: tags,
+		ungroupedLabelKeyName: tags,
 	}
 }
 
-func (tags Type) GetLabelsJsonArrayString() string {
-	b, _ := json.Marshal(tags.Labels)
-	return fmt.Sprintf("%v", string(b))
+func New(tags []string, groupedTags map[string][]string) Type {
+	outputTags := Type{}
+
+	for k, v := range groupedTags {
+		outputTags[k] = v
+	}
+
+	outputTags[ungroupedLabelKeyName] = tags
+
+	return outputTags
 }
 
-func MustParseJsonArrayString(s string) []string {
-	var labels []string
-	err := json.Unmarshal([]byte(s), &labels)
-	if err != nil {
-		panic(err)
+func (t Type) UngroupedTags() []string {
+	label, ok := t[ungroupedLabelKeyName]
+	if !ok {
+		return []string{}
 	}
-	return labels
+
+	return label
+}
+
+func (t Type) GroupedTags() map[string][]string {
+	return maputil.FilterKeys(t, func(s string) bool { return s != ungroupedLabelKeyName })
 }

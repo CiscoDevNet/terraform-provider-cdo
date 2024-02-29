@@ -10,9 +10,9 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc/fmcplatform"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	internalTesting "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/testing"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/devicelicense"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/jarcoal/httpmock"
@@ -30,11 +30,7 @@ func TestUpdateCloudFtd(t *testing.T) {
 		Uid("test-uid").
 		Licenses([]license.Type{license.Essentials}).
 		Name("test-name").
-		Tags(
-			tags.New([]string{"test-tag"}, map[string][]string{
-				"grouped-tags": {"grouped-tags-1", "grouped-tags-2"},
-			}),
-		).
+		Tags(internalTesting.NewTestingTags()).
 		Build()
 
 	testMetadata := cloudftd.NewMetadataBuilder().

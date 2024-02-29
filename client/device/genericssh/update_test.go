@@ -12,9 +12,9 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/crypto"
 	internalHttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/jsonutil"
+	internalTesting "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/testing"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
@@ -28,12 +28,7 @@ func TestGenericSshUpdate(t *testing.T) {
 		Uid:   genericSshUid,
 		Name:  genericSshName,
 		State: state.DONE,
-		Tags: tags.New(
-			[]string{"tags1", "tags2", "tags3"},
-			map[string][]string{
-				"grouped-tags": {"grouped-tag-1", "grouped-tag-2"},
-			},
-		),
+		Tags:  internalTesting.NewTestingTags(),
 	}
 
 	testCases := []struct {

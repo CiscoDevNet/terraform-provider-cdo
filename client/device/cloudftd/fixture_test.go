@@ -6,10 +6,10 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudfmc/fmcappliance"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/statemachine"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/testing"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/accesspolicies"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/fmcconfig"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/cloudfmc/fmcdomain"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/license"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd/tier"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
@@ -66,11 +66,7 @@ const (
 var (
 	ftdLicenseCaps     = &[]license.Type{license.Base, license.Carrier}
 	ftdPerformanceTier = tier.FTDv5
-	ftdTags            = tags.New(
-		[]string{"tags1", "tags2", "tags3"},
-		map[string][]string{
-			"grouped-tags": {"grouped-tags-1", "grouped-tags-2"},
-		})
+	ftdTags            = testing.NewTestingTags()
 )
 
 var (

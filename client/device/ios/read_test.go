@@ -6,11 +6,11 @@ import (
 	"time"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/ios"
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	internalTesting "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/testing"
 	"github.com/jarcoal/httpmock"
 )
 
@@ -24,12 +24,7 @@ func TestIosRead(t *testing.T) {
 		WithName("my-ios").
 		OnboardedUsingOnPremConnector("88888888-8888-8888-8888-888888888888").
 		WithLocation("10.10.0.1", 443).
-		WithTags(
-			tags.New(
-				[]string{"tags1", "tags2", "tags3"},
-				map[string][]string{"grouped-tags": {"grouped-tag-1", "grouped-tag-2"}},
-			),
-		).
+		WithTags(internalTesting.NewTestingTags()).
 		Build()
 
 	testCases := []struct {

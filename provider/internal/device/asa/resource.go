@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 
@@ -270,9 +269,6 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 		planTags,
 	)
 
-	logger := log.Default()
-	logger.Printf("CREATE INPUT: %+v\n", createInp)
-
 	createOutp, createErr := r.client.CreateAsa(ctx, *createInp)
 	if createErr != nil {
 		tflog.Error(ctx, "Failed to create ASA device")
@@ -288,8 +284,6 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 
-	logger.Printf("CREATE OUTPUT:\n%+v\n", createOutp)
-
 	planData.ID = types.StringValue(createOutp.Uid)
 	planData.ConnectorType = types.StringValue(createOutp.ConnectorType)
 	planData.ConnectorName = getConnectorName(&planData)
@@ -303,8 +297,6 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 
 	}
 	planData.Port = types.Int64Value(port)
-
-	log.Printf("PLAN TO BE SAVED:\n%+v\n", planData)
 
 	res.Diagnostics.Append(res.State.Set(ctx, &planData)...)
 }

@@ -95,7 +95,7 @@ jobs:
     name: Terraform Provider Acceptance Tests
     needs: unit-test
     runs-on: ubuntu-latest
-    # if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     defaults:
       run:
         working-directory: provider
@@ -129,7 +129,7 @@ jobs:
           ASA_RESOURCE_SDC_PASSWORD: ${{ secrets.ASA_RESOURCE_SDC_PASSWORD }}
           DUO_ADMIN_PANEL_RESOURCE_INTEGRATION_KEY: ${{ secrets.DUO_ADMIN_PANEL_RESOURCE_INTEGRATION_KEY }}
           DUO_ADMIN_PANEL_RESOURCE_SECRET_KEY: ${{ secrets.DUO_ADMIN_PANEL_RESOURCE_SECRET_KEY }}
-        run: go test -cover -p 1  ./...
+        run: go test -v -cover -p 1 -run "TestAcc.*" ./...
         timeout-minutes: 10
   tag-release-version:
     name: "Tag Release Version"

@@ -66,19 +66,18 @@ func TestAsaCreate(t *testing.T) {
 			},
 		},
 		{
-			testName: "fails onboards Duo Admin Panel if cdg read fails",
+			testName: "fails onboards Duo Admin Panel if trigger transaction fails",
 			input:    createInput,
 
 			setupFunc: func(input asa.CreateInput) {
-				internalTesting.MockGetError(url.ReadConnectorByUid(testModel.BaseUrl, cdgReadOutput.Uid), "read cdg error")
-				internalTesting.MockPostAccepted(url.CreateAsa(testModel.BaseUrl), doneTransaction)
+				internalTesting.MockPostError(url.CreateAsa(testModel.BaseUrl), "post error")
 				internalTesting.MockGetOk(url.ReadDevice(testModel.BaseUrl, readOutput.Uid), readOutput)
 			},
 
 			assertFunc: func(actualOutput *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
 				assert.Nil(t, actualOutput)
 				assert.NotNil(t, err)
-				assert.ErrorContains(t, err, "read cdg error")
+				assert.ErrorContains(t, err, "post error")
 			},
 		},
 	}

@@ -49,7 +49,7 @@ func TestIosCreate(t *testing.T) {
 			},
 		},
 		{
-			testName: "fails onboards Duo Admin Panel if transaction fails",
+			testName: "fails onboards IOS if transaction fails",
 			input:    createInput,
 
 			setupFunc: func(input ios.CreateInput) {

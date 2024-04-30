@@ -77,6 +77,7 @@ var testIosResource_ReplaceGroupTags = acctest.MustOverrideFields(testIosResourc
 var testIosResourceConfig_ReplaceGroupTags = acctest.MustParseTemplate(testIosResourceTemplate, testIosResource_ReplaceGroupTags)
 
 func TestAccIosDeviceResource_SDC(t *testing.T) {
+	t.Skip("Disabling this test because the vSphere SDC lab is down. Yay!")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 acctest.PreCheckFunc(t),
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,

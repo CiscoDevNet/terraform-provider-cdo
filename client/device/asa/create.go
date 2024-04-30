@@ -68,12 +68,16 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 
 	createUrl := url.CreateAsa(client.BaseUrl())
 
-	conn, err := connector.ReadByUid(ctx, client, connector.ReadByUidInput{ConnectorUid: createInp.ConnectorUid})
-	if err != nil {
-		return nil, &CreateError{
-			Err:               err,
-			CreatedResourceId: nil,
+	var connectorName string
+	if createInp.ConnectorType == "SDC" {
+		conn, err := connector.ReadByUid(ctx, client, connector.ReadByUidInput{ConnectorUid: createInp.ConnectorUid})
+		if err != nil {
+			return nil, &CreateError{
+				Err:               err,
+				CreatedResourceId: nil,
+			}
 		}
+		connectorName = conn.Name
 	}
 
 	transaction, err := publicapi.TriggerTransaction(
@@ -87,7 +91,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 			Password:          createInp.Password,
 			ConnectorType:     createInp.ConnectorType,
 			IgnoreCertificate: createInp.IgnoreCertificate,
-			ConnectorName:     conn.Name,
+			ConnectorName:     connectorName,
 			Labels:            createInp.Labels,
 		},
 	)

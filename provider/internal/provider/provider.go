@@ -76,7 +76,7 @@ func (p *CdoProvider) Schema(ctx context.Context, req provider.SchemaRequest, re
 				MarkdownDescription: "The base CDO URL. This is the URL you enter when logging into your CDO account.",
 				Required:            true,
 				Validators: []validator.String{
-					stringvalidator.OneOf("https://www.defenseorchestrator.com", "https://www.defenseorchestrator.eu", "https://apj.cdo.cisco.com", "https://staging.dev.lockhart.io", "https://ci.dev.lockhart.io", "https://scale.dev.lockhart.io", "http://localhost:9000"),
+					stringvalidator.OneOf("https://www.defenseorchestrator.com", "https://www.defenseorchestrator.eu", "https://apj.cdo.cisco.com", "https://staging.dev.lockhart.io", "https://ci.dev.lockhart.io", "https://scale.dev.lockhart.io", "http://localhost:9000", "https://aus.cdo.cisco.com", "https://in.cdo.cisco.com"),
 				},
 			},
 		},

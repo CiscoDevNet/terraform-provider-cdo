@@ -47,3 +47,12 @@ module "asav" {
 
   depends_on = [cdo_sdc_onboarding.sdc]
 }
+
+resource "cdo_asa_device" "my-asa" {
+  name               = "my-asa"
+  socket_address     = module.asav.mgmt_interface_ip
+  username           = var.asa_username
+  password           = random_password.asa_password.result
+  connector_type     = "CDG"
+  ignore_certificate = false
+ }

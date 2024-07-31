@@ -73,6 +73,8 @@ var testResourceConfig_ReplaceGroupedLabels = acctest.MustParseTemplate(Resource
 
 func TestAccFtdResource(t *testing.T) {
 
+	t.Skip("This test is flaky due to occasionally brief failure of fmceUpdateStateMachine, see LH-83416")
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 acctest.PreCheckFunc(t),
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,

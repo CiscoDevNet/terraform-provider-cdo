@@ -2,6 +2,7 @@ package cloudfmc
 
 import (
 	"context"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/statemachine"
@@ -9,6 +10,9 @@ import (
 )
 
 func UntilStateDone(ctx context.Context, client http.Client, uid string) retry.Func {
+
+	client.Logger.Println("waiting for cdfmc to be done")
+
 	return func() (bool, error) {
 		fmcReadSpecificRes, err := ReadSpecific(ctx, client, NewReadSpecificInput(uid))
 		if err != nil {

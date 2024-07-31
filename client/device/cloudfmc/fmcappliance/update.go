@@ -2,6 +2,7 @@ package fmcappliance
 
 import (
 	"context"
+
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 )
@@ -33,6 +34,9 @@ type updateRequestBody struct {
 }
 
 func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*UpdateOutput, error) {
+
+	client.Logger.Println("updating fmc appliance")
+
 	updateUrl := url.UpdateFmcAppliance(client.BaseUrl(), updateInp.FmcApplianceUid)
 	updateBody := newUpdateRequestBodyBuilder().
 		QueueTriggerState(updateInp.QueueTriggerState).

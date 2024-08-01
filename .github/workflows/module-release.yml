@@ -29,6 +29,7 @@ jobs:
         with:
           args: release --clean
           workdir: provider
+          version: latest
         env:
           # GitHub sets the GITHUB_TOKEN secret automatically.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

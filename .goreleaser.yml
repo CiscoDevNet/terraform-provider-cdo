@@ -61,3 +61,4 @@ release:
   # draft: true
 changelog:
   skip: true
+version: 2

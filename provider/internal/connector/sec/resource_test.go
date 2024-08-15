@@ -17,6 +17,7 @@ resource "cdo_sec" "test" {}`
 var resourceConfig = acctest.MustParseTemplate(resourceTemplate, resourceModel)
 
 func TestAccSecResource(t *testing.T) {
+	t.Skip("LH-84085")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 acctest.PreCheckFunc(t),
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,

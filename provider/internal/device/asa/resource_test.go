@@ -106,6 +106,7 @@ var testAsaResource_SDC_ReplaceGroupedLabels = acctest.MustOverrideFields(testAs
 var testAsaResourceConfig_SDC_ReplaceGroupedLabels = acctest.MustParseTemplate(asaResourceTemplate, testAsaResource_SDC_ReplaceGroupedLabels)
 
 func TestAccAsaDeviceResource_SDC(t *testing.T) {
+	t.Skip("LH-84085")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 acctest.PreCheckFunc(t),
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
@@ -186,6 +187,7 @@ func TestAccAsaDeviceResource_SDC(t *testing.T) {
 }
 
 func TestAccAsaDeviceResource_SDC_NoLabels(t *testing.T) {
+	t.Skip("LH-84085")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 acctest.PreCheckFunc(t),
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,

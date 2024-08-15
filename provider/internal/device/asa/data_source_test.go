@@ -36,7 +36,7 @@ data "cdo_asa_device" "test" {
 var testAsaDataSourceConfig = acctest.MustParseTemplate(testAsaDataSourceTemplate, testAsaDataSource)
 
 func TestAccAsaDeviceDataSource(t *testing.T) {
-    t.Skip("LH-84085")
+	t.Skip("LH-84085")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 acctest.PreCheckFunc(t),
 		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,

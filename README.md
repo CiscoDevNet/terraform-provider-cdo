@@ -152,3 +152,18 @@ To release a new version of the Terraform CDO Provider manually, perform the fol
 ## Gitleaks License
 
 The Gitleaks License is free, and stored in the `GITLEAKS_LICENSE` secret. In addition, it is saved to [Conjur](https://secrets.cisco.com/conjur/nonprod/eng/cdo/gitleaks-license). Speak to Jay, Doron, Siddhu, or Pedro to access it.
+
+## Running acceptance test locally against Github environment
+1. Create a file called `./provider/.github-action.local.env` locally
+2. File should contain the following:
+   ```bash
+   ASA_RESOURCE_SDC_PASSWORD=<fill this>
+   IOS_RESOURCE_PASSWORD=<fill this>
+   DUO_ADMIN_PANEL_RESOURCE_INTEGRATION_KEY=<fill this>
+   DUO_ADMIN_PANEL_RESOURCE_SECRET_KEY=<fill this>
+   ```
+3. Login to the github environment in ci, the tenant name is `terraform-provider-cdo@lockhart.io`
+4. Generate a api token
+5. In the console, export it as environment variable, named `ACC_TEST_CISCO_CDO_API_TOKEN`
+6. Run `cd ./provider`
+7. Run `make testacc`

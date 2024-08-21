@@ -39,7 +39,7 @@ func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp 
 			"This resource waits for you to finish pasting the registration command, and onboards the FTD to CDO. " +
 			"If you are spinning up an FTDv using Terraform, you can pass the output of the `cdo_ftd_device` through to the FTDv. " +
 			"If you are using a manually deployed FTDv or a physical FTD, you cannot add this resource to your Terraform code until after you have applied the `cdo_ftd_device` resource, retrieved the `generated_command` from the resource, and pasted it into the FTD device's CLI. " +
-			"This resource will time out if the registration command is not applied on the FTD CLI within 30 minutes of it starting to poll.",
+			"This resource will time out if the registration command is not applied on the FTD CLI within 3 minutes of it starting to poll.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "The unique identifier of this FTD onboarding resource, it is the registration key of the FTD.",

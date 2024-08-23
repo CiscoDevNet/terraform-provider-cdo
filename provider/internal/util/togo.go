@@ -25,7 +25,7 @@ func TFStringSetToGoStringList(ctx context.Context, s types.Set) ([]string, erro
 	stringList := make([]string, len(elements))
 	d := s.ElementsAs(ctx, &stringList, false)
 	if d.HasError() {
-		return nil, fmt.Errorf(DiagSummary(d))
+		return nil, fmt.Errorf("%s", DiagSummary(d))
 	}
 	return stringList, nil
 }

@@ -36,11 +36,11 @@ jobs:
       - run: go mod download
       - run: go build -v .
       - name: Run linters
-        uses: golangci/golangci-lint-action@3a919529898de77ec3da873e3063ca4b10e7f5cc # v3.7.0
+        uses: golangci/golangci-lint-action@v6
         with:
-          version: latest
+          version: v1.60
           working-directory: provider
-          skip-pkg-cache: true
+          skip-cache: true
   scan-for-secrets:
     name: Scan for Secrets
     runs-on: ubuntu-latest

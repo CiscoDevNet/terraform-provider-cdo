@@ -67,12 +67,12 @@ func extractRoleFromToken(tokenString string) (string, error) {
 
 	parts := strings.Split(tokenString, ".")
 	if len(parts) != 3 {
-		return "", fmt.Errorf(ErrInvalidTokenFormat)
+		return "", fmt.Errorf("%s", ErrInvalidTokenFormat)
 	}
 
 	payloadBytes, err := base64.RawURLEncoding.DecodeString(parts[1])
 	if err != nil {
-		return "", fmt.Errorf(ErrDecodeFailed)
+		return "", fmt.Errorf("%s", ErrDecodeFailed)
 	}
 
 	var claims jwt.MapClaims
@@ -90,7 +90,7 @@ func extractRoleFromToken(tokenString string) (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf(ErrNoRolesFound)
+	return "", fmt.Errorf("%s", ErrNoRolesFound)
 }
 
 // OneOfRoles checks that the JWT token roles String held in the attribute

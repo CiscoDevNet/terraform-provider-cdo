@@ -4,6 +4,7 @@ package client
 
 import (
 	"context"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/msp/tenants"
 	"net/http"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/connectoronboarding"
@@ -272,4 +273,12 @@ func (c *Client) ReadTenantSettings(ctx context.Context) (*settings.TenantSettin
 
 func (c *Client) UpdateTenantSettings(ctx context.Context, updateTenantSettingsInput tenantsettings.UpdateTenantSettingsInput) (*settings.TenantSettings, error) {
 	return tenantsettings.Update(ctx, c.client, updateTenantSettingsInput)
+}
+
+func (c *Client) CreateTenantUsingMspPortal(ctx context.Context, createInput tenants.MspCreateTenantInput) (*tenants.MspTenantOutput, *tenants.CreateError) {
+	return tenants.Create(ctx, c.client, createInput)
+}
+
+func (c *Client) ReadMspManagedTenant(ctx context.Context, readByUidInput tenants.ReadByUidInput) (*tenants.MspTenantOutput, error) {
+	return tenants.Read(ctx, c.client, readByUidInput)
 }

@@ -173,7 +173,6 @@ func (p PreventUpdatePlanModifier) MarkdownDescription(ctx context.Context) stri
 	return "Prevents updates to an existing tenant resource."
 }
 
-// PlanModifyString prevents changes to the string attribute
 func (p PreventUpdatePlanModifier) PlanModifyString(ctx context.Context, req planmodifier.StringRequest, resp *planmodifier.StringResponse) {
 	if !req.StateValue.IsNull() && req.StateValue != req.PlanValue {
 		// If the value is changing, prevent it and return an error

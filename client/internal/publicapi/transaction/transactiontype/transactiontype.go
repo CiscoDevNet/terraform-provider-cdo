@@ -12,4 +12,5 @@ const (
 	RECONNECT_ASA             Type = "RECONNECT_ASA"
 	READ_ASA                  Type = "READ_ASA"
 	DEPLOY_ASA_DEVICE_CHANGES Type = "DEPLOY_ASA_DEVICE_CHANGES"
+	MSP_CREATE_TENANT         Type = "MSP_CREATE_TENANT"
 )

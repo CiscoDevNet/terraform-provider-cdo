@@ -205,3 +205,11 @@ func RegisterFtd(baseUrl string) string {
 func CreateIos(baseUrl string) string {
 	return fmt.Sprintf("%s/api/rest/v1/inventory/devices/ios", baseUrl)
 }
+
+func CreateMspManagedTenant(baseUrl string) string {
+	return fmt.Sprintf("%s/api/rest/v1/msp/tenants/create", baseUrl)
+}
+
+func ReadMspManagedTenant(baseUrl string, tenantUid string) string {
+	return fmt.Sprintf("%s/api/rest/v1/msp/tenants/%s", baseUrl, tenantUid)
+}

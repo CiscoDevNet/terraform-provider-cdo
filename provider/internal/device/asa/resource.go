@@ -243,7 +243,7 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 		var err error
 		specificSdcOutp, err = r.client.ReadConnectorByName(ctx, *readSdcByNameInp)
 		if err != nil {
-			res.Diagnostics.AddError("failed to read SDC by name", err.Error())
+			res.Diagnostics.AddError("failed to create ASA", err.Error())
 			return
 		}
 

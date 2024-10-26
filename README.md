@@ -65,9 +65,15 @@ ACC_TEST_CISCO_CDO_API_TOKEN=<CDO_API_TOKEN> make testacc
 ```
 
 ## Linting
+
+Ensure you have golangci-lint installed:
+```
+curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.61.0
+```
+
 Run following command in the `client` or `provider` directory.
 ```bash
-golangci-lint run
+~/go/bin/golangci-lint run #change ~/go/bin to your $GOBIN
 ```
 
 ## Running Examples

@@ -213,3 +213,7 @@ func CreateMspManagedTenant(baseUrl string) string {
 func ReadMspManagedTenant(baseUrl string, tenantUid string) string {
 	return fmt.Sprintf("%s/api/rest/v1/msp/tenants/%s", baseUrl, tenantUid)
 }
+
+func FindMspManagedTenantsByName(baseUrl string, tenantName string) string {
+	return fmt.Sprintf("%s/api/rest/v1/msp/tenants?q=name:%s", baseUrl, tenantName)
+}

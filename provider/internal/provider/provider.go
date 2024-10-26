@@ -77,7 +77,7 @@ func (p *CdoProvider) Schema(ctx context.Context, req provider.SchemaRequest, re
 				MarkdownDescription: "The base CDO URL. This is the URL you enter when logging into your CDO account.",
 				Required:            true,
 				Validators: []validator.String{
-					stringvalidator.OneOf("https://www.defenseorchestrator.com", "https://www.defenseorchestrator.eu", "https://apj.cdo.cisco.com", "https://staging.dev.lockhart.io", "https://ci.dev.lockhart.io", "https://scale.dev.lockhart.io", "http://localhost:9000", "https://aus.cdo.cisco.com", "https://in.cdo.cisco.com"),
+					stringvalidator.OneOf("https://www.defenseorchestrator.com", "https://us.manage.security.cisco.com", "https://www.defenseorchestrator.eu", "https://eu.manage.security.cisco.com", "https://apj.cdo.cisco.com", "https://apj.manage.security.cisco.com", "https://staging.dev.lockhart.io", "https://staging.manage.security.cisco.com", "https://ci.dev.lockhart.io", "https://ci.manage.security.cisco.com", "https://scale.dev.lockhart.io", "https://scale.manage.security.cisco.com", "http://localhost:9000", "https://aus.cdo.cisco.com", "https://aus.manage.security.cisco.com", "https://in.cdo.cisco.com", "https://aus.manage.security.cisco.com"),
 				},
 			},
 		},
@@ -187,6 +187,7 @@ func (p *CdoProvider) DataSources(ctx context.Context) []func() datasource.DataS
 		tenant.NewDataSource,
 		cdfmc.NewDataSource,
 		tenantsettings.NewTenantSettingsDataSource,
+		msp_tenant.NewTenantDataSource,
 	}
 }
 

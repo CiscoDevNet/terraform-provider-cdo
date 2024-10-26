@@ -282,3 +282,7 @@ func (c *Client) CreateTenantUsingMspPortal(ctx context.Context, createInput ten
 func (c *Client) ReadMspManagedTenant(ctx context.Context, readByUidInput tenants.ReadByUidInput) (*tenants.MspTenantOutput, error) {
 	return tenants.Read(ctx, c.client, readByUidInput)
 }
+
+func (c *Client) FindMspManagedTenantByName(ctx context.Context, readByNameInput tenants.ReadByNameInput) (*tenants.MspTenantsOutput, error) {
+	return tenants.ReadByName(ctx, c.client, readByNameInput)
+}

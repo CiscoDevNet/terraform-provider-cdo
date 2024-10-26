@@ -12,6 +12,17 @@ type MspTenantOutput struct {
 	Region      string `json:"region"`
 }
 
+type MspTenantsOutput struct {
+	Count  int               `json:"count"`
+	Limit  int               `json:"limit"`
+	Offset int               `json:"offset"`
+	Items  []MspTenantOutput `json:"items"`
+}
+
 type ReadByUidInput struct {
 	Uid string `json:"uid"`
+}
+
+type ReadByNameInput struct {
+	Name string `json:"name"`
 }

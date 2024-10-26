@@ -12,9 +12,10 @@ import (
 )
 
 const (
-	apiTokenEnvName    = "ACC_TEST_CISCO_CDO_API_TOKEN"
-	mspApiTokenEnvName = "ACC_TEST_CISCO_CDO_MSP_API_TOKEN"
-	apiTokenSecretName = "staging-terraform-provider-cdo-acceptance-test-api-token"
+	apiTokenEnvName       = "ACC_TEST_CISCO_CDO_API_TOKEN"
+	mspApiTokenEnvName    = "ACC_TEST_CISCO_CDO_MSP_API_TOKEN"
+	apiTokenSecretName    = "staging-terraform-provider-cdo-acceptance-test-api-token"
+	mspApiTokenSecretName = "staging-terraform-provider-cdo-acceptance-test-api-token"
 )
 
 var cdoSecretManager = NewCdoSecretManager("us-west-2")
@@ -44,7 +45,7 @@ func GetMspApiToken() (string, error) {
 		return tokenFromSecretManager, nil
 	}
 
-	return "", fmt.Errorf("failed to retrieve api token from environment variable and secret manager.\nenvironment variable name=%s\nsecret manager secret token name=%s\nplease set one of them.\ncause=%v", apiTokenEnvName, apiTokenSecretName, err)
+	return "", fmt.Errorf("failed to retrieve api token from environment variable and secret manager.\nenvironment variable name=%s\nsecret manager secret token name=%s\nplease set one of them.\ncause=%v", mspApiTokenEnvName, mspApiTokenSecretName, err)
 }
 
 func PreCheckFunc(t *testing.T) func() {

@@ -316,6 +316,22 @@ func (e *env) TenantSettingsTenantUid() string {
 	return e.mustGetString("TENANT_SETTINGS_TENANT_UID")
 }
 
+func (e *env) MspTenantName() string {
+	return e.mustGetString("MSP_TENANT_NAME")
+}
+
+func (e *env) MspTenantDisplayName() string {
+	return e.mustGetString("MSP_TENANT_DISPLAY_NAME")
+}
+
+func (e *env) MspTenantId() string {
+	return e.mustGetString("MSP_TENANT_ID")
+}
+
+func (e *env) MspTenantRegion() string {
+	return e.mustGetString("MSP_TENANT_REGION")
+}
+
 func (e *env) mustGetString(envName string) string {
 	value, ok := os.LookupEnv(envName)
 	if ok {

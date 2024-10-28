@@ -21,14 +21,6 @@ type TenantResource struct {
 	client *cdoClient.Client
 }
 
-type TenantResourceModel struct {
-	Id            types.String `tfsdk:"id"`
-	Name          types.String `tfsdk:"name"`
-	DisplayName   types.String `tfsdk:"display_name"`
-	GeneratedName types.String `tfsdk:"generated_name"`
-	Region        types.String `tfsdk:"region"`
-}
-
 func (*TenantResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
 	response.TypeName = request.ProviderTypeName + "_msp_managed_tenant"
 }
@@ -135,7 +127,7 @@ func (t *TenantResource) Read(ctx context.Context, request resource.ReadRequest,
 	readInp := tenants.ReadByUidInput{
 		Uid: stateData.Id.ValueString(),
 	}
-	tenantReadOutp, err := t.client.ReadMspManagedTenant(ctx, readInp)
+	tenantReadOutp, err := t.client.ReadMspManagedTenantByUid(ctx, readInp)
 
 	if err != nil {
 		if util.Is404Error(err) {

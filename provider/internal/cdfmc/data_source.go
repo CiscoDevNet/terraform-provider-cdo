@@ -39,7 +39,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Computed:            true,
 			},
 			"hostname": schema.StringAttribute{
-				MarkdownDescription: "Name of the tenant.",
+				MarkdownDescription: "Name of the cdFMC.",
 				Computed:            true,
 			},
 			"software_version": schema.StringAttribute{

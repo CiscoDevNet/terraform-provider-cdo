@@ -12,8 +12,10 @@ import (
 )
 
 const (
-	apiTokenEnvName    = "ACC_TEST_CISCO_CDO_API_TOKEN"
-	apiTokenSecretName = "staging-terraform-provider-cdo-acceptance-test-api-token"
+	apiTokenEnvName       = "ACC_TEST_CISCO_CDO_API_TOKEN"
+	mspApiTokenEnvName    = "ACC_TEST_CISCO_CDO_MSP_API_TOKEN"
+	apiTokenSecretName    = "staging-terraform-provider-cdo-acceptance-test-api-token"
+	mspApiTokenSecretName = "staging-terraform-provider-cdo-acceptance-test-api-token"
 )
 
 var cdoSecretManager = NewCdoSecretManager("us-west-2")
@@ -32,11 +34,29 @@ func GetApiToken() (string, error) {
 	return "", fmt.Errorf("failed to retrieve api token from environment variable and secret manager.\nenvironment variable name=%s\nsecret manager secret token name=%s\nplease set one of them.\ncause=%v", apiTokenEnvName, apiTokenSecretName, err)
 }
 
+func GetMspApiToken() (string, error) {
+	tokenFromEnv, ok := os.LookupEnv(mspApiTokenEnvName)
+	if ok {
+		return tokenFromEnv, nil
+	}
+
+	tokenFromSecretManager, err := cdoSecretManager.getCurrentSecretValue(mspApiTokenEnvName)
+	if err == nil {
+		return tokenFromSecretManager, nil
+	}
+
+	return "", fmt.Errorf("failed to retrieve api token from environment variable and secret manager.\nenvironment variable name=%s\nsecret manager secret token name=%s\nplease set one of them.\ncause=%v", mspApiTokenEnvName, mspApiTokenSecretName, err)
+}
+
 func PreCheckFunc(t *testing.T) func() {
 	return func() {
 		_, err := GetApiToken()
+		_, mspErr := GetMspApiToken()
 		if err != nil {
 			t.Fatalf("Precheck failed, cause=%v", err)
+		}
+		if mspErr != nil {
+			t.Fatalf("Precheck failed, cause=%v", mspErr)
 		}
 	}
 }
@@ -54,6 +74,21 @@ func ProviderConfig() string {
 	}
 	// New line
 	`, token)
+}
+
+func MspProviderConfig() string {
+	mspToken, err := GetMspApiToken()
+	if err != nil {
+		panic(fmt.Errorf("failed to retrieve api token, cause=%w", err))
+	}
+
+	return fmt.Sprintf(`
+	provider "cdo" {
+		api_token = "%s"
+		base_url = "https://ci.manage.security.cisco.com"
+	}
+	// New line
+	`, mspToken)
 }
 
 // ProtoV6ProviderFactories are used to instantiate a provider during

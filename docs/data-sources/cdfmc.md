@@ -18,6 +18,6 @@ Use this data source to get information on the cloud-delivered FMC in your tenan
 ### Read-Only
 
 - `domain_uuid` (String) The domain UUID of the cdFMC.
-- `hostname` (String) Name of the tenant.
+- `hostname` (String) Name of the cdFMC.
 - `id` (String) Universally unique identifier for the cdFMC.
 - `software_version` (String) Software version of the cdFMC.

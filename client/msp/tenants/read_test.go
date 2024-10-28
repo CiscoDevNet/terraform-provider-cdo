@@ -30,7 +30,7 @@ func TestRead(t *testing.T) {
 			"/api/rest/v1/msp/tenants/"+entityUid,
 			httpmock.NewJsonResponderOrPanic(200, tenantResponse),
 		)
-		actual, err := tenants.Read(context.Background(), *http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute), tenants.ReadByUidInput{
+		actual, err := tenants.ReadByUid(context.Background(), *http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute), tenants.ReadByUidInput{
 			Uid: entityUid,
 		})
 
@@ -46,11 +46,65 @@ func TestRead(t *testing.T) {
 			"/api/rest/v1/msp/tenants/"+entityUid,
 			httpmock.NewJsonResponderOrPanic(404, "Not found"),
 		)
-		actual, err := tenants.Read(context.Background(), *http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute), tenants.ReadByUidInput{
+		actual, err := tenants.ReadByUid(context.Background(), *http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute), tenants.ReadByUidInput{
 			Uid: entityUid,
 		})
 
 		assert.Nil(t, actual)
 		assert.ErrorContains(t, err, "Not Found")
+	})
+
+	t.Run("Find tenant by name", func(t *testing.T) {
+		httpmock.Reset()
+		var tenantName = "test-tenant"
+		var expectedTenant = tenants.MspTenantOutput{
+			Uid:         uuid.New().String(),
+			Name:        "test-tenant",
+			DisplayName: "Pineapple Crushers Inc",
+			Region:      "STAGING",
+		}
+		var tenantResponse = tenants.MspTenantsOutput{
+			Count:  1,
+			Limit:  50,
+			Offset: 0,
+			Items:  []tenants.MspTenantOutput{expectedTenant},
+		}
+
+		httpmock.RegisterResponder(
+			netHttp.MethodGet,
+			"/api/rest/v1/msp/tenants?q=name%3A"+tenantName,
+			httpmock.NewJsonResponderOrPanic(200, tenantResponse),
+		)
+		actual, err := tenants.ReadByName(context.Background(), *http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute), tenants.ReadByNameInput{
+			Name: tenantName,
+		})
+
+		assert.NotNil(t, actual)
+		assert.Equal(t, *actual, tenantResponse)
+		assert.NoError(t, err)
+	})
+
+	t.Run("Find no tenants by name", func(t *testing.T) {
+		httpmock.Reset()
+		var tenantName = "test-tenant"
+		var tenantResponse = tenants.MspTenantsOutput{
+			Count:  0,
+			Limit:  50,
+			Offset: 0,
+			Items:  []tenants.MspTenantOutput{},
+		}
+
+		httpmock.RegisterResponder(
+			netHttp.MethodGet,
+			"/api/rest/v1/msp/tenants?q=name%3A"+tenantName,
+			httpmock.NewJsonResponderOrPanic(200, tenantResponse),
+		)
+		actual, err := tenants.ReadByName(context.Background(), *http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute), tenants.ReadByNameInput{
+			Name: tenantName,
+		})
+
+		assert.NotNil(t, actual)
+		assert.Equal(t, *actual, tenantResponse)
+		assert.NoError(t, err)
 	})
 }

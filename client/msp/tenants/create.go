@@ -36,7 +36,7 @@ func Create(ctx context.Context, client http.Client, createInp MspCreateTenantIn
 		}
 	}
 
-	readOut, err := Read(ctx, client, ReadByUidInput{Uid: transaction.EntityUid})
+	readOut, err := ReadByUid(ctx, client, ReadByUidInput{Uid: transaction.EntityUid})
 	client.Logger.Println("Created tenant for CDO")
 	if err == nil {
 		return readOut, nil

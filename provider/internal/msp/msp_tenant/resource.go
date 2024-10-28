@@ -127,7 +127,7 @@ func (t *TenantResource) Read(ctx context.Context, request resource.ReadRequest,
 	readInp := tenants.ReadByUidInput{
 		Uid: stateData.Id.ValueString(),
 	}
-	tenantReadOutp, err := t.client.ReadMspManagedTenant(ctx, readInp)
+	tenantReadOutp, err := t.client.ReadMspManagedTenantByUid(ctx, readInp)
 
 	if err != nil {
 		if util.Is404Error(err) {

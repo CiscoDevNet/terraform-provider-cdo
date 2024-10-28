@@ -30,7 +30,7 @@ func TestRead(t *testing.T) {
 			"/api/rest/v1/msp/tenants/"+entityUid,
 			httpmock.NewJsonResponderOrPanic(200, tenantResponse),
 		)
-		actual, err := tenants.Read(context.Background(), *http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute), tenants.ReadByUidInput{
+		actual, err := tenants.ReadByUid(context.Background(), *http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute), tenants.ReadByUidInput{
 			Uid: entityUid,
 		})
 
@@ -46,7 +46,7 @@ func TestRead(t *testing.T) {
 			"/api/rest/v1/msp/tenants/"+entityUid,
 			httpmock.NewJsonResponderOrPanic(404, "Not found"),
 		)
-		actual, err := tenants.Read(context.Background(), *http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute), tenants.ReadByUidInput{
+		actual, err := tenants.ReadByUid(context.Background(), *http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute), tenants.ReadByUidInput{
 			Uid: entityUid,
 		})
 

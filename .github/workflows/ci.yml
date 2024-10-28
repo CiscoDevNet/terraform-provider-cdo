@@ -124,8 +124,8 @@ jobs:
       - run: cat .github-action.env >> $GITHUB_ENV # https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables
       - env:
           TF_ACC: "1"
-          ACC_TEST_CISCO_CDO_MSP_API_TOKEN: ${{ secrets.ACC_TEST_CISCO_CDO_API_TOKEN }}
-          ACC_TEST_CISCO_CDO_API_TOKEN: ${{ secrets.ACC_TEST_CISCO_CDO_MSP_API_TOKEN }}
+          ACC_TEST_CISCO_CDO_MSP_API_TOKEN: ${{ secrets.ACC_TEST_CISCO_CDO_MSP_API_TOKEN }}
+          ACC_TEST_CISCO_CDO_API_TOKEN: ${{ secrets.ACC_TEST_CISCO_CDO_API_TOKEN }}
           IOS_RESOURCE_PASSWORD: ${{ secrets.IOS_RESOURCE_PASSWORD }}
           ASA_RESOURCE_SDC_PASSWORD: ${{ secrets.ASA_RESOURCE_SDC_PASSWORD }}
           DUO_ADMIN_PANEL_RESOURCE_INTEGRATION_KEY: ${{ secrets.DUO_ADMIN_PANEL_RESOURCE_INTEGRATION_KEY }}

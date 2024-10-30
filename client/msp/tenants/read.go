@@ -9,7 +9,7 @@ import (
 func ReadByUid(ctx context.Context, client http.Client, readInp ReadByUidInput) (*MspTenantOutput, error) {
 	client.Logger.Println("reading tenant by UID " + readInp.Uid)
 
-	readUrl := url.ReadMspManagedTenantByUid(client.BaseUrl(), readInp.Uid)
+	readUrl := url.MspManagedTenantByUid(client.BaseUrl(), readInp.Uid)
 	req := client.NewGet(ctx, readUrl)
 
 	var outp MspTenantOutput

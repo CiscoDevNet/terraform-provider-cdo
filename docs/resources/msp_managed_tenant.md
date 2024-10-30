@@ -3,12 +3,12 @@
 page_title: "cdo_msp_managed_tenant Resource - cdo"
 subcategory: ""
 description: |-
-  Provides an MSP managed tenant resource. This allows MSP managed tenants to be created.
+  Provides an MSP managed tenant resource. This allows MSP managed tenants to be created. Note: deleting this resource removes the created tenant from the MSP portal by disassociating the tenant from the MSP portal, but the tenant will continue to exist. To completely delete a tenant, please contact Cisco TAC.
 ---
 
 # cdo_msp_managed_tenant (Resource)
 
-Provides an MSP managed tenant resource. This allows MSP managed tenants to be created.
+Provides an MSP managed tenant resource. This allows MSP managed tenants to be created. Note: deleting this resource removes the created tenant from the MSP portal by disassociating the tenant from the MSP portal, but the tenant will continue to exist. To completely delete a tenant, please contact Cisco TAC.
 
 
 

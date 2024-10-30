@@ -27,7 +27,7 @@ func (*TenantResource) Metadata(ctx context.Context, request resource.MetadataRe
 
 func (*TenantResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = schema.Schema{
-		MarkdownDescription: "Provides an MSP managed tenant resource. This allows MSP managed tenants to be created.",
+		MarkdownDescription: "Provides an MSP managed tenant resource. This allows MSP managed tenants to be created. Note: deleting this resource removes the created tenant from the MSP portal by disassociating the tenant from the MSP portal, but the tenant will continue to exist. To completely delete a tenant, please contact Cisco TAC.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Universally unique identifier of the tenant",
@@ -62,7 +62,7 @@ func (*TenantResource) Schema(ctx context.Context, request resource.SchemaReques
 	}
 }
 
-func (resource *TenantResource) Configure(ctx context.Context, req resource.ConfigureRequest, res *resource.ConfigureResponse) {
+func (t *TenantResource) Configure(ctx context.Context, req resource.ConfigureRequest, res *resource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -78,7 +78,7 @@ func (resource *TenantResource) Configure(ctx context.Context, req resource.Conf
 		return
 	}
 
-	resource.client = client
+	t.client = client
 }
 
 func (t *TenantResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
@@ -150,7 +150,20 @@ func (t *TenantResource) Update(ctx context.Context, request resource.UpdateRequ
 }
 
 func (t *TenantResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
-	response.Diagnostics.AddError("Cannot delete a created tenant", "Please reach out to CDO TAC if you really want to delete a CDO tenant. You can choose to manually remove the tenant from the Terraform state if you want to remove the tenant from your Terraform configuration.")
+	tflog.Debug(ctx, "'Deleting' a CDO tenant by removing it from the MSP portal...")
+	var stateData *TenantResourceModel
+	response.Diagnostics.Append(request.State.Get(ctx, &stateData)...)
+	if response.Diagnostics.HasError() {
+		return
+	}
+
+	deleteInp := tenants.DeleteByUidInput{
+		Uid: stateData.Id.ValueString(),
+	}
+	_, err := t.client.DeleteMspManagedTenantByUid(ctx, deleteInp)
+	if err != nil {
+		response.Diagnostics.AddError("failed to delete tenant from MSP portal", err.Error())
+	}
 }
 
 type PreventUpdatePlanModifier struct{}

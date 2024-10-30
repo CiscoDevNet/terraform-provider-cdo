@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/msp/msp_tenant"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/msp/msp_tenant_users"
 	"os"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/connector"
@@ -174,6 +175,7 @@ func (p *CdoProvider) Resources(ctx context.Context) []func() resource.Resource 
 		duoadminpanel.NewResource,
 		tenantsettings.NewTenantSettingsResource,
 		msp_tenant.NewTenantResource,
+		msp_tenant_users.NewMspManagedTenantUsersResource,
 	}
 }
 

@@ -25,7 +25,7 @@ func (d *DataSource) Metadata(ctx context.Context, request datasource.MetadataRe
 
 func (d *DataSource) Schema(ctx context.Context, request datasource.SchemaRequest, response *datasource.SchemaResponse) {
 	response.Schema = schema.Schema{
-		MarkdownDescription: "Use this data source to get information on the cloud-delivered FMC in your tenant.",
+		MarkdownDescription: "Use this data source to get information on an MSP-managed tenant in your portal.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Universally unique identifier of the tenant",

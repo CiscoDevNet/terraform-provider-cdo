@@ -5,6 +5,7 @@ package client
 import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/msp/tenants"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/msp/users"
 	"net/http"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector/connectoronboarding"
@@ -285,4 +286,12 @@ func (c *Client) ReadMspManagedTenantByUid(ctx context.Context, readByUidInput t
 
 func (c *Client) FindMspManagedTenantByName(ctx context.Context, readByNameInput tenants.ReadByNameInput) (*tenants.MspTenantsOutput, error) {
 	return tenants.ReadByName(ctx, c.client, readByNameInput)
+}
+
+func (c *Client) CreateUsersInMspManagedTenant(ctx context.Context, createInput users.MspCreateUsersInput) (*[]users.UserInput, *users.CreateError) {
+	return users.Create(ctx, c.client, createInput)
+}
+
+func (c *Client) DeleteUsersInMspManagedTenant(ctx context.Context, deleteInput users.MspDeleteUsersInput) (interface{}, error) {
+	return users.Delete(ctx, c.client, deleteInput)
 }

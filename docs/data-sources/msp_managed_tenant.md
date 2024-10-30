@@ -3,12 +3,12 @@
 page_title: "cdo_msp_managed_tenant Data Source - cdo"
 subcategory: ""
 description: |-
-  Use this data source to get information on the cloud-delivered FMC in your tenant.
+  Use this data source to get information on an MSP-managed tenant in your portal.
 ---
 
 # cdo_msp_managed_tenant (Data Source)
 
-Use this data source to get information on the cloud-delivered FMC in your tenant.
+Use this data source to get information on an MSP-managed tenant in your portal.
 
 
 

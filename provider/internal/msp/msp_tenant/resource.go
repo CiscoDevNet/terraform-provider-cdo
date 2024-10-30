@@ -88,8 +88,6 @@ func (t *TenantResource) Create(ctx context.Context, request resource.CreateRequ
 	var planData TenantResourceModel
 
 	response.Diagnostics.Append(request.Plan.Get(ctx, &planData)...)
-	tflog.Debug(ctx, fmt.Sprintf("Diagnostics: %v", response.Diagnostics))
-	tflog.Debug(ctx, fmt.Sprintf("lavda: %v", planData.Name))
 
 	if response.Diagnostics.HasError() {
 		return

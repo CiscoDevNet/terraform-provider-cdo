@@ -8,7 +8,7 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 )
 
-func Create(ctx context.Context, client http.Client, createInp MspCreateUsersInput) (*[]UserInput, *CreateError) {
+func Create(ctx context.Context, client http.Client, createInp MspCreateUsersInput) (*[]UserDetails, *CreateError) {
 	client.Logger.Printf("Creating %d users in %s\n", len(createInp.Users), createInp.TenantUid)
 	createUrl := url.CreateUsersInMspManagedTenant(client.BaseUrl(), createInp.TenantUid)
 	transaction, err := publicapi.TriggerTransaction(

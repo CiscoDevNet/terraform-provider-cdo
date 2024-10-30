@@ -27,7 +27,7 @@ func TestCreate(t *testing.T) {
 		var managedTenantUid = uuid.New().String()
 		var createInp = users.MspCreateUsersInput{
 			TenantUid: managedTenantUid,
-			Users: []users.UserInput{
+			Users: []users.UserDetails{
 				{Username: "apples@bananas.com", Role: string(role.SuperAdmin), ApiOnlyUser: false},
 				{Username: "api-only-user", Role: string(role.ReadOnly), ApiOnlyUser: true},
 			},
@@ -79,7 +79,7 @@ func TestCreate(t *testing.T) {
 		var managedTenantUid = uuid.New().String()
 		var createInp = users.MspCreateUsersInput{
 			TenantUid: managedTenantUid,
-			Users: []users.UserInput{
+			Users: []users.UserDetails{
 				{Username: "apples@bananas.com", Role: string(role.SuperAdmin), ApiOnlyUser: false},
 				{Username: "api-only-user", Role: string(role.ReadOnly), ApiOnlyUser: true},
 			},
@@ -134,7 +134,7 @@ func TestCreate(t *testing.T) {
 		var managedTenantUid = uuid.New().String()
 		var createInp = users.MspCreateUsersInput{
 			TenantUid: managedTenantUid,
-			Users: []users.UserInput{
+			Users: []users.UserDetails{
 				{Username: "apples@bananas.com", Role: string(role.SuperAdmin), ApiOnlyUser: false},
 				{Username: "api-only-user", Role: string(role.ReadOnly), ApiOnlyUser: true},
 			},

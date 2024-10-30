@@ -5,10 +5,12 @@ import (
 	"fmt"
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/msp/users"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -36,6 +38,9 @@ func (r *MspManagedTenantUsersResource) Schema(ctx context.Context, request reso
 						"role": schema.StringAttribute{
 							Required:            true,
 							MarkdownDescription: "The role to assign to the user in the CDO tenant.",
+							Validators: []validator.String{
+								stringvalidator.OneOf("ROLE_READ_ONLY", "ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_DEPLOY_ONLY", "ROLE_EDIT_ONLY", "ROLE_VPN_SESSIONS_MANAGER"),
+							},
 						},
 						"api_only_user": schema.BoolAttribute{
 							Required:            true,
@@ -126,15 +131,15 @@ func (r *MspManagedTenantUsersResource) deleteAllUsersInState(ctx context.Contex
 	return r.client.DeleteUsersInMspManagedTenant(ctx, deleteInput)
 }
 
-func (r *MspManagedTenantUsersResource) createAllUsersInPlan(ctx context.Context, planData *MspManagedTenantUsersResourceModel) (*[]users.UserInput, *users.CreateError) {
-	var nativeUsers []users.UserInput
+func (r *MspManagedTenantUsersResource) createAllUsersInPlan(ctx context.Context, planData *MspManagedTenantUsersResourceModel) (*[]users.UserDetails, *users.CreateError) {
+	var nativeUsers []users.UserDetails
 
 	// 2. use plan data to create tenant and fill up rest of the model
 	for _, user := range planData.Users {
 		username := user.Username.ValueString()
 		role := user.Role.ValueString()
 		apiOnlyUser := user.ApiOnlyUser.ValueBool()
-		nativeUsers = append(nativeUsers, users.UserInput{
+		nativeUsers = append(nativeUsers, users.UserDetails{
 			Username:    username,
 			Role:        role,
 			ApiOnlyUser: apiOnlyUser,

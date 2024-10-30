@@ -19,7 +19,7 @@ var testMspManagedTenantUsersResource = struct {
 }{
 	Users: []Users{
 		{Username: "user1@example.com", Role: "ROLE_SUPER_ADMIN", ApiOnlyUser: false},
-		{Username: "example-api-user", Role: "ROLE_SUPER_ADMIN", ApiOnlyUser: true},
+		{Username: "example-api-user", Role: "ROLE_ADMIN", ApiOnlyUser: true},
 	},
 	TenantUid: acctest.Env.MspTenantId(),
 }

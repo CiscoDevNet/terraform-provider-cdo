@@ -288,7 +288,7 @@ func (c *Client) FindMspManagedTenantByName(ctx context.Context, readByNameInput
 	return tenants.ReadByName(ctx, c.client, readByNameInput)
 }
 
-func (c *Client) CreateUsersInMspManagedTenant(ctx context.Context, createInput users.MspCreateUsersInput) (*[]users.UserInput, *users.CreateError) {
+func (c *Client) CreateUsersInMspManagedTenant(ctx context.Context, createInput users.MspCreateUsersInput) (*[]users.UserDetails, *users.CreateError) {
 	return users.Create(ctx, c.client, createInput)
 }
 

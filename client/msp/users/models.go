@@ -1,8 +1,8 @@
 package users
 
 type MspCreateUsersInput struct {
-	TenantUid string      `json:"tenantUid"`
-	Users     []UserInput `json:"users"`
+	TenantUid string        `json:"tenantUid"`
+	Users     []UserDetails `json:"users"`
 }
 
 type MspDeleteUsersInput struct {
@@ -10,7 +10,7 @@ type MspDeleteUsersInput struct {
 	Usernames []string `json:"usernames"`
 }
 
-type UserInput struct {
+type UserDetails struct {
 	Username    string `json:"username"`
 	Role        string `json:"role"`
 	ApiOnlyUser bool   `json:"apiOnlyUser"`

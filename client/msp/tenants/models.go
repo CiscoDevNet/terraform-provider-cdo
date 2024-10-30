@@ -26,3 +26,10 @@ type ReadByUidInput struct {
 type ReadByNameInput struct {
 	Name string `json:"name"`
 }
+
+type DeleteByUidInput struct {
+	Uid string `json:"uid"`
+}
+
+type DeleteOutput struct {
+}

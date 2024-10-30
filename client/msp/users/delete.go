@@ -21,7 +21,7 @@ func Delete(ctx context.Context, client http.Client, deleteInp MspDeleteUsersInp
 		return nil, err
 	}
 
-	transaction, err = publicapi.WaitForTransactionToFinishWithDefaults(
+	_, err = publicapi.WaitForTransactionToFinishWithDefaults(
 		ctx,
 		client,
 		transaction,

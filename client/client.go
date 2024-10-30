@@ -284,6 +284,10 @@ func (c *Client) ReadMspManagedTenantByUid(ctx context.Context, readByUidInput t
 	return tenants.ReadByUid(ctx, c.client, readByUidInput)
 }
 
+func (c *Client) DeleteMspManagedTenantByUid(ctx context.Context, deleteByUidInput tenants.DeleteByUidInput) (interface{}, error) {
+	return tenants.DeleteByUid(ctx, c.client, deleteByUidInput)
+}
+
 func (c *Client) FindMspManagedTenantByName(ctx context.Context, readByNameInput tenants.ReadByNameInput) (*tenants.MspTenantsOutput, error) {
 	return tenants.ReadByName(ctx, c.client, readByNameInput)
 }

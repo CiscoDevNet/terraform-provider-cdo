@@ -8,14 +8,25 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 )
 
-func Create(ctx context.Context, client http.Client, createInp MspCreateUsersInput) (*[]UserDetails, *CreateError) {
+func Create(ctx context.Context, client http.Client, createInp MspUsersInput) (*[]UserDetails, *CreateError) {
 	client.Logger.Printf("Creating %d users in %s\n", len(createInp.Users), createInp.TenantUid)
 	createUrl := url.CreateUsersInMspManagedTenant(client.BaseUrl(), createInp.TenantUid)
+	var userDetailsPublicApiInput []UserDetailsPublicApiInput
+	for _, user := range createInp.Users {
+		userDetailsPublicApiInput = append(userDetailsPublicApiInput, UserDetailsPublicApiInput{
+			Username:    user.Username,
+			Role:        user.Roles[0],
+			ApiOnlyUser: user.ApiOnlyUser,
+		})
+	}
 	transaction, err := publicapi.TriggerTransaction(
 		ctx,
 		client,
 		createUrl,
-		createInp,
+		MspUsersPublicApiInput{
+			TenantUid: createInp.TenantUid,
+			Users:     userDetailsPublicApiInput,
+		},
 	)
 	if err != nil {
 		return nil, &CreateError{
@@ -36,5 +47,13 @@ func Create(ctx context.Context, client http.Client, createInp MspCreateUsersInp
 		}
 	}
 
-	return &createInp.Users, nil
+	readUserDetrails, err := ReadCreatedUsersInTenant(ctx, client, createInp)
+	if err != nil {
+		client.Logger.Println("Failed to read users from tenant after creation")
+		return nil, &CreateError{
+			Err:               err,
+			CreatedResourceId: &transaction.EntityUid,
+		}
+	}
+	return readUserDetrails, nil
 }

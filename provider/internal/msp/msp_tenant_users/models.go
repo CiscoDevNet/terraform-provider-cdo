@@ -8,7 +8,8 @@ type MspManagedTenantUsersResourceModel struct {
 }
 
 type User struct {
+	Id          types.String `tfsdk:"id"`
 	Username    types.String `tfsdk:"username"`
-	Role        types.String `tfsdk:"role"`
+	Roles       types.List   `tfsdk:"roles"`
 	ApiOnlyUser types.Bool   `tfsdk:"api_only_user"`
 }

@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/acctest"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"strings"
 	"testing"
+	"text/template"
 )
 
 type Users struct {
 	Username    string
-	Role        string
+	Roles       []string
 	ApiOnlyUser bool
 }
 
@@ -18,10 +20,19 @@ var testMspManagedTenantUsersResource = struct {
 	Users     []Users
 }{
 	Users: []Users{
-		{Username: "user1@example.com", Role: "ROLE_SUPER_ADMIN", ApiOnlyUser: false},
-		{Username: "example-api-user", Role: "ROLE_ADMIN", ApiOnlyUser: true},
+		{Username: "user1@example.com", Roles: []string{"ROLE_SUPER_ADMIN"}, ApiOnlyUser: false},
+		{Username: "example-api-user", Roles: []string{"ROLE_ADMIN"}, ApiOnlyUser: true},
 	},
 	TenantUid: acctest.Env.MspTenantId(),
+}
+
+// Join function to concatenate elements of a slice into a JSON array string.
+func join(slice []string) string {
+	quoted := make([]string, len(slice))
+	for i, s := range slice {
+		quoted[i] = fmt.Sprintf("%q", s) // Quotes each role to make it valid JSON
+	}
+	return strings.Join(quoted, ", ") // Joins with a comma
 }
 
 const testMspManagedTenantUsersTemplate = `
@@ -30,18 +41,20 @@ resource "cdo_msp_managed_tenant_users" "test" {
 	users = [
 		{
 			"username": "{{(index .Users 0).Username}}"
-			"role": "{{(index .Users 0).Role}}"
+			"roles": [{{ join (index .Users 0).Roles }}]
 			"api_only_user": "{{(index .Users 0).ApiOnlyUser}}"
 		},
 		{
 			"username": "{{(index .Users 1).Username}}"
-			"role": "{{(index .Users 1).Role}}"
+			"roles": [{{ join (index .Users 1).Roles }}]
 			"api_only_user": {{(index .Users 1).ApiOnlyUser}}
 		}
 	]
 }`
 
-var testMspManagedTenantUsersResourceConfig = acctest.MustParseTemplate(testMspManagedTenantUsersTemplate, testMspManagedTenantUsersResource)
+var testMspManagedTenantUsersResourceConfig = acctest.MustParseTemplateWithFuncMap(testMspManagedTenantUsersTemplate, testMspManagedTenantUsersResource, template.FuncMap{
+	"join": join,
+})
 
 func TestAccMspManagedTenantUsersResource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -54,10 +67,18 @@ func TestAccMspManagedTenantUsersResource(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("cdo_msp_managed_tenant_users.test", "tenant_uid", testMspManagedTenantUsersResource.TenantUid),
 					resource.TestCheckResourceAttr("cdo_msp_managed_tenant_users.test", "users.0.username", testMspManagedTenantUsersResource.Users[0].Username),
-					resource.TestCheckResourceAttr("cdo_msp_managed_tenant_users.test", "users.0.role", testMspManagedTenantUsersResource.Users[0].Role),
+					resource.TestCheckResourceAttr(
+						"cdo_msp_managed_tenant_users.test",
+						"users.0.roles.0",
+						testMspManagedTenantUsersResource.Users[0].Roles[0],
+					),
 					resource.TestCheckResourceAttr("cdo_msp_managed_tenant_users.test", "users.0.api_only_user", fmt.Sprintf("%t", testMspManagedTenantUsersResource.Users[0].ApiOnlyUser)),
 					resource.TestCheckResourceAttr("cdo_msp_managed_tenant_users.test", "users.1.username", testMspManagedTenantUsersResource.Users[1].Username),
-					resource.TestCheckResourceAttr("cdo_msp_managed_tenant_users.test", "users.1.role", testMspManagedTenantUsersResource.Users[1].Role),
+					resource.TestCheckResourceAttr(
+						"cdo_msp_managed_tenant_users.test",
+						"users.1.roles.0",
+						testMspManagedTenantUsersResource.Users[1].Roles[0],
+					),
 					resource.TestCheckResourceAttr("cdo_msp_managed_tenant_users.test", "users.1.api_only_user", fmt.Sprintf("%t", testMspManagedTenantUsersResource.Users[1].ApiOnlyUser)),
 				),
 			},

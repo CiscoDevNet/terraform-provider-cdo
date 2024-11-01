@@ -1,5 +1,5 @@
 data "cdo_msp_managed_tenant" "tenant" {
-  name             = "CDO_isaks-birthday-surprise__skfh2r"
+  name             = "CDO_test-tenant-name"
 }
 
 resource "cdo_msp_managed_tenant_users" "example" {

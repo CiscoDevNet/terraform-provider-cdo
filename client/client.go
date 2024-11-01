@@ -292,8 +292,12 @@ func (c *Client) FindMspManagedTenantByName(ctx context.Context, readByNameInput
 	return tenants.ReadByName(ctx, c.client, readByNameInput)
 }
 
-func (c *Client) CreateUsersInMspManagedTenant(ctx context.Context, createInput users.MspCreateUsersInput) (*[]users.UserDetails, *users.CreateError) {
+func (c *Client) CreateUsersInMspManagedTenant(ctx context.Context, createInput users.MspUsersInput) (*[]users.UserDetails, *users.CreateError) {
 	return users.Create(ctx, c.client, createInput)
+}
+
+func (c *Client) ReadUsersInMspManagedTenant(ctx context.Context, readInput users.MspUsersInput) (*[]users.UserDetails, error) {
+	return users.ReadCreatedUsersInTenant(ctx, c.client, readInput)
 }
 
 func (c *Client) DeleteUsersInMspManagedTenant(ctx context.Context, deleteInput users.MspDeleteUsersInput) (interface{}, error) {

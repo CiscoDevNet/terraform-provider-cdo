@@ -47,7 +47,7 @@ func (d *DataSource) Schema(ctx context.Context, req datasource.SchemaRequest, r
 				Computed:            true,
 			},
 			"role": schema.StringAttribute{
-				MarkdownDescription: "Role assigned to the user in this tenant.",
+				MarkdownDescription: "Roles assigned to the user in this tenant.",
 				Computed:            true,
 			},
 		},

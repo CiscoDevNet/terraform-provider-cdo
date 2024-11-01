@@ -14,10 +14,31 @@ import (
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	netHttp "net/http"
+	"strconv"
 	"testing"
 	"time"
 )
 
+// Function to generate users
+func generateUsers(num int) []users.UserDetails {
+	var createdUsers []users.UserDetails
+	for i := 1; i <= num; i++ {
+		uid := "uid" + strconv.Itoa(i)       // Generate unique UID
+		username := "user" + strconv.Itoa(i) // Generate usernames like user1, user2, etc.
+		roles := []string{"ROLE_USER"}       // Assign a default role; you can modify this as needed
+		apiOnlyUser := i%2 == 0              // Example: alternate between true/false for ApiOnlyUser
+
+		createdUsers = append(createdUsers, users.UserDetails{
+			Uid:         uid,
+			Username:    username,
+			Roles:       roles,
+			ApiOnlyUser: apiOnlyUser,
+		})
+	}
+	return createdUsers
+}
+
+// the create test also tests read!
 func TestCreate(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
@@ -25,13 +46,28 @@ func TestCreate(t *testing.T) {
 	t.Run("successfully create users in MSP-managed tenant", func(t *testing.T) {
 		httpmock.Reset()
 		var managedTenantUid = uuid.New().String()
-		var createInp = users.MspCreateUsersInput{
+		var createInp = users.MspUsersInput{
 			TenantUid: managedTenantUid,
 			Users: []users.UserDetails{
-				{Username: "apples@bananas.com", Role: string(role.SuperAdmin), ApiOnlyUser: false},
-				{Username: "api-only-user", Role: string(role.ReadOnly), ApiOnlyUser: true},
+				{Username: "apples@bananas.com", Roles: []string{string(role.SuperAdmin)}, ApiOnlyUser: false},
+				{Username: "api-only-user", Roles: []string{string(role.ReadOnly)}, ApiOnlyUser: true},
 			},
 		}
+
+		var usersInCdoTenant = generateUsers(250)
+		var usersWithIds []users.UserDetails
+		for _, user := range createInp.Users {
+			userWithId := users.UserDetails{
+				Uid:         uuid.New().String(),
+				Username:    user.Username,
+				Roles:       user.Roles,
+				ApiOnlyUser: user.ApiOnlyUser,
+			}
+			usersInCdoTenant = append(usersInCdoTenant, userWithId)
+			usersWithIds = append(usersWithIds, userWithId)
+		}
+		firstUserPage := users.UserPage{Items: usersInCdoTenant[:200], Count: len(usersInCdoTenant), Limit: 200, Offset: 0}
+		secondUserPage := users.UserPage{Items: usersInCdoTenant[200:], Count: len(usersInCdoTenant), Limit: 200, Offset: 200}
 		var transactionUid = uuid.New().String()
 		var inProgressTransaction = transaction.Type{
 			TransactionUid:  transactionUid,
@@ -66,22 +102,32 @@ func TestCreate(t *testing.T) {
 			inProgressTransaction.PollingUrl,
 			httpmock.NewJsonResponderOrPanic(200, doneTransaction),
 		)
+		httpmock.RegisterResponder(
+			netHttp.MethodGet,
+			fmt.Sprintf("/api/rest/v1/msp/tenants/%s/users?limit=200&offset=0", managedTenantUid),
+			httpmock.NewJsonResponderOrPanic(200, firstUserPage),
+		)
+		httpmock.RegisterResponder(
+			netHttp.MethodGet,
+			fmt.Sprintf("/api/rest/v1/msp/tenants/%s/users?limit=200&offset=200", managedTenantUid),
+			httpmock.NewJsonResponderOrPanic(200, secondUserPage),
+		)
 
 		actual, err := users.Create(context.Background(), *http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute), createInp)
 
 		assert.NotNil(t, actual, "Created users should have not been nil")
 		assert.Nil(t, err, "Created users operation should have not been an error")
-		assert.Equal(t, createInp.Users, *actual, "Created users operation should have been the same as the created tenant")
+		assert.Equal(t, usersWithIds, *actual, "Created users operation should have been the same as the created tenant")
 	})
 
 	t.Run("user creation transaction fails", func(t *testing.T) {
 		httpmock.Reset()
 		var managedTenantUid = uuid.New().String()
-		var createInp = users.MspCreateUsersInput{
+		var createInp = users.MspUsersInput{
 			TenantUid: managedTenantUid,
 			Users: []users.UserDetails{
-				{Username: "apples@bananas.com", Role: string(role.SuperAdmin), ApiOnlyUser: false},
-				{Username: "api-only-user", Role: string(role.ReadOnly), ApiOnlyUser: true},
+				{Username: "apples@bananas.com", Roles: []string{string(role.SuperAdmin)}, ApiOnlyUser: false},
+				{Username: "api-only-user", Roles: []string{string(role.ReadOnly)}, ApiOnlyUser: true},
 			},
 		}
 		var transactionUid = uuid.New().String()
@@ -132,11 +178,11 @@ func TestCreate(t *testing.T) {
 	t.Run("user creation API call fails", func(t *testing.T) {
 		httpmock.Reset()
 		var managedTenantUid = uuid.New().String()
-		var createInp = users.MspCreateUsersInput{
+		var createInp = users.MspUsersInput{
 			TenantUid: managedTenantUid,
 			Users: []users.UserDetails{
-				{Username: "apples@bananas.com", Role: string(role.SuperAdmin), ApiOnlyUser: false},
-				{Username: "api-only-user", Role: string(role.ReadOnly), ApiOnlyUser: true},
+				{Username: "apples@bananas.com", Roles: []string{string(role.SuperAdmin)}, ApiOnlyUser: false},
+				{Username: "api-only-user", Roles: []string{string(role.ReadOnly)}, ApiOnlyUser: true},
 			},
 		}
 		var transactionUid = uuid.New().String()

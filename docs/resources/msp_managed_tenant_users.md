@@ -26,5 +26,9 @@ Provides a resource to add users to an MSP managed tenant.
 Required:
 
 - `api_only_user` (Boolean) Whether the user is an API-only user
-- `role` (String) The role to assign to the user in the CDO tenant.
+- `roles` (List of String) The roles to assign to the user in the CDO tenant. Note: this list can only contain one entry.
 - `username` (String) The name of the user in CDO. This must be a valid e-mail address if the user is not an API-only user.
+
+Read-Only:
+
+- `id` (String) Universally unique identifier of the user

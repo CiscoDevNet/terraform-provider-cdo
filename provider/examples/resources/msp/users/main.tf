@@ -1,5 +1,5 @@
 data "cdo_msp_managed_tenant" "tenant" {
-  name             = "CDO_tenant-name"
+  name             = "CDO_isaks-birthday-surprise__skfh2r"
 }
 
 resource "cdo_msp_managed_tenant_users" "example" {
@@ -7,12 +7,12 @@ resource "cdo_msp_managed_tenant_users" "example" {
   users = [
     {
       username = "username@example.com",
-      role = "ROLE_SUPER_ADMIN"
+      roles = ["ROLE_SUPER_ADMIN"]
       api_only_user = false
     },
     {
       username = "username2@example.com",
-      role = "ROLE_ADMIN"
+      roles = ["ROLE_ADMIN"]
       api_only_user = false
     }
   ]

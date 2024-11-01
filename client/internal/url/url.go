@@ -222,6 +222,10 @@ func CreateUsersInMspManagedTenant(baseUrl string, tenantUid string) string {
 	return fmt.Sprintf("%s/api/rest/v1/msp/tenants/%s/users", baseUrl, tenantUid)
 }
 
+func GetUsersInMspManagedTenant(baseUrl string, tenantUid string, limit int, offset int) string {
+	return fmt.Sprintf("%s/api/rest/v1/msp/tenants/%s/users?limit=%d&offset=%d", baseUrl, tenantUid, limit, offset)
+}
+
 func DeleteUsersInMspManagedTenant(baseUrl string, tenantUid string) string {
 	return fmt.Sprintf("%s/api/rest/v1/msp/tenants/%s/users/delete", baseUrl, tenantUid)
 }

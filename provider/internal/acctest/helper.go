@@ -20,6 +20,14 @@ func MustParseTemplate(tmpl string, obj any) string {
 	return buf.String()
 }
 
+func MustParseTemplateWithFuncMap(tmpl string, obj any, funcMap template.FuncMap) string {
+	buf := bytes.Buffer{}
+	if err := template.Must(template.New("").Funcs(funcMap).Parse(tmpl)).Execute(&buf, obj); err != nil {
+		panic(err)
+	}
+	return buf.String()
+}
+
 func MustOverrideFields[K any](obj K, fields map[string]any) K {
 	copyObj := obj
 	copyValue := reflect.ValueOf(&copyObj).Elem()

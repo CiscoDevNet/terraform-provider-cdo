@@ -5,12 +5,15 @@ import (
 	"fmt"
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/msp/users"
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -20,7 +23,7 @@ type MspManagedTenantUsersResource struct {
 	client *cdoClient.Client
 }
 
-func (r *MspManagedTenantUsersResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
+func (resource *MspManagedTenantUsersResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = schema.Schema{
 		MarkdownDescription: "Provides a resource to add users to an MSP managed tenant.",
 		Attributes: map[string]schema.Attribute{
@@ -31,15 +34,23 @@ func (r *MspManagedTenantUsersResource) Schema(ctx context.Context, request reso
 			"users": schema.ListNestedAttribute{
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
+						"id": schema.StringAttribute{
+							MarkdownDescription: "Universally unique identifier of the user",
+							Computed:            true,
+						},
 						"username": schema.StringAttribute{
 							Required:            true,
 							MarkdownDescription: "The name of the user in CDO. This must be a valid e-mail address if the user is not an API-only user.",
 						},
-						"role": schema.StringAttribute{
+						"roles": schema.ListAttribute{
 							Required:            true,
-							MarkdownDescription: "The role to assign to the user in the CDO tenant.",
-							Validators: []validator.String{
-								stringvalidator.OneOf("ROLE_READ_ONLY", "ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_DEPLOY_ONLY", "ROLE_EDIT_ONLY", "ROLE_VPN_SESSIONS_MANAGER"),
+							MarkdownDescription: "The roles to assign to the user in the CDO tenant. Note: this list can only contain one entry.",
+							ElementType:         types.StringType,
+							Validators: []validator.List{
+								listvalidator.ValueStringsAre(
+									stringvalidator.OneOf("ROLE_READ_ONLY", "ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_DEPLOY_ONLY", "ROLE_EDIT_ONLY", "ROLE_VPN_SESSIONS_MANAGER"),
+								),
+								listvalidator.SizeAtMost(1),
 							},
 						},
 						"api_only_user": schema.BoolAttribute{
@@ -58,7 +69,7 @@ func (r *MspManagedTenantUsersResource) Schema(ctx context.Context, request reso
 	}
 }
 
-func (r *MspManagedTenantUsersResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
+func (resource *MspManagedTenantUsersResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
 	tflog.Debug(ctx, "Adding users to the MSSP-managed CDO tenant")
 	var planData MspManagedTenantUsersResourceModel
 	response.Diagnostics.Append(request.Plan.Get(ctx, &planData)...)
@@ -67,22 +78,37 @@ func (r *MspManagedTenantUsersResource) Create(ctx context.Context, request reso
 		return
 	}
 
-	_, err := r.createAllUsersInPlan(ctx, &planData)
+	createdUserDetails, err := resource.client.CreateUsersInMspManagedTenant(ctx, *resource.buildMspUsersInput(&planData))
+
 	if err != nil {
 		response.Diagnostics.AddError("failed to create users in MSP-managed tenant", err.Error())
 		return
 	}
+
+	planData.Users = *resource.transformApiResponseToPlan(createdUserDetails)
+
 	response.Diagnostics.Append(response.State.Set(ctx, &planData)...)
 }
 
-func (r *MspManagedTenantUsersResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
-	tflog.Debug(ctx, "Reading users from MSP-managed CDO tenant is a NOOP")
+func (resource *MspManagedTenantUsersResource) Read(ctx context.Context, request resource.ReadRequest, response *resource.ReadResponse) {
+	tflog.Debug(ctx, "Reading users from MSP-managed CDO tenant")
+	var stateData MspManagedTenantUsersResourceModel
+	response.Diagnostics.Append(request.State.Get(ctx, &stateData)...)
+
+	userDetails, err := resource.client.ReadUsersInMspManagedTenant(ctx, *resource.buildMspUsersInput(&stateData))
+	if err != nil {
+		response.Diagnostics.AddError("failed to read users in MSP-managed tenant", err.Error())
+		return
+	}
+
+	stateData.Users = *resource.transformApiResponseToPlan(userDetails)
+	response.Diagnostics.Append(response.State.Set(ctx, &stateData)...)
 }
 
-func (r *MspManagedTenantUsersResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
+func (resource *MspManagedTenantUsersResource) Update(ctx context.Context, request resource.UpdateRequest, response *resource.UpdateResponse) {
 }
 
-func (r *MspManagedTenantUsersResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
+func (resource *MspManagedTenantUsersResource) Delete(ctx context.Context, request resource.DeleteRequest, response *resource.DeleteResponse) {
 	tflog.Debug(ctx, "Deleting users from MSP-managed CDO tenant")
 	var stateData MspManagedTenantUsersResourceModel
 	response.Diagnostics.Append(request.State.Get(ctx, &stateData)...)
@@ -90,10 +116,12 @@ func (r *MspManagedTenantUsersResource) Delete(ctx context.Context, request reso
 		return
 	}
 
-	_, err := r.deleteAllUsersInState(ctx, &stateData)
+	_, err := resource.deleteAllUsersInState(ctx, &stateData)
 	if err != nil {
 		response.Diagnostics.AddError("failed to delete users", err.Error())
 	}
+	stateData.Users = []User{}
+	response.Diagnostics.Append(response.State.Set(ctx, &stateData)...)
 }
 
 func (*MspManagedTenantUsersResource) Metadata(ctx context.Context, request resource.MetadataRequest, response *resource.MetadataResponse) {
@@ -119,7 +147,7 @@ func (resource *MspManagedTenantUsersResource) Configure(ctx context.Context, re
 	resource.client = client
 }
 
-func (r *MspManagedTenantUsersResource) deleteAllUsersInState(ctx context.Context, stateData *MspManagedTenantUsersResourceModel) (interface{}, error) {
+func (resource *MspManagedTenantUsersResource) deleteAllUsersInState(ctx context.Context, stateData *MspManagedTenantUsersResourceModel) (interface{}, error) {
 	var usernames []string
 	for _, user := range stateData.Users {
 		usernames = append(usernames, user.Username.ValueString())
@@ -128,27 +156,50 @@ func (r *MspManagedTenantUsersResource) deleteAllUsersInState(ctx context.Contex
 		TenantUid: stateData.TenantUid.ValueString(),
 		Usernames: usernames,
 	}
-	return r.client.DeleteUsersInMspManagedTenant(ctx, deleteInput)
+	return resource.client.DeleteUsersInMspManagedTenant(ctx, deleteInput)
 }
 
-func (r *MspManagedTenantUsersResource) createAllUsersInPlan(ctx context.Context, planData *MspManagedTenantUsersResourceModel) (*[]users.UserDetails, *users.CreateError) {
+func (resource *MspManagedTenantUsersResource) buildMspUsersInput(planData *MspManagedTenantUsersResourceModel) *users.MspUsersInput {
 	var nativeUsers []users.UserDetails
 
-	// 2. use plan data to create tenant and fill up rest of the model
+	// 2. use plan data to create user and fill up rest of the model
 	for _, user := range planData.Users {
 		username := user.Username.ValueString()
-		role := user.Role.ValueString()
+		// Convert user.Roles to a slice of strings
+		var roles []string
+		for _, roleValue := range user.Roles.Elements() {
+			if roleStr, ok := roleValue.(types.String); ok {
+				roles = append(roles, roleStr.ValueString())
+			}
+		}
 		apiOnlyUser := user.ApiOnlyUser.ValueBool()
 		nativeUsers = append(nativeUsers, users.UserDetails{
 			Username:    username,
-			Role:        role,
+			Roles:       roles,
 			ApiOnlyUser: apiOnlyUser,
 		})
 	}
 
-	// TODO we need endpoint to read users in an MSP-managed tenant
-	return r.client.CreateUsersInMspManagedTenant(ctx, users.MspCreateUsersInput{
+	return &users.MspUsersInput{
 		TenantUid: planData.TenantUid.ValueString(),
 		Users:     nativeUsers,
-	})
+	}
+}
+
+func (resource *MspManagedTenantUsersResource) transformApiResponseToPlan(createdUserDetails *[]users.UserDetails) *[]User {
+	var users []User
+	for _, userDetails := range *createdUserDetails {
+		var roles []attr.Value
+		for _, role := range userDetails.Roles {
+			roles = append(roles, types.StringValue(role))
+		}
+		users = append(users, User{
+			Id:          types.StringValue(userDetails.Uid),
+			Username:    types.StringValue(userDetails.Username),
+			ApiOnlyUser: types.BoolValue(userDetails.ApiOnlyUser),
+			Roles:       types.ListValueMust(types.StringType, roles),
+		})
+	}
+
+	return &users
 }

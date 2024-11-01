@@ -126,6 +126,10 @@ func RevokeApiToken(baseUrl string, tokenId string) string {
 	return fmt.Sprintf("%s/anubis/rest/v1/oauth/revoke/%s", baseUrl, tokenId)
 }
 
+func RevokeApiTokenUsingPublicApi(baseUrl string) string {
+	return fmt.Sprintf("%s/api/rest/v1/token/revoke", baseUrl)
+}
+
 func ReadTokenInfo(baseUrl string) string {
 	return fmt.Sprintf("%s/anubis/rest/v1/oauth/check_token", baseUrl)
 }
@@ -228,4 +232,8 @@ func GetUsersInMspManagedTenant(baseUrl string, tenantUid string, limit int, off
 
 func DeleteUsersInMspManagedTenant(baseUrl string, tenantUid string) string {
 	return fmt.Sprintf("%s/api/rest/v1/msp/tenants/%s/users/delete", baseUrl, tenantUid)
+}
+
+func GenerateApiTokenForUserInMspManagedTenant(baseUrl string, tenantUid string, userUid string) string {
+	return fmt.Sprintf("%s/api/rest/v1/msp/tenants/%s/users/%s/token", baseUrl, tenantUid, userUid)
 }

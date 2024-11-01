@@ -303,3 +303,11 @@ func (c *Client) ReadUsersInMspManagedTenant(ctx context.Context, readInput user
 func (c *Client) DeleteUsersInMspManagedTenant(ctx context.Context, deleteInput users.MspDeleteUsersInput) (interface{}, error) {
 	return users.Delete(ctx, c.client, deleteInput)
 }
+
+func (c *Client) GenerateApiTokenForUserInMspManagedTenant(ctx context.Context, generateApiTokenInput users.MspGenerateApiTokenInput) (*users.MspGenerateApiTokenOutput, error) {
+	return users.GenerateApiToken(ctx, c.client, generateApiTokenInput)
+}
+
+func (c *Client) RevokeApiTokenForUserInMspManagedTenant(ctx context.Context, revokeApiTokenInput users.MspRevokeApiTokenInput) (interface{}, error) {
+	return users.RevokeApiToken(ctx, c.client, revokeApiTokenInput)
+}

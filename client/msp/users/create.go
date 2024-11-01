@@ -57,3 +57,14 @@ func Create(ctx context.Context, client http.Client, createInp MspUsersInput) (*
 	}
 	return readUserDetrails, nil
 }
+
+func GenerateApiToken(ctx context.Context, client http.Client, generateApiTokenInp MspGenerateApiTokenInput) (*MspGenerateApiTokenOutput, error) {
+	client.Logger.Printf("Generating API token for user %s in tenant %s", generateApiTokenInp.UserUid, generateApiTokenInp.TenantUid)
+	genApiTokenUrl := url.GenerateApiTokenForUserInMspManagedTenant(client.BaseUrl(), generateApiTokenInp.TenantUid, generateApiTokenInp.UserUid)
+	var mspApiTokenOutput MspGenerateApiTokenOutput
+	req := client.NewPost(ctx, genApiTokenUrl, nil)
+	if err := req.Send(&mspApiTokenOutput); err != nil {
+		return nil, err
+	}
+	return &mspApiTokenOutput, nil
+}

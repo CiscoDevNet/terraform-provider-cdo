@@ -1,5 +1,10 @@
 [[rules]]
   description = "Ignore ApiToken in tests"
-  regex = '''(?i)(ApiToken:\s?"fake-api-token")'''
-  allowlist = ["ApiToken"]
+  regex = '''(?i)ApiToken:\s?"fake-api-token"'''
   path = '''^.*_test\.go$'''
+
+  [rules.allowlist]
+    description = "Allow fake ApiToken in test files"
+    commits = []
+    files = []
+    paths = ["^.*_test\\.go$"]

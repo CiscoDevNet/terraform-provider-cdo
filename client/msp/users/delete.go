@@ -40,7 +40,7 @@ func RevokeApiToken(ctx context.Context, client http.Client, revokeInput MspRevo
 	req := client.NewPost(ctx, revokeTokenUrl, nil)
 	// overwrite token in header with API token for the user that we are revoking
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", revokeInput.ApiToken))
-	if err := req.Send(&struct{}{}); err != nil {
+	if err := req.SendWithToken(&struct{}{}, &revokeInput.ApiToken); err != nil {
 		return nil, err
 	}
 

@@ -16,6 +16,29 @@ import (
 	"time"
 )
 
+func TestRevokeApiToken(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	t.Run("successfully revoke API token for user in MSP-managed tenant", func(t *testing.T) {
+		httpmock.Reset()
+		revokeInput := users.MspRevokeApiTokenInput{
+			ApiToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIzNDU2Nzg5LCJuYW1lIjoiSm9zZXBoIn0.OpOSSw7e485LOP5PrzScxHb7SR6sAOMRckfFwi4rp7o",
+		}
+		httpmock.RegisterResponder(
+			netHttp.MethodPost,
+			"/api/rest/v1/token/revoke",
+			httpmock.NewJsonResponderOrPanic(200, nil),
+		)
+		response, err := users.RevokeApiToken(context.Background(),
+			*http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute),
+			revokeInput)
+
+		assert.Nil(t, err)
+		assert.Nil(t, response)
+	})
+}
+
 func TestDelete(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()

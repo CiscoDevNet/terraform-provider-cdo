@@ -65,7 +65,7 @@ func (m *MspManagedTenantUserApiTokenResource) Create(ctx context.Context, reque
 		TenantUid: planData.TenantUid.ValueString(),
 	})
 	if err != nil {
-		response.Diagnostics.AddError(fmt.Sprintf("failed to generate API token for user %s in MSP-managed tenant %s", planData.UserUid, planData.TenantUid), err.Error())
+		response.Diagnostics.AddError(fmt.Sprintf("Failed to generate API token for user %s in MSP-managed tenant %s", planData.UserUid, planData.TenantUid), err.Error())
 		return
 	}
 

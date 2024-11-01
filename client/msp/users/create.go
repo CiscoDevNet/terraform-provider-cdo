@@ -47,7 +47,7 @@ func Create(ctx context.Context, client http.Client, createInp MspUsersInput) (*
 		}
 	}
 
-	readUserDetrails, err := ReadCreatedUsersInTenant(ctx, client, createInp)
+	readUserDetails, err := ReadCreatedUsersInTenant(ctx, client, createInp)
 	if err != nil {
 		client.Logger.Println("Failed to read users from tenant after creation")
 		return nil, &CreateError{
@@ -55,5 +55,16 @@ func Create(ctx context.Context, client http.Client, createInp MspUsersInput) (*
 			CreatedResourceId: &transaction.EntityUid,
 		}
 	}
-	return readUserDetrails, nil
+	return readUserDetails, nil
+}
+
+func GenerateApiToken(ctx context.Context, client http.Client, generateApiTokenInp MspGenerateApiTokenInput) (*MspGenerateApiTokenOutput, error) {
+	client.Logger.Printf("Generating API token for user %s in tenant %s", generateApiTokenInp.UserUid, generateApiTokenInp.TenantUid)
+	genApiTokenUrl := url.GenerateApiTokenForUserInMspManagedTenant(client.BaseUrl(), generateApiTokenInp.TenantUid, generateApiTokenInp.UserUid)
+	var mspApiTokenOutput MspGenerateApiTokenOutput
+	req := client.NewPost(ctx, genApiTokenUrl, nil)
+	if err := req.Send(&mspApiTokenOutput); err != nil {
+		return nil, err
+	}
+	return &mspApiTokenOutput, nil
 }

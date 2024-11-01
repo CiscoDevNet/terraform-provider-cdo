@@ -33,3 +33,16 @@ func Delete(ctx context.Context, client http.Client, deleteInp MspDeleteUsersInp
 
 	return nil, nil
 }
+
+func RevokeApiToken(ctx context.Context, client http.Client, revokeInput MspRevokeApiTokenInput) (interface{}, error) {
+	revokeTokenUrl := url.RevokeApiTokenUsingPublicApi(client.BaseUrl())
+	client.Logger.Printf("Revoking api token at %s\n", revokeTokenUrl)
+	req := client.NewPost(ctx, revokeTokenUrl, nil)
+	// overwrite token in header with API token for the user that we are revoking
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", revokeInput.ApiToken))
+	if err := req.SendWithToken(&struct{}{}, &revokeInput.ApiToken); err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}

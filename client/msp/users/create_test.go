@@ -14,6 +14,7 @@ import (
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 	netHttp "net/http"
+	"sort"
 	"strconv"
 	"testing"
 	"time"
@@ -36,6 +37,60 @@ func generateUsers(num int) []users.UserDetails {
 		})
 	}
 	return createdUsers
+}
+
+func TestGenerateApiToken(t *testing.T) {
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	t.Run("generate API token successfully", func(t *testing.T) {
+		httpmock.Reset()
+		managedTenantUid := uuid.New().String()
+		userUid := uuid.New().String()
+		generateTokenApiTokenInput := users.MspGenerateApiTokenInput{
+			UserUid:   userUid,
+			TenantUid: managedTenantUid,
+		}
+		generateTokenApiOutput := users.MspGenerateApiTokenOutput{
+			ApiToken: "fake-api-token",
+		}
+
+		httpmock.RegisterResponder(
+			netHttp.MethodPost,
+			fmt.Sprintf("/api/rest/v1/msp/tenants/%s/users/%s/token", managedTenantUid, userUid),
+			httpmock.NewJsonResponderOrPanic(200, generateTokenApiOutput),
+		)
+
+		actual, err := users.GenerateApiToken(context.Background(),
+			*http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute),
+			generateTokenApiTokenInput)
+
+		assert.Nil(t, err)
+		assert.Equal(t, generateTokenApiOutput, *actual, "Token not returned as expected")
+	})
+
+	t.Run("fail to generate API token", func(t *testing.T) {
+		httpmock.Reset()
+		managedTenantUid := uuid.New().String()
+		userUid := uuid.New().String()
+		generateTokenApiTokenInput := users.MspGenerateApiTokenInput{
+			UserUid:   userUid,
+			TenantUid: managedTenantUid,
+		}
+
+		httpmock.RegisterResponder(
+			netHttp.MethodPost,
+			fmt.Sprintf("/api/rest/v1/msp/tenants/%s/users/%s/token", managedTenantUid, userUid),
+			httpmock.NewJsonResponderOrPanic(500, nil),
+		)
+
+		actual, err := users.GenerateApiToken(context.Background(),
+			*http.MustNewWithConfig(baseUrl, "valid_token", 0, 0, time.Minute),
+			generateTokenApiTokenInput)
+
+		assert.Nil(t, actual)
+		assert.NotNil(t, err)
+	})
 }
 
 // the create test also tests read!
@@ -117,6 +172,12 @@ func TestCreate(t *testing.T) {
 
 		assert.NotNil(t, actual, "Created users should have not been nil")
 		assert.Nil(t, err, "Created users operation should have not been an error")
+		sort.Slice(usersWithIds, func(i, j int) bool {
+			return usersWithIds[i].Uid < usersWithIds[j].Uid
+		})
+		sort.Slice(*actual, func(i, j int) bool {
+			return (*actual)[i].Uid < (*actual)[j].Uid
+		})
 		assert.Equal(t, usersWithIds, *actual, "Created users operation should have been the same as the created tenant")
 	})
 

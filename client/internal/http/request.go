@@ -54,10 +54,14 @@ func NewRequest(config cdo.Config, httpClient *http.Client, logger *log.Logger, 
 	}
 }
 
+func (r *Request) Send(output any) error {
+	return r.SendWithToken(output, &r.config.ApiToken)
+}
+
 // Send wrap send() with retry & delay & timeout... stuff
 // TODO: cancel retry when context done
 // output: if given, will unmarshal response body into this object, should be a pointer for it to be useful
-func (r *Request) Send(output any) error {
+func (r *Request) SendWithToken(output any, token *string) error {
 	err := retry.Do(
 		// context.Background() will never cancel according to documentation
 		// we do not want to cancel here because this retry mechanism is intended to overcome
@@ -65,8 +69,7 @@ func (r *Request) Send(output any) error {
 		// and fail due to flaky-ness, but if we want to cancel, there is no obvious bad side effect.
 		context.Background(),
 		func() (bool, error) {
-
-			err := r.send(output)
+			err := r.send(output, token)
 			if err != nil {
 				return false, err
 			}
@@ -83,13 +86,13 @@ func (r *Request) Send(output any) error {
 	return err
 }
 
-func (r *Request) send(output any) error {
+func (r *Request) send(output any, token *string) error {
 	// clear prev response
 	r.Response = nil
 	r.Error = nil
 
 	// build net/http.Request
-	req, err := r.build()
+	req, err := r.build(token)
 	if err != nil {
 		r.Error = err
 		return err
@@ -147,7 +150,7 @@ func (r *Request) OverrideApiToken(apiToken string) {
 }
 
 // build the net/http.Request
-func (r *Request) build() (*http.Request, error) {
+func (r *Request) build(token *string) (*http.Request, error) {
 
 	bodyReader, err := toReader(r.body)
 	if err != nil {
@@ -162,7 +165,7 @@ func (r *Request) build() (*http.Request, error) {
 		req = req.WithContext(r.ctx)
 	}
 
-	r.addHeaders(req)
+	r.addHeaders(req, token)
 	r.addQueryParams(req)
 	return req, nil
 }
@@ -177,8 +180,8 @@ func (r *Request) addQueryParams(req *http.Request) {
 	req.URL.RawQuery = q.Encode()
 }
 
-func (r *Request) addHeaders(req *http.Request) {
-	r.addAuthHeader(req)
+func (r *Request) addHeaders(req *http.Request, token *string) {
+	r.addAuthHeader(req, token)
 	r.addOtherHeader(req)
 	r.addJsonContentTypeHeaderIfNotPresent(req)
 	r.addUserAgentHeader(req)
@@ -192,8 +195,8 @@ func (r *Request) addJsonContentTypeHeaderIfNotPresent(req *http.Request) {
 	}
 }
 
-func (r *Request) addAuthHeader(req *http.Request) {
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.config.ApiToken))
+func (r *Request) addAuthHeader(req *http.Request, token *string) {
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", *token))
 }
 
 func (r *Request) addUserAgentHeader(req *http.Request) {

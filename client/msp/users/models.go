@@ -36,6 +36,19 @@ type UserPage struct {
 	Items  []UserDetails `json:"items"`
 }
 
+type MspGenerateApiTokenInput struct {
+	TenantUid string `json:"tenantUid"`
+	UserUid   string `json:"userUid"`
+}
+
+type MspRevokeApiTokenInput struct {
+	ApiToken string `json:"apiToken"`
+}
+
+type MspGenerateApiTokenOutput struct {
+	ApiToken string `json:"apiToken"`
+}
+
 type CreateError struct {
 	Err               error
 	CreatedResourceId *string

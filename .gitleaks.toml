@@ -1,0 +1,5 @@
+[[rules]]
+  description = "Ignore ApiToken in tests"
+  regex = '''(?i)(ApiToken:\s?"fake-api-token")'''
+  allowlist = ["ApiToken"]
+  path = '''^.*_test\.go$'''

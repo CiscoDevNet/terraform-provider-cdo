@@ -27,7 +27,7 @@ func (m *MspManagedTenantUserApiTokenResource) Metadata(ctx context.Context, req
 
 func (m *MspManagedTenantUserApiTokenResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
 	response.Schema = schema.Schema{
-		MarkdownDescription: "Provides a resource to generate an API token for a user in an MSP-managed tenant.",
+		MarkdownDescription: "Provides a resource to manage an API token for a user in an MSP-managed tenant.",
 		Attributes: map[string]schema.Attribute{
 			"tenant_uid": schema.StringAttribute{
 				MarkdownDescription: "Universally unique identifier of the tenant in which the API token for the user should be generated.",

@@ -3,12 +3,12 @@
 page_title: "cdo_msp_managed_tenant_user_api_token Resource - cdo"
 subcategory: ""
 description: |-
-  Provides a resource to generate an API token for a user in an MSP-managed tenant.
+  Provides a resource to manage an API token for a user in an MSP-managed tenant.
 ---
 
 # cdo_msp_managed_tenant_user_api_token (Resource)
 
-Provides a resource to generate an API token for a user in an MSP-managed tenant.
+Provides a resource to manage an API token for a user in an MSP-managed tenant.
 
 
 

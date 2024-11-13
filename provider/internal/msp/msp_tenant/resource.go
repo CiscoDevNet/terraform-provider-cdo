@@ -6,11 +6,9 @@ import (
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/msp/tenants"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
-	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -35,10 +33,7 @@ func (*TenantResource) Schema(ctx context.Context, request resource.SchemaReques
 			},
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Name of the tenant",
-				Validators: []validator.String{
-					validators.NewCdoTenantValidator(),
-				},
-				Required: true,
+				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					PreventUpdatePlanModifier{}, // Prevent updates to name
 				},

@@ -15,12 +15,26 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"sort"
 )
 
 func NewMspManagedTenantUsersResource() resource.Resource { return &MspManagedTenantUsersResource{} }
 
 type MspManagedTenantUsersResource struct {
 	client *cdoClient.Client
+}
+
+func sortUsersToOrderInPlanData(users []User, planData *MspManagedTenantUsersResourceModel) *[]User {
+	userOrder := make(map[string]int)
+	for i, user := range planData.Users {
+		userOrder[user.Username.ValueString()] = i
+	}
+
+	sort.Slice(users, func(i, j int) bool {
+		return userOrder[users[i].Username.ValueString()] < userOrder[users[j].Username.ValueString()]
+	})
+
+	return &users
 }
 
 func (resource *MspManagedTenantUsersResource) Schema(ctx context.Context, request resource.SchemaRequest, response *resource.SchemaResponse) {
@@ -85,7 +99,7 @@ func (resource *MspManagedTenantUsersResource) Create(ctx context.Context, reque
 		return
 	}
 
-	planData.Users = *resource.transformApiResponseToPlan(createdUserDetails)
+	planData.Users = *sortUsersToOrderInPlanData(*resource.transformApiResponseToPlan(createdUserDetails), &planData)
 
 	response.Diagnostics.Append(response.State.Set(ctx, &planData)...)
 }
@@ -101,7 +115,7 @@ func (resource *MspManagedTenantUsersResource) Read(ctx context.Context, request
 		return
 	}
 
-	stateData.Users = *resource.transformApiResponseToPlan(userDetails)
+	stateData.Users = *sortUsersToOrderInPlanData(*resource.transformApiResponseToPlan(userDetails), &stateData)
 	response.Diagnostics.Append(response.State.Set(ctx, &stateData)...)
 }
 

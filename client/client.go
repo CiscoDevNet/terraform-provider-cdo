@@ -5,6 +5,7 @@ package client
 import (
 	"context"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/msp/tenants"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/msp/usergroups"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/msp/users"
 	"net/http"
 
@@ -310,4 +311,16 @@ func (c *Client) GenerateApiTokenForUserInMspManagedTenant(ctx context.Context, 
 
 func (c *Client) RevokeApiTokenForUserInMspManagedTenant(ctx context.Context, revokeApiTokenInput users.MspRevokeApiTokenInput) (interface{}, error) {
 	return users.RevokeApiToken(ctx, c.client, revokeApiTokenInput)
+}
+
+func (c *Client) CreateUserGroupsInMspManagedTenant(ctx context.Context, tenantUid string, userGroups *[]usergroups.MspManagedUserGroupInput) (*[]usergroups.MspManagedUserGroup, *usergroups.CreateError) {
+	return usergroups.Create(ctx, c.client, tenantUid, userGroups)
+}
+
+func (c *Client) ReadUserGroupsInMspManagedTenant(ctx context.Context, tenantUid string, userGroups *[]usergroups.MspManagedUserGroupInput) (*[]usergroups.MspManagedUserGroup, error) {
+	return usergroups.ReadCreatedUserGroupsInTenant(ctx, c.client, tenantUid, userGroups)
+}
+
+func (c *Client) DeleteUserGroupsInMspManagedTenant(ctx context.Context, tenantUid string, deleteInput *usergroups.MspManagedUserGroupDeleteInput) (interface{}, error) {
+	return usergroups.Delete(ctx, c.client, tenantUid, deleteInput)
 }

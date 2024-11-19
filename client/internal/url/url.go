@@ -237,3 +237,15 @@ func DeleteUsersInMspManagedTenant(baseUrl string, tenantUid string) string {
 func GenerateApiTokenForUserInMspManagedTenant(baseUrl string, tenantUid string, userUid string) string {
 	return fmt.Sprintf("%s/api/rest/v1/msp/tenants/%s/users/%s/token", baseUrl, tenantUid, userUid)
 }
+
+func CreateUserGroupsInMspManagedTenant(baseUrl string, tenantUid string) string {
+	return fmt.Sprintf("%s/api/rest/v1/msp/tenants/%s/users/groups", baseUrl, tenantUid)
+}
+
+func GetUserGroupsInMspManagedTenant(baseUrl string, tenantUid string, limit int, offset int) string {
+	return fmt.Sprintf("%s/api/rest/v1/msp/tenants/%s/users/groups?limit=%d&offset=%d", baseUrl, tenantUid, limit, offset)
+}
+
+func DeleteUserGroupsInMspManagedTenant(baseUrl string, tenantUid string) string {
+	return fmt.Sprintf("%s/api/rest/v1/msp/tenants/%s/users/groups/delete", baseUrl, tenantUid)
+}

@@ -63,11 +63,11 @@ func (d *DataSource) Read(ctx context.Context, request datasource.ReadRequest, r
 		response.Diagnostics.AddError("Failed to read MSP Managed Tenant", err.Error())
 		return
 	}
+	tflog.Debug(ctx, fmt.Sprintf("Found %d MSP managed tenants by name %s", mspManagedTenants.Count, planData.Name.ValueString()))
 	if mspManagedTenants.Count != 1 {
 		response.Diagnostics.AddError("Cannot find MSP managed tenant by name "+planData.Name.ValueString(), fmt.Sprintf("Found %d tenants by name %s", mspManagedTenants.Count, planData.Name.ValueString()))
+		return
 	}
-
-	tflog.Debug(ctx, fmt.Sprintf("fuckity shit: %v", mspManagedTenants))
 
 	mspManagedTenant := mspManagedTenants.Items[0]
 	planData.Id = types.StringValue(mspManagedTenant.Uid)

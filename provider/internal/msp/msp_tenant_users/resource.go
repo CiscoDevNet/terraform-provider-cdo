@@ -78,6 +78,9 @@ func (resource *MspManagedTenantUsersResource) Schema(ctx context.Context, reque
 				},
 				MarkdownDescription: "The list of users to be added to the tenant. You can add a maximum of 50 users at a time.",
 				Required:            true,
+				Validators: []validator.List{
+					listvalidator.SizeAtLeast(1),
+				},
 			},
 		},
 	}

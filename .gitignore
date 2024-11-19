@@ -1,2 +1,2 @@
 .idea
-provider/.github-action.local.env
+provider/.github-action.local.envprovider/terraform-provider-cdo

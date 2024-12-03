@@ -214,6 +214,10 @@ func CreateMspManagedTenant(baseUrl string) string {
 	return fmt.Sprintf("%s/api/rest/v1/msp/tenants/create", baseUrl)
 }
 
+func AddExistingTenantToMspManagedTenant(baseUrl string) string {
+	return fmt.Sprintf("%s/api/rest/v1/msp/tenants", baseUrl)
+}
+
 func MspManagedTenantByUid(baseUrl string, tenantUid string) string {
 	return fmt.Sprintf("%s/api/rest/v1/msp/tenants/%s", baseUrl, tenantUid)
 }

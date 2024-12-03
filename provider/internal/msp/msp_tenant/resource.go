@@ -6,9 +6,11 @@ import (
 	cdoClient "github.com/CiscoDevnet/terraform-provider-cdo/go-client"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/msp/tenants"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/util"
+	"github.com/CiscoDevnet/terraform-provider-cdo/validators"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -33,10 +35,14 @@ func (*TenantResource) Schema(ctx context.Context, request resource.SchemaReques
 			},
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Name of the tenant",
-				Required:            true,
+				Optional:            true,
 				PlanModifiers: []planmodifier.String{
 					PreventUpdatePlanModifier{}, // Prevent updates to name
 				},
+				Validators: []validator.String{
+					validators.NewMspManagedTenantNameValidator(),
+				},
+				Computed: true,
 			},
 			"display_name": schema.StringAttribute{
 				MarkdownDescription: "Display name of the tenant. If no display name is specified, the display name will be set to the tenant name.",
@@ -44,6 +50,7 @@ func (*TenantResource) Schema(ctx context.Context, request resource.SchemaReques
 				PlanModifiers: []planmodifier.String{
 					PreventUpdatePlanModifier{}, // Prevent updates to name
 				},
+				Computed: true,
 			},
 			"generated_name": schema.StringAttribute{
 				MarkdownDescription: "Actual name of the tenant returned by the API. This auto-generated name will differ from the name entered by the customer.",
@@ -52,6 +59,14 @@ func (*TenantResource) Schema(ctx context.Context, request resource.SchemaReques
 			"region": schema.StringAttribute{
 				MarkdownDescription: "CDO region in which the tenant is created. This is the same region as the region of the MSP portal.",
 				Computed:            true,
+			},
+			"api_token": schema.StringAttribute{
+				MarkdownDescription: "API token for an API-only user with super-admin privileges on the tenant",
+				Optional:            true,
+				PlanModifiers: []planmodifier.String{
+					PreventUpdatePlanModifier{}, // Prevent updates to api token
+				},
+				Sensitive: true,
 			},
 		},
 	}
@@ -77,7 +92,7 @@ func (t *TenantResource) Configure(ctx context.Context, req resource.ConfigureRe
 }
 
 func (t *TenantResource) Create(ctx context.Context, request resource.CreateRequest, response *resource.CreateResponse) {
-	tflog.Debug(ctx, "Creating a CDO tenant")
+	tflog.Debug(ctx, "Creating a CDO tenant/Adding an existing tenant using API token to the MSP portal...")
 
 	// 1. Read plan data into planData
 	var planData TenantResourceModel
@@ -88,18 +103,31 @@ func (t *TenantResource) Create(ctx context.Context, request resource.CreateRequ
 		return
 	}
 
-	// 2. use plan data to create tenant and fill up rest of the model
-	createOut, err := t.client.CreateTenantUsingMspPortal(ctx, tenants.MspCreateTenantInput{
-		Name:        planData.Name.ValueString(),
-		DisplayName: planData.DisplayName.ValueString(),
-	})
-	if err != nil {
+	var createOut *tenants.MspTenantOutput
+	var err *tenants.CreateError
+	if !planData.ApiToken.IsNull() {
+		// add tenant to MSP portal
+		tflog.Debug(ctx, "Adding existing tenant using API token to MSP portal")
+		createOut, err = t.client.AddExistingTenantToMspPortalUsingApiToken(ctx, tenants.MspAddExistingTenantInput{ApiToken: planData.ApiToken.ValueString()})
+	} else {
+		tflog.Debug(ctx, "Creating new tenant and adding it to the MSP portal")
+		// 2. use plan data to create tenant and fill up rest of the model
+		createOut, err = t.client.CreateTenantUsingMspPortal(ctx, tenants.MspCreateTenantInput{
+			Name:        planData.Name.ValueString(),
+			DisplayName: planData.DisplayName.ValueString(),
+		})
+	}
+
+	if err != nil || createOut == nil {
 		response.Diagnostics.AddError("failed to create CDO Tenant", err.Error())
 		return
 	}
 
 	planData.Id = types.StringValue(createOut.Uid)
-	planData.Name = types.StringValue(planData.Name.ValueString())
+	// when a new tenant is created, the name is auto-generated, do not set it to planData.Name
+	if planData.Name.IsNull() || planData.Name.IsUnknown() {
+		planData.Name = types.StringValue(createOut.Name)
+	}
 	planData.DisplayName = types.StringValue(createOut.DisplayName)
 	planData.GeneratedName = types.StringValue(createOut.Name)
 	planData.Region = types.StringValue(createOut.Region)

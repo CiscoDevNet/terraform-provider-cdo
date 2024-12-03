@@ -281,6 +281,10 @@ func (c *Client) CreateTenantUsingMspPortal(ctx context.Context, createInput ten
 	return tenants.Create(ctx, c.client, createInput)
 }
 
+func (c *Client) AddExistingTenantToMspPortalUsingApiToken(ctx context.Context, createInput tenants.MspAddExistingTenantInput) (*tenants.MspTenantOutput, *tenants.CreateError) {
+	return tenants.AddExistingTenantUsingApiToken(ctx, c.client, createInput)
+}
+
 func (c *Client) ReadMspManagedTenantByUid(ctx context.Context, readByUidInput tenants.ReadByUidInput) (*tenants.MspTenantOutput, error) {
 	return tenants.ReadByUid(ctx, c.client, readByUidInput)
 }

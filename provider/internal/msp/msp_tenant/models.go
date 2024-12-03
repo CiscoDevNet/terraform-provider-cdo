@@ -8,6 +8,7 @@ type TenantResourceModel struct {
 	DisplayName   types.String `tfsdk:"display_name"`
 	GeneratedName types.String `tfsdk:"generated_name"`
 	Region        types.String `tfsdk:"region"`
+	ApiToken      types.String `tfsdk:"api_token"`
 }
 
 type TenantDatasourceModel struct {

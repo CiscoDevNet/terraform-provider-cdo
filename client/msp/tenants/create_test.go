@@ -16,10 +16,6 @@ import (
 	"time"
 )
 
-const (
-	baseUrl = "https://unittest.cdo.cisco.com"
-)
-
 func TestCreate(t *testing.T) {
 	httpmock.Activate()
 	defer httpmock.DeactivateAndReset()
@@ -80,7 +76,7 @@ func TestCreate(t *testing.T) {
 
 		assert.NotNil(t, actual, "Created tenant should have not been nil")
 		assert.Nil(t, err, "Created tenant operation should have not been an error")
-		assert.Equal(t, creationOutput, *actual, "Created tenant operation should have been the same as the created tenant")
+		assert.Equal(t, creationOutput, *actual, "Create tenant operation should have been the same as the created tenant")
 	})
 
 	t.Run("tenant creation transaction fails", func(t *testing.T) {

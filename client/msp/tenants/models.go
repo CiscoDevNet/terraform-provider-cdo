@@ -5,6 +5,15 @@ type MspCreateTenantInput struct {
 	DisplayName string `json:"displayName"`
 }
 
+type MspAddExistingTenantInput struct {
+	ApiToken string `json:"apiToken"`
+}
+
+type MspManagedTenantStatusInfo struct {
+	Status           string          `json:"uid"`
+	MspManagedTenant MspTenantOutput `json:"mspManagedTenant"`
+}
+
 type MspTenantOutput struct {
 	Uid         string `json:"uid"`
 	Name        string `json:"name"`

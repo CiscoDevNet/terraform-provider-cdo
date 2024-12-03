@@ -130,6 +130,7 @@ jobs:
           ASA_RESOURCE_SDC_PASSWORD: ${{ secrets.ASA_RESOURCE_SDC_PASSWORD }}
           DUO_ADMIN_PANEL_RESOURCE_INTEGRATION_KEY: ${{ secrets.DUO_ADMIN_PANEL_RESOURCE_INTEGRATION_KEY }}
           DUO_ADMIN_PANEL_RESOURCE_SECRET_KEY: ${{ secrets.DUO_ADMIN_PANEL_RESOURCE_SECRET_KEY }}
+          ADDED_MSP_MANAGED_TENANT_API_TOKEN: ${{ secrets.ADDED_MSP_MANAGED_TENANT_API_TOKEN }}
         run: go test -v -cover -p 1 -run "TestAcc.*" ./...
         timeout-minutes: 10
   tag-release-version:

@@ -34,7 +34,7 @@ func (*TenantResource) Schema(ctx context.Context, request resource.SchemaReques
 				Computed:            true,
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "Name of the tenant",
+				MarkdownDescription: "Name of the tenant. This should be specified only if a new tenant is being created, and should not be provided if an existing tenant is being added to the MSP protal (i.e., the `api_token` attribute is specified).",
 				Optional:            true,
 				PlanModifiers: []planmodifier.String{
 					PreventUpdatePlanModifier{}, // Prevent updates to name
@@ -45,7 +45,7 @@ func (*TenantResource) Schema(ctx context.Context, request resource.SchemaReques
 				Computed: true,
 			},
 			"display_name": schema.StringAttribute{
-				MarkdownDescription: "Display name of the tenant. If no display name is specified, the display name will be set to the tenant name.",
+				MarkdownDescription: "Display name of the tenant. If no display name is specified, the display name will be set to the tenant name. This should be specified only if a new tenant is being created, and should not be provided if an existing tenant is being added to the MSP protal (i.e., the `api_token` attribute is specified).",
 				Optional:            true,
 				PlanModifiers: []planmodifier.String{
 					PreventUpdatePlanModifier{}, // Prevent updates to name
@@ -61,7 +61,7 @@ func (*TenantResource) Schema(ctx context.Context, request resource.SchemaReques
 				Computed:            true,
 			},
 			"api_token": schema.StringAttribute{
-				MarkdownDescription: "API token for an API-only user with super-admin privileges on the tenant",
+				MarkdownDescription: "API token for an API-only user with super-admin privileges on the tenant. This should be specified only when adding an existing tenant to the MSP portal, and should not be provided if a new tenant is being created (i.e., the `name` and/or `display_name` attributes are specified).",
 				Optional:            true,
 				PlanModifiers: []planmodifier.String{
 					PreventUpdatePlanModifier{}, // Prevent updates to api token

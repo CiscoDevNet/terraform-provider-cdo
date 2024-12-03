@@ -7,7 +7,7 @@ import (
 )
 
 func AddExistingTenantUsingApiToken(ctx context.Context, client http.Client, addInp MspAddExistingTenantInput) (*MspTenantOutput, *CreateError) {
-	client.Logger.Println("Creating tenant for CDO")
+	client.Logger.Println("Adding existing tenant to MSp portal...")
 	addUrl := url.AddExistingTenantToMspManagedTenant(client.BaseUrl())
 
 	req := client.NewPost(ctx, addUrl, addInp)
@@ -17,9 +17,7 @@ func AddExistingTenantUsingApiToken(ctx context.Context, client http.Client, add
 		return nil, &CreateError{Err: err}
 	}
 
-	return &createOutp.MspManagedTenant, nil
-}
+	client.Logger.Printf("Added existing tenant %s to MSP portal using API token...", createOutp.MspManagedTenant.Name)
 
-type StatusInfo struct {
-	status string
+	return &createOutp.MspManagedTenant, nil
 }

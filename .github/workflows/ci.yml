@@ -95,7 +95,7 @@ jobs:
     name: Terraform Provider Acceptance Tests
     needs: unit-test
     runs-on: ubuntu-latest
-    # if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     defaults:
       run:
         working-directory: provider

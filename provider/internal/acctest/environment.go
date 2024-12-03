@@ -328,6 +328,26 @@ func (e *env) MspTenantId() string {
 	return e.mustGetString("MSP_TENANT_ID")
 }
 
+func (e *env) AddedMspManagedTenantId() string {
+	return e.mustGetString("ADDED_MSP_MANAGED_TENANT_UID")
+}
+
+func (e *env) AddedMspManagedTenantName() string {
+	return e.mustGetString("ADDED_MSP_MANAGED_TENANT_NAME")
+}
+
+func (e *env) AddedMspManagedTenantDisplayName() string {
+	return e.mustGetString("ADDED_MSP_MANAGED_TENANT_DISPLAY_NAME")
+}
+
+func (e *env) AddedMspManagedTenantApiToken() string {
+	return e.mustGetString("ADDED_MSP_MANAGED_TENANT_API_TOKEN")
+}
+
+func (e *env) MspManagedTenantRegion() string {
+	return e.mustGetString("ADDED_MSP_MANAGED_TENANT_REGION")
+}
+
 func (e *env) MspTenantRegion() string {
 	return e.mustGetString("MSP_TENANT_REGION")
 }

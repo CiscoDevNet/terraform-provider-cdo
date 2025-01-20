@@ -214,6 +214,16 @@ func (r *AsaDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 
+	asaSpecificDeviceReadOutp, err := r.client.ReadSpecificAsa(ctx, asa.ReadSpecificInput{Uid: stateData.ID.ValueString()})
+	if err != nil {
+		if util.Is404Error(err) {
+			resp.State.RemoveResource(ctx)
+			return
+		}
+		resp.Diagnostics.AddError("unable to read ASA Specific Device", err.Error())
+		return
+	}
+
 	port, err := strconv.ParseInt(asaReadOutp.Port, 10, 16)
 	if err != nil {
 		resp.Diagnostics.AddError("unable to read ASA Device", err.Error())
@@ -230,7 +240,7 @@ func (r *AsaDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 	stateData.Labels = util.GoStringSliceToTFStringSet(asaReadOutp.Tags.UngroupedTags())
 	stateData.GroupedLabels = util.GoMapToStringSetTFMap(asaReadOutp.Tags.GroupedTags())
 	stateData.SoftwareVersion = types.StringValue(asaReadOutp.SoftwareVersion)
-	stateData.AsdmVersion = types.StringValue(asaReadOutp.AsdmVersion)
+	stateData.AsdmVersion = types.StringValue(asaSpecificDeviceReadOutp.Metadata.AsdmVersion)
 
 	tflog.Trace(ctx, "done read ASA device resource")
 
@@ -355,6 +365,11 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 		planTags,
 	)
 
+	if isSoftwareVersionUpdated(planData, stateData) || isAsdmVersionUpdated(planData, stateData) {
+		res.Diagnostics.AddError("Software version and ASDM version cannot be updated yet", "Coming soon: the ability to trigger ASA device upgrades by changing software version and ASDM version")
+		return
+	}
+
 	if isNameUpdated(planData, stateData) {
 		updateInp.Name = planData.Name.ValueString()
 	}
@@ -457,6 +472,14 @@ func isCredentialUpdated(planData, stateData *AsaDeviceResourceModel) bool {
 
 func isNameUpdated(planData, stateData *AsaDeviceResourceModel) bool {
 	return !planData.Name.Equal(stateData.Name)
+}
+
+func isSoftwareVersionUpdated(planData, stateData *AsaDeviceResourceModel) bool {
+	return !planData.SoftwareVersion.Equal(stateData.SoftwareVersion)
+}
+
+func isAsdmVersionUpdated(planData, stateData *AsaDeviceResourceModel) bool {
+	return !planData.AsdmVersion.Equal(stateData.AsdmVersion)
 }
 
 func isLocationUpdated(planData, stateData *AsaDeviceResourceModel) bool {

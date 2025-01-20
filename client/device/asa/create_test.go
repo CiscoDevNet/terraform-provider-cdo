@@ -24,6 +24,11 @@ func TestAsaCreate(t *testing.T) {
 	cdgReadOutput := testModel.CdgReadOutput()
 	createInput := testModel.AsaCreateInput()
 	readOutput := testModel.AsaReadOutput()
+	readSpecificOutput := testModel.AsaReadSpecificDeviceOutput()
+	createInputWithIncorrectSoftwareVersion := createInput
+	createInputWithIncorrectSoftwareVersion.SoftwareVersion = readOutput.SoftwareVersion + "_different"
+	createInputWithIncorrectAsdmVersion := createInput
+	createInputWithIncorrectAsdmVersion.AsdmVersion = readOutput.AsdmVersion + "_different"
 	doneTransaction := testModel.CreateDoneTransaction(readOutput.Uid, transactiontype.ONBOARD_ASA)
 	errorTransaction := testModel.CreateErrorTransaction(readOutput.Uid, transactiontype.ONBOARD_ASA)
 
@@ -31,7 +36,7 @@ func TestAsaCreate(t *testing.T) {
 		testName   string
 		input      asa.CreateInput
 		setupFunc  func(input asa.CreateInput)
-		assertFunc func(output *asa.CreateOutput, err *asa.CreateError, t *testing.T)
+		assertFunc func(output *asa.ReadOutput, specificDeviceOutput *asa.ReadSpecificOutput, err *asa.CreateError, t *testing.T)
 	}{
 		{
 			testName: "successfully onboards ASA",
@@ -41,16 +46,50 @@ func TestAsaCreate(t *testing.T) {
 				internalTesting.MockGetOk(url.ReadConnectorByUid(testModel.BaseUrl, cdgReadOutput.Uid), cdgReadOutput)
 				internalTesting.MockPostAccepted(url.CreateAsa(testModel.BaseUrl), doneTransaction)
 				internalTesting.MockGetOk(url.ReadDevice(testModel.BaseUrl, readOutput.Uid), readOutput)
+				internalTesting.MockGetOk(url.ReadSpecificDevice(testModel.BaseUrl, readOutput.Uid), readSpecificOutput)
 			},
 
-			assertFunc: func(actualOutput *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
+			assertFunc: func(actualOutput *asa.ReadOutput, actualSpecificDeviceOutput *asa.ReadSpecificOutput, err *asa.CreateError, t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, actualOutput)
+				assert.NotNil(t, actualSpecificDeviceOutput)
 				assert.Equal(t, readOutput, *actualOutput)
 			},
 		},
 		{
-			testName: "fails onboards Duo Admin Panel if transaction fails",
+			testName: "fails to onboard ASA due to specified software version mismatch",
+			input:    createInputWithIncorrectSoftwareVersion,
+			setupFunc: func(input asa.CreateInput) {
+				internalTesting.MockGetOk(url.ReadConnectorByUid(testModel.BaseUrl, cdgReadOutput.Uid), cdgReadOutput)
+				internalTesting.MockPostAccepted(url.CreateAsa(testModel.BaseUrl), doneTransaction)
+				internalTesting.MockGetOk(url.ReadDevice(testModel.BaseUrl, readOutput.Uid), readOutput)
+				internalTesting.MockGetOk(url.ReadSpecificDevice(testModel.BaseUrl, readOutput.Uid), readSpecificOutput)
+			},
+			assertFunc: func(actualOutput *asa.ReadOutput, actualSpecificDeviceOutput *asa.ReadSpecificOutput, err *asa.CreateError, t *testing.T) {
+				assert.Nil(t, actualOutput)
+				assert.Nil(t, actualSpecificDeviceOutput)
+				assert.NotNil(t, err)
+				assert.ErrorContains(t, err, "ASA Software version mismatch.")
+			},
+		},
+		{
+			testName: "fails to onboard ASA due to specified ASDM version mismatch",
+			input:    createInputWithIncorrectAsdmVersion,
+			setupFunc: func(input asa.CreateInput) {
+				internalTesting.MockGetOk(url.ReadConnectorByUid(testModel.BaseUrl, cdgReadOutput.Uid), cdgReadOutput)
+				internalTesting.MockPostAccepted(url.CreateAsa(testModel.BaseUrl), doneTransaction)
+				internalTesting.MockGetOk(url.ReadDevice(testModel.BaseUrl, readOutput.Uid), readOutput)
+				internalTesting.MockGetOk(url.ReadSpecificDevice(testModel.BaseUrl, readOutput.Uid), readSpecificOutput)
+			},
+			assertFunc: func(actualOutput *asa.ReadOutput, actualSpecificDeviceOutput *asa.ReadSpecificOutput, err *asa.CreateError, t *testing.T) {
+				assert.Nil(t, actualOutput)
+				assert.Nil(t, actualSpecificDeviceOutput)
+				assert.NotNil(t, err)
+				assert.ErrorContains(t, err, "ASDM version mismatch.")
+			},
+		},
+		{
+			testName: "fails onboards ASA if transaction fails",
 			input:    createInput,
 
 			setupFunc: func(input asa.CreateInput) {
@@ -59,14 +98,15 @@ func TestAsaCreate(t *testing.T) {
 				internalTesting.MockGetOk(url.ReadDevice(testModel.BaseUrl, readOutput.Uid), readOutput)
 			},
 
-			assertFunc: func(actualOutput *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
+			assertFunc: func(actualOutput *asa.ReadOutput, actualSpecificDeviceOutput *asa.ReadSpecificOutput, err *asa.CreateError, t *testing.T) {
 				assert.Nil(t, actualOutput)
+				assert.Nil(t, actualSpecificDeviceOutput)
 				assert.NotNil(t, err)
 				assert.ErrorContains(t, err, errorTransaction.ErrorMessage)
 			},
 		},
 		{
-			testName: "fails onboards Duo Admin Panel if trigger transaction fails",
+			testName: "fails onboards ASA if trigger transaction fails",
 			input:    createInput,
 
 			setupFunc: func(input asa.CreateInput) {
@@ -74,8 +114,9 @@ func TestAsaCreate(t *testing.T) {
 				internalTesting.MockGetOk(url.ReadDevice(testModel.BaseUrl, readOutput.Uid), readOutput)
 			},
 
-			assertFunc: func(actualOutput *asa.CreateOutput, err *asa.CreateError, t *testing.T) {
+			assertFunc: func(actualOutput *asa.ReadOutput, actualSpecificDeviceOutput *asa.ReadSpecificOutput, err *asa.CreateError, t *testing.T) {
 				assert.Nil(t, actualOutput)
+				assert.Nil(t, actualSpecificDeviceOutput)
 				assert.NotNil(t, err)
 				assert.ErrorContains(t, err, "post error")
 			},
@@ -88,13 +129,13 @@ func TestAsaCreate(t *testing.T) {
 
 			testCase.setupFunc(testCase.input)
 
-			output, err := asa.Create(
+			output, specificDeviceOuput, err := asa.Create(
 				context.Background(),
 				*http.MustNewWithConfig(testModel.BaseUrl, "a_valid_token", 0, 0, time.Minute),
 				testCase.input,
 			)
 
-			testCase.assertFunc(output, err, t)
+			testCase.assertFunc(output, specificDeviceOuput, err, t)
 		})
 	}
 }

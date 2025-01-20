@@ -34,6 +34,15 @@ func (m Model) AsaReadOutput() asa.ReadOutput {
 	}
 }
 
+func (m Model) AsaReadSpecificDeviceOutput() asa.ReadSpecificOutput {
+	return asa.ReadSpecificOutput{
+		SpecificUid: m.AsaUid.String(),
+		Metadata: asa.SpecificDeviceMetadata{
+			AsdmVersion: "7.6(2)",
+		},
+	}
+}
+
 func (m Model) AsaCreateInput() asa.CreateInput {
 	return asa.CreateInput{
 		Name:              m.AsaName,

@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
 	"github.com/jarcoal/httpmock"
@@ -35,7 +34,7 @@ func TestAsaReadSpecific(t *testing.T) {
 			},
 
 			setupFunc: func() {
-				configureDeviceReadSpecificToRespondSuccessfully(deviceUid, device.ReadSpecificOutput(specificDevice))
+				configureDeviceReadSpecificToRespondSuccessfully(deviceUid, asa.ReadSpecificOutput(specificDevice))
 			},
 
 			assertFunc: func(output *asa.ReadSpecificOutput, err error, t *testing.T) {

@@ -13,10 +13,15 @@ type ReadSpecificInput struct {
 }
 
 type ReadSpecificOutput struct {
-	SpecificUid string     `json:"uid"`
-	State       state.Type `json:"state"`
-	Namespace   string     `json:"namespace"`
-	Type        string     `json:"type"`
+	SpecificUid string                 `json:"uid"`
+	State       state.Type             `json:"state"`
+	Namespace   string                 `json:"namespace"`
+	Type        string                 `json:"type"`
+	Metadata    SpecificDeviceMetadata `json:"metadata"`
+}
+
+type SpecificDeviceMetadata struct {
+	AsdmVersion string `json:"deviceManager"`
 }
 
 func NewReadSpecificInput(uid string) *ReadSpecificInput {

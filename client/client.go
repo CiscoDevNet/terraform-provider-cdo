@@ -73,7 +73,7 @@ func (c *Client) ReadDeviceByName(ctx context.Context, inp device.ReadByNameAndT
 	return device.ReadByNameAndType(ctx, c.client, inp)
 }
 
-func (c *Client) CreateAsa(ctx context.Context, inp asa.CreateInput) (*asa.CreateOutput, *asa.CreateError) {
+func (c *Client) CreateAsa(ctx context.Context, inp asa.CreateInput) (*asa.ReadOutput, *asa.ReadSpecificOutput, *asa.CreateError) {
 	return asa.Create(ctx, c.client, inp)
 }
 

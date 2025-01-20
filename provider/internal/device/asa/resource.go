@@ -365,6 +365,7 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 		planTags,
 	)
 
+	tflog.Debug(ctx, fmt.Sprintf("Software version plan: %s, state: %s", planData.SoftwareVersion, stateData.SoftwareVersion))
 	if isSoftwareVersionUpdated(planData, stateData) || isAsdmVersionUpdated(planData, stateData) {
 		res.Diagnostics.AddError("Software version and ASDM version cannot be updated yet", "Coming soon: the ability to trigger ASA device upgrades by changing software version and ASDM version")
 		return
@@ -475,11 +476,11 @@ func isNameUpdated(planData, stateData *AsaDeviceResourceModel) bool {
 }
 
 func isSoftwareVersionUpdated(planData, stateData *AsaDeviceResourceModel) bool {
-	return !planData.SoftwareVersion.Equal(stateData.SoftwareVersion)
+	return !planData.SoftwareVersion.IsUnknown() && !planData.SoftwareVersion.Equal(stateData.SoftwareVersion)
 }
 
 func isAsdmVersionUpdated(planData, stateData *AsaDeviceResourceModel) bool {
-	return !planData.AsdmVersion.Equal(stateData.AsdmVersion)
+	return !planData.AsdmVersion.IsUnknown() && !planData.AsdmVersion.Equal(stateData.AsdmVersion)
 }
 
 func isLocationUpdated(planData, stateData *AsaDeviceResourceModel) bool {

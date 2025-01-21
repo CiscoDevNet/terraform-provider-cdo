@@ -58,6 +58,8 @@ type AsaDeviceResourceModel struct {
 	Username          types.String `tfsdk:"username"`
 	Password          types.String `tfsdk:"password"`
 	IgnoreCertificate types.Bool   `tfsdk:"ignore_certificate"`
+	SoftwareVersion   types.String `tfsdk:"software_version"`
+	AsdmVersion       types.String `tfsdk:"asdm_version"`
 }
 
 func (r *AsaDeviceResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -148,6 +150,16 @@ func (r *AsaDeviceResource) Schema(ctx context.Context, req resource.SchemaReque
 				MarkdownDescription: "Set this attribute to true if you do not want CDO to validate the certificate of this device before onboarding.",
 				Required:            true,
 			},
+			"software_version": schema.StringAttribute{
+				MarkdownDescription: "The version of the ASA device. If this attribute is set during resource creation and the version of the ASA is not the same as that specified, resource creation will fail. If the version attribute is updated following the creation of a resource, the CDO terraform provider will attempt to upgrade the device to the specified version.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"asdm_version": schema.StringAttribute{
+				MarkdownDescription: "The version of the ASDM on the ASA device. If this attribute is set during resource creation and the version of ASDM on the ASA is not the same as that specified, resource creation will fail. If the version attribute is updated following the creation of a resource, the CDO terraform provider will attempt to upgrade the ASDM on the device to the specified version.",
+				Optional:            true,
+				Computed:            true,
+			},
 		},
 	}
 }
@@ -202,6 +214,16 @@ func (r *AsaDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 
+	asaSpecificDeviceReadOutp, err := r.client.ReadSpecificAsa(ctx, asa.ReadSpecificInput{Uid: stateData.ID.ValueString()})
+	if err != nil {
+		if util.Is404Error(err) {
+			resp.State.RemoveResource(ctx)
+			return
+		}
+		resp.Diagnostics.AddError("unable to read ASA Specific Device", err.Error())
+		return
+	}
+
 	port, err := strconv.ParseInt(asaReadOutp.Port, 10, 16)
 	if err != nil {
 		resp.Diagnostics.AddError("unable to read ASA Device", err.Error())
@@ -217,6 +239,8 @@ func (r *AsaDeviceResource) Read(ctx context.Context, req resource.ReadRequest, 
 	stateData.IgnoreCertificate = types.BoolValue(asaReadOutp.IgnoreCertificate)
 	stateData.Labels = util.GoStringSliceToTFStringSet(asaReadOutp.Tags.UngroupedTags())
 	stateData.GroupedLabels = util.GoMapToStringSetTFMap(asaReadOutp.Tags.GroupedTags())
+	stateData.SoftwareVersion = types.StringValue(asaReadOutp.SoftwareVersion)
+	stateData.AsdmVersion = types.StringValue(asaSpecificDeviceReadOutp.Metadata.AsdmVersion)
 
 	tflog.Trace(ctx, "done read ASA device resource")
 
@@ -267,9 +291,11 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 		planData.Password.ValueString(),
 		planData.IgnoreCertificate.ValueBool(),
 		planTags,
+		planData.SoftwareVersion.ValueString(),
+		planData.AsdmVersion.ValueString(),
 	)
 
-	createOutp, createErr := r.client.CreateAsa(ctx, *createInp)
+	createOutp, createSpecificOutp, createErr := r.client.CreateAsa(ctx, *createInp)
 	if createErr != nil {
 		tflog.Error(ctx, "Failed to create ASA device")
 		if createErr.CreatedResourceId != nil {
@@ -288,15 +314,22 @@ func (r *AsaDeviceResource) Create(ctx context.Context, req resource.CreateReque
 	planData.ConnectorType = types.StringValue(createOutp.ConnectorType)
 	planData.ConnectorName = getConnectorName(&planData)
 	planData.Name = types.StringValue(createOutp.Name)
-	planData.Host = types.StringValue(createOutp.Host)
-
-	port, err := strconv.ParseInt(createOutp.Port, 10, 16)
-	if err != nil {
-		res.Diagnostics.AddError("failed to parse ASA port", err.Error())
-		// delete the ASA coz we're screwed here
-
+	parts := strings.Split(planData.SocketAddress.ValueString(), ":")
+	if len(parts) == 2 {
+		planData.Host = types.StringValue(parts[0])
+		port, err := strconv.ParseInt(parts[1], 10, 64)
+		if err != nil {
+			res.Diagnostics.AddError("failed to parse port", err.Error())
+			return
+		}
+		planData.Port = types.Int64Value(port)
+	} else {
+		res.Diagnostics.AddError("invalid socket address format", "expected format is host:port")
+		return
 	}
-	planData.Port = types.Int64Value(port)
+
+	planData.SoftwareVersion = types.StringValue(createOutp.SoftwareVersion)
+	planData.AsdmVersion = types.StringValue(createSpecificOutp.Metadata.AsdmVersion)
 
 	res.Diagnostics.Append(res.State.Set(ctx, &planData)...)
 }
@@ -331,6 +364,12 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 		"",
 		planTags,
 	)
+
+	tflog.Debug(ctx, fmt.Sprintf("Software version plan: %s, state: %s", planData.SoftwareVersion, stateData.SoftwareVersion))
+	if isSoftwareVersionUpdated(planData, stateData) || isAsdmVersionUpdated(planData, stateData) {
+		res.Diagnostics.AddError("Software version and ASDM version cannot be updated yet", "Coming soon: the ability to trigger ASA device upgrades by changing software version and ASDM version")
+		return
+	}
 
 	if isNameUpdated(planData, stateData) {
 		updateInp.Name = planData.Name.ValueString()
@@ -434,6 +473,14 @@ func isCredentialUpdated(planData, stateData *AsaDeviceResourceModel) bool {
 
 func isNameUpdated(planData, stateData *AsaDeviceResourceModel) bool {
 	return !planData.Name.Equal(stateData.Name)
+}
+
+func isSoftwareVersionUpdated(planData, stateData *AsaDeviceResourceModel) bool {
+	return !planData.SoftwareVersion.IsUnknown() && !planData.SoftwareVersion.Equal(stateData.SoftwareVersion)
+}
+
+func isAsdmVersionUpdated(planData, stateData *AsaDeviceResourceModel) bool {
+	return !planData.AsdmVersion.IsUnknown() && !planData.AsdmVersion.Equal(stateData.AsdmVersion)
 }
 
 func isLocationUpdated(planData, stateData *AsaDeviceResourceModel) bool {

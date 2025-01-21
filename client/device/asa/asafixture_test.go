@@ -129,7 +129,7 @@ func configureDeviceReadToRespondWithError(deviceUid string) {
 	)
 }
 
-func configureDeviceReadSpecificToRespondSuccessfully(deviceUid string, readOutput device.ReadSpecificOutput) {
+func configureDeviceReadSpecificToRespondSuccessfully(deviceUid string, readOutput asa.ReadSpecificOutput) {
 	httpmock.RegisterResponder(
 		http.MethodGet,
 		buildDeviceReadSpecificPath(deviceUid),

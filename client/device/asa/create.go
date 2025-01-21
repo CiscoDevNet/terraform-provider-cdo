@@ -2,6 +2,9 @@ package asa
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
@@ -21,9 +24,9 @@ type CreateInput struct {
 	Password string
 
 	IgnoreCertificate bool
+	SoftwareVersion   string
+	AsdmVersion       string
 }
-
-type CreateOutput = ReadOutput
 
 type Metadata struct {
 	IsNewPolicyObjectModel string `json:"isNewPolicyObjectModel"` // yes it is a string, but it should be either "true" or "false" :/
@@ -49,7 +52,7 @@ func (r *CreateError) Error() string {
 	return r.Err.Error()
 }
 
-func NewCreateRequestInput(name, connectorUid, connectorType, socketAddress, username, password string, ignoreCertificate bool, labels publicapilabels.Type) *CreateInput {
+func NewCreateRequestInput(name, connectorUid, connectorType, socketAddress, username, password string, ignoreCertificate bool, labels publicapilabels.Type, softwareVersion string, asdmVersion string) *CreateInput {
 	return &CreateInput{
 		Name:              name,
 		ConnectorUid:      connectorUid,
@@ -59,12 +62,14 @@ func NewCreateRequestInput(name, connectorUid, connectorType, socketAddress, use
 		Password:          password,
 		IgnoreCertificate: ignoreCertificate,
 		Labels:            labels,
+		SoftwareVersion:   softwareVersion,
+		AsdmVersion:       asdmVersion,
 	}
 }
 
-func Create(ctx context.Context, client http.Client, createInp CreateInput) (*CreateOutput, *CreateError) {
+func Create(ctx context.Context, client http.Client, createInp CreateInput) (*ReadOutput, *ReadSpecificOutput, *CreateError) {
 
-	client.Logger.Println("creating asa")
+	client.Logger.Println("creating asa device")
 
 	createUrl := url.CreateAsa(client.BaseUrl())
 
@@ -72,7 +77,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 	if createInp.ConnectorType == "SDC" {
 		conn, err := connector.ReadByUid(ctx, client, connector.ReadByUidInput{ConnectorUid: createInp.ConnectorUid})
 		if err != nil {
-			return nil, &CreateError{
+			return nil, nil, &CreateError{
 				Err:               err,
 				CreatedResourceId: nil,
 			}
@@ -96,7 +101,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		},
 	)
 	if err != nil {
-		return nil, &CreateError{
+		return nil, nil, &CreateError{
 			Err:               err,
 			CreatedResourceId: &transaction.EntityUid,
 		}
@@ -108,7 +113,7 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 		"Waiting for Asa to onboard...",
 	)
 	if err != nil {
-		return nil, &CreateError{
+		return nil, nil, &CreateError{
 			Err:               err,
 			CreatedResourceId: &transaction.EntityUid,
 		}
@@ -116,11 +121,45 @@ func Create(ctx context.Context, client http.Client, createInp CreateInput) (*Cr
 
 	readOut, err := Read(ctx, client, ReadInput{Uid: transaction.EntityUid})
 	if err == nil {
-		return readOut, nil
-	} else {
-		return readOut, &CreateError{
-			Err:               err,
-			CreatedResourceId: &transaction.EntityUid,
+		if err = validateSoftwareVersion(readOut, createInp.SoftwareVersion); err != nil {
+			client.Logger.Println("Version validation failed...")
+			return nil, nil, &CreateError{
+				Err:               err,
+				CreatedResourceId: &transaction.EntityUid,
+			}
+		}
+
+		readSpecificOut, err := ReadSpecific(ctx, client, ReadSpecificInput{Uid: transaction.EntityUid})
+		if err == nil {
+			if err = validateAsdmVersion(readSpecificOut, createInp.AsdmVersion); err != nil {
+				client.Logger.Println("ASDM version validation failed...")
+				return nil, nil, &CreateError{
+					Err:               err,
+					CreatedResourceId: &transaction.EntityUid,
+				}
+			}
+			return readOut, readSpecificOut, nil
 		}
 	}
+
+	return nil, nil, &CreateError{
+		Err:               err,
+		CreatedResourceId: &transaction.EntityUid,
+	}
+}
+
+func validateSoftwareVersion(readOut *ReadOutput, softwareVersion string) error {
+	if strings.TrimSpace(softwareVersion) != "" && readOut.SoftwareVersion != softwareVersion {
+		return errors.New(fmt.Sprintf("ASA Software version mismatch. Specified software version %s does not match actual software version %s on ASA device", softwareVersion, readOut.SoftwareVersion))
+	}
+
+	return nil
+}
+
+func validateAsdmVersion(readOut *ReadSpecificOutput, asdmVersion string) error {
+	if strings.TrimSpace(asdmVersion) != "" && readOut.Metadata.AsdmVersion != asdmVersion {
+		return errors.New(fmt.Sprintf("ASDM version mismatch. Specified ASDM version %s does not match actual ASDM version %s on ASA device", asdmVersion, readOut.Metadata.AsdmVersion))
+	}
+
+	return nil
 }

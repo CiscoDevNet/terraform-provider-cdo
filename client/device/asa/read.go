@@ -2,7 +2,6 @@ package asa
 
 import (
 	"context"
-
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/device/tags"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/devicetype"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine"
@@ -26,6 +25,8 @@ type ReadOutput struct {
 	Port            string          `json:"port"`
 	Host            string          `json:"host"`
 	Tags            tags.Type       `json:"tags"`
+	SoftwareVersion string          `json:"softwareVersion"`
+	AsdmVersion     string          `json:"asdmVersion,omitempty"`
 
 	IgnoreCertificate   bool                 `json:"ignoreCertificate"`
 	ConnectivityState   int                  `json:"connectivityState,omitempty"`

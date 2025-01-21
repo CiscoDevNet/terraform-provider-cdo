@@ -87,7 +87,7 @@ func TestAsaUpdate(t *testing.T) {
 			},
 
 			setupFunc: func(input asa.UpdateInput) {
-				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
+				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, asaConfig)
 				configureDeviceReadToRespondSuccessfully(asaDevice)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
 				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: state.DONE})
@@ -111,7 +111,7 @@ func TestAsaUpdate(t *testing.T) {
 			},
 
 			setupFunc: func(input asa.UpdateInput) {
-				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
+				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, asaConfig)
 				configureDeviceReadToRespondSuccessfully(asaDeviceOnboardedByOnPremConnector)
 
 				configureConnectorReadToRespondSuccessfully(onPremConnector)
@@ -141,7 +141,7 @@ func TestAsaUpdate(t *testing.T) {
 				updatedDevice.Host = "10.10.5.4"
 				updatedDevice.Port = "443"
 
-				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
+				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, asaConfig)
 				configureDeviceReadToRespondSuccessfully(asaDevice)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
 				configureAsaConfigReadToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.ReadOutput{Uid: asaConfig.SpecificUid, State: state.DONE})
@@ -193,7 +193,7 @@ func TestAsaUpdate(t *testing.T) {
 			},
 
 			setupFunc: func(input asa.UpdateInput) {
-				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
+				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, asaConfig)
 				configureDeviceReadToRespondWithError(asaDeviceOnboardedByOnPremConnector.Uid)
 
 				configureConnectorReadToRespondSuccessfully(onPremConnector)
@@ -217,7 +217,7 @@ func TestAsaUpdate(t *testing.T) {
 			},
 
 			setupFunc: func(input asa.UpdateInput) {
-				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
+				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, asaConfig)
 				configureDeviceReadToRespondSuccessfully(asaDeviceOnboardedByOnPremConnector)
 
 				configureConnectorReadToRespondWithError(onPremConnector.Uid)
@@ -241,7 +241,7 @@ func TestAsaUpdate(t *testing.T) {
 			},
 
 			setupFunc: func(input asa.UpdateInput) {
-				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
+				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, asaConfig)
 				configureDeviceReadToRespondSuccessfully(asaDeviceOnboardedByOnPremConnector)
 
 				configureConnectorReadToRespondSuccessfully(onPremConnector)
@@ -265,7 +265,7 @@ func TestAsaUpdate(t *testing.T) {
 			},
 
 			setupFunc: func(input asa.UpdateInput) {
-				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
+				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, asaConfig)
 				configureDeviceReadToRespondSuccessfully(asaDeviceOnboardedByOnPremConnector)
 
 				configureConnectorReadToRespondSuccessfully(onPremConnector)
@@ -293,7 +293,7 @@ func TestAsaUpdate(t *testing.T) {
 				updatedDevice.Host = "10.10.5.4"
 				updatedDevice.Port = "443"
 
-				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, device.ReadSpecificOutput(asaConfig))
+				configureDeviceReadSpecificToRespondSuccessfully(input.Uid, asaConfig)
 				configureDeviceReadToRespondSuccessfully(asaDevice)
 				configureAsaConfigUpdateToRespondSuccessfully(asaConfig.SpecificUid, asaconfig.UpdateOutput{Uid: asaConfig.SpecificUid})
 				configureAsaConfigReadToRespondWithError(asaConfig.SpecificUid)

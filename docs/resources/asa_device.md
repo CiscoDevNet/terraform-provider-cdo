@@ -26,9 +26,11 @@ Provides an ASA device resource. This allows ASA devices to be onboarded, update
 
 ### Optional
 
+- `asdm_version` (String) The version of the ASDM on the ASA device. If this attribute is set during resource creation and the version of ASDM on the ASA is not the same as that specified, resource creation will fail. If the version attribute is updated following the creation of a resource, the CDO terraform provider will attempt to upgrade the ASDM on the device to the specified version.
 - `connector_name` (String) The name of the Secure Device Connector (SDC) that will be used to communicate with the device. This value is not required if the connector type selected is Cloud Connector (CDG).
 - `grouped_labels` (Map of Set of String) Specify a map of grouped labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.
 - `labels` (Set of String) Specify a set of labels to identify the device as part of a group. Refer to the [CDO documentation](https://docs.defenseorchestrator.com/t-applying-labels-to-devices-and-objects.html#!c-labels-and-filtering.html) for details on how labels are used in CDO.
+- `software_version` (String) The version of the ASA device. If this attribute is set during resource creation and the version of the ASA is not the same as that specified, resource creation will fail. If the version attribute is updated following the creation of a resource, the CDO terraform provider will attempt to upgrade the device to the specified version.
 
 ### Read-Only
 

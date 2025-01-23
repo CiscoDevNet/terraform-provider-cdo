@@ -9,7 +9,7 @@ import (
 )
 
 func Update(ctx context.Context, client http.Client, updateInp UpdateUserInput) (*model.UserDetails, error) {
-	client.Logger.Println(fmt.Sprintf("Creating user %s", updateInp.Uid))
+	client.Logger.Println(fmt.Sprintf("Updating user %s", updateInp.Uid))
 
 	req := NewUpdateRequest(ctx, client, updateInp)
 	var outp UserTenantAssociation

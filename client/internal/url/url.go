@@ -253,3 +253,11 @@ func GetUserGroupsInMspManagedTenant(baseUrl string, tenantUid string, limit int
 func DeleteUserGroupsInMspManagedTenant(baseUrl string, tenantUid string) string {
 	return fmt.Sprintf("%s/api/rest/v1/msp/tenants/%s/users/groups/delete", baseUrl, tenantUid)
 }
+
+func GetCompatibleAsaVersions(baseUrl string, deviceUid string) string {
+	return fmt.Sprintf("%s/api/rest/v1/inventory/devices/asas/%s/upgrades/versions", baseUrl, deviceUid)
+}
+
+func GetUpgradeAsaUrl(baseUrl string, deviceUid string) string {
+	return fmt.Sprintf("%s/api/rest/v1/inventory/devices/asas/%s/upgrades/trigger", baseUrl, deviceUid)
+}

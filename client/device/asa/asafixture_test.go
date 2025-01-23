@@ -7,7 +7,9 @@ import (
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
 	internalhttp "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi/transaction"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/user"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -126,6 +128,38 @@ func configureDeviceReadToRespondWithError(deviceUid string) {
 		http.MethodGet,
 		buildDevicePath(deviceUid),
 		httpmock.NewStringResponder(500, ""),
+	)
+}
+
+func configureCompatibleVersionsToRespondSuccessfully(deviceUid string, compatibleVersions model.CdoListResponse[asa.CompatibleVersion]) {
+	httpmock.RegisterResponder(
+		http.MethodGet,
+		url.GetCompatibleAsaVersions(baseUrl, deviceUid),
+		httpmock.NewJsonResponderOrPanic(200, compatibleVersions),
+	)
+}
+
+func configureCompatibleVersionsToFailToRespond(deviceUid string) {
+	httpmock.RegisterResponder(
+		http.MethodGet,
+		url.GetCompatibleAsaVersions(baseUrl, deviceUid),
+		httpmock.NewStringResponder(500, ""),
+	)
+}
+
+func configureUpgradeAsaToFailToRespond(deviceUid string) {
+	httpmock.RegisterResponder(
+		http.MethodPost,
+		url.GetUpgradeAsaUrl(baseUrl, deviceUid),
+		httpmock.NewStringResponder(500, ""),
+	)
+}
+
+func configureUpgradeAsaToRespondSuccessfully(deviceUid string, transaction transaction.Type) {
+	httpmock.RegisterResponder(
+		http.MethodPost,
+		url.GetUpgradeAsaUrl(baseUrl, deviceUid),
+		httpmock.NewJsonResponderOrPanic(200, transaction),
 	)
 }
 

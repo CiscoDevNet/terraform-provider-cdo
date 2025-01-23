@@ -2,9 +2,16 @@ package asa_test
 
 import (
 	"context"
+	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/connector"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/asa/asaconfig"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi/transaction"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi/transaction/transactionstatus"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi/transaction/transactiontype"
+	internalTesting "github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/testing"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/statemachine/state"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -77,7 +84,113 @@ func TestAsaUpdate(t *testing.T) {
 				assert.Equal(t, expectedUpdateOutput, *output)
 			},
 		},
-
+		{
+			testName: "fail to upgrade an ASA device if version not compatible",
+			input: asa.UpdateInput{
+				Uid:             asaDevice.Uid,
+				SoftwareVersion: "9.8(4)",
+				AsdmVersion:     "7.16(1)",
+			},
+			setupFunc: func(input asa.UpdateInput) {
+				configureCompatibleVersionsToRespondSuccessfully(input.Uid, model.CdoListResponse[asa.CompatibleVersion]{
+					Items: []asa.CompatibleVersion{
+						{SoftwareVersion: "9.16(4)", AsdmVersion: "7.12(1)"},
+						{SoftwareVersion: "9.16(6)100", AsdmVersion: "7.12(2)"},
+					},
+					Count: 2,
+				})
+			},
+			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+			},
+		},
+		{
+			testName: "fail to upgrade an ASA device if fetching version compatibility matrix fails",
+			input: asa.UpdateInput{
+				Uid:             asaDevice.Uid,
+				SoftwareVersion: "9.8(4)",
+				AsdmVersion:     "7.16(1)",
+			},
+			setupFunc: func(input asa.UpdateInput) {
+				configureCompatibleVersionsToFailToRespond(input.Uid)
+			},
+			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+			},
+		},
+		{
+			testName: "fail to upgrade an ASA device if triggering upgrade fails",
+			input: asa.UpdateInput{
+				Uid:             asaDevice.Uid,
+				SoftwareVersion: "9.8(4)",
+				AsdmVersion:     "7.16(1)",
+			},
+			setupFunc: func(input asa.UpdateInput) {
+				configureCompatibleVersionsToRespondSuccessfully(input.Uid, model.CdoListResponse[asa.CompatibleVersion]{
+					Items: []asa.CompatibleVersion{
+						{SoftwareVersion: "9.16(4)", AsdmVersion: "7.12(1)"},
+						{SoftwareVersion: "9.16(6)100", AsdmVersion: "7.12(2)"},
+					},
+					Count: 2,
+				})
+				configureUpgradeAsaToFailToRespond(input.Uid)
+			},
+			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
+				assert.NotNil(t, err)
+				assert.Nil(t, output)
+			},
+		},
+		{
+			testName: "successfully upgrade an ASA device",
+			input: asa.UpdateInput{
+				Uid:             asaDevice.Uid,
+				SoftwareVersion: "9.8(4)",
+				AsdmVersion:     "7.16(1)",
+			},
+			setupFunc: func(input asa.UpdateInput) {
+				transactionUid := uuid.New().String()
+				inProgressTransaction := transaction.Type{
+					TransactionUid:  uuid.New().String(),
+					TenantUid:       uuid.New().String(),
+					EntityUid:       uuid.New().String(),
+					EntityUrl:       "https://unittest.cdo.cisco.com/api/rest/v1/inventory/devices/" + input.Uid,
+					PollingUrl:      "https://unittest.cdo.cisco.com/api/rest/v1/transactions/" + transactionUid,
+					SubmissionTime:  "2024-09-10T20:10:00Z",
+					LastUpdatedTime: "2024-10-10T20:10:00Z",
+					Type:            transactiontype.UPGRADE_ASA,
+					Status:          transactionstatus.IN_PROGRESS,
+				}
+				doneTransaction := transaction.Type{
+					TransactionUid:  inProgressTransaction.TransactionUid,
+					TenantUid:       inProgressTransaction.TenantUid,
+					EntityUid:       inProgressTransaction.EntityUid,
+					EntityUrl:       inProgressTransaction.EntityUrl,
+					PollingUrl:      inProgressTransaction.PollingUrl,
+					SubmissionTime:  inProgressTransaction.SubmissionTime,
+					LastUpdatedTime: "2024-10-10T20:11:00Z",
+					Type:            inProgressTransaction.Type,
+					Status:          transactionstatus.DONE,
+				}
+				configureCompatibleVersionsToRespondSuccessfully(input.Uid, model.CdoListResponse[asa.CompatibleVersion]{
+					Items: []asa.CompatibleVersion{
+						{SoftwareVersion: input.SoftwareVersion, AsdmVersion: input.AsdmVersion},
+						{SoftwareVersion: "9.16(6)100", AsdmVersion: "7.12(2)"},
+					},
+					Count: 2,
+				})
+				configureUpgradeAsaToRespondSuccessfully(input.Uid, inProgressTransaction)
+				configureDeviceUpdateToRespondSuccessfully(input.Uid, asaDevice)
+				internalTesting.MockGetOk(fmt.Sprintf("%s/api/rest/v1/transactions/%s", baseUrl, transactionUid), doneTransaction)
+				configureDeviceUpdateToRespondSuccessfully(input.Uid, asaDevice)
+				configureDeviceReadToRespondSuccessfully(device.ReadOutput{Uid: input.Uid, State: "DONE", Status: "IDLE", ConnectivityState: 1})
+			},
+			assertFunc: func(input asa.UpdateInput, output *asa.UpdateOutput, err error, t *testing.T) {
+				assert.Nil(t, err)
+				assert.NotNil(t, output)
+			},
+		},
 		{
 			testName: "successfully updates ASA credentials",
 			input: asa.UpdateInput{

@@ -17,12 +17,14 @@ import (
 )
 
 type UpdateInput struct {
-	Uid      string    `json:"-"`
-	Name     string    `json:"name"`
-	Location string    `json:"-"`
-	Username string    `json:"-"`
-	Password string    `json:"-"`
-	Tags     tags.Type `json:"tags"`
+	Uid             string    `json:"-"`
+	Name            string    `json:"name"`
+	Location        string    `json:"-"`
+	Username        string    `json:"-"`
+	Password        string    `json:"-"`
+	SoftwareVersion string    `json:"-"`
+	AsdmVersion     string    `json:"-"`
+	Tags            tags.Type `json:"tags"`
 }
 
 type UpdateOutput = device.UpdateOutput
@@ -39,7 +41,22 @@ func NewUpdateInput(uid string, name string, username string, password string, t
 
 func Update(ctx context.Context, client http.Client, updateInp UpdateInput) (*UpdateOutput, error) {
 
-	client.Logger.Println("updating asa device")
+	if updateInp.AsdmVersion != "" || updateInp.SoftwareVersion != "" {
+		client.Logger.Printf("Upgrading ASA device to software version %s and ASDM version %s", updateInp.SoftwareVersion, updateInp.AsdmVersion)
+		err := ValidateVersionCompatibility(ctx, client, updateInp.Uid, updateInp.SoftwareVersion, updateInp.AsdmVersion)
+		if err != nil {
+			client.Logger.Println("Failed to validate version compatibility")
+			return nil, err
+		}
+
+		err = UpgradeAsa(ctx, client, updateInp.Uid, updateInp.SoftwareVersion, updateInp.AsdmVersion)
+		if err != nil {
+			client.Logger.Println("Failed to upgrade ASA")
+			return nil, err
+		}
+	}
+
+	client.Logger.Println("updating asa device (not upgrade")
 
 	if isSpecificDeviceIsRequired(updateInp) {
 

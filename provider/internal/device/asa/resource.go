@@ -366,9 +366,20 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 	)
 
 	tflog.Debug(ctx, fmt.Sprintf("Software version plan: %s, state: %s", planData.SoftwareVersion, stateData.SoftwareVersion))
-	if isSoftwareVersionUpdated(planData, stateData) || isAsdmVersionUpdated(planData, stateData) {
-		res.Diagnostics.AddError("Software version and ASDM version cannot be updated yet", "Coming soon: the ability to trigger ASA device upgrades by changing software version and ASDM version")
+	softwareVersionUpdated := !util.DoNormalisedVersionsMatch(planData.SoftwareVersion.ValueString(), stateData.SoftwareVersion.ValueString())
+	asdmVersionUpdated := !util.DoNormalisedVersionsMatch(planData.AsdmVersion.ValueString(), stateData.AsdmVersion.ValueString())
+
+	if asdmVersionUpdated && !softwareVersionUpdated {
+		res.Diagnostics.AddError("ASDM version cannot be updated without software version being updated", "ASDM version can only be updated if software version is also updated. This is a known issue which we will resolve shortly.")
 		return
+	}
+	if asdmVersionUpdated {
+		updateInp.AsdmVersion = planData.AsdmVersion.ValueString()
+		tflog.Debug(ctx, fmt.Sprintf("Updating ASDM version to %s", updateInp.AsdmVersion))
+	}
+	if softwareVersionUpdated {
+		updateInp.SoftwareVersion = planData.SoftwareVersion.ValueString()
+		tflog.Debug(ctx, fmt.Sprintf("Updating software version to %s", updateInp.SoftwareVersion))
 	}
 
 	if isNameUpdated(planData, stateData) {
@@ -391,27 +402,69 @@ func (r *AsaDeviceResource) Update(ctx context.Context, req resource.UpdateReque
 		updateInp.Password = planData.Password.ValueString()
 	}
 
-	updateOutp, err := r.client.UpdateAsa(ctx, *updateInp)
+	_, err = r.client.UpdateAsa(ctx, *updateInp)
 	if err != nil {
 		res.Diagnostics.AddError("failed to update ASA device", err.Error())
 		return
 	}
 
-	port, err := parsePort(updateOutp.Port)
+	readOutp, err := r.client.ReadAsa(ctx, asa.ReadInput{Uid: stateData.ID.ValueString()})
+	if err != nil {
+		if util.Is404Error(err) {
+			res.State.RemoveResource(ctx)
+			return
+		}
+		res.Diagnostics.AddError("unable to read ASA Device", err.Error())
+		return
+	}
+	asaSpecificDeviceReadOutp, err := r.client.ReadSpecificAsa(ctx, asa.ReadSpecificInput{Uid: stateData.ID.ValueString()})
+	if err != nil {
+		if util.Is404Error(err) {
+			res.State.RemoveResource(ctx)
+			return
+		}
+		res.Diagnostics.AddError("unable to read ASA Specific Device", err.Error())
+		return
+	}
+	port, err := parsePort(readOutp.Port)
 	if err != nil {
 		res.Diagnostics.AddError("unable to parse port", err.Error())
 		return
 	}
 
-	stateData.ID = types.StringValue(updateOutp.Uid)
+	tflog.Debug(ctx, fmt.Sprintf("On CDO --- Software version: %s, ASDM version: %s", readOutp.SoftwareVersion, asaSpecificDeviceReadOutp.Metadata.AsdmVersion))
+	tflog.Debug(ctx, fmt.Sprintf("Plan data  --- Software version: %s, ASDM version: %s", planData.SoftwareVersion, planData.AsdmVersion))
+	tflog.Debug(ctx, fmt.Sprintf("State data --- Software version: %s, ASDM version: %s", stateData.SoftwareVersion, stateData.AsdmVersion))
+
+	stateData.ID = types.StringValue(readOutp.Uid)
 	stateData.ConnectorType = types.StringValue(planData.ConnectorType.ValueString())
 	stateData.ConnectorName = getConnectorName(planData)
-	stateData.Name = types.StringValue(updateOutp.Name)
+	stateData.Name = types.StringValue(readOutp.Name)
 	stateData.SocketAddress = planData.SocketAddress
-	stateData.Host = types.StringValue(updateOutp.Host)
+	stateData.Host = types.StringValue(readOutp.Host)
 	stateData.Port = types.Int64Value(port)
 	stateData.Labels = planData.Labels
 	stateData.GroupedLabels = planData.GroupedLabels
+	if planData.SoftwareVersion.ValueString() != "" && util.DoNormalisedVersionsMatch(planData.SoftwareVersion.ValueString(), readOutp.SoftwareVersion) {
+		tflog.Debug(ctx, "Setting software version to plan value; the planned software version is set and same as read output value")
+		stateData.SoftwareVersion = planData.SoftwareVersion
+	} else if planData.SoftwareVersion.ValueString() == "" {
+		tflog.Debug(ctx, "Setting software version to read output value; the planned software version is not set")
+		stateData.SoftwareVersion = types.StringValue(readOutp.SoftwareVersion)
+	} else {
+		res.Diagnostics.AddError("Software version mismatch between plan and device", "Software version was set in plan, but the current version is not the same as the planned software version")
+		return
+	}
+	if planData.AsdmVersion.ValueString() != "" && util.DoNormalisedVersionsMatch(planData.AsdmVersion.ValueString(), asaSpecificDeviceReadOutp.Metadata.AsdmVersion) {
+		tflog.Debug(ctx, "Setting ASDM version to plan value; the planned ASDM version is set and same as read output value")
+		stateData.AsdmVersion = planData.AsdmVersion
+	} else if planData.AsdmVersion.ValueString() == "" {
+		tflog.Debug(ctx, "Setting ASDM version to read output value; the planned ASDM version is not set")
+		stateData.AsdmVersion = types.StringValue(asaSpecificDeviceReadOutp.Metadata.AsdmVersion)
+	} else {
+		res.Diagnostics.AddError("ASDM version mismatch between plan and device", "ASDM version was set in plan, but the current version is not the same as the planned ASDM version")
+		return
+	}
 
 	stateData.IgnoreCertificate = planData.IgnoreCertificate
 
@@ -453,10 +506,25 @@ func (r *AsaDeviceResource) ModifyPlan(ctx context.Context, req resource.ModifyP
 			return
 		}
 
-		if planData != nil && stateData != nil && strings.EqualFold(planData.SocketAddress.ValueString(), stateData.SocketAddress.ValueString()) {
-			tflog.Debug(ctx, "There is no change in the socket address; remove host and port diffs")
-			planData.Host = stateData.Host
-			planData.Port = stateData.Port
+		if planData != nil && stateData != nil {
+			// Normalize software versions
+			if planData.SoftwareVersion.ValueString() == "" || !isSoftwareVersionUpdated(planData, stateData) {
+				tflog.Debug(ctx, "There is no change in the ASA software version; remove diffs")
+				planData.SoftwareVersion = stateData.SoftwareVersion
+			}
+
+			// Normalize ASDM versions
+
+			if planData.AsdmVersion.ValueString() == "" || !isAsdmVersionUpdated(planData, stateData) {
+				tflog.Debug(ctx, "There is no change in the ASDM version; remove diffs")
+				planData.AsdmVersion = stateData.AsdmVersion
+			}
+
+			if strings.EqualFold(planData.SocketAddress.ValueString(), stateData.SocketAddress.ValueString()) {
+				tflog.Debug(ctx, "There is no change in the socket address; remove host and port diffs")
+				planData.Host = stateData.Host
+				planData.Port = stateData.Port
+			}
 		}
 
 		res.Diagnostics.Append(res.Plan.Set(ctx, &planData)...)
@@ -476,11 +544,11 @@ func isNameUpdated(planData, stateData *AsaDeviceResourceModel) bool {
 }
 
 func isSoftwareVersionUpdated(planData, stateData *AsaDeviceResourceModel) bool {
-	return !planData.SoftwareVersion.IsUnknown() && !planData.SoftwareVersion.Equal(stateData.SoftwareVersion)
+	return !util.DoNormalisedVersionsMatch(planData.SoftwareVersion.ValueString(), stateData.SoftwareVersion.ValueString())
 }
 
 func isAsdmVersionUpdated(planData, stateData *AsaDeviceResourceModel) bool {
-	return !planData.AsdmVersion.IsUnknown() && !planData.AsdmVersion.Equal(stateData.AsdmVersion)
+	return !util.DoNormalisedVersionsMatch(planData.AsdmVersion.ValueString(), stateData.AsdmVersion.ValueString())
 }
 
 func isLocationUpdated(planData, stateData *AsaDeviceResourceModel) bool {

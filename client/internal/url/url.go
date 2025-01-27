@@ -261,3 +261,7 @@ func GetCompatibleAsaVersions(baseUrl string, deviceUid string) string {
 func GetUpgradeAsaUrl(baseUrl string, deviceUid string) string {
 	return fmt.Sprintf("%s/api/rest/v1/inventory/devices/asas/%s/upgrades/trigger", baseUrl, deviceUid)
 }
+
+func GetFtdUpgradePackagesUrl(baseUrl string, deviceUid string) string {
+	return fmt.Sprintf("%s/api/rest/v1/inventory/devices/ftds/%s/upgrades/versions", baseUrl, deviceUid)
+}

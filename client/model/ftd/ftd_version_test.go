@@ -69,6 +69,16 @@ func TestFtdVersionComparison(t *testing.T) {
 			},
 		},
 		{
+			testName:      "Compare major.minor.patch versions semantically",
+			versionOneStr: "7.1.2",
+			versionTwoStr: "7.3.0",
+			assertFunc: func(t *testing.T, versionOne, versionTwo *ftd.Version) {
+				assert.True(t, versionOne.LessThan(versionTwo))
+				assert.True(t, versionTwo.GreaterThan(versionOne))
+				assert.False(t, versionTwo.Equal(versionOne))
+			},
+		},
+		{
 			testName:      "Compare equal major.minor.patch versions",
 			versionOneStr: "7.2.0",
 			versionTwoStr: "7.2.0",

@@ -19,12 +19,17 @@ func NewReadByUidInput(uid string) ReadByUidInput {
 }
 
 type ReadOutput struct {
-	Uid      string    `json:"uid"`
-	Name     string    `json:"name"`
-	Metadata Metadata  `json:"metadata,omitempty"`
-	State    string    `json:"state"`
-	Tags     tags.Type `json:"tags"`
+	Uid               string    `json:"uid"`
+	DeviceType        string    `json:"deviceType"`
+	Name              string    `json:"name"`
+	Metadata          Metadata  `json:"metadata,omitempty"`
+	State             string    `json:"state"`
+	ConnectivityState int       `json:"connectivityState"`
+	Tags              tags.Type `json:"tags"`
+	SoftwareVersion   string    `json:"softwareVersion"`
 }
+
+type FtdDevice = ReadOutput
 
 func ReadByUid(ctx context.Context, client http.Client, readInp ReadByUidInput) (*ReadOutput, error) {
 

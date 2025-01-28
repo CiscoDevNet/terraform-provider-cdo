@@ -6,6 +6,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"github.com/CiscoDevnet/terraform-provider-cdo/internal/device/ftd/ftdversion"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/msp/msp_tenant"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/msp/msp_tenant_user_api_token"
 	"github.com/CiscoDevnet/terraform-provider-cdo/internal/msp/msp_tenant_user_groups"
@@ -180,6 +181,7 @@ func (p *CdoProvider) Resources(ctx context.Context) []func() resource.Resource 
 		msp_tenant_users.NewMspManagedTenantUsersResource,
 		msp_tenant_user_api_token.NewMspManagedTenantUserApiTokenResource,
 		msp_tenant_user_groups.NewMspManagedTenantUserGroupsResource,
+		ftdversion.NewResource,
 	}
 }
 

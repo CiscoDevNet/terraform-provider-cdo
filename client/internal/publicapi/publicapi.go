@@ -58,7 +58,7 @@ func untilDoneOrError(ctx context.Context, client http.Client, transactionPollin
 			return false, err
 		}
 		*trans = t
-		client.Logger.Printf("status=%s\n", t.Status)
+		client.Logger.Printf("Polled transaction:\ntransactionUid=%s,\nstatus=%s,\ndetails%s\n", t.TransactionUid, t.Status, t.Details)
 		return isDoneOrError(t), nil
 	}
 }

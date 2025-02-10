@@ -15,6 +15,7 @@ type Type struct {
 	LastUpdatedTime string                 `json:"lastUpdatedTime"`
 	Type            transactiontype.Type   `json:"transactionType"`
 	Status          transactionstatus.Type `json:"cdoTransactionStatus"`
+	Details         map[string]string      `json:"transactionDetails"`
 	ErrorMessage    string                 `json:"errorMessage"`
 	ErrorDetails    map[string]string      `json:"errorDetails"`
 }

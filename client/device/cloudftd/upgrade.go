@@ -5,13 +5,16 @@ import (
 	"errors"
 	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/retry"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/url"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model/ftd"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"time"
 )
 
 type FtdUpgradeInput struct {
-	Uid             string `json:"uid"`
-	SoftwareVersion string `json:"softwareVersion"`
+	UpgradePackageUid string `json:"upgradePackageUid"`
 }
 
 type FtdUpgradeService interface {
@@ -30,7 +33,9 @@ func NewFtdUpgradeService(ctx context.Context, client *http.Client) FtdUpgradeSe
 	}
 }
 
-func (f *ftdUpgradeService) Upgrade(uid string, softwareVersion string) (*FtdDevice, error) {
+func (f *ftdUpgradeService) Upgrade(uid string, softwareVersionStr string) (*FtdDevice, error) {
+	var upgradePackage *UpgradePackage
+	var newSoftwareVersion *ftd.Version
 	ftdDevice, err := ReadByUid(f.Ctx, *f.Client, ReadByUidInput{Uid: uid})
 	if err != nil {
 		return nil, err
@@ -46,11 +51,46 @@ func (f *ftdUpgradeService) Upgrade(uid string, softwareVersion string) (*FtdDev
 	if err != nil {
 		return nil, err
 	}
-	err = f.validateFtdVersion(ftdDevice, softwareVersion)
+	newSoftwareVersion, err = f.validateFtdVersion(ftdDevice, softwareVersionStr)
+	if err != nil {
+		return nil, err
+	}
+	if newSoftwareVersion == nil {
+		tflog.Debug(f.Ctx, "New software version is the same as the current software version. No upgrade needed.")
+		return ftdDevice, nil
+	}
+	upgradePackage, err = f.validateUpgradePathExistsTo(ftdDevice, newSoftwareVersion)
 	if err != nil {
 		return nil, err
 	}
 
+	tflog.Debug(f.Ctx, "Triggering the FTD device upgrade.")
+	return f.doUpgrade(upgradePackage, ftdDevice)
+}
+
+func (f *ftdUpgradeService) doUpgrade(upgradePackage *UpgradePackage, ftdDevice *FtdDevice) (*FtdDevice, error) {
+	upgradeUrl := url.GetFtdUpgradeUrl(f.Client.BaseUrl(), ftdDevice.Uid)
+	transaction, err := publicapi.TriggerTransaction(f.Ctx, *f.Client, upgradeUrl, FtdUpgradeInput{
+		UpgradePackageUid: upgradePackage.UpgradePackageUid,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// poll every 30 seconds for up to 60 minutes
+	_, err = publicapi.WaitForTransactionToFinish(f.Ctx, *f.Client, transaction, retry.NewOptionsBuilder().
+		Logger(f.Client.Logger).
+		Timeout(60*time.Minute).
+		Retries(-1).
+		EarlyExitOnError(true).
+		Message(fmt.Sprintf("Upgrading FTD device to version: %s)", upgradePackage.SoftwareVersion)).
+		Delay(30*time.Second).
+		Build())
+	if err != nil {
+		return nil, err
+	}
+
+	f.Client.Logger.Println("FTD upgrade successful.")
 	return ftdDevice, nil
 }
 
@@ -70,49 +110,44 @@ func (f *ftdUpgradeService) validateConnectivityState(ftdDevice *FtdDevice) erro
 	return nil
 }
 
-func (f *ftdUpgradeService) validateFtdVersion(ftdDevice *FtdDevice, softwareVersionToUpgradeToStr string) error {
+func (f *ftdUpgradeService) validateFtdVersion(ftdDevice *FtdDevice, softwareVersionToUpgradeToStr string) (*ftd.Version, error) {
 	versionOnDevice, err := ftd.NewVersion(ftdDevice.SoftwareVersion)
 	if err != nil {
 		f.Client.Logger.Printf("error parsing software version %s on device\n", ftdDevice.SoftwareVersion)
-		return err
+		return nil, err
 	}
 	versionToUpgradeTo, err := ftd.NewVersion(softwareVersionToUpgradeToStr)
 	if err != nil {
 		f.Client.Logger.Printf("error parsing software version %s to upgrade to\n", softwareVersionToUpgradeToStr)
-		return err
+		return nil, err
 	}
-
 	if versionOnDevice.GreaterThan(versionToUpgradeTo) {
-		return errors.New(fmt.Sprintf("FTD device is on version %s, which is newer than the"+
+		return nil, errors.New(fmt.Sprintf("FTD device is on version %s, which is newer than the"+
 			" version to upgrade to: %s", ftdDevice.SoftwareVersion, softwareVersionToUpgradeToStr))
 	}
 	if versionOnDevice.LessThan(versionToUpgradeTo) {
-		err = f.validateUpgradePathExistsTo(ftdDevice, versionToUpgradeTo)
-		if err != nil {
-			return err
-		}
-		return errors.New("upgrade implementation coming soon")
+		return versionToUpgradeTo, nil
 	}
 
-	return nil
+	return nil, nil
 }
 
-func (f *ftdUpgradeService) validateUpgradePathExistsTo(ftdDevice *FtdDevice, toVersion *ftd.Version) error {
+func (f *ftdUpgradeService) validateUpgradePathExistsTo(ftdDevice *FtdDevice, toVersion *ftd.Version) (*UpgradePackage, error) {
 	upgradePackages, err := ReadUpgradePackages(f.Ctx, *f.Client, ftdDevice.Uid)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	for _, upgradePackage := range *upgradePackages {
 		tflog.Debug(f.Ctx, fmt.Sprintf("Checking upgrade package: %s", upgradePackage.SoftwareVersion))
 		softwareVersion, err := ftd.NewVersion(upgradePackage.SoftwareVersion)
 		if err != nil {
 			f.Client.Logger.Printf("error parsing software version %s in upgrade package\n", upgradePackage.SoftwareVersion)
-			return err
+			return nil, err
 		}
 		if softwareVersion.Equal(toVersion) {
-			return nil
+			return &upgradePackage, nil
 		}
 	}
 
-	return errors.New(fmt.Sprintf("%s is not a valid version to upgrade FTD device %s to", toVersion.String(), ftdDevice.Name))
+	return nil, errors.New(fmt.Sprintf("%s is not a valid version to upgrade FTD device %s to", toVersion.String(), ftdDevice.Name))
 }

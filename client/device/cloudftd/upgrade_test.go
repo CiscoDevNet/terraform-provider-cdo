@@ -2,8 +2,12 @@ package cloudftd_test
 
 import (
 	"errors"
+	"fmt"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/device/cloudftd"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/http"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi/transaction"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi/transaction/transactionstatus"
+	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/internal/publicapi/transaction/transactiontype"
 	"github.com/CiscoDevnet/terraform-provider-cdo/go-client/model"
 	"github.com/google/uuid"
 	"github.com/jarcoal/httpmock"
@@ -164,6 +168,9 @@ func TestUpgrade(t *testing.T) {
 				assert.NotNil(t, ftdDevice)
 				assert.Nil(t, err)
 				assert.Equal(t, expectedFtdDevice, ftdDevice)
+				info := httpmock.GetCallCountInfo()
+				assert.Equal(t, 0, info[mockhttp.MethodGet+baseUrl+"/aegis/rest/v1/services/targets/devices/"+ftdDevice.Uid],
+					"Should not call the API to get the device's upgrade packages because the device's software version is equal to the version to upgrade to")
 			},
 		},
 		{
@@ -196,9 +203,8 @@ func TestUpgrade(t *testing.T) {
 				assert.Equal(t, expectedError.Error(), err.Error())
 			},
 		},
-		// TODO this test should be changed to a success test once the upgrade implementation is done
 		{
-			testName:        "Upgrade FTD device - fail because the code has not been implemented yet",
+			testName:        "Upgrade FTD device - Do not fail when the device is upgraded successfully",
 			uid:             uuid.New().String(),
 			softwareVersion: "7.2.5.1-29",
 			expectedFtdDevice: &cloudftd.FtdDevice{
@@ -211,8 +217,31 @@ func TestUpgrade(t *testing.T) {
 				Tags:              nil,
 				SoftwareVersion:   "7.2.3",
 			},
-			expectedError: errors.New("upgrade implementation coming soon"),
+			expectedError: nil,
 			setupFunc: func(deviceUid string, softwareVersion string, ftdDevice *cloudftd.FtdDevice) {
+				transactionUid := uuid.New().String()
+				inProgressTransaction := transaction.Type{
+					TransactionUid:  uuid.New().String(),
+					TenantUid:       uuid.New().String(),
+					EntityUid:       uuid.New().String(),
+					EntityUrl:       baseUrl + "/api/rest/v1/inventory/devices/" + deviceUid,
+					PollingUrl:      baseUrl + "/api/rest/v1/transactions/" + transactionUid,
+					SubmissionTime:  "2025-09-07T20:10:00Z",
+					LastUpdatedTime: "2025-10-07T20:10:00Z",
+					Type:            transactiontype.UPGRADE_FTD,
+					Status:          transactionstatus.IN_PROGRESS,
+				}
+				doneTransaction := transaction.Type{
+					TransactionUid:  inProgressTransaction.TransactionUid,
+					TenantUid:       inProgressTransaction.TenantUid,
+					EntityUid:       inProgressTransaction.EntityUid,
+					EntityUrl:       inProgressTransaction.EntityUrl,
+					PollingUrl:      inProgressTransaction.PollingUrl,
+					SubmissionTime:  inProgressTransaction.SubmissionTime,
+					LastUpdatedTime: "2025-10-07T20:11:00Z",
+					Type:            inProgressTransaction.Type,
+					Status:          transactionstatus.DONE,
+				}
 				httpmock.RegisterResponder(mockhttp.MethodGet,
 					baseUrl+"/aegis/rest/v1/services/targets/devices/"+deviceUid,
 					httpmock.NewJsonResponderOrPanic(200, ftdDevice))
@@ -220,11 +249,17 @@ func TestUpgrade(t *testing.T) {
 					Items: upgradePackages,
 					Count: len(upgradePackages),
 				}))
+				httpmock.RegisterResponder(mockhttp.MethodPost,
+					baseUrl+"/api/rest/v1/inventory/devices/ftds/"+ftdDevice.Uid+"/upgrades/trigger",
+					httpmock.NewJsonResponderOrPanic(202, inProgressTransaction))
+				httpmock.RegisterResponder(mockhttp.MethodGet,
+					fmt.Sprintf("%s/api/rest/v1/transactions/%s", baseUrl, transactionUid),
+					httpmock.NewJsonResponderOrPanic(200, doneTransaction))
 			},
 			assertFunc: func(ftdDevice *cloudftd.FtdDevice, err error, expectedFtdDevice *cloudftd.FtdDevice, expectedError error, t *testing.T) {
-				assert.Nil(t, ftdDevice)
-				assert.NotNil(t, err)
-				assert.Equal(t, expectedError.Error(), err.Error())
+				assert.NotNil(t, ftdDevice)
+				assert.Nil(t, err)
+				assert.Equal(t, expectedFtdDevice, ftdDevice)
 			},
 		},
 	}

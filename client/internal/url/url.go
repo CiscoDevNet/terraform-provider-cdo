@@ -265,3 +265,7 @@ func GetUpgradeAsaUrl(baseUrl string, deviceUid string) string {
 func GetFtdUpgradePackagesUrl(baseUrl string, deviceUid string) string {
 	return fmt.Sprintf("%s/api/rest/v1/inventory/devices/ftds/%s/upgrades/versions", baseUrl, deviceUid)
 }
+
+func GetFtdUpgradeUrl(baseUrl string, deviceUid string) string {
+	return fmt.Sprintf("%s/api/rest/v1/inventory/devices/ftds/%s/upgrades/trigger", baseUrl, deviceUid)
+}

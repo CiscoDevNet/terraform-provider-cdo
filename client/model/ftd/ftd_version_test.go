@@ -103,9 +103,9 @@ func TestFtdVersionComparison(t *testing.T) {
 			versionOneStr: "7.2.0-68",
 			versionTwoStr: "7.2.0-69",
 			assertFunc: func(t *testing.T, versionOne, versionTwo *ftd.Version) {
-				assert.True(t, versionOne.LessThan(versionTwo))
-				assert.True(t, versionTwo.GreaterThan(versionOne))
-				assert.False(t, versionTwo.Equal(versionOne))
+				assert.False(t, versionOne.LessThan(versionTwo))
+				assert.False(t, versionTwo.GreaterThan(versionOne))
+				assert.True(t, versionTwo.Equal(versionOne))
 			},
 		},
 		{

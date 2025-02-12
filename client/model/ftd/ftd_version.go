@@ -161,8 +161,8 @@ func (v *Version) GreaterThanEqual(o *Version) bool {
 }
 
 // Equal tests if two versions are equal to each other.
-// Note, versions can be equal with different metadata since metadata
-// is not considered part of the comparable version.
+// Note, versions can be equal with different build numbers or metadata
+// since they are not considered part of the comparable version.
 func (v *Version) Equal(o *Version) bool {
 	if v == o {
 		return true
@@ -176,8 +176,8 @@ func (v *Version) Equal(o *Version) bool {
 // Compare compares this version to another one. It returns -1, 0, or 1 if
 // the version smaller, equal, or larger than the other version.
 //
-// Versions are compared by X.Y.Z. Build metadata is ignored. Prerelease is
-// lower than the version without a prerelease. Compare always takes into account
+// Versions are compared by W.X.Y.Z. Build numbers and metadata are ignored.
+// Prerelease is lower than the version without a prerelease. Compare always takes into account
 // prereleases. If you want to work with ranges using typical range syntaxes that
 // skip prereleases if the range is not looking for them use constraints.
 func (v *Version) Compare(o *Version) int {
@@ -191,9 +191,6 @@ func (v *Version) Compare(o *Version) int {
 		return d
 	}
 	if d := compareSegment(v.Hotfix(), o.Hotfix()); d != 0 {
-		return d
-	}
-	if d := compareSegment(v.Buildnum(), o.Buildnum()); d != 0 {
 		return d
 	}
 
